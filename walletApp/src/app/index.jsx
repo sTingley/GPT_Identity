@@ -2,10 +2,8 @@ import React from 'react';
 import {render} from 'react-dom';
 import { Router, Route, IndexRoute, hashHistory } from 'react-router'
 
-
 import Menu from './Components/menu.jsx';
 import Header from './Components/header.jsx';
-
 
 import Home from './Components/Home.jsx';
 import NameRegister from './Components/NameRegister.jsx';
@@ -18,10 +16,10 @@ class App extends React.Component {
       	<Header />
 	    	<div className="container-fluid">
 		      <div className="row">
-		        <div className="col-sm-3 col-md-2 sidebar">
+		        <div className="col-sm-3 col-md-2 sidebar hidden-md hidden-sm">
 		        	<Menu />
 		        </div>
-		        <div className="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+		        <div className="col-sm-9 col-md-9 col-lg-10 col-lg-offset-2 col-md-offset-3 main">
 		        	{this.props.children}
 		        </div>
 		      </div>

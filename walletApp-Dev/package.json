@@ -17,6 +17,10 @@
     "react": "^15.3.0",
     "react-dom": "^15.3.0",
     "react-router": "^2.6.1",
+    "secp256k1": "^3.1.0",
     "webpack": "^1.13.1"
+  },
+  "devDependencies": {
+    "json-loader": "^0.5.4"
   }
 }

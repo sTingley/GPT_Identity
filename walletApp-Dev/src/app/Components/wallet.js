@@ -1,7 +1,9 @@
-var wallet = {};
-//var newcryp = newcryp;
+var crypto = require('crypto');
+var secp256k1 = require('secp256k1/js');
 
-function byteToHexString(uint8arr) {
+var wallet = {};
+
+wallet.byteToHexString = function (uint8arr) {
   if (!uint8arr) {
     return '';
   }
@@ -17,7 +19,7 @@ function byteToHexString(uint8arr) {
   return hexStr.toUpperCase();
 }
 
-function hexStringToByte(str) {
+wallet.hexStringToByte = function (str) {
   if (!str) {
     return new Uint8Array();
   }
@@ -31,7 +33,7 @@ function hexStringToByte(str) {
 }
 
 // string to uint array
-function stringToTypedArray(s) {
+wallet.stringToTypedArray =function (s) {
     var escstr = encodeURIComponent(s);
     var binstr = escstr.replace(/%([0-9A-F]{2})/g, function(match, p1) {
         return String.fromCharCode('0x' + p1);
@@ -55,7 +57,7 @@ wallet.getKeyPair = function() {
 	console.log(secp256k1);
 	var privKey;
 	do {
-	  privKey = newcryp.randomBytes(32);
+	  privKey = crypto.randomBytes(32);
 	} while (!secp256k1.privateKeyVerify(privKey));
 
 	// get the public key in a compressed format
@@ -74,3 +76,5 @@ wallet.getSign = function(msg) {
 	var sign = secp256k1.sign(msg, this.keypair.privateKey);
 	return sign;					
 }
+
+module.exports = wallet;

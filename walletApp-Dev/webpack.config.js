@@ -2,8 +2,8 @@ var webpack = require('webpack');
 var path = require('path');
 
 
-var DEPLOY_PATH = "C:/xampp/htdocs/walletclient";
-var BUILD_DIR = path.resolve(DEPLOY_PATH+'/public');
+var DEPLOY_PATH = "/Applications/XAMPP/xamppfiles/htdocs/walletapp";
+var BUILD_DIR = path.resolve(DEPLOY_PATH+'/js');
 var APP_DIR = path.resolve(__dirname, 'src/app');
 
 var config = {
@@ -18,7 +18,8 @@ var config = {
         test : /\.jsx?/,
         include : APP_DIR,
         loader : 'babel'
-      }
+      },
+      { test: /\.json$/, loader: "json" }
     ]
   }
 };

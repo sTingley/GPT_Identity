@@ -1,15 +1,40 @@
 import React from 'react';
+import wallet from './wallet.js';
+
 
 class Home extends React.Component {
+
+	constructor(props){
+		super(props);
+		this.state = {
+			pwd:'',
+			hashCreated: false,
+			pubKey:'',
+			priKey: ''
+		};
+		this.keyGenerate = this.keyGenerate.bind(this);
+	}
 
 	/*
 	 * Generate Public/Private key pair from SECP256k1
 	 */
 	keyGenerate(e){
 		e.preventDefault();
+		var password = e.target.pwd.value;
+		console.log(password);
 		wallet.getKeyPair();
-		var pubKey = byteToHexString(wallet.keypair.publicKey);
-		var priKey = byteToHexString(wallet.keypair.privateKey));
+		var pubKey = wallet.byteToHexString(wallet.keypair.publicKey);
+		var priKey = wallet.byteToHexString(wallet.keypair.privateKey);
+
+
+		this.setState({
+			pwd: password,
+			hashCreated: true,
+			pubKey: pubKey,
+			priKey: priKey
+		});
+
+
 		console.log("Public Key : " + pubKey + ", privateKey " + priKey);
 	}
 

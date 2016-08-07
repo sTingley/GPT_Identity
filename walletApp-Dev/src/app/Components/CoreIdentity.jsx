@@ -6,12 +6,10 @@ class CoreIdentity extends React.Component {
 	    	<div id="CoreIdentityContainer">
 	    		<h1>Core Identity</h1>
 	    		<form method="POST" id="register" role="form">
-
-							
 							<div className="form-group">
 								<label htmlFor="name">Name</label>
 								<input className="form-control" id="name" type="text" name="name"/>
-							</div>
+							</div>	
 							<div className="form-group">
 								<label htmlFor="officialid1">Official ID 1</label>
 								<input className="form-control" id="officialid1" type="text" name="officialid1"/>

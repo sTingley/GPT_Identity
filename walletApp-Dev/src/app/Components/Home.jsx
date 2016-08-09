@@ -1,6 +1,39 @@
 import React from 'react';
 import wallet from './wallet.js';
 
+class DownloadFile extends React.Component{
+
+	constructor(props){
+		super(props);
+		this.state = {
+			download_url: props.params[1],
+			pwd: props.params[0],
+			priv_key: props.params[2]
+		};
+	}
+
+	render(){
+		return (
+			<div className="download_container row"><hr/>
+			<h1>Success! Your wallet has been generated.</h1>
+			<div className="col-md-6">
+				<div className="form-group">
+					<label htmlFor="download_button">Keystore/JSON File(Encrypted)</label>
+					<a href={this.state.download_url} download="keypairs.json" name="download_button" className="btn btn-primary btn-block">DOWNLOAD</a>
+				</div>
+			</div>
+			<div className="col-md-6">
+				<div className="form-group">
+					<label htmlFor="private_key">Private Key</label>
+					<textarea name="private_key" className="form-control" id="private_key" disabled>{this.state.priv_key}</textarea>
+				</div>
+			</div>
+		   </div>	
+		);
+	}
+
+};
+
 
 class Home extends React.Component {
 
@@ -9,9 +42,10 @@ class Home extends React.Component {
 		this.state = {
 			pwd:'',
 			hashCreated: false,
-			pubKey:'',
-			priKey: ''
+			download_url:'',
+			private_key:'',
 		};
+		this.wallet = new wallet();
 		this.keyGenerate = this.keyGenerate.bind(this);
 	}
 
@@ -21,21 +55,15 @@ class Home extends React.Component {
 	keyGenerate(e){
 		e.preventDefault();
 		var password = e.target.pwd.value;
-		console.log(password);
-		wallet.getKeyPair();
-		var pubKey = wallet.byteToHexString(wallet.keypair.publicKey);
-		var priKey = wallet.byteToHexString(wallet.keypair.privateKey);
-
-
-		this.setState({
-			pwd: password,
-			hashCreated: true,
-			pubKey: pubKey,
-			priKey: priKey
-		});
-
-
-		console.log("Public Key : " + pubKey + ", privateKey " + priKey);
+		this.wallet.setPassword(password);
+		this.wallet.generateKeys();
+		if(this.wallet.getPubKey()) {
+			var url = this.wallet.makeWalletFile();
+			this.setState({ pwd: password, hashCreated: true, download_url: url, private_key: this.wallet.getPrivateKey() });
+			console.log(url);
+		} else {
+			console.log("Error: creating key pairs");
+		}
 	}
 
 	render () {
@@ -52,6 +80,7 @@ class Home extends React.Component {
 						<button className="btn btn-primary" type="submit">Generate Keypair</button>
 					</div>
 				</form>
+				{ this.state.hashCreated ? <DownloadFile params={[this.state.pwd, this.state.download_url, this.state.private_key]} /> : null }
 	    	</div>
 	    );
    }

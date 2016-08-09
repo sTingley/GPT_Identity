@@ -18,9 +18,10 @@ class Header extends React.Component {
           </div>
           <div id="navbar" className="navbar-collapse collapse">
              <ul className="nav navbar-nav hidden-lg">
-                <li className="active"><Link to='/'>Home</Link></li>
-                <li><Link to='register'>Name Register</Link></li>
-               <li><Link to='identity'>Core Identity</Link></li>
+                <li><Link to='/home' activeClassName="active">Home</Link></li>
+                <li><Link to='/upload' activeClassName="active">Upload Keys</Link></li>
+                <li><Link to='/register' activeClassName="active">Name Register</Link></li>
+                <li><Link to='/identity' activeClassName="active">Core Identity</Link></li>
             </ul>
             <ul className="nav navbar-nav navbar-right">
                 <li><a href="#">Faq</a></li>

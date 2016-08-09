@@ -1,6 +1,6 @@
 import React from 'react';
 import {render} from 'react-dom';
-import { Router, Route, IndexRoute, hashHistory } from 'react-router'
+import { Router, Route, IndexRedirect, hashHistory } from 'react-router';
 
 import Menu from './Components/menu.jsx';
 import Header from './Components/header.jsx';
@@ -8,6 +8,7 @@ import Header from './Components/header.jsx';
 import Home from './Components/Home.jsx';
 import NameRegister from './Components/NameRegister.jsx';
 import CoreIdentity from './Components/CoreIdentity.jsx';
+import UploadKeyStore from './Components/Upload.jsx';
 
 class App extends React.Component {
   render () {
@@ -32,9 +33,11 @@ class App extends React.Component {
 render((
 	<Router history={hashHistory}>
     	<Route path="/" component={App}>
-      		<IndexRoute component={Home} />
+      		<IndexRedirect to="/home" />
+          <Route path="home" component={Home} />
       		<Route path="register" component={NameRegister} />
       		<Route path="identity" component={CoreIdentity} />
+          <Route path="upload" component={UploadKeyStore} />
       	</Route>
     </Router>
 ), document.getElementById('app'));

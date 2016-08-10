@@ -2,8 +2,9 @@
 
 ## Ballot (ballot.js)
 
-	--TODO :-- Should create Ballot.sol instance
-	--TODO :-- Should listen event from Ballot.sol, backend should send "public key" and "message" along with the event
+	TODO : Should create Ballot.sol instance
+	TODO : Should listen event from Ballot.sol, backend should send "public key" and "message" along with the event
+	
 	- For now assuming event has triggerd ballot.js creates JSON file named with public key under the <Digital Twin>/notifications (path can be changed anywhere)
 	- If file already exists, read the files and push the messages at the top
 	- <public_key>.json has 
@@ -26,8 +27,8 @@
 
 ## WalletApp
 
-	--TODO :-- Notification request need to triggered when the user uploaded keystore file
-	--TODO :-- If notification exists that has to be shown in wallet app
+	TODO : Notification request need to triggered when the user uploaded keystore file
+	TODO : If notification exists that has to be shown in wallet app
 
 
 

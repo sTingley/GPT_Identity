@@ -23,7 +23,7 @@
 - Read/send notifications based on public key in case of notification request from wallet app
 - If notifications empty returns empty braces ({});
 - Expected url from wallet App
-	>http://<host:port>/notify/public_key
+>http://<host:port>/notify/public_key
 
 ## WalletApp
 

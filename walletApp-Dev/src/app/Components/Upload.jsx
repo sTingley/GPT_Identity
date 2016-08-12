@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router';
 
 class Notify extends React.Component {
 	constructor(props){
@@ -10,7 +11,7 @@ class Notify extends React.Component {
 		//var css = "alert alert-"+type;
 		return (
 			<div className="alert alert-info" role="alert">
-			  You received an notification <b>Open</b>
+			  <span className="glyphicon glyphicon-alert"></span>You received an notification <Link to="/tovote">Click to open</Link>
 			</div>
 		);
 	}
@@ -71,7 +72,7 @@ class UploadKeyStore extends React.Component {
 				}
 			}
 		}
-		console.log("State====>", this.state);
+		this.props.loginHandler(this.state);
 	}
 
 	render () {

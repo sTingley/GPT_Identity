@@ -25,7 +25,11 @@ var server = http.createServer(function(req, res) {
   var key = params[2];
 
   function writeResponse(response, res){
-  	res.writeHead(200, { 'Content-Type': 'application/json' });
+  	res.writeHead(200, { 
+  		'Content-Type': 'text/plain',
+  		'Access-Control-Allow-Origin' : 'http://localhost',
+    	'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE' 
+    });
 	res.write(response);
 	res.end();
   }
@@ -34,7 +38,7 @@ var server = http.createServer(function(req, res) {
 		var key = params[2];
 		if(fs.existsSync("notifications/"+key+".json")){
 			fs.readFile("notifications/"+key+".json", function(err, data){
-				writeResponse(data.toString(), res);
+				writeResponse(data, res);
 			});
 		} else {
 			writeResponse("{}", res);	

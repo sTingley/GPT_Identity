@@ -1,0 +1,16 @@
+{
+  "name": "proxy-server",
+  "version": "1.0.0",
+  "description": "Capture HTTP request from client",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Arun Kumar Sekar",
+  "license": "ISC",
+  "dependencies": {
+    "http": "0.0.0",
+    "http-proxy": "^1.14.0",
+    "restify": "^4.1.1"
+  }
+}

@@ -1,5 +1,20 @@
 import React from 'react';
 
+class Notify extends React.Component {
+	constructor(props){
+		super(props);
+		this.prop = props;
+	}
+	render(){
+		//var type = this.prop.params.type || "info";
+		//var css = "alert alert-"+type;
+		return (
+			<div className="alert alert-info" role="alert">
+			  You received an notification <b>Open</b>
+			</div>
+		);
+	}
+};
 
 // TODO : Drag and Upload
 // TODO	: Dropbox/google cloud upload for mobile/tablet users
@@ -8,8 +23,24 @@ class UploadKeyStore extends React.Component {
 
 	constructor(props){
 		super(props);
-		this.state = {pubKey:"",priKey:"", fileread: false};
+		this.url = "http://localhost:5050/notify/";
+		this.state = {
+			pubKey:"",
+			priKey:"", 
+			fileread: false,
+			notify: false,
+			coid:null
+		};
 		this.uploadFile = this.uploadFile.bind(this);
+		this.onResponse = this.onResponse.bind(this);
+	}
+
+	getUrl(){
+		return this.url + this.state.pubKey;
+	}
+
+	toVote(){
+		$.get(this.getUrl(), this.onResponse);
 	}
 
 	uploadFile(e){
@@ -19,14 +50,28 @@ class UploadKeyStore extends React.Component {
 		if(fileType == "json"){
 			var reader = new FileReader();
 			reader.onload = function(event){
-				console.log(event.target.result);
 		        var obj = JSON.parse(event.target.result);
 		        this.setState({pubKey:obj.public_key, priKey: obj.private_key, fileread:true });
+		        this.toVote();
 			}.bind(this);
 			reader.readAsText(e.target.files.files[0]);
 		} else {
 			alert("Unknown file format ! We support only JSON");
 		}
+	}
+
+	onResponse(result){
+		var data = JSON.parse(result);
+		var msgs = data.messages;
+		this.setState({coid: msgs});
+		if(msgs.length > 0){
+			for(var i=0; i<msgs.length; i++){
+				if(msgs[i].read_status == false){
+					this.setState({notify: true});
+				}
+			}
+		}
+		console.log("State====>", this.state);
 	}
 
 	render () {
@@ -36,6 +81,7 @@ class UploadKeyStore extends React.Component {
 	    	<div className="panel panel-default">
 	    	<div className="panel-heading"><strong>Upload Key Store File</strong> <small>JSON(.json) file format only supported</small></div>
 	        <div className="panel-body">
+	         {this.state.notify ? <Notify /> : null}
 	          <h4>Select file from your computer</h4>
 	          <form action="" method="post" encType="multipart/form-data" id="js-upload-form" onSubmit={this.uploadFile}>
 	            <div className="form-inline">

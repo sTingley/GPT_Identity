@@ -9,7 +9,8 @@
   "author": "Arun Kumar Sekar",
   "license": "ISC",
   "dependencies": {
-    "http": "0.0.0",
-    "http-proxy": "^1.14.0"
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "http-proxy-middleware": "^0.17.1"
   }
 }

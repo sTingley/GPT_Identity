@@ -1,56 +1,57 @@
-var fs = require ('fs');
-var express = require('express');
-var app = express();
+var http = require ('http');
+var erisC = require('eris-contracts');
 
-
-var ballot = function(){
-
-	this.folderpath = "/Users/arunkumar/Node/proxy/notifications/";
-	this.filename = "";
-
-	this.writeFile = function(key, message){
-		this.filename = this.folderpath+key+".json";
-		var timestamp = Number(new Date()); 
-		if (fs.existsSync(this.filename)) {
-			var _this = this;
-			fs.readFile(this.filename, function(err, data){
-				if(err) return console.log("Error reading existing file", err);
-				var notifications = JSON.parse(data.toString());
-				var msg = {
-					msg: message,
-					read_status: false,
-					time: timestamp
-				}
-				notifications.messages.unshift(msg);
-				fs.writeFile(_this.filename, JSON.stringify(notifications), function(err){
-					if(err) return console.log("Error updating file", err);
-				});
-			});
-		} else {
-			var msg = {
-				id: key,
-				messages: [{
-					msg: message,
-					read_status: false,
-					time: timestamp
-				}]
-			};
-			var _this = this;
-			fs.writeFile(this.filename, JSON.stringify(msg), function (err) {
-			  if (err) return console.log("Error creating file ", err);
-			  console.log(_this.filename + " created");
-			});
-		}
-	}
+var ballotApp = function(){
+	
+	// eris:chain id with full privilages
+    this.chain = 'mychain_full_000';
+    // Change eris:db url
+    this.erisdburl = "http://10.100.99.100:1337/rpc";
+	
+    this.contractData = require("./epm.json");
+    this.contractAddress = this.contractData['Ballot'];
+    this.erisAbi = JSON.parse(fs.readFileSync("./abi/"+this.contractAddress));
+    this.accountData = require("./accounts.json");
+    this.contractMgr = erisC.newContractManagerDev(this.erisdburl, this.accountData[this.chain]);
+    this.ballotContract = this.contractMgr.newContractFactory(this.erisAbi).at(this.contractAddress);
+	
+	var self = this;
+	
+	this.dataReady = function(postData){
+		if(!postData.pubKey && !postData.proposalID) return false;	// Nothing to do without public key and proposal id
+		postData = JSON.stringify(postData);
+		var req = this.sendProposal(this.onResponse);
+		req.write(postData);
+		req.end();
+	};
+	
+	this.sendProposal = function(callback){
+		return http.request({
+			method: 'POST',
+			host: 'localhost',
+			port: 5050,
+			path: "/ballot/notify",
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded'
+			}
+		}, callback);
+	};
+	
+	this.onResponse = function(res){
+		res.on('data',function(post_data){	console.log("Received post data", post_data);	});
+		console.log(response);
+	};
 }
-// this method has to initiated when the event fired from ballot.sol
-var ballot = new ballot();
-ballot.writeFile("1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740","You have notification");
 
-app.get("/notify", function(req, res){
-  console.log("comes to ballot");
-});
+var ballot = new ballotApp();
+ballot.dataReady({
+			"pubKey": "1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740",
+			"proposalID": "0987654321",				
+			"coidData": JSON.stringify({"name":"abc123","uniqueId":"123abcd","uniqueIdAttributes":["abc1","abc2"],"ownershipId":"addd1234","ownerIdList":["23456"],"controlId":"cc1234","controlIdList":["1755"],"ownershipTokenId":"03483677","ownershipTokenAttributes":["ba1","a2","a3"],"ownershipTokenQuantity":"5","controlTokenId":"24345","controlTokenAttributes":["a1", "b2","c3"],"controlTokenQuantity":"5","identityRecoveryIdList":["123456"],"recoveryCondition":"1"})});
 
-app.listen(8082,function(){
-	console.log("Ballot Server 8082 is running.....");
-});
+
+			
+			
+const server = http.createServer();				 
+console.log("ballot app server running @ 8082");
+server.listen(8082);			

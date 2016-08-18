@@ -6,10 +6,9 @@ var ballotCtrl = {
 	PATH: "/Users/arunkumar/GPT_Identity/Notification/DigitalTwin/notifications/",
 	
 	saveNotification: function(req, res) {
-
 		var params = req.body;
 		if(!params.pubKey) return false;
-
+		
 		var folderpath = this.PATH;
 		var filename = folderpath + params.pubKey + ".json";
 		var error = false;
@@ -21,7 +20,8 @@ var ballotCtrl = {
 				if(err) error = true;
 				var notifications = JSON.parse(data.toString());
 				var msg = {
-					msg: saveMsg.proposal,
+					proposalID: params.proposalID,
+					coidData: params.coidData,
 					read_status: false,
 					time: timestamp
 				}
@@ -33,7 +33,8 @@ var ballotCtrl = {
 			var message = {
 				id: pubKey,
 				messages: [{
-					msg: saveMsg.proposal,
+					proposalID: params.proposalID,
+					coidData: params.coidData,
 					read_status: false,
 					time: timestamp
 				}]

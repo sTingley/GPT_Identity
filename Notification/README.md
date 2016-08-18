@@ -15,7 +15,7 @@
 - Digital Twin is now capabale of handle multiple contract through (route, filter, rewritePath)
 - As of now, there Two api's created for Ballot App and redirection for GateKeeper
 - ballotCtrl.js is a controller file which has Ballot Read/Write functionality(in future may have multiple controller file for Digital Twin).
-- Sample JSON file exists in 
+- Sample JSON file exists in [public_key.json](https://github.com/sTingley/GPT_Identity/blob/master/Notification/DigitalTwin/notifications/1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740.json)
 
 ### API Style
 _Example: http://localhost:5050/ballot/notify_

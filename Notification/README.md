@@ -1,34 +1,49 @@
 # Digital Twin / Ballot
 
 ## Ballot (ballot.js)
+- [ ] TODO : Should create Ballot.sol instance
+- [ ] TODO : Should listen event from Ballot.sol, backend should send "public key" and "message" along with the event
 
--TODO : Should create Ballot.sol instance
--TODO : Should listen event from Ballot.sol, backend should send "public key" and "message" along with the event
-
-- For now assuming event has triggerd ballot.js creates JSON file named with public key under the <Digital Twin>/notifications (path can be changed anywhere)
-- If file already exists, read the files and push the messages at the top
-- <public_key>.json has 
-	- id : <public key>
-	- messages :  <Array holds all messages>
-		- msg : <message received from backend>
-		- time : <created timestamp>
-		- read_status : <intially false, once the user responded it will be true>
+- Listen the event from ballot contract
+- Event should come along with `PublicKey`, `proposalID` and `COID` data
+- Ballot app submit the data via HTTP request (POST) request to Digital Twin
 - runs in 8082 port
 
 ## Digital Twin
 
 - Runs on 5050 port
-- Filter the request from wallet app
-- For now all requests from wallet app redirected to (app.js which is runs on 8081) expect notifications
-- Read/send notifications based on public key in case of notification request from wallet app
-- If notifications empty returns empty braces ({});
-- Expected url from wallet App
->http://<host:port>/notify/public_key
+- Digital Twin is now capabale of handle multiple contract through (route, filter, rewritePath)
+- As of now, there Two api's created for Ballot App and redirection for GateKeeper
+- ballotCtrl.js is a controller file which has Ballot Read/Write functionality(in future may have multiple controller file for Digital Twin).
+- Sample JSON file exists in 
+
+### API Style
+_Example: http://localhost:5050/ballot/notify_
+- **http://localhost:5050** - Host:Port
+- **ballot** - Contract (`gk` for GateKeeper)
+- **notify** - Functionality
+	- What ever left in the url considered as arguments (Query String - GET)
+
+### API's
+```
+ /ballot/notify (POST)
+```
+- Invoked by ballot app
+- Mandatory parameters are COID, proposalID, pubKey
+- Content-Type must be `application/x-www-form-urlencoded`
+- Resposible to write proposals in JSON against public key
+
+```
+ /ballot/proposals/:pubKey (GET)
+ ```
+- Invoked by Wallet App
+- public key is madatory
+- Responsible to send proposals to the wallet if exists
 
 ## WalletApp
 
--TODO : Notification request need to triggered when the user uploaded keystore file
--TODO : If notification exists that has to be shown in wallet app
+- [x] TODO : If notification exists that has to be shown in wallet app
+- [ ] TODO : Yes/No votting functionality has to be done
 
 
 

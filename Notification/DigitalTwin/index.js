@@ -2,7 +2,6 @@ var app = require('express')(),
     proxy = require('http-proxy-middleware'),
     bodyParser = require('body-parser');
 
-
 var ballotCtrl = require('./ballotCtrl.js');
   
  // for parsing application/json
@@ -11,34 +10,21 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
-/**
- * API responsible to wite coid data
- * Method : POST
- * Inputs : JSON Object (Mandatory : pubKey, proposalID, coidData )
- */
-app.post('/ballot/notify', ballotCtrl.saveNotification);
+app.post('/ballot/writeNotify', ballotCtrl.writeNotification);
+app.get('/ballot/readNotify/:pubKey', ballotCtrl.fetchNotification);
 
-/**
- * API responsible to send coid data to wallet app
- * Method : GET
- * Inputs : <public Key>
- * API invoked from Wallet
- */
-app.get('/ballot/proposals/:pubKey', ballotCtrl.FetchCoidData);
+app.post('/ballot/writeCoid', ballotCtrl.writeCoidData);
+app.get('/ballot/readCoid/:proposalID/publicKey/:pubKey/', ballotCtrl.fetchCoidData);
 
-
-/**
- * If gate keeper functionality that has to be proxied
- */
-var proxyConfig = {
+var proxyConfigGk = {
   target: 'http://localhost:8081',
   pathRewrite: (path, req) => {
     // small tweek to make work existing gatekeeper api
     return path.replace(path, path.replace("/gk",""));
   }
 };
+app.use('/gk/**', proxy(proxyConfigGk));
 
-app.use('/gk/**', proxy(proxyConfig));
 
 console.log("Digital Twin running at 5050");
 app.listen(5050);

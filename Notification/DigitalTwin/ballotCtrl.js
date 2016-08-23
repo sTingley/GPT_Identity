@@ -1,62 +1,128 @@
 var fs = require ('fs');
 
+// var PATH = "/Users/arunkumar/GPT_Identity/Notification/DigitalTwin/notifications/";
+
+var PATH = "D:/Source/GPT_Identity-master/Notification/DigitalTwin/notifications/";
+
+var notify_suffix =  "_notify";
+
+var coid_suffix =  "_coid";
+
 var ballotCtrl = {
-	
-	// notification COID data JSON file path
-	PATH: "/Users/arunkumar/GPT_Identity/Notification/DigitalTwin/notifications/",
-	
-	saveNotification: function(req, res) {
+
+	// Just write notification 
+	writeNotification: function(req, res){
+		
 		var params = req.body;
-		if(!params.pubKey) return false;
-		
-		var folderpath = this.PATH;
-		var filename = folderpath + params.pubKey + ".json";
-		var error = false;
-		
+		if(!params.pubKey) res.status(400).json({"Error": "Invalid input parameters"});
+		var fileName = PATH + params.pubKey + notify_suffix + ".json";
 		var timestamp = Number(new Date()); 
-		var _this = this;
-		if (fs.existsSync(filename)) {
-			fs.readFile(filename, function(err, data){
-				if(err) error = true;
-				var notifications = JSON.parse(data.toString());
-				var msg = {
-					proposalID: params.proposalID,
-					coidData: params.coidData,
-					read_status: false,
-					time: timestamp
-				}
-				notifications.messages.unshift(msg);
-				fs.writeFile(filename, JSON.stringify(notifications), callback);
-			});
-		} 
-		else {
-			var message = {
-				id: pubKey,
-				messages: [{
-					proposalID: params.proposalID,
-					coidData: params.coidData,
-					read_status: false,
-					time: timestamp
-				}]
+		
+		var dataFormat = () => {
+			return {
+				type: 'proposal',
+				proposal_id: params.proposalID,
+				message: params.message,
+				read_status: false,
+				time: timestamp
 			};
-			fs.writeFile(filename, JSON.stringify(message),callback);
+		};
+		
+		if (fs.existsSync(fileName)) {
+			fs.readFile(fileName, (err, data) => {
+				if(err) res.status(400).json({"Error": "Unable to read notifications"});
+				var notifications = JSON.parse(data.toString());
+				notifications.messages.unshift(dataFormat());
+				fs.writeFile(fileName, JSON.stringify(notifications), (err) => {
+					if(err){
+						res.status(400).json({"Error": "Unable to create file under " + fileName});
+					}
+					res.json({"Msg":"Notification updated successfully"});
+				});
+			});
+		} else {
+			var msg = {
+				id: params.pubKey,//public key
+				messages:[dataFormat()]
+			}
+			fs.writeFile(fileName, JSON.stringify(msg), (err) => {
+				if(err){
+					res.status(400).json({"Error": "Unable to write message in " + fileName});
+				}
+				res.json({"Msg":"Notification updated successfully"});
+			});
 		}
 	},
-
-	FetchCoidData: function(req, res){
-		var returnMsg = "{}";
+	
+	fetchNotification: function(req, res){
 		var param = req.params;
-		var filename = this.PATH + param.pubKey + ".json";
-		var _this = this;
-		if(pubKey && fs.existsSync(filename)){
-			fs.readFile(filename, function(err, data){
-				_this.writeResponse(data.toString(), res);
+		var fileName = PATH + param.pubKey + notify_suffix + ".json";
+		if(param.pubKey && fs.existsSync(fileName)){
+			fs.readFile(fileName, 'utf8', function(err, data){
+				if(err) res.status(400).json({"Error": "Unable to read notifications"});
+				res.json({'data': JSON.parse(data)});
+			});
+		} else {
+			res.json({'data': 'Notifications unavailable'});
+		}
+	},
+	
+	writeCoidData: function(req, res) {
+		var params = req.body;
+		if(!params.pubKey || !params.proposalID){
+			res.status(400).json({"Error": "Invalid input parameters"});
+			return;
+		} 
+		var fileName = PATH + params.pubKey + coid_suffix + ".json";
+		var timestamp = Number(new Date());
+		
+		var dataFormat = () => {
+			return {
+				proposalID: params.proposalID,
+				vote_state: false,
+				time: timestamp,
+				coid: JSON.parse(params.coid)
+			}
+		};
+		
+		if (fs.existsSync(fileName)) {
+			fs.readFile(fileName, (err, data) => {
+				if(err) res.status(400).json({"Error": "Unable to read notifications"});
+				var notifications = JSON.parse(data.toString());
+				notifications.data.unshift(dataFormat());
+				fs.writeFile(fileName, JSON.stringify(notifications), (err) => {
+					if(err){
+						res.status(400).json({"Error": "Unable to create file under " + fileName});
+					}
+					res.json({"Msg":"Proposal updated successfully"});
+				});
+			});
+		} else {
+			var msg = {
+				id: params.pubKey,//public key
+				data:[dataFormat()]
+			}
+			fs.writeFile(fileName, JSON.stringify(msg), (err) => {
+				if(err){
+					res.status(400).json({"Error": "Unable to write message in " + fileName});
+				}
+				res.json({"Msg":"Proposal updated successfully" });
 			});
 		}
-		else {
-			_this.writeResponse(returnMsg, res);
+		
+	},
+	
+	fetchCoidData: function(req, res){
+		var param = req.params;
+		var fileName = PATH + param.pubKey + coid_suffix + ".json";
+		if(param.pubKey && fs.existsSync(fileName)){
+			fs.readFile(fileName, 'utf8', function(err, data){
+				if(err) res.status(400).json({"Error": "Unable to read notifications"});
+				res.json({'data': JSON.parse(data)});
+			});
+		} else {
+			res.json({'data': 'Notifications unavailable'});
 		}
 	}
 }
 module.exports = ballotCtrl;
-

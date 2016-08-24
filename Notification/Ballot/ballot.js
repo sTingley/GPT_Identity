@@ -1,8 +1,14 @@
-var http = require ('http');
+/*
+ *	TODO: Create Event listener for Ballot contract
+ *	TODO: Test with real data (end to end notification flow)
+ * 	TODO: Proposal expiary notification
+ */
+var app = require("express")();
+var request = require("superagent");
 var erisC = require('eris-contracts');
 
 var ballotApp = function(){
-	
+
 	// eris:chain id with full privilages
     this.chain = 'mychain_full_000';
     // Change eris:db url
@@ -15,43 +21,45 @@ var ballotApp = function(){
     this.contractMgr = erisC.newContractManagerDev(this.erisdburl, this.accountData[this.chain]);
     this.ballotContract = this.contractMgr.newContractFactory(this.erisAbi).at(this.contractAddress);
 	
+	this.twinUrl = "http://localhost:5050";
 	var self = this;
 	
-	this.dataReady = function(postData){
-		if(!postData.pubKey && !postData.proposalID) return false;	// Nothing to do without public key and proposal id
-		postData = JSON.stringify(postData);
-		var req = this.sendProposal(this.onResponse);
-		req.write(postData);
-		req.end();
+	this.createNotification = function(inputs){
+		request.post(this.twinUrl + "/ballot/writeNotify")
+			.send(inputs)
+			.set('Accept', 'application/json')
+			.end((err,res) => {
+				if(res.status == 200){
+					// do something
+				}
+			});
 	};
 	
-	this.sendProposal = function(callback){
-		return http.request({
-			method: 'POST',
-			host: 'localhost',
-			port: 5050,
-			path: "/ballot/notify",
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded'
-			}
-		}, callback);
-	};
-	
-	this.onResponse = function(res){
-		res.on('data',function(post_data){	console.log("Received post data", post_data);	});
-		console.log(response);
-	};
+	this.createCoid = function(inputs){
+		request.post(this.twinUrl + "/ballot/writeCoid")
+			.send(inputs)
+			.set('Accept', 'application/json')
+			.end((err,res) => {
+				if(res.status == 200){
+					// do something
+				}
+			});
+	}
 }
 
+/*
+ * Example Usage
 var ballot = new ballotApp();
-ballot.dataReady({
-			"pubKey": "1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740",
-			"proposalID": "0987654321",				
-			"coidData": JSON.stringify({"name":"abc123","uniqueId":"123abcd","uniqueIdAttributes":["abc1","abc2"],"ownershipId":"addd1234","ownerIdList":["23456"],"controlId":"cc1234","controlIdList":["1755"],"ownershipTokenId":"03483677","ownershipTokenAttributes":["ba1","a2","a3"],"ownershipTokenQuantity":"5","controlTokenId":"24345","controlTokenAttributes":["a1", "b2","c3"],"controlTokenQuantity":"5","identityRecoveryIdList":["123456"],"recoveryCondition":"1"})});
-
-
-			
-			
-const server = http.createServer();				 
-console.log("ballot app server running @ 8082");
-server.listen(8082);			
+var formData = {pubKey: '1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740',
+					proposalID: '1234567890',
+					message: 'You are invited to vote for an proposal'
+				};
+var coidData = {
+	pubKey: '1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740',
+	proposalID: '1234567890',
+	coid: JSON.stringify({"name":"abc123","uniqueId":"123abcd","uniqueIdAttributes":["abc1","abc2"],"ownershipId":"addd1234","ownerIdList":["23456"],"controlId":"cc1234","controlIdList":["1755"],"ownershipTokenId":"03483677","ownershipTokenAttributes":["ba1","a2","a3"],"ownershipTokenQuantity":"5","controlTokenId":"24345","controlTokenAttributes":["a1", "b2","c3"],"controlTokenQuantity":"5","identityRecoveryIdList":["123456"],"recoveryCondition":"1"})
+}			
+	ballot.createNotification(formData);
+	ballot.createCoid(coidData);
+*/
+app.listen(8082);

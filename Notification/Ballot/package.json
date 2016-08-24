@@ -9,6 +9,7 @@
   "author": "Arun Kumar Sekar",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.14.0"
+    "express": "^4.14.0",
+    "superagent": "^2.2.0"
   }
 }

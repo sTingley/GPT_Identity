@@ -3,6 +3,10 @@ import {render} from 'react-dom';
 import { Router, Route, IndexRedirect, hashHistory } from 'react-router';
 
 // TODO: import components on demand
+// TODO: Remove code duplication, Wallet main menu exists in two places (menu.jsx and menu.jsx) for responsive make that as single component.
+// TODO: Login state should maintain in LocalStorage or Browser Cookie, as of now its in window
+// TODO: Asset should be implemented with real data
+
 import Menu from './Components/menu.jsx';
 import Header from './Components/header.jsx';
 import Home from './Components/Home.jsx';
@@ -10,6 +14,7 @@ import NameRegister from './Components/NameRegister.jsx';
 import CoreIdentity from './Components/CoreIdentity.jsx';
 import UploadKeyStore from './Components/Upload.jsx';
 import ToVote from './Components/ToVote.jsx';
+import Assets from './Components/Assets.jsx';
 
 // saving state in global scope so that the variable could be accessible through out the application
 // Dirty hack, need to change
@@ -79,6 +84,7 @@ render((
 			<Route path="tovote" component={ToVote} onEnter={validateLogin} />
 			<Route path="identity" component={CoreIdentity} />
 			<Route path="upload" component={UploadKeyStore} />
+			<Route path="assets" component={Assets} />
       	</Route>
     </Router>
 ), document.getElementById('app'));

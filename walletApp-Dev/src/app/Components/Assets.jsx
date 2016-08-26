@@ -1,10 +1,18 @@
 import React, {Component} from 'react';
 import { Link } from 'react-router';
 
+import TagsInput from 'react-tagsinput';
+
 class Modal extends Component {
 	
 	constructor(props){
 		super(props);
+		this.state = {
+			asset: props.asset || {},
+			asset_class: [],
+			asset_subclass: []
+		};
+		this.handleClassChange = this.handleClassChange.bind(this);
 	}
 	
 	componentDidMount(){
@@ -12,8 +20,28 @@ class Modal extends Component {
         $("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
     }
 	
+	handleClassChange(tags){
+		this.setState({asset_class:tags});
+	}
+	
+	handleSubClassChange(tags){
+		this.setState({asset_subclass: tags});
+	}
+	
 	render(){
 		var prop = this.props.asset;
+		var classInput = {
+			addKeys: [13,188],	// Enter and comma
+			value: this.state.asset_class,
+			onChange: this.handleClassChange,
+			inputProps: {placeholder: ""}
+		};
+		var subClassInput = {
+			addKeys: [13,188],	// Enter and comma
+			value: this.state.asset_subclass,
+			onChange: this.handleSubClassChange.bind(this),
+			inputProps: {placeholder: ""}
+		};
 		return(
 			<div className="modal fade" id="assetDetails" key={prop.asset_id} tabIndex="-1" role="dialog" aria-labelledby="asset">
 			  <div className="modal-dialog" role="document">
@@ -32,6 +60,14 @@ class Modal extends Component {
 							<tr>
 								<td>Asset Description</td>
 								<td>{prop.asset_name} description</td>
+							</tr>
+							<tr>
+								<td>Asset Class<p className="text-info">Use comma/enter to add class</p></td>
+								<td><TagsInput {...classInput}  /></td>
+							</tr>
+							<tr>
+								<td>Asset SubClass<p className="text-info">Use comma/enter to add sub class</p></td>
+								<td><TagsInput {...subClassInput}  /></td>
 							</tr>
 							<tr>
 								<td>Public Key</td>
@@ -72,10 +108,11 @@ class Assets extends Component {
 	constructor(props){
 		super(props);
 		
+		// static values
 		this.state = {
 			assets_active: false,
 			showDetails: false,
-			accounts: [{acc_id:123, acc_name:'Account - I'}, {acc_id:456, acc_name:'Account - II'}],
+			accounts: [{acc_id:123, acc_name:'Wallet - I'}, {acc_id:456, acc_name:'Wallet - II'}],
 			own_assets: [{asset_id:789, asset_name:'COID'},{asset_id:101112, asset_name:'Phone'},{asset_id:131415, asset_name:'House'}],
 			controlled_assets:[{asset_id:161718, asset_name:'Parents House'},{asset_id:192021, asset_name:'My Car'}],
 			active_asset: {}
@@ -111,8 +148,23 @@ class Assets extends Component {
 		var cssClass = (this.state.assets_active) ? 'show' : 'hidden';
 		return (
 			<div id="assets-container" className="assets">
+				<div className="row" id="search-bar">
+					<div className="col-md-6">
+						<h3 className="margin0px">Manage Assets</h3>
+					</div>
+					<div className="col-md-6">
+						<form className="form-inline">
+							<div className="form-group pull-right">
+								<input type="text" name="search-assets" id="search-assets" className="form-control" placeholder="Search Assets" />
+								<button type="submit" className="btn btn-primary">
+								<span className="glyphicon glyphicon-search"></span>
+								Search</button>
+							</div>
+						</form>
+					</div>
+				</div>
 				<div id="my-accounts">
-					<h3>My Accounts</h3> <hr/>
+					<h4>My Wallets</h4> <hr/>
 					<div className="all-accounts">
 						<div className="row accounts">
 							{this.state.accounts.map((acc) => {

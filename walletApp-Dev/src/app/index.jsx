@@ -2,10 +2,14 @@ import React from 'react';
 import {render} from 'react-dom';
 import { Router, Route, IndexRedirect, hashHistory } from 'react-router';
 
+// InProgress: Search/Save Class for assets
+
 // TODO: import components on demand
-// TODO: Remove code duplication, Wallet main menu exists in two places (menu.jsx and menu.jsx) for responsive make that as single component.
+// TODO: Remove code duplication, Wallet main menu exists in two places (menu.jsx and header.jsx) for responsive make that as single component.
 // TODO: Login state should maintain in LocalStorage or Browser Cookie, as of now its in window
 // TODO: Asset should be implemented with real data
+// TODO: Asset menu only applicable for logged in users, this will be taking care once the functionality get done
+
 
 import Menu from './Components/menu.jsx';
 import Header from './Components/header.jsx';

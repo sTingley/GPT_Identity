@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import { Link } from 'react-router';
-
 import TagsInput from 'react-tagsinput';
+
+//import jsonDB from './jsonDB.js';
 
 class Modal extends Component {
 	
@@ -110,26 +111,18 @@ class Assets extends Component {
 		
 		// static values
 		this.state = {
-			assets_active: false,
 			showDetails: false,
-			accounts: [{acc_id:123, acc_name:'Wallet - I'}, {acc_id:456, acc_name:'Wallet - II'}],
+			wallet: {pubKey:"1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740", priKey:"1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740"},
 			own_assets: [{asset_id:789, asset_name:'COID'},{asset_id:101112, asset_name:'Phone'},{asset_id:131415, asset_name:'House'}],
 			controlled_assets:[{asset_id:161718, asset_name:'Parents House'},{asset_id:192021, asset_name:'My Car'}],
 			active_asset: {}
 		};
 		
+		//var db = new jsonDB("test");
+		
 		// event handlers must attached with current scope
-		this.accountHandler = this.accountHandler.bind(this);
 		this.assetHandler = this.assetHandler.bind(this);
 		this.hideHandler = this.hideHandler.bind(this);
-	}
-	
-	accountHandler(acc){
-		var acc_id = acc.acc_id;
-		if(acc_id){
-			this.setState({ assets_active: true });
-			//alert(acc_id);
-		}
 	}
 	
 	assetHandler(asset){
@@ -145,7 +138,6 @@ class Assets extends Component {
 	}
 	
 	render(){
-		var cssClass = (this.state.assets_active) ? 'show' : 'hidden';
 		return (
 			<div id="assets-container" className="assets">
 				<div className="row" id="search-bar">
@@ -164,21 +156,15 @@ class Assets extends Component {
 					</div>
 				</div>
 				<div id="my-accounts">
-					<h4>My Wallets</h4> <hr/>
+					<h4>My Wallet</h4> <hr/>
 					<div className="all-accounts">
 						<div className="row accounts">
-							{this.state.accounts.map((acc) => {
-								return(
-									<button type="button" key={acc.acc_id} className="btn btn-primary" onClick={() => this.accountHandler(acc)}>
-										<span className="glyphicon glyphicon-lock"></span>
-										{acc.acc_name}
-									</button>
-								);
-							})}
+							<p><b>Public Key : </b>{this.state.wallet.pubKey}</p>
+							<p><b>Private Key : </b>{this.state.wallet.priKey}</p>
 						</div>
 					</div>
 				</div>
-				<div id="own-assets" className={cssClass}>
+				<div id="own-assets">
 					<h4>My Owned Assets</h4> <hr/>
 					<div className="own-assets">
 						<div className="row assets">
@@ -193,7 +179,7 @@ class Assets extends Component {
 						</div>
 					</div>
 				</div>
-				<div id="controlled-assets" className={cssClass}>
+				<div id="controlled-assets">
 					<h4>My Controlled Assets</h4> <hr/>
 					<div className="row assets">
 						{this.state.controlled_assets.map((asset) => {

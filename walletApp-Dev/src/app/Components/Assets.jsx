@@ -2,16 +2,19 @@ import React, {Component} from 'react';
 import { Link } from 'react-router';
 import TagsInput from 'react-tagsinput';
 
-//import jsonDB from './jsonDB.js';
+import AssetTags from './classAndSubClass.js';
+
+// TODO: Static public/private keys has to be changed
 
 class Modal extends Component {
 	
 	constructor(props){
 		super(props);
+		this.tags = new AssetTags('1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740', props.asset.asset_id);
 		this.state = {
 			asset: props.asset || {},
-			asset_class: [],
-			asset_subclass: []
+			asset_class: this.tags.getAssetData("classes"),
+			asset_subclass: this.tags.getAssetData("subclasses")
 		};
 		this.handleClassChange = this.handleClassChange.bind(this);
 	}
@@ -23,10 +26,12 @@ class Modal extends Component {
 	
 	handleClassChange(tags){
 		this.setState({asset_class:tags});
+		this.tags.updateClasses(tags, this.props.asset.asset_id, "classes");
 	}
 	
 	handleSubClassChange(tags){
 		this.setState({asset_subclass: tags});
+		this.tags.updateClasses(tags,this.props.asset.asset_id, "subclasses");
 	}
 	
 	render(){
@@ -101,7 +106,8 @@ class Modal extends Component {
 }
 
 Modal.propTypes = {
-  hideHandler: React.PropTypes.func.isRequired	// hideHandler method must exists in parent component
+  hideHandler: React.PropTypes.func.isRequired,	// hideHandler method must exists in parent component
+  syncHandler: React.PropTypes.func.isRequired
 };
 
 class Assets extends Component {
@@ -115,14 +121,14 @@ class Assets extends Component {
 			wallet: {pubKey:"1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740", priKey:"1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740"},
 			own_assets: [{asset_id:789, asset_name:'COID'},{asset_id:101112, asset_name:'Phone'},{asset_id:131415, asset_name:'House'}],
 			controlled_assets:[{asset_id:161718, asset_name:'Parents House'},{asset_id:192021, asset_name:'My Car'}],
-			active_asset: {}
+			active_asset: {},
+			show_only:[]
 		};
-		
-		//var db = new jsonDB("test");
 		
 		// event handlers must attached with current scope
 		this.assetHandler = this.assetHandler.bind(this);
 		this.hideHandler = this.hideHandler.bind(this);
+		this.searchHandler = this.searchHandler.bind(this);
 	}
 	
 	assetHandler(asset){
@@ -137,6 +143,25 @@ class Assets extends Component {
 		this.setState({showDetails: false, active_asset:{} });
 	}
 	
+	searchHandler(e){
+		var str = e.target.value.trim();
+		var _this = this;
+		setTimeout(function(){
+			var data = JSON.parse(localStorage.getItem(_this.state.wallet.pubKey));
+			var indexed = [];
+			for(var assetID in data){
+				var allTags  = data[assetID].classes.concat(data[assetID].subclasses);
+				allTags.map((ele) => {
+					if(ele.toLowerCase() == str.toLowerCase()){
+						indexed.push(assetID);
+					}
+				})
+			}
+			_this.setState({show_only:indexed});
+		}, 350);
+		if(!str.length) this.setState({show_only:[]});
+	}
+	
 	render(){
 		return (
 			<div id="assets-container" className="assets">
@@ -147,10 +172,10 @@ class Assets extends Component {
 					<div className="col-md-6">
 						<form className="form-inline">
 							<div className="form-group pull-right">
-								<input type="text" name="search-assets" id="search-assets" className="form-control" placeholder="Search Assets" />
-								<button type="submit" className="btn btn-primary">
-								<span className="glyphicon glyphicon-search"></span>
-								Search</button>
+								<div className="input-group">
+									<input type="text" name="search-assets" id="search-assets" className="form-control" placeholder="Search Assets" onKeyUp={this.searchHandler} />
+									<div className="input-group-addon"><span className="glyphicon glyphicon-search"></span></div>
+								</div>
 							</div>
 						</form>
 					</div>
@@ -169,8 +194,15 @@ class Assets extends Component {
 					<div className="own-assets">
 						<div className="row assets">
 							{this.state.own_assets.map((asset) => {
+								var cssClass = "btn btn-success";
+								console.log(this.state.show_only);
+								if(this.state.show_only.length > 0){
+									if(this.state.show_only.toString().indexOf(asset.asset_id.toString()) == -1){
+										cssClass += " hidden";
+									} else cssClass.replace("hidden","");
+								}
 								return(
-									<button type="button" key={asset.asset_id} className="btn btn-success" onClick={() => this.assetHandler(asset)}>
+									<button type="button" key={asset.asset_id} className={cssClass} onClick={() => this.assetHandler(asset)}>
 										<span className="glyphicon glyphicon-ok-circle"></span>
 										{asset.asset_name}
 									</button>
@@ -183,8 +215,14 @@ class Assets extends Component {
 					<h4>My Controlled Assets</h4> <hr/>
 					<div className="row assets">
 						{this.state.controlled_assets.map((asset) => {
+							var cssClass = "btn btn-info";
+							if(this.state.show_only.length > 0){
+								if(this.state.show_only.toString().indexOf(asset.asset_id.toString()) >= 0){
+									cssClass += " show";
+								} else cssClass += " hidden";
+							}
 							return(
-								<button type="button" key={asset.asset_id} className="btn btn-info" onClick={() => this.assetHandler(asset)}>
+								<button type="button" key={asset.asset_id} className={cssClass} onClick={() => this.assetHandler(asset)}>
 									<span className="glyphicon glyphicon-link"></span>
 									{asset.asset_name}
 								</button>

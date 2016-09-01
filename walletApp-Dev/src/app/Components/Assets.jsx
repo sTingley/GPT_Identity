@@ -106,8 +106,7 @@ class Modal extends Component {
 }
 
 Modal.propTypes = {
-  hideHandler: React.PropTypes.func.isRequired,	// hideHandler method must exists in parent component
-  syncHandler: React.PropTypes.func.isRequired
+  hideHandler: React.PropTypes.func.isRequired	// hideHandler method must exists in parent component
 };
 
 class Assets extends Component {
@@ -195,7 +194,6 @@ class Assets extends Component {
 						<div className="row assets">
 							{this.state.own_assets.map((asset) => {
 								var cssClass = "btn btn-success";
-								console.log(this.state.show_only);
 								if(this.state.show_only.length > 0){
 									if(this.state.show_only.toString().indexOf(asset.asset_id.toString()) == -1){
 										cssClass += " hidden";

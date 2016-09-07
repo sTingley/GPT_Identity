@@ -20,12 +20,16 @@ import UploadKeyStore from './Components/Upload.jsx';
 import ToVote from './Components/ToVote.jsx';
 import Assets from './Components/Assets.jsx';
 
+import Documents from './Components/Documents.jsx';
+import NewUpload from './Components/NewUpload.jsx';
+import AllDocuments from './Components/AllDocuments.jsx';
+
 // saving state in global scope so that the variable could be accessible through out the application
 // Dirty hack, need to change
 window.login = false;
 
 class App extends React.Component {
-	
+
   constructor(props){
 	  super(props);
 	  this.state = {
@@ -45,11 +49,11 @@ class App extends React.Component {
 	  });
 	  login = this.state.login;
   }
-  
+
   getcoid(){
 	return this.state.coid;
   }
-  
+
   render () {
 	return (
 	  <div>
@@ -82,13 +86,18 @@ function validateLogin(nextState, replaceState){
 render((
 	<Router history={hashHistory}>
     	<Route path="/" component={App}>
-			<IndexRedirect to="/home" />
-			<Route path="home" component={Home} />
-			<Route path="register" component={NameRegister} />
-			<Route path="tovote" component={ToVote} onEnter={validateLogin} />
-			<Route path="identity" component={CoreIdentity} />
-			<Route path="upload" component={UploadKeyStore} />
-			<Route path="assets" component={Assets} />
+					<IndexRedirect to="/home" />
+					<Route path="home" component={Home} />
+					<Route path="register" component={NameRegister} />
+					<Route path="tovote" component={ToVote} onEnter={validateLogin} />
+					<Route path="identity" component={CoreIdentity} />
+					<Route path="upload" component={UploadKeyStore} />
+					<Route path="assets" component={Assets} />
+					<Route path="docs" component={Documents}>
+						<IndexRedirect to="/docs/upload" />
+						<Route path="/docs/upload" component={NewUpload} />
+						<Route path="/docs/alldocs" component={AllDocuments} />
+					</Route>
       	</Route>
     </Router>
 ), document.getElementById('app'));

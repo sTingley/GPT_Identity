@@ -8,19 +8,24 @@ class NewUpload extends Component {
 		this.state = {
 			files:[]
 		}
-		this.onDrop = this.onDrop.bind(this);
-		this.removeFile = this.removeFile.bind(this);
+		this.uploadFile = this.uploadFile.bind(this);
 	}
 	
-	onDrop(files){
-		this.setState({files: files});
-		console.log('Received files: ', files);
-	}
-	
-	removeFile(index){
-		var newFiles = this.state.files;
-		newFiles.splice(index, 1);
-		this.setState({files: newFiles});
+	uploadFile(e){
+		
+		var fData = new FormData(e.target);
+		$.ajax({
+			url: "http://localhost:5050/ipfs/upload",
+			type: 'POST',
+			data: fData,
+			cache: false,
+			processData: false,
+			contentType: false,
+			success: function (dataofconfirm) {
+				console.log("on Response");
+			}
+		});
+		e.preventDefault();
 	}
 	
 	render(){
@@ -30,38 +35,12 @@ class NewUpload extends Component {
 			cssClass="";
 		return(
 			<div className="new-upload">
-				<Dropzone onDrop={this.onDrop} className="drop-container">
-				  <div className="file-drop">Just Drag and Drop your files here</div>
-				</Dropzone>
-				<div className={cssClass}>
-					<div className="row margin-top-fix">
-						<div className="col-md-12">
-							<div className="pull-right">
-								<button type="button" className="btn btn-primary btn-sm">
-									<span className="glyphicon glyphicon-ok" aria-hidden="true" /> Upload All
-								</button>
-							</div>
-						</div>
+				<form action="" className="form-inline" method="post" encType="multipart/form-data" onSubmit={this.uploadFile}>
+					<div className="form-group">
+						<input type="file" className="form-control" name="documents" multiple />
 					</div>
-					<div className="row">
-						<div className="col-md-12">
-							<ul className="list-group">
-								{allFiles.map((file, i) => {
-										return (
-											<li className="list-group-item" key={file.size}>{file.name} ({file.size})
-												<div className="pull-right">
-													<button type="button" className="btn btn-danger btn-xs" onClick={()=> { this.removeFile(i); }}>
-														<span className="glyphicon glyphicon-remove" aria-hidden="true" />
-													</button>
-												</div>
-											</li>
-										)
-									})
-								}
-							</ul>
-						</div>
-					</div>
-				</div>
+					<input type="submit" value="Upload" className="btn btn-primary" />
+				</form>
 			</div>
 		);
 	}

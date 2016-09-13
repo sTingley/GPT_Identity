@@ -6,6 +6,40 @@
 var app = require("express")();
 var request = require("superagent");
 var erisC = require('eris-contracts');
+var erisContracts = require('eris-contracts')
+var fs = require('fs')
+
+//verification contract
+var chainUrl = 'http://localhost:1337/rpc'
+var requester_address = require('/home/demoadmin/.eris/apps/SOLIDITY/VerifyOraclizerEthereum/wallet2/epm.json').deployStorageK
+var requester_abi = JSON.parse(fs.readFileSync('/home/demoadmin/.eris/apps/SOLIDITY/VerifyOraclizerEthereum/wallet2/abi/' + requester_address, ‘utf8’))
+var VerificationContract = manager_full.newContractFactory(requester_address).at(requester_abi)
+var manager_full = contracts.newContractManagerDev(chainUrl,accounts.newchain_full_000)
+
+
+//this is for verification
+function verifyIt(string msg, string sig, string pubKey, callback)
+{
+    VerificationContract.VerificationQuery(msg,sig,pubKey, function(error,result)
+    {
+        VerificationContract.CallbackReady.once(function(error,result)
+        {
+            VerificationContract.myCallback(function(error,result)
+            {
+                callback(result);
+            })//end myCallback
+        })  //end CallbackReady.once   
+    })//end VerificationQuery   
+}
+
+//this is a template for when the ballot functions are inserted:
+this.verifyIt(input.msg,input.sig,input.pubKey,function(result)
+{
+    if(result == "true")
+    {
+        //contract logic here
+    }
+})
 
 var ballotApp = function(){
 

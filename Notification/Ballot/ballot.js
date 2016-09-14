@@ -16,9 +16,16 @@ var requester_abi = JSON.parse(fs.readFileSync('/home/demoadmin/.eris/apps/SOLID
 var VerificationContract = manager_full.newContractFactory(requester_address).at(requester_abi)
 var manager_full = contracts.newContractManagerDev(chainUrl,accounts.newchain_full_000)
 
+//bigchain contract
+var bigchain_query_addr = require('/home/demoadmin/.eris/apps/SOLIDITY/BigchainOraclizer/epm.json').deployStorageK
+var bigchain_abi = JSON.parse(fs.readFileSync('/home/demoadmin/.eris/apps/SOLIDITY/BigchainOraclizer/abi/' + bigchain_query_addr, 'utf8'))
+var bigchain_contract = manager_full.newContractFactory(bigchain_abi).at(bigchain_query_addr)
+
+
+
 
 //this is for verification
-function verifyIt(string msg, string sig, string pubKey, callback)
+function verifyIt(msg,sig,pubKey, callback)
 {
     VerificationContract.VerificationQuery(msg,sig,pubKey, function(error,result)
     {
@@ -32,14 +39,29 @@ function verifyIt(string msg, string sig, string pubKey, callback)
     })//end VerificationQuery   
 }
 
-//this is a template for when the ballot functions are inserted:
-this.verifyIt(input.msg,input.sig,input.pubKey,function(result)
+//to write what 
+function bigchainIt(txnDesc, proposalID, signature, publicKey, msg)
 {
-    if(result == "true")
-    {
-        //contract logic here
-    }
-})
+    var thePubKey = accounts.new_chain_root_000 //public key
+    
+    var bigchainInput = {"Transaction Description": txnDesc, "Proposal ID": proposalID, "Signature": signature, "Public Key": publicKey, "Message": msg}
+
+    var bigchainEndpoint = 'addData/' + thePubkey + '/1'
+
+    var theobj = {"method": "POST", "stringJSONData": bigchainInput, "endpoint": bigchainEndpoint}
+
+    bigchain_contract.BigChainQuery(JSON.stringify(theobj),function(error,result){
+        bigchain_contract.CallbackReady.once(function(){
+            bigchain_contract.myCallback(function(error,result){
+                callback(result)
+
+            })
+        })
+
+    })
+
+}
+
 
 var ballotApp = function(){
 
@@ -80,6 +102,77 @@ var ballotApp = function(){
 			});
 	}
 }
+
+
+var bigchainTransactions = [];
+var ballot = newballotApp();
+//This endpoint is for voting
+//Input Fields (as JSON): msg, signature, publicKey, proposalID, vote
+app.post("/vote", function(req,res)
+{
+    var msg = req.body.msg;
+    var signature = req.body.signature;
+    var publicKey = req.body.publicKey;
+    var proposalID = req.body.proposalID;
+    var vote = req.body.vote;
+    var txnDesc = "Validator Vote"
+    
+    this.verifyIt(msg, signature, publicKey, function(result)
+    {
+        if(result == true)
+        {
+            //they are able to vote
+            ballot.ballotContract.vote(txnDesc, proposalID,vote,publicKey,function(error,result)
+            {
+                //write into bigchainDB if they were able to vote:
+                if(result == true)
+                {
+                    this.bigchainIt(proposalID, signature, publicKey, msg, function(error,result)
+                    {
+                        bigchainTransactions.push(result);
+                    })
+                }  
+            })
+        }
+    })              
+    
+})
+
+
+//This endpoint is for voting
+//Input Fields (as JSON): msg, signature, publicKey, proposalID, vote
+app.post("/delegate", function(req,res)
+{
+    var msg = req.body.msg;
+    var signature = req.body.signature;
+    var publicKey = req.body.publicKey;
+    var proposalID = req.body.proposalID;
+    var toDelegate = req.body.toDelegate;
+    var txnDesc = "Validator Delegate";
+    
+    this.verifyIt(msg, signature, publicKey, function(result)
+    {
+        if(result == true)
+        {
+            //they are able to vote
+            ballot.ballotContract.delegate(proposalID,toDelegate,publicKey,function(error,result)
+            {
+                //write into bigchainDB if they were able to vote:
+                if(result == true)
+                {
+                    this.bigchainIt(txnDesc, proposalID, signature, publicKey, msg, function(error,result)
+                    {
+                        bigchainTransactions.push(result);
+                    })
+                }  
+            })
+        }
+    })              
+    
+})
+
+
+
 
 /*
  * Example Usage

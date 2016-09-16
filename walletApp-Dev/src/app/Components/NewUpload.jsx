@@ -39,6 +39,7 @@ class NewUpload extends Component {
 					<div className="form-group">
 						<input type="file" className="form-control" name="documents" multiple />
 					</div>
+					<input type="hidden" name="user_pubkey" value="1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740" />
 					<input type="submit" value="Upload" className="btn btn-primary" />
 				</form>
 			</div>

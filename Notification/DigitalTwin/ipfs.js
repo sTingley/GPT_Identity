@@ -1,41 +1,158 @@
-var exec = require('child_process').exec;
-
-
-var IPFS = function(){
+var spawn = require('child_process').spawn,
+	Crypto = require('./cryptoCtr.js'),
+	fs = require('fs'),
+	http = require('http');
 	
-	this.result = [];
+//var tmpPath = "D:/Source/GPT_Identity-master/Notification/DigitalTwin/tmp/";
+var tmpPath = "/Users/arunkumar/Node/GPT_Identity/Notification/DigitalTwin/tmp/";
+//var JSONPath = "D:/Source/GPT_Identity-master/Notification/DigitalTwin/notifications/";
+var JSONPath = "/Users/arunkumar/Node/GPT_Identity/Notification/DigitalTwin/notifications/";
+var IPFS_baseUrl = "http://192.168.99.101:8080/ipfs/";
+
+var suffix = "_files";
+
+// TODO : If the hash already exists in json that has to updated instead of new entry
+function updateJSON(pubKey, fileData, res){
+	var fileName = JSONPath + pubKey + suffix + ".json";
+	var cryptoEncr = new Crypto({pubKey: pubKey});
 	
-	this.upload = function(req, res){
-		var files = req.files.documents;
-		console.log("comes here======================>",files.path);
-		this.result = [];
-		
-		exec('ipfs add '+files.path+' -n', (err, stdout, stderr) => {
-				if (err) {
-					console.error(`exec error: ${err}`);
+	if (fs.existsSync(fileName)) {
+		fs.readFile(fileName, (err, data) => {
+			if(err) {
+				res.status(400).json({"Error": "Unable to write JSON"});
+				return;
+			} 
+			var decryptData = cryptoEncr.decrypt(data.toString());
+			var allDocs = JSON.parse(decryptData);
+			allDocs.documents.unshift(fileData);
+			var cryptoData = cryptoEncr.encrypt(JSON.stringify(allDocs));
+			fs.writeFile(fileName, cryptoData, (err) => {
+				if(err){
+					res.status(400).json({"Error": "Unable to create file under " + fileName});
 					return;
-				  }
-				_that.push(stdout);
-				console.log(`stderr: ${stderr}`);
+				}
+				res.json({"Msg":"Ok", "hash": fileData.hash });
 			});
-		
-		/*
-		if(files.length > 0){
-			console.log("comes here")
-			for(var i=0; i<files.length; i++){
-				console.log("current file", files[i]);
-				IPFS.uploadAsync(files[i]);
-			}
-			console.log("End Output", IPFS.result);
+		});
+	} else {
+		var msg = {
+			id: pubKey,//public key
+			documents:[fileData]
 		}
-		*/
-	};
-	
-	this.uploadAsync = function(file){
-		
-		
+		var cryptoData = cryptoEncr.encrypt(JSON.stringify(msg));
+		fs.writeFile(fileName, cryptoData, (err) => {
+			if(err){
+				res.status(400).json({"Error": "Unable to write message in " + fileName});
+				return;
+			}
+			res.json({"Msg":"Ok", "hash": fileData.hash });
+		});
 	}
-	
 }
 
-module.exports = new IPFS();
+exports.uploadFile = function(req, res){
+	var uploadedFile;
+	if (!req.files) {
+        res.send('No files were uploaded.');
+        return;
+    }
+	uploadedFile = req.files.documents;
+	var file = tmpPath + uploadedFile.name;
+	uploadedFile.mv(file, function(err) {
+        if (err) {
+            res.status(500).send(err);
+        }
+        else {
+			const ipfs = spawn('eris',['files','put',file]);
+			var buffer = [];
+			ipfs.stdout.on('data', (data) => {
+				buffer.push(data.toString());
+			});
+			ipfs.stderr.on('data', (data) => {
+				console.log(`stderr: ${data}`);
+			});
+			ipfs.on('close', (code) => {
+				if(code > 0){
+					res.status(400).json({"Error": "Uploading File "+ uploadedFile.name +". Status code "+ code});
+				} else {
+					var hash = buffer[buffer.length - 1].replace(/^\s+|\s+$/g, '');
+					if(hash.length > 0){
+						var fileData = {
+							filename: uploadedFile.name, 
+							hash: hash, 
+							ipfs_url: IPFS_baseUrl + hash,
+							timestamp: Number(new Date()), 
+							fileformat: uploadedFile.mimetype 
+						};
+						updateJSON(req.body.user_pubkey, fileData, res);
+					} else {
+						res.status(400).json({"Error": "Unable to create file under " + uploadedFile.name});
+					}
+				}
+				fs.unlinkSync(file); // Delete the file from temp path
+			});
+        }
+    });
+}
+
+exports.getAllFiles = function(req, res){
+	var param = req.params;
+	var fileName = JSONPath + param.pubKey + suffix + ".json";
+	var cryptoDecr = new Crypto({pubKey: param.pubKey});
+	if(param.pubKey && fs.existsSync(fileName)){
+		fs.readFile(fileName, 'utf8', function(err, data){
+			if(err) res.status(400).json({"Error": "Unable to read IPFS files"});
+			res.json({'data': JSON.parse(cryptoDecr.decrypt(data))});
+		});
+	} else {
+		res.json({'data': 'Unable to read IPFS files'});
+	}
+}
+
+exports.getFile = function(req, res){
+	var param = req.params;
+	var hash = param.hash;
+	var pubKey = param.pubKey;
+	if(!hash || !pubKey) res.status(400).json({"Error": "IPFS hash and Public Key required to download file"});
+	var fileName = JSONPath + pubKey + suffix + ".json";
+	var cryptoDecr = new Crypto({pubKey: param.pubKey});
+	if(param.pubKey && fs.existsSync(fileName)){
+		fs.readFile(fileName, 'utf8', function(err, data){
+			var filesData = JSON.parse(cryptoDecr.decrypt(data));
+			var files = filesData.documents;
+			if(files.length > 0){
+				for(var i=0; i<files.length; i++){
+					if(files[i].hash == hash){
+						var file = fs.createWriteStream(files[i].filename);
+						var request = http.get(files[i].ipfs_url, function(response) {
+							var data = [];
+
+							response.on('data', function(chunk) {
+							  data.push(chunk);
+							});
+
+							response.on('end', function() {
+							  data = Buffer.concat(data);
+							  console.log('requested content length: ', response.headers['content-length']);
+							  console.log('parsed content length: ', data.length);
+							  res.writeHead(200, {
+							    'Content-Type': files[i].fileformat,
+							    'Content-Disposition': 'attachment; filename='+files[i].filename,
+							    'Content-Length': data.length
+							  });
+							  res.end(data);
+							});
+						});
+
+						request.end();
+
+						break;
+					}
+				}
+			}	
+		});
+	} else {
+		res.json({'data': 'Unable to read IPFS files'});
+	}
+
+}

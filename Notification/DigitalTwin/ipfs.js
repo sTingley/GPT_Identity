@@ -76,6 +76,8 @@ exports.uploadFile = function(req, res){
 					res.status(400).json({"Error": "Uploading File "+ uploadedFile.name +". Status code "+ code});
 				} else {
 					var hash = buffer[buffer.length - 1].replace(/^\s+|\s+$/g, '');
+					//Calling cacheFile function to cache the uploaded file
+					cacheFile(hash);
 					if(hash.length > 0){
 						var fileData = {
 							filename: uploadedFile.name, 
@@ -155,4 +157,84 @@ exports.getFile = function(req, res){
 		res.json({'data': 'Unable to read IPFS files'});
 	}
 
+}
+
+var tmpCachePath = "/Users/arunkumar/Node/GPT_Identity/Notification/DigitalTwin/tmpCache/";
+
+
+exports.cacheFile = function(fileHash){
+	const ipfs = spawn('eris',['files','cache',fileHash]);
+	var buffer = [];
+	ipfs.stdout.on('data', (data) => {
+		buffer.push(data.toString());
+	});
+	ipfs.stderr.on('data', (data) => {
+		console.log(`stderr: ${data}`);
+	});
+	ipfs.on('close', (code) => {
+		if(code > 0){
+			console.log({"Error": "Caching File "+ fileHash +". Status code "+ code});
+		} else {
+			//Calling cachedFile() to display the files which are cached.
+			cachedFile();
+			// if files are successfully cached then display the list of files which are cached
+			/*const ipfsCached = spawn('eris',['files','cached']);
+			var bufferCached = [];
+			ipfs.stdout.on('data', (data) => {
+				bufferCached.push(data.toString());
+			});
+			ipfs.stderr.on('data', (data) => {
+				console.log(`stderr: ${data}`);
+			});
+			ipfsCached.on('close', (code) => {
+				if(code > 0){
+					console.log({"Error": "Didn't find the cached file "+ fileHash +". Status code "+ code});
+				} else {
+					var displayCachedFile = bufferCached[bufferCached.length - 1].replace(/^\s+|\s+$/g, '');
+					// if not null read the file
+					if(displayCachedFile.length > 0){
+					// if null log the error while reading 
+					} else {
+						
+					}
+					
+					
+				}
+			});
+			
+		} */
+	});
+}
+
+
+
+
+// function for displaying cached files
+
+exports.cachedFile = function(){
+	const ipfsCached = spawn('eris',['files','cached']);
+			var bufferCached = [];
+			ipfs.stdout.on('data', (data) => {
+				bufferCached.push(data.toString());
+			});
+			ipfs.stderr.on('data', (data) => {
+				console.log(`stderr: ${data}`);
+			});
+			ipfsCached.on('close', (code) => {
+				if(code > 0){
+					console.log({"Error": "Didn't find the cached file. Status code "+ code});
+				} else {
+					var displayCachedFile = bufferCached[bufferCached.length - 1].replace(/^\s+|\s+$/g, '');
+					// if not null read the file
+					if(displayCachedFile.length > 0){
+					// if null log the error while reading 
+					} else {
+						
+					}
+					
+					
+				}
+			});
+			
+		}
 }

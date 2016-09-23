@@ -91,6 +91,17 @@ var ballotApp = function(){
 			});
 	};
 	
+	this.createExpiredProposalNotification = function(inputs){
+		request.post(this.twinUrl + "/ballot/writeExpiredProposal")
+			.send(inputs)
+			.set('Accept', 'application/json')
+			.end((err,res) => {
+				if(res.status == 200){
+					// do something
+				}
+			});
+	};
+	
 	this.createCoid = function(inputs){
 		request.post(this.twinUrl + "/ballot/writeCoid")
 			.send(inputs)
@@ -100,7 +111,28 @@ var ballotApp = function(){
 					// do something
 				}
 			});
+	};
+	
+	this.watchForEvent = function(callback){
+		var event = _this.ballotContract.proposalExpired();
+		event.watch(callback(error, result){
+			this.createExpiredProposalNotification(result);
+		});
 	}
+	
+	
+	this.watchForNotifyEvent = function(callback){
+		var event = ballot.ballotContract.notifyValidator();
+		event.watch(callback(error, result));
+	}
+
+	//var ballot = new ballotApp();
+	var formData = {pubKey: '1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740',
+						proposalID: '1234567890',
+	//                    message: 'You are invited to vote for an proposal'
+					};
+					
+		ballot.createNotification(formData);
 }
 
 

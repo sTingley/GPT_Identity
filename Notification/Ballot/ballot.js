@@ -91,6 +91,17 @@ var ballotApp = function(){
 			});
 	};
 	
+	this.createExpiredProposalNotification = function(inputs){
+		request.post(this.twinUrl + "/ballot/writeExpiredProposal")
+			.send(inputs)
+			.set('Accept', 'application/json')
+			.end((err,res) => {
+				if(res.status == 200){
+					// do something
+				}
+			});
+	};
+	
 	this.createCoid = function(inputs){
 		request.post(this.twinUrl + "/ballot/writeCoid")
 			.send(inputs)
@@ -100,6 +111,13 @@ var ballotApp = function(){
 					// do something
 				}
 			});
+	};
+	
+	this.watchForEvent = function(callback){
+		var event = _this.ballotContract.proposalExpired();
+		event.watch(callback(error, result){
+			this.createExpiredProposalNotification(result);
+		});
 	}
 }
 

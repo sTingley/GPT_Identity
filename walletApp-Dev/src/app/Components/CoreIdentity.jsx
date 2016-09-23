@@ -1,139 +1,120 @@
 import React from 'react';
+import TagsInput from 'react-tagsinput';
 
 class CoreIdentity extends React.Component {
+	
+	constructor(props){
+		super(props);
+		this.state = {
+			name:'',
+			official_id:[],
+			owner_id:[],
+			control_id:[],
+			recovery_id:[],
+			owner_token_id:[],
+			control_token_id:[],
+			files:[]
+		};
+		this.onFieldChange = this.onFieldChange.bind(this);
+	}
+	
+	onFieldChange(inputField, e){
+		var multipleValues = {};
+		if(inputField == "name"){
+			this.setState({name: e.target.value});
+		} else {
+			multipleValues[inputField] = e;
+			this.setState(multipleValues);
+		}
+	}
+	
+	uploadFile(e){
+		var fileInput = $("input[name=documents]");
+		var pubKey = $("input[name=user_pubkey]").val();
+		var fData = new FormData();
+		fData.append("documents", fileInput[0].files);
+		fData.append("user_pubkey", pubKey);
+		
+		//var fData = new FormData(e.target);
+		$.ajax({
+			url: "http://localhost:5050/ipfs/upload",
+			type: 'POST',
+			data: fData,
+			cache: false,
+			processData: false,
+			contentType: false,
+			success: function (dataofconfirm) {
+				console.log("on Response");
+			}
+		});
+				
+		e.preventDefault();
+		
+
+	}
+	
+	submitCoid(e){
+		e.preventDefault();
+		console.log("submitted values ==> ", this.state);
+	}
+	
 	render () {
+		var inputAttrs = {
+			addKeys: [13,188],	// Enter and comma
+			inputProps: {
+				placeholder: "use comma(,) to add multiple values",
+				style:{width:'30%'}
+			}
+		};
 	    return (
 	    	<div id="CoreIdentityContainer">
 	    		<h1>Core Identity</h1>
-	    		<form method="POST" id="register" role="form">
-							<div className="form-group">
-								<label htmlFor="name">Name</label>
-								<input className="form-control" id="name" type="text" name="name"/>
-							</div>	
-							<div className="form-group">
-								<label htmlFor="officialid1">Official ID 1</label>
-								<input className="form-control" id="officialid1" type="text" name="officialid1"/>
+	    		<form method="POST" id="register" role="form" onSubmit={this.submitCoid.bind(this)}>
+						<div className="form-group">
+							<label htmlFor="name">Name</label>
+							<input className="form-control" id="name" type="text" name="name" onChange={ (e)=>{ this.onFieldChange("name", e) } }/>
+						</div>	
+						<div className="form-group">
+							<label htmlFor="official_id">Official ID</label>
+							<TagsInput {...inputAttrs} value={this.state.official_id} onChange={(e)=>{ this.onFieldChange("official_id", e) } } />
+						</div>
+						<div className="form-group">
+							<label htmlFor="owner_id">Owner ID</label>
+							<TagsInput {...inputAttrs} value={this.state.owner_id} onChange={(e)=>{ this.onFieldChange("owner_id", e) } } />
+						</div>
+						<div className="form-group">
+							<label htmlFor="control_id">Control ID</label>
+							<TagsInput {...inputAttrs} value={this.state.control_id} onChange={(e)=>{ this.onFieldChange("control_id", e) } } />
+						</div>
+						<div className="form-group">
+							<label htmlFor="recovery_id">Recovery ID</label>
+							<TagsInput {...inputAttrs} value={this.state.recovery_id} onChange={(e)=>{ this.onFieldChange("recovery_id", e) } } />
+						</div>
+						<div className="form-group">
+							<label htmlFor="owner_token_id">Ownership Token ID</label>
+							<TagsInput {...inputAttrs} value={this.state.owner_token_id} onChange={(e)=>{ this.onFieldChange("owner_token_id", e) } } />
+						</div>
+						<div className="form-group">
+							<label htmlFor="control_token_id">Control Token ID</label>
+							<TagsInput {...inputAttrs} value={this.state.control_token_id} onChange={(e)=>{ this.onFieldChange("control_token_id", e) } } />
+						</div>
+						<div className="form-group">
+							<label htmlFor="documents" className="col-md-12">Documents</label>
+							<div className="col-md-4">
+								<input type="file" className="form-control" name="documents" multiple />
+								<input type="hidden" className="form-control" name="user_pubkey" value="1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740" />
 							</div>
-							<div className="form-group">
-								<label htmlFor="officialid2">Official ID 2</label>
-								<input className="form-control" id="officialid2" type="text" name="officialid2"/>
+							<div className="col-md-8">
+								<input type="submit" value="Upload" className="btn btn-primary" onClick={this.uploadFile.bind(this)} />
 							</div>
-							<div className="form-group">
-								<label htmlFor="officialid3">Official ID 3</label>
-								<input className="form-control" id="officialid3" type="text" name="officialid3"/>
-							</div>
-							<div className="form-group">
-								<label htmlFor="officialid4">Official ID 4</label>
-								<input className="form-control" id="officialid4" type="text" name="officialid4"/>
-							</div>
-							<div className="form-group">
-								<label htmlFor="officialid5">Official ID 5</label>
-								<input className="form-control" id="officialid5" type="text" name="officialid5"/>
-							</div>
-
-							
-							<div className="form-group">
-								<label htmlFor="ownerid1">Owner ID 1</label>
-								<input className="form-control" id="ownerid1" type="text" name="ownerid1"/>
-							</div>
-							<div className="form-group">
-								<label htmlFor="ownerid2">Owner ID 2</label>
-								<input className="form-control" id="ownerid2" type="text" name="ownerid2"/>
-							</div>
-							<div className="form-group">
-								<label htmlFor="ownerid3">Owner ID 3</label>
-								<input className="form-control" id="ownerid3" type="text" name="ownerid3"/>
-							</div>
-							<div className="form-group">
-								<label htmlFor="ownerid4">Owner ID 4</label>
-								<input className="form-control" id="ownerid4" type="text" name="ownerid4"/>
-							</div>
-							<div className="form-group">
-								<label htmlFor="ownerid5">Owner ID 5</label>
-								<input className="form-control" id="ownerid5" type="text" name="ownerid5"/>
-							</div>
-
-							
-							<div className="form-group">
-								<label htmlFor="controlid1">Control ID 1</label>
-								<input className="form-control" id="controlid1" type="text" name="controlid1"/>
-							</div>
-							<div className="form-group">
-								<label htmlFor="controlid2">Control ID 2</label>
-								<input className="form-control" id="controlid2" type="text" name="controlid2"/>
-							</div>
-							<div className="form-group">
-								<label htmlFor="controlid3">Control ID 3</label>
-								<input className="form-control" id="controlid3" type="text" name="controlid3"/>
-							</div>
-							<div className="form-group">
-								<label htmlFor="controlid4">Control ID 4</label>
-								<input className="form-control" id="controlid4" type="text" name="controlid4"/>
-							</div>
-							<div className="form-group">
-								<label htmlFor="controlid5">Control ID 5</label>
-								<input className="form-control" id="controlid5" type="text" name="controlid5"/>
-							</div>
-
-							
-							<div className="form-group">
-								<label htmlFor="recoveryid1">Recovery ID 1</label>
-								<input className="form-control" id="recoveryid1" type="text" name="recoveryid1"/>
-							</div>
-							<div className="form-group">
-								<label htmlFor="recoveryid2">Recovery ID 2</label>
-								<input className="form-control" id="recoveryid2" type="text" name="recoveryid2"/>
-							</div>
-							<div className="form-group">
-								<label htmlFor="recoveryid3">Recovery ID 3</label>
-								<input className="form-control" id="recoveryid3" type="text" name="recoveryid3"/>
-							</div>
-
-							
-							<div className="form-group">
-								<label htmlFor="ownershiptokenid1">Ownership Token ID 1</label>
-								<input className="form-control" id="ownershiptokenid1" type="text" name="ownershiptokenid1"/>
-							</div>
-							<div className="form-group">
-								<label htmlFor="ownershiptokenid2">Ownership Token ID 2</label>
-								<input className="form-control" id="ownershiptokenid2" type="text" name="ownershiptokenid2"/>
-							</div>
-							<div className="form-group">
-								<label htmlFor="ownershiptokenid3">Ownership Token ID 3</label>
-								<input className="form-control" id="ownershiptokenid3" type="text" name="ownershiptokenid3"/>
-							</div>
-							<div className="form-group">
-								<label htmlFor="ownershiptokenid4">Ownership Token ID 4</label>
-								<input className="form-control" id="ownershiptokenid4" type="text" name="ownershiptokenid4"/>
-							</div>
-							<div className="form-group">
-								<label htmlFor="ownershiptokenid5">Ownership Token ID 5</label>
-								<input className="form-control" id="ownershiptokenid5" type="text" name="ownershiptokenid5"/>
-							</div>
-
-							
-							<div className="form-group">
-								<label htmlFor="controltokenid1">Control Token ID 1</label>
-								<input className="form-control" id="controltokenid1" type="text" name="controltokenid1"/>
-							</div>
-							<div className="form-group">
-								<label htmlFor="controltokenid2">Control Token ID 2</label>
-								<input className="form-control" id="controltokenid2" type="text" name="controltokenid2"/>
-							</div>
-							<div className="form-group">
-								<label htmlFor="controltokenid3">Control Token ID 3</label>
-								<input className="form-control" id="controltokenid3" type="text" name="controltokenid3"/>
-							</div>
-							<div className="form-group">
-								<label htmlFor="controltokenid4">Control Token ID 4</label>
-								<input className="form-control" id="controltokenid4" type="text" name="controltokenid4"/>
-							</div>
-							<div className="form-group">
-								<label htmlFor="controltokenid5">Control Token ID 5</label>
-								<input className="form-control" id="controltokenid5" type="text" name="controltokenid5"/>
-							</div>				
-							<button className="btn btn-primary" type="submit">Submit</button>
-						</form>
+						</div>
+						<div className="form-group">
+						  <div className="col-sm-6">
+						  <br/>
+							<button className="btn btn-primary" type="submit">Submit Identity</button>
+						  </div>
+						</div>
+					</form>
 	    	</div>
 	    );
    }

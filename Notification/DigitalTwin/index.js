@@ -27,6 +27,9 @@ app.get('/ballot/readNotify/:pubKey', ballotCtrl.fetchNotification);
 app.post('/ballot/writeCoid', ballotCtrl.writeCoidData);
 app.get('/ballot/readCoid/:proposalID/publicKey/:pubKey/', ballotCtrl.fetchCoidData);
 
+app.post('/ballot/writeExpiredProposal', expiredNotification.writeExpiredProposalNotification);
+app.get('/ballot/readExpiredProposal/:pubKey', expiredNotification.fetchExpiredProposalNotification);
+
 app.post('/ipfs/upload', IPFS.uploadFile);
 app.get('/ipfs/alldocs/:pubKey', IPFS.getAllFiles);
 app.get('/ipfs/getfile/:pubKey/:hash', IPFS.getFile);

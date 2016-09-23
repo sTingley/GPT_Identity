@@ -3,7 +3,7 @@ var app = require('express')(),
     bodyParser = require('body-parser'),
 	fileUpload = require('express-fileupload'),
 	ballotCtrl = require('./ballotCtrl.js'),
-	expiredNotification = require('./ballotCtrl.js'),
+	expiredNotification = require('./expiredNotification.js'),
 	IPFS = require('./ipfs.js');
 
  // for parsing application/json

@@ -119,6 +119,20 @@ var ballotApp = function(){
 			this.createExpiredProposalNotification(result);
 		});
 	}
+	
+	
+	this.watchForNotifyEvent = function(callback){
+		var event = ballot.ballotContract.notifyValidator();
+		event.watch(callback(error, result));
+	}
+
+	//var ballot = new ballotApp();
+	var formData = {pubKey: '1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740',
+						proposalID: '1234567890',
+	//                    message: 'You are invited to vote for an proposal'
+					};
+					
+		ballot.createNotification(formData);
 }
 
 

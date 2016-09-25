@@ -203,8 +203,8 @@ exports.cacheFile = function(fileHash){
 			});
 			
 		} */
-	});
-}
+	}
+}),
 
 
 

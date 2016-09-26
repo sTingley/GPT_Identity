@@ -32,8 +32,11 @@ class CoreIdentity extends React.Component {
 		var fileInput = $("input[name=documents]");
 		var pubKey = $("input[name=user_pubkey]").val();
 		var fData = new FormData();
-		fData.append("documents", fileInput[0].files);
+		
 		fData.append("user_pubkey", pubKey);
+		 $.each(fileInput[0].files, function(key, value){
+			fData.append(key, value);
+		});
 		
 		//var fData = new FormData(e.target);
 		$.ajax({
@@ -47,10 +50,7 @@ class CoreIdentity extends React.Component {
 				console.log("on Response");
 			}
 		});
-				
 		e.preventDefault();
-		
-
 	}
 	
 	submitCoid(e){

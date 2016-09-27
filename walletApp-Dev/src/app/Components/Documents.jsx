@@ -3,27 +3,64 @@ import { Link } from 'react-router';
 
 class Documents extends Component {
 	
-	getActiveClass(menu){
-		var path = this.props.location.pathname.split("/");
-		if(menu == path[2])
-			return "active";
-		return "";
+	constructor(props){
+		super(props);
+		this.state = {
+			docs:{},
+			pubKey: '1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740'
+		};
+	}
+	
+	componentDidMount(){
+		$.ajax({
+			url: "http://localhost:5050/ipfs/alldocs/"+this.state.pubKey,
+			dataType: 'json',
+			cache: false,
+			success: function(resp) {
+				console.log("Response Data ", resp.data.documents)
+				this.setState({docs: resp.data.documents});
+			}.bind(this),
+			error: function(xhr, status, err) {
+				console.error(this.props.url, status, err.toString());
+			}.bind(this)
+		});
+	}
+	
+	getDateFormat(timestamp){
+		var d = new Date(timestamp);
+		return (d.getMonth()+1) + "/" + d.getDate() + "/" + d.getFullYear();
 	}
 	
 	render(){
+		var style = {
+			fontSize: '13px',
+			lineHeight: 2
+		}
 		return(
 			<div className="documents" id="documents-container">
-				<h3>Manage Documents</h3> <hr/>
-				<ul className="nav nav-tabs">
-					<li role="presentation" className={this.getActiveClass("upload")}>
-						<Link to="/docs/upload" activeClassName="active">Upload Document</Link>
-					</li>
-					<li role="presentation" className={this.getActiveClass("alldocs")}>
-						<Link to="/docs/alldocs" activeClassName="active">All Documents</Link>
-					</li>
-				</ul>
-				<div className="tab-content docs-tabs">
-				{this.props.children}
+				<h3>My Documents</h3> <hr/>
+				<div className="file-container">
+					<ul className="list-group">
+						{(() => {
+							if(this.state.docs.length > 0){
+								var i = 0;
+								return this.state.docs.map((files) => {
+									i++;
+									return(
+										<li key={i} className="list-group-item">
+											<a className="btn btn-success btn-sm pull-right" href={files.ipfs_url} target="_blank" role="button">Download</a>
+											<h4 className="list-group-item-heading">{files.filename}</h4>
+											<p className="list-group-item-text" style={style}><b className="text-info">Created On:</b> { this.getDateFormat(files.timestamp) }</p>
+											<p className="list-group-item-text" style={style}><b className="text-info">IPFS Hash:</b> { files.hash }</p>
+										</li>
+									)
+								})
+								
+							} else {
+								return <li className="list-group-item">No documents found</li>
+							}
+						})(this)}
+					</ul>
 				</div>
 			</div>
 		);

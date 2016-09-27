@@ -23,7 +23,7 @@ class Header extends React.Component {
                 <li><Link to='/register' activeClassName="active">Name Register</Link></li>
                 <li><Link to='/identity' activeClassName="active">Core Identity</Link></li>
 				<li><Link to='/assets' activeClassName="active">Assets</Link></li>
-				<li><Link to='/docs' activeClassName="active">Documents</Link></li>
+				<li><Link to='/docs' activeClassName="active">My Documents</Link></li>
             </ul>
             <ul className="nav navbar-nav navbar-right">
                 <li><a href="#">Faq</a></li>

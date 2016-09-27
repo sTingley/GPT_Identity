@@ -30,6 +30,9 @@ class CoreIdentity extends React.Component {
 	
 	uploadFile(e){
 		var fileInput = $("input[name=documents]");
+		
+		if(fileInput[0].files.length == 0) return;
+		
 		var pubKey = $("input[name=user_pubkey]").val();
 		var fData = new FormData();
 		
@@ -38,7 +41,10 @@ class CoreIdentity extends React.Component {
 			fData.append(key, value);
 		});
 		
-		//var fData = new FormData(e.target);
+		
+		var uploadBut = $('input[name=upload-file]'),
+			formBut = $('button[name=submit-form]');
+		
 		$.ajax({
 			url: "http://localhost:5050/ipfs/upload",
 			type: 'POST',
@@ -46,9 +52,18 @@ class CoreIdentity extends React.Component {
 			cache: false,
 			processData: false,
 			contentType: false,
-			success: function (dataofconfirm) {
-				console.log("on Response");
-			}
+			beforeSend: function(xhr){
+				uploadBut.button('loading');
+				formBut.button('loading');
+			},
+			success: function (response) {
+				console.log(response);
+				$("input[name=documents]").empty();
+			},
+			complete: function(xhr, textStatus) {
+				uploadBut.button('reset');
+				formBut.button('reset');
+			} 
 		});
 		e.preventDefault();
 	}
@@ -105,13 +120,13 @@ class CoreIdentity extends React.Component {
 								<input type="hidden" className="form-control" name="user_pubkey" value="1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740" />
 							</div>
 							<div className="col-md-8">
-								<input type="submit" value="Upload" className="btn btn-primary" onClick={this.uploadFile.bind(this)} />
+								<input type="button" data-loading-text="Uploading Files..." value="Upload" name="upload-file" className="btn btn-primary" onClick={this.uploadFile.bind(this)} />
 							</div>
 						</div>
 						<div className="form-group">
 						  <div className="col-sm-6">
 						  <br/>
-							<button className="btn btn-primary" type="submit">Submit Identity</button>
+							<button className="btn btn-primary" data-loading-text="Submit Identity" name="submit-form" type="submit">Submit Identity</button>
 						  </div>
 						</div>
 					</form>

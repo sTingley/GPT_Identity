@@ -3,7 +3,6 @@ var app = require('express')(),
     bodyParser = require('body-parser'),
 	fileUpload = require('express-fileupload'),
 	ballotCtrl = require('./ballotCtrl.js'),
-	expiredNotification = require('./expiredNotification.js'),
 	IPFS = require('./ipfs.js');
 
  // for parsing application/json
@@ -33,7 +32,7 @@ app.get('/ballot/readExpiredProposal/:pubKey', expiredNotification.fetchExpiredP
 
 app.post('/ipfs/upload', IPFS.uploadFile);
 app.get('/ipfs/alldocs/:pubKey', IPFS.getAllFiles);
-app.get('/ipfs/getfile/:pubKey/:hash', IPFS.getFile);
+app.get('/ipfs/getfile/:hash', IPFS.getUrl);
 
 
 var proxyConfigGk = {

@@ -4,10 +4,10 @@ var spawn = require('child_process').spawn,
 	fs = require('fs'),
 	http = require('http');
 	
-var tmpPath = "D:/Source/GPT_Identity-master/Notification/DigitalTwin/tmp/";
-//var tmpPath = "/Users/arunkumar/Node/GPT_Identity/Notification/DigitalTwin/tmp/";
-var JSONPath = "D:/Source/GPT_Identity-master/Notification/DigitalTwin/notifications/";
-//var JSONPath = "/Users/arunkumar/Node/GPT_Identity/Notification/DigitalTwin/notifications/";
+//var tmpPath = "D:/Source/GPT_Identity-master/Notification/DigitalTwin/tmp/";
+var tmpPath = "/Users/arunkumar/Node/GPT_Identity/Notification/DigitalTwin/tmp/";
+//var JSONPath = "D:/Source/GPT_Identity-master/Notification/DigitalTwin/notifications/";
+var JSONPath = "/Users/arunkumar/Node/GPT_Identity/Notification/DigitalTwin/notifications/";
 var IPFS_baseUrl = "http://192.168.99.101:8080/ipfs/";
 
 var suffix = "_files";
@@ -90,6 +90,8 @@ var IPFS = {
 	moveFileToIPFS: function(fileNode, res, callback){
 		fileNode.mv(tmpPath + fileNode.name, (err) => {
 			if(!err){
+				const file = tmpPath + fileNode.name;
+				console.log(file);
 				const ipfs = spawn('eris',['files','put',file]);
 				var buffer = [];
 				ipfs.stdout.on('data', (data) => {
@@ -107,7 +109,7 @@ var IPFS = {
 							var ipfsCache = spawn('eris',['files','cache', hash]);
 							ipfsCache.on('close', (code) => {
 								IPFS.getFileHash(tmpPath + fileNode.name).then((fileHash) => {
-									var hash = Math.random();
+									
 									var fileData = {
 										'filename': fileNode.name, 
 										'hash': hash,
@@ -118,13 +120,13 @@ var IPFS = {
 									};
 									IPFS.incr++;
 									callback.apply(this, [fileData, res]);
+									fs.unlinkSync(file); // Delete the file from temp path
 								});
 							});
 						} else {
 							IPFS.erros.push(fileNode.name);
 						}
 					}
-					fs.unlinkSync(file); // Delete the file from temp path
 				});
 			}
 		});

@@ -1,5 +1,6 @@
 var spawn = require('child_process').spawn,
-	Crypto = require('./cryptoCtr.js'),
+	crypt = require('./cryptoCtr.js'),
+	crypto = require('crypto'),
 	fs = require('fs'),
 	http = require('http');
 	
@@ -47,7 +48,7 @@ var IPFS = {
 				id:IPFS.pubKey,
 				documents:[]
 			};
-			var cryptoEncr = new Crypto({pubKey: IPFS.pubKey});
+			var cryptoEncr = new crypt({pubKey: IPFS.pubKey});
 			var cryptoData = cryptoEncr.encrypt(JSON.stringify(datastruct));
 			fs.writeFileSync(fileName, cryptoData, 'utf8');
 		}
@@ -72,15 +73,16 @@ var IPFS = {
 	},
 	
 	writeData: function(data, res){
-		IPFS.documents.push({'filename':data.filename, 'hash': data.hash});
+		var allDocs = [];
+		allDocs.push({'filename':data.filename, 'hash': data.hash, 'file_hash': data.file_hash});
 		var fileName = JSONPath + IPFS.pubKey + suffix + ".json";
-		var crypt = new Crypto({pubKey: IPFS.pubKey});
-		var fileContent = crypt.decrypt(fs.readFileSync(fileName, 'utf8'));
+		var cryptDec = new crypt({pubKey: IPFS.pubKey});
+		var fileContent = cryptDec.decrypt(fs.readFileSync(fileName, 'utf8'));
 		var struct = JSON.parse(fileContent);
 		struct.documents.unshift(data);
-		fs.writeFileSync(fileName, crypt.encrypt(JSON.stringify(struct)));
-		if(IPFS.incr == IPFS.filesLength){
-			res.status(200).json({"uploded": IPFS.documents, "failed": IPFS.errors});
+		fs.writeFileSync(fileName, cryptDec.encrypt(JSON.stringify(struct)));
+		if(allDocs.length > 0){
+			res.status(200).json({"uploded": allDocs, "failed": IPFS.errors});
 			return;
 		}
 	},
@@ -104,15 +106,19 @@ var IPFS = {
 						if(hash.length > 0){
 							var ipfsCache = spawn('eris',['files','cache', hash]);
 							ipfsCache.on('close', (code) => {
-								var fileData = {
-									'filename': fileNode.name, 
-									'hash': hash, 
-									'ipfs_url': IPFS_baseUrl + hash,
-									'timestamp': Number(new Date()), 
-									'fileformat': fileNode.mimetype
-								};
-								IPFS.incr++;
-								callback.apply(this, [fileData, res]);
+								IPFS.getFileHash(tmpPath + fileNode.name).then((fileHash) => {
+									var hash = Math.random();
+									var fileData = {
+										'filename': fileNode.name, 
+										'hash': hash,
+										'file_hash': fileHash, 
+										'ipfs_url': IPFS_baseUrl + hash,
+										'timestamp': Number(new Date()), 
+										'fileformat': fileNode.mimetype
+									};
+									IPFS.incr++;
+									callback.apply(this, [fileData, res]);
+								});
 							});
 						} else {
 							IPFS.erros.push(fileNode.name);
@@ -124,10 +130,24 @@ var IPFS = {
 		});
 	},
 	
+	getFileHash: function(filePath){
+		var promise = new Promise((resolve, reject) => {
+			var input = fs.createReadStream(filePath);
+			var hash = crypto.createHash('sha256');
+			hash.setEncoding('hex');
+			input.on('end', () => {
+				hash.end();
+				resolve(hash.read());
+			});
+			input.pipe(hash);
+		});
+		return promise;
+	},
+	
 	getAllFiles: function(req, res){
 		var param = req.params;
 		var fileName = JSONPath + param.pubKey + suffix + ".json";
-		var cryptoDecr = new Crypto({pubKey: param.pubKey});
+		var cryptoDecr = new crypt({pubKey: param.pubKey});
 		if(param.pubKey && fs.existsSync(fileName)){
 			fs.readFile(fileName, 'utf8', function(err, data){
 				if(err) res.status(400).json({"Error": "Unable to read IPFS files"});

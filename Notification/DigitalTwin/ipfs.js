@@ -4,10 +4,10 @@ var spawn = require('child_process').spawn,
 	fs = require('fs'),
 	http = require('http');
 	
-//var tmpPath = "D:/Source/GPT_Identity-master/Notification/DigitalTwin/tmp/";
-var tmpPath = "/Users/arunkumar/Node/GPT_Identity/Notification/DigitalTwin/tmp/";
-//var JSONPath = "D:/Source/GPT_Identity-master/Notification/DigitalTwin/notifications/";
-var JSONPath = "/Users/arunkumar/Node/GPT_Identity/Notification/DigitalTwin/notifications/";
+var tmpPath = "D:/Source/GPT_Identity-master/Notification/DigitalTwin/tmp/";
+//var tmpPath = "/Users/arunkumar/Node/GPT_Identity/Notification/DigitalTwin/tmp/";
+var JSONPath = "D:/Source/GPT_Identity-master/Notification/DigitalTwin/notifications/";
+//var JSONPath = "/Users/arunkumar/Node/GPT_Identity/Notification/DigitalTwin/notifications/";
 var IPFS_baseUrl = "http://192.168.99.101:8080/ipfs/";
 
 var suffix = "_files";
@@ -72,14 +72,33 @@ var IPFS = {
 		return newArr;
 	},
 	
+	checkIsExists: function(allData, data){
+		const docs = allData.documents;
+		if(docs.length > 0){
+			for(var i=0; i<docs.length; i++){
+				let doc = docs[i];
+				if(doc.hash == data.hash){
+					return i;
+					break;
+				}
+			}
+		}
+		return -1;
+	},
+	
 	writeData: function(data, res){
 		var allDocs = [];
 		allDocs.push({'filename':data.filename, 'hash': data.hash, 'file_hash': data.file_hash});
 		var fileName = JSONPath + IPFS.pubKey + suffix + ".json";
 		var cryptDec = new crypt({pubKey: IPFS.pubKey});
 		var fileContent = cryptDec.decrypt(fs.readFileSync(fileName, 'utf8'));
-		var struct = JSON.parse(fileContent);
-		struct.documents.unshift(data);
+		var struct = JSON.parse(fileContent),
+			index = IPFS.checkIsExists(struct, data);
+		if(index > -1){
+			struct.documents[index] = data;
+		} else {
+			struct.documents.unshift(data);
+		}
 		fs.writeFileSync(fileName, cryptDec.encrypt(JSON.stringify(struct)));
 		if(allDocs.length > 0){
 			res.status(200).json({"uploded": allDocs, "failed": IPFS.errors});
@@ -91,7 +110,6 @@ var IPFS = {
 		fileNode.mv(tmpPath + fileNode.name, (err) => {
 			if(!err){
 				const file = tmpPath + fileNode.name;
-				console.log(file);
 				const ipfs = spawn('eris',['files','put',file]);
 				var buffer = [];
 				ipfs.stdout.on('data', (data) => {
@@ -99,6 +117,7 @@ var IPFS = {
 				});
 				ipfs.stderr.on('data', (data) => {
 					console.log(`stderr: ${data}`);
+					fs.unlinkSync(file); // Delete the file from temp path
 				});
 				ipfs.on('close', (code) => {
 					if(code > 0){
@@ -109,7 +128,6 @@ var IPFS = {
 							var ipfsCache = spawn('eris',['files','cache', hash]);
 							ipfsCache.on('close', (code) => {
 								IPFS.getFileHash(tmpPath + fileNode.name).then((fileHash) => {
-									
 									var fileData = {
 										'filename': fileNode.name, 
 										'hash': hash,

@@ -176,7 +176,8 @@ class CoreIdentity extends React.Component {
 			owner_token_id:[],
 			control_token_id:[],
 			showModal: false,
-			tmpFile:''
+			tmpFile:'',
+			pubKey: localStorage.getItem("pubKey")
 		};
 		
 		this.maxUniqAttr = 10;
@@ -398,7 +399,7 @@ class CoreIdentity extends React.Component {
 					  </div>
 					</div>
 				</form>
-				{this.state.showModal ? <UploadIpfsFile pubKey="02d7ceb37a16fde15a5237652b31a52d94def283a2ab09aaf5d1af48db1b84e20a" dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal}/> : null}
+				{this.state.showModal ? <UploadIpfsFile pubKey={this.state.pubKey} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal}/> : null}
         </div>
     );
    }

@@ -24,7 +24,7 @@ class UploadKeyStore extends React.Component {
 
 	constructor(props){
 		super(props);
-		this.url = "http://localhost:5050/notify/";
+		this.url = "http://localhost:5050/ballot/readNotify/";
 		this.state = {
 			pubKey:"",
 			priKey:"", 
@@ -52,6 +52,7 @@ class UploadKeyStore extends React.Component {
 			var reader = new FileReader();
 			reader.onload = function(event){
 		        var obj = JSON.parse(event.target.result);
+		        localStorage.setItem("pubKey", obj.public_key);
 		        this.setState({pubKey:obj.public_key, priKey: obj.private_key, fileread:true });
 		        this.toVote();
 			}.bind(this);
@@ -62,17 +63,22 @@ class UploadKeyStore extends React.Component {
 	}
 
 	onResponse(result){
-		var data = JSON.parse(result);
-		var msgs = data.messages;
-		this.setState({coid: msgs});
-		if(msgs.length > 0){
-			for(var i=0; i<msgs.length; i++){
-				if(msgs[i].read_status == false){
-					this.setState({notify: true});
+		if(!$.isPlainObject(result)){
+			var data = JSON.parse(result);	
+		} else 
+			var data = result;
+		if(data.messages){
+			var msgs = data.messages;
+			this.setState({coid: msgs});
+			if(msgs.length > 0){
+				for(var i=0; i<msgs.length; i++){
+					if(msgs[i].read_status == false){
+						this.setState({notify: true});
+					}
 				}
 			}
+			this.props.loginHandler(this.state);
 		}
-		this.props.loginHandler(this.state);
 	}
 
 	render () {

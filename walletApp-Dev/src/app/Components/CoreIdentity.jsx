@@ -10,7 +10,7 @@ class UploadIpfsFile extends React.Component {
 		super(props);
 		this.state = {
 			docs: {},
-			pubKey: '1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740',
+			pubKey: props.pubKey,
 			selected:'0',
 			files:''
 		};
@@ -167,11 +167,7 @@ class CoreIdentity extends React.Component {
 	constructor(props){
 		super(props);
 		this.state = {
-			name:'',
 			file_attrs:[],
-			pubKey: '1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740',
-			message:'',
-			signature:'',
 			inputs: ['input-0','input-1'],
 			official_id:[],
 			owner_id:[],
@@ -227,11 +223,12 @@ class CoreIdentity extends React.Component {
 	}
 	
 	prepareJsonToSubmit(){
+		console.log();
 		var inputObj = {
-				"pubKey": this.state.pubKey,
-				"sig": this.state.signature,
-				"msg": this.state.message,
-				"name": this.state.name,
+				"pubKey": this.refs.pubKey.value,
+				"sig": this.refs.signature.value,
+				"msg": this.refs.message.value,
+				"name": this.refs.nameReg.value,
 				"uniqueId": this.createHashAttribute(this.state.file_attrs),
 				"uniqueIdAttributes": this.prepareUniqueIdAttrs(),
 				"ownershipId": this.createHashAttribute(this.state.owner_id),
@@ -244,7 +241,7 @@ class CoreIdentity extends React.Component {
 				"controlTokenId": this.createHashAttribute(this.state.control_token_id),
 				"controlTokenAttributes": this.valueIntoHash(this.state.control_token_id),
 				"controlTokenQuantity": 5,
-				"identityRecoveryIdList": [],
+				"identityRecoveryIdList": this.valueIntoHash(this.state.recovery_id),
 				"recoveryCondition": 2,
 				"yesVotesRequiredToPass": 2 
 		};
@@ -296,7 +293,8 @@ class CoreIdentity extends React.Component {
 				var ipfsHash, fileHash;
 				[ipfsHash, fileHash] = this.state.file_attrs[i][key].split("|");
 				tmpArr.push(fileHash);
-				tmpArr.push(ipfsHash);
+				//temporary hack: hash ipfs links so they will be 32 bytes... need to fix ... remove this.getHash later
+				tmpArr.push(this.getHash(ipfsHash));
 			}
 			newArr.push(tmpArr);
 		}
@@ -307,7 +305,7 @@ class CoreIdentity extends React.Component {
 		e.preventDefault();
 		var json = this.prepareJsonToSubmit();
 		$.ajax({
-			url: 'http://localhost:5050/gk/gatekeeper'
+			url: 'http://localhost:5050/gk/gatekeeper',
 			type: 'POST',
 			data: json,
 			success: function(res){
@@ -352,7 +350,7 @@ class CoreIdentity extends React.Component {
 	    		<form method="POST" id="register" role="form" onSubmit={this.submitCoid.bind(this)}>
 					<div className="form-group">
 						<label htmlFor="name">Name</label>
-						<input className="form-control" id="name" type="text" name="name" onChange={ (e)=>{ this.onFieldChange("name", e) } }/>
+						<input className="form-control" id="name" ref="nameReg" type="text" name="name" />
 					</div>
 					<div className="form-group">
 						<label htmlFor="unique_id">Unique Id</label>
@@ -365,10 +363,6 @@ class CoreIdentity extends React.Component {
 								<span className="glyphicon glyphicon-plus"></span>Add More
 							</button>
 						</div>
-					</div>
-					<div className="form-group">
-						<label htmlFor="signature">Signature</label>
-						<input className="form-control" id="signature" type="text" name="signature" onChange={ (e)=>{ this.onFieldChange("signature", e) } }/>
 					</div>
 					<div className="form-group">
 						<label htmlFor="official_id">Official ID</label>
@@ -395,18 +389,16 @@ class CoreIdentity extends React.Component {
 						<TagsInput {...inputAttrs} value={this.state.control_token_id} onChange={(e)=>{ this.onFieldChange("control_token_id", e) } } />
 					</div>
 					<div className="form-group">
-						<label htmlFor="message">Message</label>
-						<input className="form-control" id="message" type="text" name="message" onChange={ (e)=>{ this.onFieldChange("message", e) } }/>
-					</div>
-					<div className="form-group">
 					  <div className="col-sm-6">
 					  <br/>
-						<input type="hidden" name="pubkey" value={this.state.pubKey} />
+						<input className="form-control" ref="signature" type="hidden" value="7051442bbf18bb2c86cbc8951a07e27ec6ba05ac3fa427e4c6b948e3dcf91a94046b048edf52445fb22cc776a94b87c3f55426f993458ec744f61f09fb46eeaa" />
+						<input className="form-control" type="hidden" ref="message" value="8836a77b68579d1d8d4427c0cda24960f6c123f17ccf751328cc621d6237da22" />
+						<input type="hidden" name="pubkey" ref="pubKey" value="02d7ceb37a16fde15a5237652b31a52d94def283a2ab09aaf5d1af48db1b84e20a" />
 						<button className="btn btn-primary" data-loading-text="Submit Identity" name="submit-form" type="submit">Submit Identity</button>
 					  </div>
 					</div>
 				</form>
-				{this.state.showModal ? <UploadIpfsFile dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal}/> : null}
+				{this.state.showModal ? <UploadIpfsFile pubKey="02d7ceb37a16fde15a5237652b31a52d94def283a2ab09aaf5d1af48db1b84e20a" dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal}/> : null}
         </div>
     );
    }

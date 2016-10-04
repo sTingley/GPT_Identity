@@ -22,34 +22,22 @@ import Assets from './Components/Assets.jsx';
 
 import Documents from './Components/Documents.jsx';
 
-// saving state in global scope so that the variable could be accessible through out the application
-// Dirty hack, need to change
-window.login = false;
-
 class App extends React.Component {
 
   constructor(props){
 	  super(props);
 	  this.state = {
-		  login: false,
-		  userKey: null,
-		  coid: null
+		  login: localStorage.getItem("pubKey") || false
 	  }
 	  this.loginHandler = this.loginHandler.bind(this);
-	  this.getcoid = this.getcoid.bind(this);
   }
 
   loginHandler(childstate){
+	  var state = localStorage.getItem("pubKey");
 	  this.setState({
-		login: true,
-		userKey: childstate.pubKey,
-		coid:childstate.coid
+		login:  state || false,
+		userKey: childstate.pubKey || state
 	  });
-	  login = this.state.login;
-  }
-
-  getcoid(){
-	return this.state.coid;
   }
 
   render () {
@@ -63,8 +51,7 @@ class App extends React.Component {
 		        </div>
 		        <div className="col-sm-9 col-md-9 col-lg-10 col-lg-offset-2 col-md-offset-3 main">
 		        	{this.props.children && React.cloneElement(this.props.children, {
-					  loginHandler: this.loginHandler,
-					  getcoid: this.getcoid
+						loginHandler: this.loginHandler
 					})}
 		        </div>
 		      </div>
@@ -75,7 +62,8 @@ class App extends React.Component {
 }
 
 function validateLogin(nextState, replaceState){
-	if(!login){
+	var isKeyExists = localStorage.getItem("pubKey");
+	if(!isKeyExists){
 		// if not logged in user has been redirected to keystore upload screen
 		replaceState({ nextPathname: nextState.location.pathname }, '/upload')
 	}
@@ -86,12 +74,12 @@ render((
     	<Route path="/" component={App}>
 			<IndexRedirect to="/home" />
 			<Route path="home" component={Home} />
-			<Route path="register" component={NameRegister} />
-			<Route path="tovote" component={ToVote} onEnter={validateLogin} />
-			<Route path="identity" component={CoreIdentity} />
 			<Route path="upload" component={UploadKeyStore} />
-			<Route path="assets" component={Assets} />
-			<Route path="docs" component={Documents} />
+			<Route path="register" component={NameRegister} onEnter={validateLogin} />
+			<Route path="tovote" component={ToVote} onEnter={validateLogin} />
+			<Route path="identity" component={CoreIdentity} onEnter={validateLogin} />
+			<Route path="assets" component={Assets} onEnter={validateLogin} />
+			<Route path="docs" component={Documents} onEnter={validateLogin} />
       	</Route>
     </Router>
 ), document.getElementById('app'));

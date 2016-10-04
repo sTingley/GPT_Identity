@@ -39,7 +39,7 @@ class Documents extends Component {
 				<div className="file-container">
 					<ul className="list-group">
 						{(() => {
-							if(this.state.docs.length > 0){
+							if(!$.isEmptyObject(this.state.docs)){
 								var i = 0;
 								return this.state.docs.map((files) => {
 									i++;

@@ -24,7 +24,7 @@ class UploadKeyStore extends React.Component {
 
 	constructor(props){
 		super(props);
-		this.url = "http://localhost:5050/ballot/readNotify/";
+		this.url = twinUrl + "ballot/readNotify/";
 		this.state = {
 			pubKey:"",
 			priKey:"", 
@@ -46,7 +46,9 @@ class UploadKeyStore extends React.Component {
 	
 	createStorage(pubKey){
 		localStorage.setItem("pubKey", pubKey);
-		localStorage.setItem("timestamp", new Date().getTime());
+		var now = new Date();
+		now.setMinutes(now.getMinutes() + 30);
+		localStorage.setItem("timestamp", now.getTime());
 	}
 
 	uploadFile(e){

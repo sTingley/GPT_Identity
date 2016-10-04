@@ -38,7 +38,7 @@ class ToVote extends React.Component {
 	
 	componentDidMount(){
 		$.ajax({
-			url: "http://localhost:5050/ballot/readNotify/" + localStorage.getItem("pubKey"),
+			url: twinUrl + "ballot/readNotify/" + localStorage.getItem("pubKey"),
 			dataType: 'json',
 			cache: false,
 			success: function(result) {

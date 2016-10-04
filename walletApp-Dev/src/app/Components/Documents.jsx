@@ -13,7 +13,7 @@ class Documents extends Component {
 	
 	componentDidMount(){
 		$.ajax({
-			url: "http://localhost:5050/ipfs/alldocs/"+this.state.pubKey,
+			url: twinUrl + "ipfs/alldocs/"+this.state.pubKey,
 			dataType: 'json',
 			cache: false,
 			success: function(resp) {

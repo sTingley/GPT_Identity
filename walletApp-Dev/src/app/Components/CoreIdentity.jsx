@@ -19,7 +19,7 @@ class UploadIpfsFile extends React.Component {
 
 	componentDidMount(){
 		$.ajax({
-			url: "http://localhost:5050/ipfs/alldocs/"+this.state.pubKey,
+			url: twinUrl + "ipfs/alldocs/"+this.state.pubKey,
 			dataType: 'json',
 			cache: false,
 			success: function(resp) {
@@ -36,7 +36,7 @@ class UploadIpfsFile extends React.Component {
 	
 	uploadHandler(data, additionalParams){
 		var params = {
-			url: "http://localhost:5050/ipfs/upload",
+			url: twinUrl + "ipfs/upload",
 			type: 'POST',
 			data: data,
 			cache: false,
@@ -306,7 +306,7 @@ class CoreIdentity extends React.Component {
 		e.preventDefault();
 		var json = this.prepareJsonToSubmit();
 		$.ajax({
-			url: 'http://localhost:5050/gk/gatekeeper',
+			url: twinUrl + 'gk/gatekeeper',
 			type: 'POST',
 			data: json,
 			success: function(res){

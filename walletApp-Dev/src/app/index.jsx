@@ -61,11 +61,15 @@ class App extends React.Component {
   }
 }
 
-function validateLogin(nextState, replaceState){
+function validateLogin(nextState, replace){
 	var isKeyExists = localStorage.getItem("pubKey");
-	if(!isKeyExists){
-		// if not logged in user has been redirected to keystore upload screen
-		replaceState({ nextPathname: nextState.location.pathname }, '/upload')
+	var now = new Date().getTime();
+	var sessionTime = parseInt(localStorage.getItem("timestamp"));
+	if(sessionTime <= now || !isKeyExists){
+		localStorage.clear();
+		alert("Your session timed out, Please upload keypairs file again");
+		replace({ pathname: '/upload', state: {nextPathname: nextState.location.pathname} });
+		window.location.reload();
 	}
 }
 

@@ -1,10 +1,12 @@
+'use strict';
 var app = require('express')(),
     proxy = require('http-proxy-middleware'),
     bodyParser = require('body-parser'),
-	fileUpload = require('express-fileupload'),
-	ballotCtrl = require('./ballotCtrl.js'),
-	expiredNotification = require('./expiredNotification.js'),
-	IPFS = require('./ipfs.js');
+    fileUpload = require('express-fileupload'),
+    ballotCtrl = require('./ballotCtrl.js'),
+    http = require('http'),
+    expiredNotification = require('./expiredNotification.js'),
+    IPFS = require('./ipfs.js');
 
  // for parsing application/json
 app.use(bodyParser.json());
@@ -14,6 +16,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(fileUpload());
 
+/**
+ * 
+ */
 app.all('/*', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
@@ -44,4 +49,8 @@ app.use('/gk/**', proxy(proxyConfigGk));
 
 
 console.log("Digital Twin running at 5050");
-app.listen(5050);
+http.createServer(app).listen(5050);
+console.log("Digital Twin running at 5051");
+http.createServer(app).listen(5051);
+console.log("Digital Twin running at 5052");
+http.createServer(app).listen(5052);

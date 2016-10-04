@@ -10,7 +10,8 @@ class Modal extends Component {
 	
 	constructor(props){
 		super(props);
-		this.tags = new AssetTags('1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740', props.asset.asset_id);
+		this.pubKey = localStorage.getItem("pubKey");
+		this.tags = new AssetTags(this.pubKey, props.asset.asset_id);
 		this.state = {
 			asset: props.asset || {},
 			asset_class: this.tags.getAssetData("classes"),
@@ -117,7 +118,7 @@ class Assets extends Component {
 		// static values
 		this.state = {
 			showDetails: false,
-			wallet: {pubKey:"1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740", priKey:"1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740"},
+			wallet: {pubKey: localStorage.getItem("pubKey") },
 			own_assets: [{asset_id:789, asset_name:'COID'},{asset_id:101112, asset_name:'Phone'},{asset_id:131415, asset_name:'House'}],
 			controlled_assets:[{asset_id:161718, asset_name:'Parents House'},{asset_id:192021, asset_name:'My Car'}],
 			active_asset: {},
@@ -184,7 +185,6 @@ class Assets extends Component {
 					<div className="all-accounts">
 						<div className="row accounts">
 							<p><b>Public Key : </b>{this.state.wallet.pubKey}</p>
-							<p><b>Private Key : </b>{this.state.wallet.priKey}</p>
 						</div>
 					</div>
 				</div>

@@ -394,7 +394,7 @@ class CoreIdentity extends React.Component {
 					  <br/>
 						<input className="form-control" ref="signature" type="hidden" value="7051442bbf18bb2c86cbc8951a07e27ec6ba05ac3fa427e4c6b948e3dcf91a94046b048edf52445fb22cc776a94b87c3f55426f993458ec744f61f09fb46eeaa" />
 						<input className="form-control" type="hidden" ref="message" value="8836a77b68579d1d8d4427c0cda24960f6c123f17ccf751328cc621d6237da22" />
-						<input type="hidden" name="pubkey" ref="pubKey" value="02d7ceb37a16fde15a5237652b31a52d94def283a2ab09aaf5d1af48db1b84e20a" />
+						<input type="hidden" name="pubkey" ref="pubKey" value={localStorage.getItem("pubKey")} />
 						<button className="btn btn-primary" data-loading-text="Submit Identity" name="submit-form" type="submit">Submit Identity</button>
 					  </div>
 					</div>

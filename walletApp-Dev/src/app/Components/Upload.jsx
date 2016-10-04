@@ -43,6 +43,11 @@ class UploadKeyStore extends React.Component {
 	toVote(){
 		$.get(this.getUrl(), this.onResponse);
 	}
+	
+	createStorage(pubKey){
+		localStorage.setItem("pubKey", pubKey);
+		localStorage.setItem("timestamp", new Date().getTime());
+	}
 
 	uploadFile(e){
 		e.preventDefault();
@@ -52,8 +57,9 @@ class UploadKeyStore extends React.Component {
 			var reader = new FileReader();
 			reader.onload = function(event){
 		        var obj = JSON.parse(event.target.result);
-		        localStorage.setItem("pubKey", obj.public_key);
+				this.createStorage(obj.public_key);
 		        this.setState({pubKey:obj.public_key, priKey: obj.private_key, fileread:true });
+				this.props.loginHandler(this.state);
 		        this.toVote();
 			}.bind(this);
 			reader.readAsText(e.target.files.files[0]);
@@ -77,7 +83,7 @@ class UploadKeyStore extends React.Component {
 					}
 				}
 			}
-			this.props.loginHandler(this.state);
+			
 		}
 	}
 
@@ -100,7 +106,6 @@ class UploadKeyStore extends React.Component {
 	          </form><br/>
 	          <div className={cssClass}>
 	          	<p><b>Public Key : </b> {this.state.pubKey}</p>
-	          	<p><b>Private Key : </b>{ this.state.priKey}</p>
 	          </div>
 	        </div>
 	      </div>

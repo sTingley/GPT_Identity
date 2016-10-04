@@ -87,35 +87,13 @@ var wallet = function(){
   //******************************************************************************
   // Keys & signatures are normally represented as hexstrings
   this.buffer_to_hexString = function(buffer) {
-
-      var hexString = "";
-
-      var i;
-      for (i = 0; i < buffer.length; i++) {
-          hexString = hexString + buffer[i].toString(16);
-      }
-      return hexString;
+	return buffer.toString("hex");
   }
 
   //******************************************************************************
   // Hexstring need to be converted in order to use internal secp256k1 methods
   this.hexString_to_buffer = function(str) {
-
-      var bufferString = [];
-      var current = "";
-      var counter = 0;
-      for (j = 0; j < str.length / 2; j = j + 2) {
-
-          current = str[j] + str[j + 1];
-          //now convert to decimal
-          current = parseInt(current, 16);
-          //now add it to buffer
-          bufferString[counter] = current;
-          counter++;
-      }
-      var buffer = Buffer.from(bufferString);
-      console.log('buffer: ' + buffer);
-      return buffer;
+     return new Buffer(str,"hex");
   }
 
   //******************************************************************************
@@ -143,73 +121,5 @@ var wallet = function(){
 
   //current design is to hash the pubkey and then check for the correct wallet
   //the wallet file will have to be read and then can be returned to the user
-
-  this.retrieveWallet = function(pub) {
-
-      
-
-  }
-
-
 };
-
 module.exports = wallet;
-
-//******************************************************************************
-//TESTING!!!!!!
-/*
-generateKeys()
-
-console.log()
-var msgHash = getHash("this is a message")
-//console.log("this is the msg hash: " + msgHash)
-msgHash = new Buffer(msgHash, "hex")
-//msgHash = hexString_to_buffer(msgHash)
-
-var privString = "AC27664FF75970D606D731D4F6CBD391E18D839D0365C4991944132F806441380000000000000000000000000000000000000000000000000000000000000000";
-
-var buffer3 = hexString_to_buffer(privString)
-console.log('buffer3: ' + buffer3)
-
-var erisSigObj = sign(msgHash, buffer3)
-
-var erisSig = JSON.parse(JSON.stringify(erisSigObj)).signature
-
-esig = JSON.parse(JSON.stringify(erisSig)).data
-console.log('erisSig: ' + buffer_to_hexString(esig))
-
-var erispubKey = secp256k1.publicKeyCreate(buffer3)
-
-console.log('result of verify ERIS: ' + verify(msgHash, erisSigObj.signature, erispubKey))
-console.log('eris pubkey: ' + buffer_to_hexString(erispubKey))
-
-//Eris data
-//*************************************************************************
-
-console.log('private key: ' + JSON.stringify(privKey))
-console.log('right before signing pubkey is: ' + typeof (pubkey))
-var sigObj = secp256k1.sign(msgHash, privKey)
-console.log('sigObj ' + sigObj)
-
-var sig = JSON.parse(JSON.stringify(sigObj)).signature
-sig = JSON.parse(JSON.stringify(sig)).data
-
-var hexSig = buffer_to_hexString(sig)
-console.log('signature: ' + hexSig)
-console.log()
-var hexPub = buffer_to_hexString(pubKey)
-console.log('pubKey: ' + hexPub)
-
-makeWalletFile(pubKey, privKey)
-
-console.log('result of verify: ' + secp256k1.verify(msgHash, sigObj.signature, pubKey))
-//console.log(pubKey)
-//console.log(sigObj.signature)
-console.log("this pub key: " + pubKey.toString('hex'));
-console.log("this signature: " + sigObj.signature.toString('hex'));
-
-//console.log("pub key: " + pubKey.toString('hex'));
-//console.log("sig: " + sigObj.signature.toString('hex'));
-//console.log("hash msg: " + msgHash.toString('hex'));
-
-*/

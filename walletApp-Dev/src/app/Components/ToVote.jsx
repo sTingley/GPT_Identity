@@ -2,7 +2,6 @@ import React from 'react';
 
 class Votes extends React.Component {
 	render(){
-		console.log(this.props);
 		if(this.props.msg != ""){
 			return(
 				<tr>
@@ -34,7 +33,22 @@ class Votes extends React.Component {
 class ToVote extends React.Component {
 	constructor(props){
 		super(props);
-		this.state = { coid: this.props.getcoid() };
+		this.state = { coid: '' };
+	}
+	
+	componentDidMount(){
+		$.ajax({
+			url: "http://localhost:5050/ballot/readNotify/" + localStorage.getItem("pubKey"),
+			dataType: 'json',
+			cache: false,
+			success: function(result) {
+				if(!$.isPlainObject(result)){
+					var data = JSON.parse(result);	
+				} else 
+					var data = result;
+				this.setState({coid: data.messages});
+			}.bind(this)
+		});
 	}
 	
 	render(){
@@ -43,9 +57,19 @@ class ToVote extends React.Component {
 				<h1>Vote</h1> <hr/>
 				<table className="table">
 					<tbody>
-					{this.state.coid.map(function(el,i) {
-						return <Votes key={i} msg={el.msg} timestamp={el.time} />;
-					})}
+					{(()=>{
+						if($.isPlainObject(this.state.coid)){
+							return this.state.coid.map(function(el,i) {
+								return <Votes key={i} msg={el.msg} timestamp={el.time} />;
+							});
+						} else {
+							return (<tr>
+										<td>
+											<p>No data to act upon !</p>
+										</td>
+									</tr>);
+						}
+					})(this)}
 					</tbody>
 				</table>
 			</div>

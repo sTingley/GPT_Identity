@@ -3,7 +3,8 @@ import { Link } from 'react-router';
 
 class Header extends React.Component {
 
-  render () {
+  render() {
+	var prop = this.props;  
     return (
       <nav className="navbar navbar-default navbar-fixed-top">
         <div className="container-fluid">
@@ -19,11 +20,12 @@ class Header extends React.Component {
           <div id="navbar" className="navbar-collapse collapse">
              <ul className="nav navbar-nav hidden-lg">
                 <li><Link to='/home' activeClassName="active">Home</Link></li>
-                <li><Link to='/upload' activeClassName="active">Upload Keys</Link></li>
-                <li><Link to='/register' activeClassName="active">Name Register</Link></li>
-                <li><Link to='/identity' activeClassName="active">Core Identity</Link></li>
-				<li><Link to='/assets' activeClassName="active">Assets</Link></li>
-				<li><Link to='/docs' activeClassName="active">My Documents</Link></li>
+				<li><Link to='/upload' activeClassName="active">Upload Keys</Link></li>
+				{ prop.loggedin ?  <li><Link to='/tovote' activeClassName="active">Vote</Link></li> : ''}
+				{ prop.loggedin ?  <li><Link to='/register' activeClassName="active">Name Register</Link></li> : ''}
+				{ prop.loggedin ?  <li><Link to='/identity' activeClassName="active">Core Identity</Link></li> : '' }
+				{ prop.loggedin ?  <li><Link to='/assets' activeClassName="active">Assets</Link></li> : '' }
+				{ prop.loggedin ?  <li><Link to='/docs' activeClassName="active">My Documents</Link></li> : '' }
             </ul>
             <ul className="nav navbar-nav navbar-right">
                 <li><a href="#">Faq</a></li>

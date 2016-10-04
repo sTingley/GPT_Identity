@@ -7,7 +7,7 @@ class Documents extends Component {
 		super(props);
 		this.state = {
 			docs:{},
-			pubKey: '1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740'
+			pubKey: localStorage.getItem("pubKey")
 		};
 	}
 	
@@ -19,9 +19,6 @@ class Documents extends Component {
 			success: function(resp) {
 				console.log("Response Data ", resp.data.documents)
 				this.setState({docs: resp.data.documents});
-			}.bind(this),
-			error: function(xhr, status, err) {
-				console.error(this.props.url, status, err.toString());
 			}.bind(this)
 		});
 	}

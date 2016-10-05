@@ -100,10 +100,11 @@ var wallet = function(){
   // Using fs.writeFile
   this.makeWalletFile = function() {
 
-      //we hash the keys before writing them a file
-      //wallet name will be saved as 'hashed_public_key.txt'
-      this.pubKey = this.getHash(this.buffer_to_hexString(this.pubKey));
-      this.privKey = this.getHash(this.buffer_to_hexString(this.privKey));
+      //this.pubKey = this.getHash(this.buffer_to_hexString(this.pubKey));
+      //this.privKey = this.getHash(this.buffer_to_hexString(this.privKey));
+	  
+	  this.pubKey = this.buffer_to_hexString(this.pubKey);
+	  this.privKey = this.buffer_to_hexString(this.privKey);
 
       var jsonStr = {
         'public_key' : this.pubKey,

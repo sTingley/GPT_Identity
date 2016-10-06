@@ -1,31 +1,53 @@
 import React from 'react';
 
 class Votes extends React.Component {
+	constructor(props){
+		super(props);
+	}
+	
+	submitHandler(e){
+		e.preventDefault();
+		var ele = $(e.target);
+		var index = parseInt(ele.attr("data-index"));
+		
+		var json = {
+			"txnDesc": this.refs["desc-"+index].value,
+			"signature": '7051442bbf18bb2c86cbc8951a07e27ec6ba05ac3fa427e4c6b948e3dcf91a94046b048edf52445fb22cc776a94b87c3f55426f993458ec744f61f09fb46eeaa',
+			"publicKey": localStorage.getItem("pubKey"),
+			"proposalID": this.refs["proposalid-"+index].value,
+			"vote": parseInt(ele.attr("data-val"))
+		};
+		
+		$.ajax({
+			url: twinUrl + 'voteonCOIDproposal',
+			type: 'POST',
+			data: json,
+			success: function(res){
+				// do something
+			},
+			complete: function(){
+				// do something
+			}
+		});
+		
+	}
+	
 	render(){
-		if(this.props.msg != ""){
-			return(
-				<tr>
-					<td>
-						<p><h3>{this.props.msg}</h3></p>
-						<textarea className="form-control" placeholder="Comments here.." />
-					</td>
-					<td>
-						<p>
-						  <button type="button" className="btn btn-primary btn-block">Yes</button>
-						  <button type="button" className="btn btn-default btn-block">No</button>
-						</p>
-					</td>
-				</tr>
-			)
-		} else {
-			return(
-				<tr>
-					<td>
-						<p>No data to act upon !</p>
-					</td>
-				</tr>
-			)
-		}
+		return(
+			<tr>
+				<td>
+					<h3>{this.props.msg}</h3>
+					<textarea className="form-control" ref={"desc-"+this.props.index} placeholder="Comments here.." />
+					<input type="hidden" ref={"proposalid-"+this.props.index} value={this.props.prposalid} />
+				</td>
+				<td>
+					<p>
+					  <button type="button" data-index={this.props.index} data-val="2" onClick={this.submitHandler.bind(this)} className="btn btn-primary btn-block">Yes</button>
+					  <button type="button" data-index={this.props.index} data-val="1" onClick={this.submitHandler.bind(this)} className="btn btn-default btn-block">No</button>
+					</p>
+				</td>
+			</tr>
+		)
 		
 	}
 };
@@ -33,7 +55,7 @@ class Votes extends React.Component {
 class ToVote extends React.Component {
 	constructor(props){
 		super(props);
-		this.state = { coid: '' };
+		this.state = { coid: [] };
 	}
 	
 	componentDidMount(){
@@ -42,25 +64,26 @@ class ToVote extends React.Component {
 			dataType: 'json',
 			cache: false,
 			success: function(result) {
-				if(!$.isPlainObject(result)){
+				if(typeof(result) != "object"){
 					var data = JSON.parse(result);	
 				} else 
 					var data = result;
-				this.setState({coid: data.messages});
+				this.setState({coid: data.data.messages});
 			}.bind(this)
 		});
 	}
 	
 	render(){
+		
 		return(
 			<div id="vote_container">
 				<h1>Vote</h1> <hr/>
 				<table className="table">
 					<tbody>
 					{(()=>{
-						if($.isPlainObject(this.state.coid)){
+						if($.isArray(this.state.coid) && this.state.coid.length > 0){
 							return this.state.coid.map(function(el,i) {
-								return <Votes key={i} msg={el.msg} timestamp={el.time} />;
+								return <Votes key={i} prposalid={el.proposal_id} index={i} timestamp={el.time} />;
 							});
 						} else {
 							return (<tr>

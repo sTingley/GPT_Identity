@@ -29,8 +29,10 @@ var gkConfig = {
   onProxyReq(proxyReq, req, res) {
 	if ( req.method == "POST" && req.body ) {
 		req.body.txn_id = "requestCOID";
-		req.body.message = config.endpoints.requestCOID.message;
-	   
+		req.body.msg = "8836a77b68579d1d8d4427c0cda24960f6c123f17ccf751328cc621d6237da22";
+		//req.body.msg = config.endpoints.requestCOID.message;
+	        //msg should be hash of txn_id
+
 		let body = req.body;
 		// URI encode JSON object
 		body = Object.keys( body ).map(function( key ) {
@@ -97,3 +99,4 @@ for(var i=0; i<config.env.ports.length; i++){
 	http.createServer(app).listen(port);
 	console.log("Digital Twin running at "+port);
 }
+

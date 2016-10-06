@@ -1,10 +1,10 @@
 var fs = require ('fs');
-var Crypto = require('./cryptoCtr.js');
+var Crypto = require('./cryptoCtr.js'),
+	config = require('./config.json');
 
-//var PATH = "/Users/arunkumar/GPT_Identity/Notification/DigitalTwin/notifications/";
-var PATH = "D:/Source/GPT_Identity-master/Notification/DigitalTwin/notifications/";
-var notify_suffix =  "_notify";
-var coid_suffix =  "_coid";
+var PATH = config.env.notification_folder_path;
+var notify_suffix = config.suffix.notifications_file;
+var coid_suffix = config.suffix.coid_file;
 
 var ballotCtrl = {
 
@@ -27,22 +27,11 @@ var ballotCtrl = {
 		};
 		
 		if (fs.existsSync(fileName)) {
-			fs.readFile(fileName, (err, data) => {
-				if(err) {
-					res.status(400).json({"Error": "Unable to read notifications"});
-					return;
-				} 
-				var notifications = JSON.parse(data.toString());
-				notifications.messages.unshift(dataFormat());
-				var cryptoData = cryptoEncr.encrypt(JSON.stringify(notifications));
-				fs.writeFile(fileName, cryptoData, (err) => {
-					if(err){
-						res.status(400).json({"Error": "Unable to create file under " + fileName});
-						return;
-					}
-					res.json({"Msg":"Notification updated successfully"});
-				});
-			});
+			var fileContent = cryptoEncr.decrypt(fs.readFileSync(fileName, 'utf8'));
+			var fileContent = JSON.parse(fileContent);
+			fileContent.messages.unshift(dataFormat());
+			fs.writeFileSync(fileName, cryptoEncr.encrypt(JSON.stringify(fileContent)));
+			res.json({"Msg":"Notification updated successfully"});
 		} else {
 			var msg = {
 				id: params.pubKey,//public key
@@ -92,18 +81,10 @@ var ballotCtrl = {
 		};
 		
 		if (fs.existsSync(fileName)) {
-			fs.readFile(fileName, (err, data) => {
-				if(err) res.status(400).json({"Error": "Unable to read notifications"});
-				var notifications = JSON.parse(data.toString());
-				notifications.data.unshift(dataFormat());
-				var cryptoData = cryptoEncr.encrypt(JSON.stringify(notifications));
-				fs.writeFile(fileName, cryptoData, (err) => {
-					if(err){
-						res.status(400).json({"Error": "Unable to create file under " + fileName});
-					}
-					res.json({"Msg":"Proposal updated successfully"});
-				});
-			});
+			var fileContent = cryptoEncr.decrypt(fs.readFileSync(fileName, 'utf8'));
+			var fileContent = JSON.parse(fileContent);
+			fileContent.data.unshift(dataFormat());
+			fs.writeFileSync(fileName, cryptoEncr.encrypt(JSON.stringify(fileContent)));
 		} else {
 			var msg = {
 				id: params.pubKey,//public key

@@ -4,44 +4,23 @@
 		"ipfs_file_tmp_path": "D:/Source/GPT_Identity-master/Notification/DigitalTwin/tmp/",
 		"notification_folder_path": "D:/Source/GPT_Identity-master/Notification/DigitalTwin/notifications/",
 		"ipfs_file_read_url": "http://192.168.99.101:8080/ipfs/",
-		"gatekeeper_url": "http://localhost:5050/",
-		"ballot_url": "http://localhost:8082/"
+		"gatekeeper_url": "http://localhost:8081/",
+		"ballot_url": "http://localhost:8081/",
+		"ports": [5050]
+	},
+	"suffix": {
+		"ipfs_file": "_files",
+		"coid_file": "_coid",
+		"notifications_file": "_notify"
 	},
 	"endpoints": {
-		"txns":{
-			"requestCOID": {
-				"message": "08788f857ead2deac6b9ee7e2c1b97484c3fa785e227687d60109018a0b2deea",
-				"path": "/gk/gatekeeper"
-			},
-			"voteonCOIDproposal": {
-				"message": "7835d621178da6d43d3975f414236567f7031aa2737ff9a9ae5aeada7f7f2cc3",
-				"path": "/ballot/vote"
-			}
+		"requestCOID": {
+			"message": "08788f857ead2deac6b9ee7e2c1b97484c3fa785e227687d60109018a0b2deea",
+			"path": "/gatekeeper"
 		},
-		"ipfs": {
-			"fileUpload": {
-				"message": "cda16e2533cbbd8be59fcbd3ac9a2b91bb86d4fcae1a35a2b4d9e325767a5fcf",
-				"path": "/ipfs/upload"
-			},
-			"requestFile": {
-				"message": "c1f868ceb970b6170818181b8110b32dc7edf39e13644e422183faf6435ecbbe",
-				"path": "/ipfs/getfile/:hash"
-			},
-			"requestAllFiles": {
-				"message": "f022e56ccd025ef80f563d79bb61300f85a54aaaef5950302e74321e23073533",
-				"path": "/ipfs/alldocs/:pubKey"
-			}
-		},
-		"notifications": {
-			"requestProposalNotifications": {
-				"message": "bed868f732e95ce21d1048bda9f8edfb19df816e3cd8afcd72b22b694203425f",
-				"path": "/ballot/readNotify/:pubKey"
-			},
-			"expiredProposalNotifications": {
-				"message": "dc09c08c9262fbe3bfdf14e175d30232bd3534e598273d14d12fd9c30a8f43a0",
-				"path": "/ballot/readExpiredProposal/:pubKey"
-			}
-		} 
-		
+		"voteonCOIDproposal": {
+			"message": "7835d621178da6d43d3975f414236567f7031aa2737ff9a9ae5aeada7f7f2cc3",
+			"path": "/vote"
+		}
 	}
 }

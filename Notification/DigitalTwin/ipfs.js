@@ -1,17 +1,14 @@
 var spawn = require('child_process').spawn,
 	crypt = require('./cryptoCtr.js'),
 	crypto = require('crypto'),
+	config = require('./config.json'),
 	fs = require('fs'),
 	http = require('http');
 	
-var tmpPath = "D:/Source/GPT_Identity-master/Notification/DigitalTwin/tmp/";
-//var tmpPath = "/Users/arunkumar/Node/GPT_Identity/Notification/DigitalTwin/tmp/";
-var JSONPath = "D:/Source/GPT_Identity-master/Notification/DigitalTwin/notifications/";
-//var JSONPath = "/Users/arunkumar/Node/GPT_Identity/Notification/DigitalTwin/notifications/";
-var IPFS_baseUrl = "http://192.168.99.101:8080/ipfs/";
-
-var suffix = "_files";
-
+var tmpPath = config.env.ipfs_file_tmp_path;
+var JSONPath = config.env.notification_folder_path;
+var IPFS_baseUrl = config.env.ipfs_file_read_url;
+var suffix = config.suffix.ipfs_file;
 
 var IPFS = {
 	

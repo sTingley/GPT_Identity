@@ -1,5 +1,6 @@
 var fs = require ('fs');
 var Crypto = require('./cryptoCtr.js'),
+	keccak_256 = require('js-sha3').keccak_256,
 	config = require('./config.json');
 
 var PATH = config.env.notification_folder_path;
@@ -50,9 +51,13 @@ var ballotCtrl = {
 	
 	fetchNotification: function(req, res){
 		var param = req.params;
-		var fileName = PATH + param.pubKey + notify_suffix + ".json";
-		var cryptoDecr = new Crypto({pubKey: param.pubKey});
+		console.log('pubKey: ' + param.pubKey)
+                console.log('hash of pubkey: ' + keccak_256(param.pubKey).toUpperCase())
+		var fileName = PATH + keccak_256(param.pubKey).toUpperCase() + notify_suffix + ".json";
+		var cryptoDecr = new Crypto({pubKey: keccak_256(param.pubKey).toUpperCase()});
+		console.log('hit fetchNotification: ' + fileName);
 		if(param.pubKey && fs.existsSync(fileName)){
+		console.log('inside if condition (file exists)')
 			fs.readFile(fileName, 'utf8', function(err, data){
 				if(err) res.status(400).json({"Error": "Unable to read notifications"});
 				res.json({'data': JSON.parse(cryptoDecr.decrypt(data))});
@@ -68,7 +73,7 @@ var ballotCtrl = {
 			res.status(400).json({"Error": "Invalid input parameters"});
 			return;
 		} 
-		var fileName = PATH + params.pubKey + coid_suffix + ".json";
+		var fileName = PATH + keccak_256(params.pubKey) + coid_suffix + ".json";
 		var timestamp = Number(new Date());
 		var cryptoEncr = new Crypto({pubKey: params.pubKey});
 		var dataFormat = () => {
@@ -103,7 +108,7 @@ var ballotCtrl = {
 	
 	fetchCoidData: function(req, res){
 		var param = req.params;
-		var fileName = PATH + param.pubKey + coid_suffix + ".json";
+		var fileName = PATH + keccak_256(param.pubKey) + coid_suffix + ".json";
 		if(param.pubKey && fs.existsSync(fileName)){
 			var cryptoDecr = new Crypto({pubKey: param.pubKey});
 			fs.readFile(fileName, 'utf8', function(err, data){

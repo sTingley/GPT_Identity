@@ -26,20 +26,22 @@ app.all('/*', function(req, res, next) {
 var gkConfig = {
   target: config.env.gatekeeper_url,
   changeOrigin: true,
+
   onProxyReq(proxyReq, req, res) {
 	if ( req.method == "POST" && req.body ) {
-		req.body.txn_id = "requestCOID";
-		req.body.msg = "8836a77b68579d1d8d4427c0cda24960f6c123f17ccf751328cc621d6237da22";
-		//req.body.msg = config.endpoints.requestCOID.message;
+//		req.body.txn_id = "requestCOID";
+//		req.body.msg = "8836a77b68579d1d8d4427c0cda24960f6c123f17ccf751328cc621d6237da22";
+		req.body.msg = config.endpoints.requestCOID.message;
 	        //msg should be hash of txn_id
 
 		let body = req.body;
+		console.log("req.body: " + req.body);
 		// URI encode JSON object
 		body = Object.keys( body ).map(function( key ) {
-			return encodeURIComponent( key ) + '=' + encodeURIComponent( body[ key ])
+			return  key  + '=' + body[ key ]
 		}).join('&');
 		
-		proxyReq.setHeader( 'content-type', 'application/x-www-form-urlencoded' );
+		proxyReq.setHeader( 'content-type','application/x-www-form-urlencoded' );
 		proxyReq.setHeader( 'content-length', body.length );
 
 		proxyReq.write( body );
@@ -59,16 +61,16 @@ var ballotConfig = {
 	ws: true,
 	onProxyReq(proxyReq, req, res) {
 		if ( req.method == "POST" && req.body ) {
-			req.body.message = config.endpoints.voteonCOIDproposal.message;
+			req.body.msg = config.endpoints.voteonCOIDproposal.message;
 			req.body.txn_id = "voteonCOIDproposal";
-		   
+		   	console.log(JSON.stringify(req.body));
 			let body = req.body;
 			// URI encode JSON object
 			body = Object.keys( body ).map(function( key ) {
 				return encodeURIComponent( key ) + '=' + encodeURIComponent( body[ key ])
 			}).join('&');
 			
-			proxyReq.setHeader( 'content-type', 'application/x-www-form-urlencoded' );
+			proxyReq.setHeader( 'content-type','application/x-www-form-urlencoded' );
 			proxyReq.setHeader( 'content-length', body.length );
 
 			proxyReq.write( body );

@@ -83,8 +83,10 @@ var ballotConfig = {
 }
 app.use('/voteonCOIDproposal', proxy(ballotConfig));
 app.post('/ballot/writeNotify', ballotCtrl.writeNotification);
-app.post('/ballot/writeExpiredProposal', expiredNotification.writeExpiredProposalNotification);
+app.get('/ballot/deleteProposal/:pid/:pubKey', ballotCtrl.deleteNotification);
 app.get('/ballot/readNotify/:pubKey', ballotCtrl.fetchNotification);
+
+app.post('/ballot/writeExpiredProposal', expiredNotification.writeExpiredProposalNotification);
 app.get('/ballot/readExpiredProposal/:pubKey', expiredNotification.fetchExpiredProposalNotification);
 
 app.post('/ipfs/upload', IPFS.uploadFile);
@@ -101,4 +103,3 @@ for(var i=0; i<config.env.ports.length; i++){
 	http.createServer(app).listen(port);
 	console.log("Digital Twin running at "+port);
 }
-

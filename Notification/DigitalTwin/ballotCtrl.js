@@ -49,13 +49,36 @@ var ballotCtrl = {
 		}
 	},
 	
+	deleteNotification: function(req, res){
+		var pid = req.params.pid,
+			pubKey = req.params.pubKey;
+		if(pid && pubKey){
+			var fileName = PATH + keccak_256(pubKey).toUpperCase() + notify_suffix + ".json";
+			var cryptoDecr = new Crypto({pubKey: keccak_256(pubKey).toUpperCase()});
+			if(fs.existsSync(fileName)){
+				fs.readFile(fileName, 'utf8', function(err, data){
+					var allNotifications = JSON.parse(cryptoDecr.decrypt(data)),
+						msgs = allNotifications.messages;
+					for(var i=0; i<msgs.length; i++){
+						var msg = msgs[i];
+						if(msg.proposal_id == pid){
+							msgs.splice(i,1);
+							fs.writeFileSync(fileName, cryptoDecr.encrypt(JSON.stringify(allNotifications)));
+							break;
+						}
+					}
+					res.send("successfully deleted");
+				});
+			}
+		}
+	},
+	
 	fetchNotification: function(req, res){
 		var param = req.params;
 		console.log('pubKey: ' + param.pubKey)
-                console.log('hash of pubkey: ' + keccak_256(param.pubKey).toUpperCase())
+        console.log('hash of pubkey: ' + keccak_256(param.pubKey).toUpperCase())
 		var fileName = PATH + keccak_256(param.pubKey).toUpperCase() + notify_suffix + ".json";
 		var cryptoDecr = new Crypto({pubKey: keccak_256(param.pubKey).toUpperCase()});
-		console.log('hit fetchNotification: ' + fileName);
 		if(param.pubKey && fs.existsSync(fileName)){
 		console.log('inside if condition (file exists)')
 			fs.readFile(fileName, 'utf8', function(err, data){

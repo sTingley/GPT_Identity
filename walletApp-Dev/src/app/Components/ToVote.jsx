@@ -17,16 +17,28 @@ class Votes extends React.Component {
 			"proposalID": this.refs["proposalid-"+index].value,
 			"vote": parseInt(ele.attr("data-val"))
 		};
+
+		var pid = this.refs["proposalid-"+index].value;
 		
 		$.ajax({
 			url: twinUrl + 'voteonCOIDproposal',
 			type: 'POST',
 			data: json,
 			success: function(res){
-				// do something
-			},
-			complete: function(){
-				// do something
+				if(res.status == "Ok" && res.msg == "true"){
+					var proposalID = res.proposalID || pid;
+					$.ajax({
+						url: twinUrl + proposalID + "/" + localStorage.getItem("pubKey"),
+						type: 'GET',
+						complete: function(xhr){
+							alert("vote successfully submitted");
+							window.location.reload();
+						}
+					});
+					
+				} else {
+					alert("Unable to submit your vote. Please try again later");
+				}
 			}
 		});
 		

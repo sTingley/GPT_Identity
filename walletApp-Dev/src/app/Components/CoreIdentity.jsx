@@ -289,7 +289,7 @@ class CoreIdentity extends React.Component {
 				"controlTokenDistribution": this.prepareTokenDistribution(this.state.controlTokenDistribution),
 				
 				"identityRecoveryIdList": this.valueIntoHash(this.state.recovery_id),		//user defined conditions
-				"recoveryCondition": this.state.recovery_condition,
+				"recoveryCondition": this.state.recoveryCondition,
 				"yesVotesRequiredToPass": 2 	//needs to be taken out and hardcoded in app
 				
 				//TODO:
@@ -439,8 +439,7 @@ class CoreIdentity extends React.Component {
 	    return (
 	    	<div id="CoreIdentityContainer">
 	    		<h1>Core Identity Submission Form</h1>
-	    		<form method="POST" id="register" role="form" onSubmit={this.submitCoid.bind(this)}>
-				
+	    		<form method="POST" id="register" role="form">
 					<div className="form-group">
 						<label htmlFor="unique_id">Enter Unique ID Attributes. The first Attribute has to be name (first, last). Then add any official identification such as SSN or national ID number(s). Make sure to add the supporting file(s) through "Upload File".</label>
 						{this.state.inputs.map(input => <UniqueIDAttributesForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
@@ -498,7 +497,7 @@ class CoreIdentity extends React.Component {
 					  <br/>
 						<input className="form-control" ref="signature" type="hidden" value="7051442bbf18bb2c86cbc8951a07e27ec6ba05ac3fa427e4c6b948e3dcf91a94046b048edf52445fb22cc776a94b87c3f55426f993458ec744f61f09fb46eeaa" />
 						<input type="hidden" name="pubkey" ref="pubKey" value={localStorage.getItem("pubKey")} />
-						<button className="btn btn-primary" data-loading-text="Submit Identity" name="submit-form" type="submit">Submit Identity</button>
+						<button className="btn btn-primary" data-loading-text="Submit Identity" name="submit-form" type="button" onClick={this.submitCoid.bind(this)}>Submit Identity</button>
 					  </div>
 					</div>
 				</form>
@@ -507,5 +506,4 @@ class CoreIdentity extends React.Component {
     );
    }
 }
-
 export default CoreIdentity;

@@ -70,6 +70,7 @@ class UploadIpfsFile extends React.Component {
 					success: function(resp){
 						if(resp.uploded && resp.uploded.length > 0){
 							var filedata = resp.uploded[0].hash+"|"+resp.uploded[0].file_hash;
+							//data handler forms JSON object
 							this.props.dataHandler(filedata);
 							$("button.close").trigger("click");
 						}
@@ -140,25 +141,50 @@ class UploadIpfsFile extends React.Component {
 	}
 };
 
-class UniqIdForm extends React.Component {
+
+//form where we can add addtional labels (uniqueIDAttrs)
+class UniqueIDAttributesForm extends React.Component {
 
 	constructor(props){
 		super(props);
+		
+		this.state = {
+		file_attrs:[],
+		inputs: ['input-0'],
+		tmpFile:'',
+		showModal: false,
+		pubKey: localStorage.getItem("pubKey")
+		};
+	
 	}
-
+	
+	handleShowModal(e){
+		this.setState({showModal: true, tmpFile: $(e.target).attr('data-id')});
+    }
+	
+	handleHideModal(){
+		this.setState({showModal: false});
+	}
+	
 	render(){
+		
 		return(
 			<div className="form-group col-md-12">
 				<div className="col-md-10">
+				<label htmlFor="unique_id_attrs"> Official IDs e.g. SSN, Passport, Driver's License, Digital retinal scans and/or digital fingerprints </label>
 					<input name={'label-'+this.props.labelref} className="form-control col-md-4" type="text" placeholder="Label"  />
 				</div>
 				<div className="col-md-2">
 					<button type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn btn-warning pull-right"><span className="glyphicon glyphicon-upload"></span>Upload File</button>
-				</div>
-			</div>
+				</div>	
+			</div>	
 		);
 	}
+
 };
+
+
+
 
 
 
@@ -168,13 +194,21 @@ class CoreIdentity extends React.Component {
 		super(props);
 		this.state = {
 			file_attrs:[],
-			inputs: ['input-0','input-1'],
-			official_id:[],
+			inputs: ['input-0'], //removed input-1
+			inputs_name:['input-0'],
+			official_id:[],		//first official ID is name (see identity spec v1.3)
 			owner_id:[],
+			ownershipTokenDistribution:[],	//ownership token owner and stake
+			controlTokenDistribution:[],
 			control_id:[],
 			recovery_id:[],
+			recoveryCondition:[],
 			owner_token_id:[],
+			owner_token_desc:[],
+			owner_token_quantity:[],
 			control_token_id:[],
+			control_token_desc:[],
+			control_token_quantity:[],
 			showModal: false,
 			tmpFile:'',
 			pubKey: localStorage.getItem("pubKey")
@@ -216,6 +250,7 @@ class CoreIdentity extends React.Component {
 			var value = $.trim($(this).val());
 			if(value.length > 0){
 				labelVals.push({
+					//replace the 'label' with the entered unique attribute descriptor, for example 'Name' or 'US SSN'
 					[$(this).attr('name').replace("label-","")] : value
 				});
 			}
@@ -228,27 +263,68 @@ class CoreIdentity extends React.Component {
 		var inputObj = {
 				"pubKey": this.refs.pubKey.value,
 				"sig": this.refs.signature.value,
-				"msg": this.refs.message.value,
-				"name": this.refs.nameReg.value,
+				
+				//"msg": this.refs.message.value,
+				//"name": this.refs.nameReg.value,		no longer standalone part of JSON object (it is part of unique attributes)
+
 				"uniqueId": this.createHashAttribute(this.state.file_attrs),
 				"uniqueIdAttributes": this.prepareUniqueIdAttrs(),
-				"ownershipId": this.createHashAttribute(this.state.owner_id),
+				"ownershipId": this.createHashAttribute(this.state.owner_id),	//calculated from ownerIDlist
+
 				"ownerIdList":this.valueIntoHash(this.state.owner_id),
 				"controlId": this.createHashAttribute(this.state.control_id),
 				"controlIdList": this.valueIntoHash(this.state.control_id),
-				"ownershipTokenId": this.createHashAttribute(this.state.owner_token_id),
-				"ownershipTokenAttributes":this.valueIntoHash(this.state.owner_token_id),
-				"ownershipTokenQuantity": 3,
-				"controlTokenId": this.createHashAttribute(this.state.control_token_id),
-				"controlTokenAttributes": this.valueIntoHash(this.state.control_token_id),
-				"controlTokenQuantity": 5,
-				"identityRecoveryIdList": this.valueIntoHash(this.state.recovery_id),
-				"recoveryCondition": 2,
-				"yesVotesRequiredToPass": 2 
+				
+				"ownershipTokenId": this.getHash(this.joinValuesOwnership()),	//calculated. should be one time hashing of ownershipTokenAttributes and ownership token quantity
+				//this.state.owner_token_desc,this.state.owner_token_quantity)
+				"ownershipTokenAttributes":this.state.owner_token_desc,					//these should not be hashed they should be readable. Removed hashing (ST).
+				"ownershipTokenQuantity": this.state.owner_token_quantity,
+				
+				"ownershipTokenDistribution": this.prepareTokenDistribution(this.state.ownershipTokenDistribution),		//owner of token and owner's share (2 things)
+				
+				"controlTokenId": this.getHash(this.joinValuesControl()),	//calculated
+				"controlTokenAttributes": this.state.control_token_desc,
+				"controlTokenQuantity": this.state.control_token_quantity,
+				
+				"controlTokenDistribution": this.prepareTokenDistribution(this.state.controlTokenDistribution),
+				
+				"identityRecoveryIdList": this.valueIntoHash(this.state.recovery_id),		//user defined conditions
+				"recoveryCondition": this.state.recovery_condition,
+				"yesVotesRequiredToPass": 2 	//needs to be taken out and hardcoded in app
+				
+				//TODO:
+				//0)Check that controllers pubkeys are valid
+				//1)NEED TO DISTINGUISH COID for person or thing
+					//if{Human=1} -- follow identity spec for protocol of controllers/owners for individual
+				//2)CONTROLLERS need to be able to upload documents
+
 		};
 		return inputObj;
 	}
 	
+		joinValuesOwnership()
+		{
+		var value1 = this.state.owner_token_desc;
+		var value2 = this.state.owner_token_quantity;
+        var tempArr = [];
+		tempArr.push(value1);
+		tempArr.push(value2);
+		tempArr = tempArr.join();
+        return tempArr;
+		}
+		
+		joinValuesControl()
+		{
+		var value1 = this.state.control_token_desc;
+		var value2 = this.state.control_token_quantity;
+        var tempArr = [];
+		tempArr.push(value1);
+		tempArr.push(value2);
+		tempArr = tempArr.join();
+        return tempArr;
+		}
+		
+		
 	createHashAttribute(values){
 		if($.isArray(values) && values.length > 0){
 			if($.isPlainObject(values[0])){
@@ -264,6 +340,8 @@ class CoreIdentity extends React.Component {
 					}
 				}
 				return this.getHash(str);
+				
+				//if only one value in 'values'
 			} else {
 				var valStr = values.join("|");
 				return this.getHash(valStr);
@@ -273,6 +351,7 @@ class CoreIdentity extends React.Component {
 		return '';
 	}
 	
+	//hashes arrays (no delimiter)
 	valueIntoHash(values){
 		var newArr = [];
 		var _this = this;
@@ -286,7 +365,7 @@ class CoreIdentity extends React.Component {
 	
 	prepareUniqueIdAttrs(){
 		var newArr = [],
-			labels = this.getLabelValues();
+			labels = this.getLabelValues();	//look at this
 		for(var i=0; i<labels.length; i++){
 			var tmpArr = [];
 			for(var key in labels[i]){
@@ -302,9 +381,21 @@ class CoreIdentity extends React.Component {
 		return newArr;
 	}
 	
+	//hashing the pubkeys
+	prepareTokenDistribution(value){
+		var tempArr = value;
+		for(var i=0; i<tempArr.length; i+=2){
+			tempArr[i] = this.getHash(tempArr[i]);
+		}
+		return tempArr;
+	}
+	
+	
+	
 	submitCoid(e){
 		e.preventDefault();
 		var json = this.prepareJsonToSubmit();
+		console.log(json)
 		$.ajax({
 			url: twinUrl + 'requestCOID',
 			type: 'POST',
@@ -347,15 +438,12 @@ class CoreIdentity extends React.Component {
 		}
 	    return (
 	    	<div id="CoreIdentityContainer">
-	    		<h1>Core Identity</h1>
+	    		<h1>Core Identity Submission Form</h1>
 	    		<form method="POST" id="register" role="form" onSubmit={this.submitCoid.bind(this)}>
+				
 					<div className="form-group">
-						<label htmlFor="name">Name</label>
-						<input className="form-control" id="name" ref="nameReg" type="text" name="name" />
-					</div>
-					<div className="form-group">
-						<label htmlFor="unique_id">Unique Id</label>
-						{this.state.inputs.map(input => <UniqIdForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+						<label htmlFor="unique_id">Enter Unique ID Attributes. The first Attribute has to be name (first, last). Then add any official identification such as SSN or national ID number(s). Make sure to add the supporting file(s) through "Upload File".</label>
+						{this.state.inputs.map(input => <UniqueIDAttributesForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
 					</div>
 					<div className="form-group"> 
 						<div className="col-md-offset-6 col-md-6 "> 
@@ -364,13 +452,9 @@ class CoreIdentity extends React.Component {
 								<span className="glyphicon glyphicon-plus"></span>Add More
 							</button>
 						</div>
-					</div>
+					</div>					
 					<div className="form-group">
-						<label htmlFor="official_id">Official ID</label>
-						<TagsInput {...inputAttrs} value={this.state.official_id} onChange={(e)=>{ this.onFieldChange("official_id", e) } } />
-					</div>
-					<div className="form-group">
-						<label htmlFor="owner_id">Owner ID</label>
+						<label htmlFor="owner_id">Enter Owner IDs. Owner IDs are the public keys of the identity owners. Only one owner for an individual (self).</label>
 						<TagsInput {...inputAttrs} value={this.state.owner_id} onChange={(e)=>{ this.onFieldChange("owner_id", e) } } />
 					</div>
 					<div className="form-group">
@@ -378,16 +462,36 @@ class CoreIdentity extends React.Component {
 						<TagsInput {...inputAttrs} value={this.state.control_id} onChange={(e)=>{ this.onFieldChange("control_id", e) } } />
 					</div>
 					<div className="form-group">
-						<label htmlFor="recovery_id">Recovery ID</label>
+						<label htmlFor="recovery_id">Recovery IDs (public keys of individuals who will attest to lost/stolen identity)</label>
 						<TagsInput {...inputAttrs} value={this.state.recovery_id} onChange={(e)=>{ this.onFieldChange("recovery_id", e) } } />
 					</div>
 					<div className="form-group">
-						<label htmlFor="owner_token_id">Ownership Token ID</label>
-						<TagsInput {...inputAttrs} value={this.state.owner_token_id} onChange={(e)=>{ this.onFieldChange("owner_token_id", e) } } />
+						<label htmlFor="recovery_id">Recovery Condition (# of digital signatures of recovery ID owners needed to recover identity)</label>
+						<TagsInput {...inputAttrs} value={this.state.recoveryCondition} onChange={(e)=>{ this.onFieldChange("recoveryCondition", e) } } />
 					</div>
 					<div className="form-group">
-						<label htmlFor="control_token_id">Control Token ID</label>
-						<TagsInput {...inputAttrs} value={this.state.control_token_id} onChange={(e)=>{ this.onFieldChange("control_token_id", e) } } />
+						<label htmlFor="owner_token_id">Enter Ownership Token Description. For example, 'Spencer tokens'.</label>
+						<TagsInput {...inputAttrs} value={this.state.owner_token_desc} onChange={(e)=>{ this.onFieldChange("owner_token_desc", e) } } />
+					</div>
+					<div className="form-group">
+						<label htmlFor="owner_token_id">Enter Ownership Token Quantity. For example, 1 token for an individual.</label>
+						<TagsInput {...inputAttrs} value={this.state.owner_token_quantity} onChange={(e)=>{ this.onFieldChange("owner_token_quantity", e) } } />
+					</div>
+					<div className="form-group">
+						<label htmlFor="owner_token_id">Enter Ownership Token Distribution.</label>
+						<TagsInput {...inputAttrs} value={this.state.ownershipTokenDistribution} onChange={(e)=>{ this.onFieldChange("ownershipTokenDistribution", e) } } />
+					</div>
+					<div className="form-group">
+						<label htmlFor="control_token_id">Control Token ID. Description. For example, 'Spencer tokens'.</label>
+						<TagsInput {...inputAttrs} value={this.state.control_token_desc} onChange={(e)=>{ this.onFieldChange("control_token_desc", e) } } />
+					</div>
+					<div className="form-group">
+						<label htmlFor="control_token_id">Enter Control Token Quantity. For example, 1 token for an individual.</label>
+						<TagsInput {...inputAttrs} value={this.state.control_token_quantity} onChange={(e)=>{ this.onFieldChange("control_token_quantity", e) } } />
+					</div>
+					<div className="form-group">
+						<label htmlFor="control_token_id">Enter Control Token Distribution.</label>
+						<TagsInput {...inputAttrs} value={this.state.controlTokenDistribution} onChange={(e)=>{ this.onFieldChange("controlTokenDistribution", e) } } />
 					</div>
 					<div className="form-group">
 					  <div className="col-sm-6">

@@ -60,6 +60,26 @@ var ballotConfig = {
         changeOrigin: true,
         ws: true,
         onProxyReq(proxyReq, req, res) {
+
+                if(req.method == "POST" && config.endpoints.getCoidData)
+                {
+                        req.body.msg = config.endpoints.voteonCOIDproposal.message;
+                        req.body.txn_id = "voteonCOIDproposal";
+                        console.log(JSON.stringify(req.body));
+                        let body = req.body;
+                        // URI encode JSON object
+                        body = Object.keys( body ).map(function( key ) {
+                                return encodeURIComponent( key ) + '=' + encodeURIComponent( body[ key ])
+                        }).join('&');
+
+                        proxyReq.setHeader( 'content-type','application/x-www-form-urlencoded' );
+                        proxyReq.setHeader( 'content-length', body.length );
+
+                        proxyReq.write( body );
+                        proxyReq.end();
+                }
+
+
                 if ( req.method == "POST" && req.body ) {
                         req.body.msg = config.endpoints.voteonCOIDproposal.message;
                         req.body.txn_id = "voteonCOIDproposal";
@@ -82,6 +102,7 @@ var ballotConfig = {
         }
 }
 app.use('/voteonCOIDproposal', proxy(ballotConfig));
+app.use('/getCoidData', proxy(ballotConfig));
 app.post('/ballot/writeNotify', ballotCtrl.writeNotification);
 app.get('/ballot/deleteProposal/:pid/:pubKey', ballotCtrl.deleteNotification);
 app.get('/ballot/readNotify/:pubKey', ballotCtrl.fetchNotification);

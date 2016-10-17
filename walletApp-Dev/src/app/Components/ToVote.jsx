@@ -119,7 +119,24 @@ class ModalWin extends React.Component {
 							<tr>
 								<td colSpan="2"><b>Official ID's</b></td>
 							</tr>
+							{(() => {
+								var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+								if(!$.isEmptyObject(this.state.proposal_data)){
+									console.log("**", this.state.proposal_data.official_ids)
+									return this.state.proposal_data.official_ids.map((ids,i) => {
+										return(
+											<tr key={i}>
+												<td>{ids[0]}</td>
+												<td><p>File hash: {ids[2]}</p><p>IPFS hash: <a target="_blank" href={ipfs_url+"/"+ids[1]}>{ids[1]}</a></p></td>
+											</tr>
+										)
 
+									});
+									
+								} else {
+								return <tr><td colSpan="2">No Ids found</td></tr>
+							}
+						})(this)}
 							
 							<tr>
 								<td>Ownership ID</td>

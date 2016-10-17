@@ -374,7 +374,7 @@ class CoreIdentity extends React.Component {
 				[ipfsHash, fileHash] = this.state.file_attrs[i][key].split("|");
 				tmpArr.push(fileHash);
 				//temporary hack: hash ipfs links so they will be 32 bytes... need to fix ... remove this.getHash later
-				tmpArr.push(this.getHash(ipfsHash));
+				tmpArr.push(ipfsHash);
 			}
 			newArr.push(tmpArr);
 		}

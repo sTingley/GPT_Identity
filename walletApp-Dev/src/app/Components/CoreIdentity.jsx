@@ -198,11 +198,10 @@ class CoreIdentity extends React.Component {
 			inputs_name:['input-0'],
 			official_id:[],		//first official ID is name (see identity spec v1.3)
 			owner_id:[],
-			ownershipTokenDistribution:[],	//ownership token owner and stake
-			controlTokenDistribution:[],
 			control_id:[],
 			recovery_id:[],
 			recoveryCondition:[],
+			isHuman:[],
 			owner_token_id:[],
 			owner_token_desc:[],
 			owner_token_quantity:[],
@@ -258,6 +257,11 @@ class CoreIdentity extends React.Component {
 		return labelVals;
 	}
 	
+	//TODO:
+	//0)Check that controllers pubkeys are valid
+	//1)NEED TO DISTINGUISH COID for person or thing---DONE
+	//2)CONTROLLERS need to be able to upload documents---LATER
+	
 	prepareJsonToSubmit(){
 		console.log();
 		var inputObj = {
@@ -269,34 +273,29 @@ class CoreIdentity extends React.Component {
 
 				"uniqueId": this.createHashAttribute(this.state.file_attrs),
 				"uniqueIdAttributes": this.prepareUniqueIdAttrs(),
+				
 				"ownershipId": this.createHashAttribute(this.state.owner_id),	//calculated from ownerIDlist
-
 				"ownerIdList":this.valueIntoHash(this.state.owner_id),
 				"controlId": this.createHashAttribute(this.state.control_id),
 				"controlIdList": this.valueIntoHash(this.state.control_id),
 				
-				"ownershipTokenId": this.getHash(this.joinValuesOwnership()),	//calculated. should be one time hashing of ownershipTokenAttributes and ownership token quantity
-				//this.state.owner_token_desc,this.state.owner_token_quantity)
-				"ownershipTokenAttributes":this.state.owner_token_desc,					//these should not be hashed they should be readable. Removed hashing (ST).
+				//calculated. should be one time hashing of ownershipTokenAttributes and ownership token quantity
+				"ownershipTokenId": this.getHash(this.joinValuesOwnership()),	
+				//attributes should not be hashed, they should be readable.
+				"ownershipTokenAttributes":this.state.owner_token_desc,					
 				"ownershipTokenQuantity": this.state.owner_token_quantity,
 				
-				"ownershipTokenDistribution": this.prepareTokenDistribution(this.state.ownershipTokenDistribution),		//owner of token and owner's share (2 things)
-				
-				"controlTokenId": this.getHash(this.joinValuesControl()),	//calculated
+				//calculated. should be one time hashing of controlTokenAttributes and control token quantity
+				"controlTokenId": this.getHash(this.joinValuesControl()),
 				"controlTokenAttributes": this.state.control_token_desc,
 				"controlTokenQuantity": this.state.control_token_quantity,
 				
-				"controlTokenDistribution": this.prepareTokenDistribution(this.state.controlTokenDistribution),
-				
-				"identityRecoveryIdList": this.valueIntoHash(this.state.recovery_id),		//user defined conditions
+				//pubkeys used for recovery in the event COID is lost or stolen			
+				"identityRecoveryIdList": this.valueIntoHash(this.state.recovery_id),
 				"recoveryCondition": this.state.recoveryCondition,
-				"yesVotesRequiredToPass": 2 	//needs to be taken out and hardcoded in app
+				"yesVotesRequiredToPass": 2,	//needs to be taken out and hardcoded in app
 				
-				//TODO:
-				//0)Check that controllers pubkeys are valid
-				//1)NEED TO DISTINGUISH COID for person or thing
-					//if{Human=1} -- follow identity spec for protocol of controllers/owners for individual
-				//2)CONTROLLERS need to be able to upload documents
+				"isHuman": true	
 
 		};
 		return inputObj;
@@ -373,7 +372,6 @@ class CoreIdentity extends React.Component {
 				var ipfsHash, fileHash;
 				[ipfsHash, fileHash] = this.state.file_attrs[i][key].split("|");
 				tmpArr.push(fileHash);
-				//temporary hack: hash ipfs links so they will be 32 bytes... need to fix ... remove this.getHash later
 				tmpArr.push(ipfsHash);
 			}
 			newArr.push(tmpArr);
@@ -476,10 +474,7 @@ class CoreIdentity extends React.Component {
 						<label htmlFor="owner_token_id">Enter Ownership Token Quantity. For example, 1 token for an individual.</label>
 						<TagsInput {...inputAttrs} value={this.state.owner_token_quantity} onChange={(e)=>{ this.onFieldChange("owner_token_quantity", e) } } />
 					</div>
-					<div className="form-group">
-						<label htmlFor="owner_token_id">Enter Ownership Token Distribution.</label>
-						<TagsInput {...inputAttrs} value={this.state.ownershipTokenDistribution} onChange={(e)=>{ this.onFieldChange("ownershipTokenDistribution", e) } } />
-					</div>
+
 					<div className="form-group">
 						<label htmlFor="control_token_id">Control Token ID. Description. For example, 'Spencer tokens'.</label>
 						<TagsInput {...inputAttrs} value={this.state.control_token_desc} onChange={(e)=>{ this.onFieldChange("control_token_desc", e) } } />
@@ -487,10 +482,6 @@ class CoreIdentity extends React.Component {
 					<div className="form-group">
 						<label htmlFor="control_token_id">Enter Control Token Quantity. For example, 1 token for an individual.</label>
 						<TagsInput {...inputAttrs} value={this.state.control_token_quantity} onChange={(e)=>{ this.onFieldChange("control_token_quantity", e) } } />
-					</div>
-					<div className="form-group">
-						<label htmlFor="control_token_id">Enter Control Token Distribution.</label>
-						<TagsInput {...inputAttrs} value={this.state.controlTokenDistribution} onChange={(e)=>{ this.onFieldChange("controlTokenDistribution", e) } } />
 					</div>
 					<div className="form-group">
 					  <div className="col-sm-6">

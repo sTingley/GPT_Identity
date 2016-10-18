@@ -64,6 +64,21 @@ class ModalWin extends React.Component {
 					result = JSON.parse(result);	
 				}
 				console.log(result);
+                
+                var ownerArray = [];
+                for(var i = 0; i < result.ownershipTokenQuantity.length; i++)
+                {
+                    var temp = [];
+                    temp[0] = result.ownerIdList[i];
+                    temp[1] = result.ownershipTokenQuantity[i];
+                    
+                    ownerArray.push(temp)
+                }
+                
+                
+                //now add ownerArray to the JSON object.
+                result.ownerArray = ownerArray
+                console.log(result.ownerArray)
 				
 				/*
 				result.uniqueIdAttributes = result.uniqueIdAttributes.split(",");
@@ -143,7 +158,6 @@ class ModalWin extends React.Component {
 												<td><p>File hash: {ids[2]}</p><p>IPFS hash: <a target="_blank" href={ipfs_url+"/"+ids[1]}>{ids[1]}</a></p></td>
 											</tr>
 										)
-
 									});
 									
 								} else {
@@ -155,17 +169,53 @@ class ModalWin extends React.Component {
 								<td>Ownership ID</td>
 								<td>{this.state.proposal_data.ownershipId}</td>
 							</tr>
-							<tr>
-								<td>Ownership ID List</td>
-								<td>{(() => {
-								if(!$.isEmptyObject(this.state.proposal_data)){
-									return this.state.proposal_data.ownerIdList.map((ids,i) => {
-									return <p key={i}> {this.state.proposal_data.ownerIdList[i]}</p>
-									})
+                                <td colSpan="2"><b>Ownership ID List</b></td>
+							 <tr>
+							 
+							 	{(() => {
+							 	if(!$.isEmptyObject(this.state.proposal_data)){
+							 		return this.state.proposal_data.ownerIdList.map((ids,i) => {
+							 		return <p key={i}> {this.state.proposal_data.ownerIdList[i]}</p>
+							 		})
 								}
-								})(this)}
-								</td>
+                                else
+                                {
+                                    return <tr><td colSpan="2">No Ids found</td></tr>
+                                }
+							 	})(this)}
+							 	
+							 </tr>
+                            <tr>
+							<td>Ownership ID</td>
+                            
+							<td>{this.state.proposal_data.ownershipId}</td>
 							</tr>
+							
+							
+                            
+                            <tr>
+								<td>Ownership ID List</td>
+								</tr>
+                                {(() => {
+                                    
+								if(!$.isEmptyObject(this.state.proposal_data)){
+                                    console.log(this.state.proposal_data.ownerArray)
+									return this.state.proposal_data.ownerArray.map((ids,i) => { 
+									return(
+									<tr key={i}>
+								        <td><p>Token Owner:  {ids[0]}</p>
+                                        <p>Owner Token Quantity: {ids[1]}</p> </td>
+                                    </tr>
+                                    )});
+                                    
+                                    
+                                  
+								}
+                                })(this)} 
+                        
+                            
+                            
+                            
 							<tr>
 								<td>Control ID</td>
 								<td><p> {this.state.proposal_data.controlId}</p></td>

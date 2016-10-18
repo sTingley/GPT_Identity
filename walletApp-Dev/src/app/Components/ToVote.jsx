@@ -61,6 +61,18 @@ class ModalWin extends React.Component {
 				//data.publicKey
 				//data.
 				console.log(result);
+				//make result json:
+				result = JSON.parse(result);
+				
+				result.uniqueIdAttributes = result.uniqueIdAttributes.split(",");
+				result.ownerIdList = result.ownerIdList.split(",");
+				result.ownershipTokenAttributes = result.ownershipTokenAttributes.split(",");
+				result.ownershipTokenQuantity = result.ownershipTokenQuantity.split(",");
+				result.controlIdList = result.controlIdList.split(",');		
+				result.controlTokenAttributes = result.controlTokenAttributes.split(",");
+				result.controlTokenQuantity = result.controlTokenQuantity.split(",");
+				result.identityRecoveryIdList = result.identityRecoveryIdList.split(",");
+				
 				
 			//	var result = {
 					//pubkey = result.pubkey

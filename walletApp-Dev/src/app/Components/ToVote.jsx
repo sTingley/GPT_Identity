@@ -60,19 +60,21 @@ class ModalWin extends React.Component {
 				// Fill up data in Modal window
 				//data.publicKey
 				//data.
+				if($.type(result) == "string"){
+					result = JSON.parse(result);	
+				}
 				console.log(result);
-				//make result json:
-				result = JSON.parse(result);
 				
+				/*
 				result.uniqueIdAttributes = result.uniqueIdAttributes.split(",");
 				result.ownerIdList = result.ownerIdList.split(",");
 				result.ownershipTokenAttributes = result.ownershipTokenAttributes.split(",");
 				result.ownershipTokenQuantity = result.ownershipTokenQuantity.split(",");
-				result.controlIdList = result.controlIdList.split(",');		
+				result.controlIdList = result.controlIdList.split(",");		
 				result.controlTokenAttributes = result.controlTokenAttributes.split(",");
 				result.controlTokenQuantity = result.controlTokenQuantity.split(",");
 				result.identityRecoveryIdList = result.identityRecoveryIdList.split(",");
-				
+				*/
 				
 			//	var result = {
 					//pubkey = result.pubkey
@@ -103,16 +105,15 @@ class ModalWin extends React.Component {
 				// this.setState({coid: data.data.messages});
 				$("#proposalDetails").modal('show');
 				$("#proposalDetails").on('hidden.bs.modal', _this.props.hideHandler);
-			},
-			complete: function(){
-				//$("#proposalDetails").modal('show');
-				//$("#proposalDetails").on('hidden.bs.modal', _this.props.hideHandler);
 			}
 		});
     }
 	
 	render(){
 		var prop = this.state.proposal;
+		var style = {
+			fontSize: '12.5px'
+		}
 		return(
 			<div className="modal fade" id="proposalDetails" tabIndex="-1" role="dialog">
 			  <div className="modal-dialog modal-lg" role="document">
@@ -122,7 +123,7 @@ class ModalWin extends React.Component {
 					<h4 className="modal-title" id="asset">Details</h4>
 				  </div>
 				  <div className="modal-body">
-					<table className="table table-striped table-hover">
+					<table className="table table-striped table-hover" style={style}>
 						<tbody>
 							<tr>
 								<td>Proposal ID</td>
@@ -134,8 +135,8 @@ class ModalWin extends React.Component {
 							{(() => {
 								var ipfs_url = "http://10.101.114.231:8080/ipfs/";
 								if(!$.isEmptyObject(this.state.proposal_data)){
-									console.log("**", this.state.proposal_data.official_ids)
-									return this.state.proposal_data.official_ids.map((ids,i) => {
+									console.log("**", this.state.proposal_data.uniqueIdAttributes)
+									return this.state.proposal_data.uniqueIdAttributes.map((ids,i) => {
 										return(
 											<tr key={i}>
 												<td>{ids[0]}</td>
@@ -152,21 +153,12 @@ class ModalWin extends React.Component {
 							
 							<tr>
 								<td>Ownership ID</td>
-								<td>{(() => {
-								if(!$.isEmptyObject(this.state.proposal_data)){
-									console.log("**", this.state.proposal_data.ownershipId)
-									return this.state.proposal_data.ownershipId.map((ids,i) => {
-									return <p key={i}> {this.state.proposal_data.ownershipId[i]}</p>
-									})
-								}
-								})(this)}
-								</td>
+								<td>{this.state.proposal_data.ownershipId}</td>
 							</tr>
 							<tr>
 								<td>Ownership ID List</td>
 								<td>{(() => {
 								if(!$.isEmptyObject(this.state.proposal_data)){
-									console.log("**", this.state.proposal_data.ownerIdList)
 									return this.state.proposal_data.ownerIdList.map((ids,i) => {
 									return <p key={i}> {this.state.proposal_data.ownerIdList[i]}</p>
 									})
@@ -176,21 +168,12 @@ class ModalWin extends React.Component {
 							</tr>
 							<tr>
 								<td>Control ID</td>
-								<td>{(() => {
-								if(!$.isEmptyObject(this.state.proposal_data)){
-									console.log("**", this.state.proposal_data.controlId)
-									return this.state.proposal_data.controlId.map((ids,i) => {
-									return <p key={i}> {this.state.proposal_data.controlId[i]}</p>
-									})
-								}
-								})(this)}
-								</td>
+								<td><p> {this.state.proposal_data.controlId}</p></td>
 							</tr>	
 							<tr>
 								<td>Control ID List</td>
 								<td>{(() => {
 								if(!$.isEmptyObject(this.state.proposal_data)){
-									console.log("**", this.state.proposal_data.controlIdList)
 									return this.state.proposal_data.controlIdList.map((ids,i) => {
 									return <p key={i}> {this.state.proposal_data.controlIdList[i]}</p>
 									})
@@ -202,7 +185,6 @@ class ModalWin extends React.Component {
 								<td>Recovery IDs</td>
 								<td>{(() => {
 								if(!$.isEmptyObject(this.state.proposal_data)){
-									console.log("**", this.state.proposal_data.identityRecoveryIdList)
 									return this.state.proposal_data.identityRecoveryIdList.map((ids,i) => {
 									return <p key={i}> {this.state.proposal_data.identityRecoveryIdList[i]}</p>
 									})
@@ -210,47 +192,19 @@ class ModalWin extends React.Component {
 								})(this)}
 								</td>
 							</tr>
-							<tr>
-								<td>Recovery IDs</td>
-								<td>{(() => {
-								if(!$.isEmptyObject(this.state.proposal_data)){
-									console.log("**", this.state.proposal_data.identityRecoveryIdList)
-									return this.state.proposal_data.identityRecoveryIdList.map((ids,i) => {
-									return <p key={i}> {this.state.proposal_data.identityRecoveryIdList[i]}</p>
-									})
-								}
-								})(this)}
-								</td>
-							</tr>
+							
 							<tr>
 								<td>Recovery Condition</td>
-								<td>{(() => {
-								if(!$.isEmptyObject(this.state.proposal_data)){
-									console.log("**", this.state.proposal_data.recoveryCondition)
-									return this.state.proposal_data.recoveryCondition.map((ids,i) => {
-									return <p key={i}> {this.state.proposal_data.recoveryCondition[i]}</p>
-									})
-								}
-								})(this)}
-								</td>
+								<td> <p> {this.state.proposal_data.recoveryCondition}</p></td>
 							</tr>
 							<tr>
 								<td>Ownership Token ID</td>
-								<td>{(() => {
-								if(!$.isEmptyObject(this.state.proposal_data)){
-									console.log("**", this.state.proposal_data.ownershipTokenId)
-									return this.state.proposal_data.ownershipTokenId.map((ids,i) => {
-									return <p key={i}> {this.state.proposal_data.ownershipTokenId[i]}</p>
-									})
-								}
-								})(this)}
-								</td>
+								<td><p> {this.state.proposal_data.ownershipTokenId}</p></td>
 							</tr>
 							<tr>
 								<td>Ownership Token Description</td>
 								<td>{(() => {
 								if(!$.isEmptyObject(this.state.proposal_data)){
-									console.log("**", this.state.proposal_data.ownershipTokenAttributes)
 									return this.state.proposal_data.ownershipTokenAttributes.map((ids,i) => {
 									return <p key={i}> {this.state.proposal_data.ownershipTokenAttributes[i]}</p>
 									})
@@ -260,33 +214,16 @@ class ModalWin extends React.Component {
 							</tr>
 							<tr>
 								<td>Ownership Token Quantity</td>
-								<td>{(() => {
-								if(!$.isEmptyObject(this.state.proposal_data)){
-									console.log("**", this.state.proposal_data.ownershipTokenQuantity)
-									return this.state.proposal_data.ownershipTokenQuantity.map((ids,i) => {
-									return <p key={i}> {this.state.proposal_data.ownershipTokenQuantity[i]}</p>
-									})
-								}
-								})(this)}
-								</td>
+								<td><p> {this.state.proposal_data.ownershipTokenQuantity}</p></td>
 							</tr>
 							<tr>
 								<td>Control Token ID</td>
-								<td>{(() => {
-								if(!$.isEmptyObject(this.state.proposal_data)){
-									console.log("**", this.state.proposal_data.controlTokenId)
-									return this.state.proposal_data.controlTokenId.map((ids,i) => {
-									return <p key={i}> {this.state.proposal_data.controlTokenId[i]}</p>
-									})
-								}
-								})(this)}
-								</td>
+								<td> <p> {this.state.proposal_data.controlTokenId}</p></td>
 							</tr>
 							<tr>
 								<td>Control Token Description</td>
 								<td>{(() => {
 								if(!$.isEmptyObject(this.state.proposal_data)){
-									console.log("**", this.state.proposal_data.controlTokenAttributes)
 									return this.state.proposal_data.controlTokenAttributes.map((ids,i) => {
 									return <p key={i}> {this.state.proposal_data.controlTokenAttributes[i]}</p>
 									})
@@ -296,30 +233,8 @@ class ModalWin extends React.Component {
 							</tr>
 							<tr>
 								<td>Control Token Quantity</td>
-								<td>{(() => {
-								if(!$.isEmptyObject(this.state.proposal_data)){
-									console.log("**", this.state.proposal_data.controlTokenQuantity)
-									return this.state.proposal_data.controlTokenQuantity.map((ids,i) => {
-									return <p key={i}> {this.state.proposal_data.controlTokenQuantity[i]}</p>
-									})
-								}
-								})(this)}
-								</td>
+								<td><p> {this.state.proposal_data.controlTokenQuantity}</p></td>
 							</tr>
-							<tr>
-								<td>Control Token Quantity</td>
-								<td>{(() => {
-								if(!$.isEmptyObject(this.state.proposal_data)){
-									console.log("**", this.state.proposal_data.isHuman)
-									return this.state.proposal_data.isHuman.map((ids,i) => {
-									return <p key={i}> {this.state.proposal_data.isHuman[i]}</p>
-									})
-								}
-								})(this)}
-								</td>
-							</tr>
-						
-						
 							<tr>
 								<td>Vote Description</td>
 								<td><textarea className="form-control"></textarea></td>

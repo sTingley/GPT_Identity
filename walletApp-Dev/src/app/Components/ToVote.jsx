@@ -360,7 +360,7 @@ class ToVote extends React.Component {
 		var _that = this;
 		return(
 			<div id="vote_container">
-				<h1>Vote</h1> <hr/>
+				<h1>Proposals pending for your action</h1> <hr/>
 				<table className="table table-striped">
 					<tbody>
 					{(()=>{

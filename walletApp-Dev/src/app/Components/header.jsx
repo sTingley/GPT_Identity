@@ -22,6 +22,7 @@ class Header extends React.Component {
                 <li><Link to='/home' activeClassName="active">Home</Link></li>
 				<li><Link to='/upload' activeClassName="active">Upload Keys</Link></li>
 				{ prop.loggedin ?  <li><Link to='/tovote' activeClassName="active">Vote</Link></li> : ''}
+        { prop.loggedin ?  <li><Link to='/notifications' activeClassName="active">Notifications</Link></li> : ''}
 				{ prop.loggedin ?  <li><Link to='/register' activeClassName="active">Name Register</Link></li> : ''}
 				{ prop.loggedin ?  <li><Link to='/identity' activeClassName="active">Core Identity</Link></li> : '' }
 				{ prop.loggedin ?  <li><Link to='/assets' activeClassName="active">Assets</Link></li> : '' }

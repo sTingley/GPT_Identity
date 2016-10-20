@@ -41,6 +41,9 @@ class Modal extends Component {
 	
 	render(){
 		var prop = this.props.asset.asset_name;
+		var style = {
+			fontSize: '12.5px'
+		}
 		
 		console.log("In render: " + JSON.stringify(prop));
 		var classInput = {
@@ -57,14 +60,14 @@ class Modal extends Component {
 		};
 		return(
 			<div className="modal fade" id="assetDetails" key={this.props.asset.asset_id} tabIndex="-1" role="dialog" aria-labelledby="asset">
-			  <div className="modal-dialog" role="document">
+			  <div className="modal-dialog modal-lg" role="document">
 				<div className="modal-content">
 				  <div className="modal-header">
 					<button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-					<h4 className="modal-title" id="asset">{prop.asset_name}</h4>
+					<h4 className="modal-title" id="asset">Asset Details</h4>
 				  </div>
 				  <div className="modal-body">
-					<table className="table table-striped table-hover">
+					<table className="table table-striped table-hover" style={style}>
 						<tbody>
 							<tr>
 								<td>Asset Name</td>
@@ -79,7 +82,7 @@ class Modal extends Component {
 								<td><TagsInput {...subClassInput}  /></td>
 							</tr>
 							<tr>
-								<td colSpan="2"><b>Official ID's</b></td>
+								<td colSpan="2"><b>Official IDs</b></td>
 							</tr>
 							{(() => {
 								var ipfs_url = "http://10.101.114.231:8080/ipfs/";
@@ -96,56 +99,29 @@ class Modal extends Component {
 									
 								} else {
 								return <tr><td colSpan="2">No Ids found</td></tr>
-							}
-						})(this)}
+								}
+							})(this)}
 							
 							<tr>
-								<td>Ownership ID</td>
-								<td>{prop.ownershipId}</td>
+								<td>Ownership Token ID</td>
+								<td><p> {prop.ownershipTokenId}</p></td>
 							</tr>
-                                <td colSpan="2"><b>Ownership ID List</b></td>
-							 <tr>
-							 
-							 	{(() => {
-							 	if(!$.isEmptyObject(prop)){
-							 		return prop.ownerIdList.map((ids,i) => {
-							 		return <p key={i}> {prop.ownerIdList[i]}</p>
-							 		})
+							<tr>
+								<td>Ownership Token Description</td>
+								<td>{(() => {
+								if(!$.isEmptyObject(prop.ownershipTokenAttributes)){
+									return prop.ownershipTokenAttributes.map((ids,i) => {
+									return <p key={i}> {prop.ownershipTokenAttributes[i]}</p>
+									})
 								}
-                                else
-                                {
-                                    return <tr><td colSpan="2">No Ids found</td></tr>
-                                }
-							 	})(this)}
-							 	
-							 </tr>
-                            <tr>
-							<td>Ownership ID</td>
-                            
-							<td>{prop.ownershipId}</td>
+								})(this)}
+								</td>
+							</tr>
+							<tr>
+								<td>Ownership Token Quantity</td>
+								<td><p> {prop.ownershipTokenQuantity}</p></td>
 							</tr>
 							
-							
-                            
-                            <tr>
-								<td>Ownership ID List</td>
-								</tr>
-                                {(() => {
-                                    
-								if(!$.isEmptyObject(prop.ownerIdList)){
-                                    console.log(prop.ownerIdList)
-									return prop.ownerIdList.map((ids,i) => { 
-									return(
-									<tr key={i}>
-								        <td><p>Token Owner:  {ids[0]}</p>
-                                        <p>Owner Token Quantity: {ids[1]}</p> </td>
-                                    </tr>
-                                    )});
-                                    
-                                    
-                                  
-								}
-                                })(this)} 
                         
                             
                             

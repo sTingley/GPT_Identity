@@ -34,13 +34,16 @@ class ModalWin extends React.Component {
 						url: twinUrl + proposalID + "/" + localStorage.getItem("pubKey"),
 						type: 'GET',
 						complete: function(xhr){
-							alert("vote successfully submitted");
+							//alert("vote successfully submitted");
 							window.location.reload();
+							_this.setState({
+							proposal_data: result
+							});
 						}
 					});
 					
 				} else {
-					alert("Unable to submit your vote. Please try again later");
+					//alert("Unable to submit your vote. Please try again later");
 				}
 			}
 		});
@@ -54,7 +57,7 @@ class ModalWin extends React.Component {
 			data: {
 				"publicKey": localStorage.getItem("pubKey"),
 				"proposalId": this.state.proposal.proposal_id,
-			},//.bind(this)
+			},//.bind(this)d
 			success: function(result){
 				
 				// Fill up data in Modal window
@@ -135,7 +138,7 @@ class ModalWin extends React.Component {
 				<div className="modal-content">
 				  <div className="modal-header">
 					<button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-					<h4 className="modal-title" id="asset">Details</h4>
+					<h4 className="modal-title" id="asset">COID Proposal Details</h4>
 				  </div>
 				  <div className="modal-body">
 					<table className="table table-striped table-hover" style={style}>
@@ -145,7 +148,7 @@ class ModalWin extends React.Component {
 								<td>{prop.proposal_id}</td>
 							</tr>
 							<tr>
-								<td colSpan="2"><b>Official ID's</b></td>
+								<td colSpan="2"><b>Official IDs</b></td>
 							</tr>
 							{(() => {
 								var ipfs_url = "http://10.101.114.231:8080/ipfs/";
@@ -165,13 +168,15 @@ class ModalWin extends React.Component {
 							}
 						})(this)}
 							
+
 							<tr>
 								<td>Ownership ID</td>
+	                            
 								<td>{this.state.proposal_data.ownershipId}</td>
 							</tr>
-                                <td colSpan="2"><b>Ownership ID List</b></td>
-							 <tr>
-							 
+							<tr>
+								<td>Ownership ID Attributes</td>
+							 	<td>
 							 	{(() => {
 							 	if(!$.isEmptyObject(this.state.proposal_data)){
 							 		return this.state.proposal_data.ownerIdList.map((ids,i) => {
@@ -180,39 +185,32 @@ class ModalWin extends React.Component {
 								}
                                 else
                                 {
-                                    return <tr><td colSpan="2">No Ids found</td></tr>
+                                    return <p>No Ids found</p>
                                 }
 							 	})(this)}
+							 	</td>
 							 	
-							 </tr>
-                            <tr>
-							<td>Ownership ID</td>
-                            
-							<td>{this.state.proposal_data.ownershipId}</td>
 							</tr>
-							
-							
-                            
-                            <tr>
-								<td>Ownership ID List</td>
-								</tr>
-                                {(() => {
-                                    
+
+							<tr>
+								<td>Ownership Token ID</td>
+								<td><p> {this.state.proposal_data.ownershipTokenId}</p></td>
+							</tr>
+							<tr>
+								<td>Ownership Token Description</td>
+								<td>{(() => {
 								if(!$.isEmptyObject(this.state.proposal_data)){
-                                    console.log(this.state.proposal_data.ownerArray)
-									return this.state.proposal_data.ownerArray.map((ids,i) => { 
-									return(
-									<tr key={i}>
-								        <td><p>Token Owner:  {ids[0]}</p>
-                                        <p>Owner Token Quantity: {ids[1]}</p> </td>
-                                    </tr>
-                                    )});
-                                    
-                                    
-                                  
+									return this.state.proposal_data.ownershipTokenAttributes.map((ids,i) => {
+									return <p key={i}> {this.state.proposal_data.ownershipTokenAttributes[i]}</p>
+									})
 								}
-                                })(this)} 
-                        
+								})(this)}
+								</td>
+							</tr>
+							<tr>
+								<td>Ownership Token Quantity</td>
+								<td><p> {this.state.proposal_data.ownershipTokenQuantity}</p></td>
+							</tr>
                             
                             
                             
@@ -247,25 +245,7 @@ class ModalWin extends React.Component {
 								<td>Recovery Condition</td>
 								<td> <p> {this.state.proposal_data.recoveryCondition}</p></td>
 							</tr>
-							<tr>
-								<td>Ownership Token ID</td>
-								<td><p> {this.state.proposal_data.ownershipTokenId}</p></td>
-							</tr>
-							<tr>
-								<td>Ownership Token Description</td>
-								<td>{(() => {
-								if(!$.isEmptyObject(this.state.proposal_data)){
-									return this.state.proposal_data.ownershipTokenAttributes.map((ids,i) => {
-									return <p key={i}> {this.state.proposal_data.ownershipTokenAttributes[i]}</p>
-									})
-								}
-								})(this)}
-								</td>
-							</tr>
-							<tr>
-								<td>Ownership Token Quantity</td>
-								<td><p> {this.state.proposal_data.ownershipTokenQuantity}</p></td>
-							</tr>
+							
 							<tr>
 								<td>Control Token ID</td>
 								<td> <p> {this.state.proposal_data.controlTokenId}</p></td>

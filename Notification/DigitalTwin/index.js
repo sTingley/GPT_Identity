@@ -60,16 +60,34 @@ var ballotConfig = {
         changeOrigin: true,
         ws: true,
         onProxyReq(proxyReq, req, res) {
-                if ( req.method == "POST" && req.body ) {
-                        if("/vote" == req.url){
-                                req.body.msg = config.endpoints.voteonCOIDproposal.message;
-                                req.body.txn_id = "voteonCOIDproposal";
-                                console.log(JSON.stringify(req.body));
-                        }
+
+                if(req.method == "POST" && config.endpoints.getCoidData)
+                {
+                        req.body.msg = config.endpoints.voteonCOIDproposal.message;
+                        req.body.txn_id = "";
+                        console.log(JSON.stringify(req.body));
                         let body = req.body;
                         // URI encode JSON object
                         body = Object.keys( body ).map(function( key ) {
-                                        return encodeURIComponent( key ) + '=' + encodeURIComponent( body[ key ])
+                                return encodeURIComponent( key ) + '=' + encodeURIComponent( body[ key ])
+                        }).join('&');
+
+                        proxyReq.setHeader( 'content-type','application/x-www-form-urlencoded' );
+                        proxyReq.setHeader( 'content-length', body.length );
+
+                        proxyReq.write( body );
+                        proxyReq.end();
+                }
+
+
+                if ( req.method == "POST" && req.body ) {
+                        req.body.msg = config.endpoints.voteonCOIDproposal.message;
+                        req.body.txn_id = "voteonCOIDproposal";
+                        console.log(JSON.stringify(req.body));
+                        let body = req.body;
+                        // URI encode JSON object
+                        body = Object.keys( body ).map(function( key ) {
+                                return encodeURIComponent( key ) + '=' + encodeURIComponent( body[ key ])
                         }).join('&');
 
                         proxyReq.setHeader( 'content-type','application/x-www-form-urlencoded' );
@@ -84,7 +102,11 @@ var ballotConfig = {
         }
 }
 app.use('/voteonCOIDproposal', proxy(ballotConfig));
+
+//this is for when a coid submission is done
 app.use('/getCoidData', proxy(ballotConfig));
+app.post('/pullCoidData', ballotCtrl.pullCoidData);
+
 app.post('/ballot/writeNotify', ballotCtrl.writeNotification);
 app.get('/ballot/deleteProposal/:pid/:pubKey', ballotCtrl.deleteNotification);
 app.get('/ballot/readNotify/:pubKey', ballotCtrl.fetchNotification);
@@ -98,10 +120,11 @@ app.get('/ipfs/getfile/:hash', IPFS.getUrl);
 
 
 
-app.post('/coidCreation',ballotCtrl.writeNotification)
+app.post('/coidCreation',ballotCtrl.coidCreation);
 
 
-//app.post('/ballot/writeCoid', ballotCtrl.writeCoidData);
+app.post('/writeCoid', ballotCtrl.writeCoidData);
+
 //app.get('/ballot/readCoid/:proposalID/publicKey/:pubKey/', ballotCtrl.fetchCoidData);
 
 
@@ -110,3 +133,4 @@ for(var i=0; i<config.env.ports.length; i++){
         http.createServer(app).listen(port);
         console.log("Digital Twin running at "+port);
 }
+

@@ -295,7 +295,14 @@ class CoreIdentity extends React.Component {
 				"recoveryCondition": this.state.recoveryCondition,
 				"yesVotesRequiredToPass": 2,	//needs to be taken out and hardcoded in app
 				
-				"isHuman": true	
+				"isHuman": true,
+				"time": "",
+				"assetID": "COID",
+				"Type": "non_cash",
+				"bigchainHash":  "",
+				"bigchainID": "",
+				"coidAddr": "",
+				"gatekeeperAddr": ""
 
 		};
 		return inputObj;
@@ -399,7 +406,11 @@ class CoreIdentity extends React.Component {
 			type: 'POST',
 			data: json,
 			success: function(res){
-				// do something
+				$.ajax({
+					url: twinUrl + 'writeCoid',
+					type: 'POST',
+					data: json
+				})
 			},
 			complete: function(){
 				// do something

@@ -82,6 +82,14 @@ class Modal extends Component {
 								<td><TagsInput {...subClassInput}  /></td>
 							</tr>
 							<tr>
+								<td>COID Contract address</td>
+								<td><p><b> {prop.coidAddr} </b></p></td>
+							</tr>
+							<tr>
+								<td>Gatekeeper Contract address</td>
+								<td><p><b> {prop.gatekeeperAddr} </b></p></td>
+							</tr>
+							<tr>
 								<td colSpan="2"><b>Official IDs</b></td>
 							</tr>
 							{(() => {
@@ -92,7 +100,7 @@ class Modal extends Component {
 										return(
 											<tr key={i}>
 												<td>{ids[0]}</td>
-												<td><p>File hash: {ids[2]}</p><p>IPFS hash: <a target="_blank" href={ipfs_url+"/"+ids[1]}>{ids[1]}</a></p></td>
+												<td><p>File hash: {ids[1]}</p><p>IPFS hash: <a target="_blank" href={ipfs_url+"/"+ids[2]}>{ids[2]}</a></p></td>
 											</tr>
 										)
 									});
@@ -195,7 +203,15 @@ class Modal extends Component {
 								<td>Control Token Quantity</td>
 								<td><p> {prop.controlTokenQuantity}</p></td>
 							</tr>
-							
+							<tr>
+								<td>BigchainDB Transaction ID</td>
+								<td><p> {prop.bigchainID} </p></td>
+							</tr>
+							<tr>
+								<td>BigchainDB Transaction Hash</td>
+								<td><p> {prop.bigchainHash} </p></td>
+							</tr>
+								
 						</tbody>
 					</table>
 				  </div>

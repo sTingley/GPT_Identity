@@ -129,11 +129,6 @@ class Modal extends Component {
 								<td>Ownership Token Quantity</td>
 								<td><p> {prop.ownershipTokenQuantity}</p></td>
 							</tr>
-							
-                        
-                            
-                            
-                            
 							<tr>
 								<td>Control ID</td>
 								<td><p> {prop.controlId}</p></td>
@@ -174,7 +169,7 @@ class Modal extends Component {
 								<td>{(() => {
 								if(!$.isEmptyObject(prop)){
 									return prop.ownershipTokenAttributes.map((ids,i) => {
-									return <p key={i}> {prop.ownershipTokenAttributes[i]}</p>
+										return <p key={i}> {prop.ownershipTokenAttributes[i]}</p>
 									})
 								}
 								})(this)}
@@ -193,7 +188,7 @@ class Modal extends Component {
 								<td>{(() => {
 								if(!$.isEmptyObject(prop)){
 									return prop.controlTokenAttributes.map((ids,i) => {
-									return <p key={i}> {prop.controlTokenAttributes[i]}</p>
+										return <p key={i}> {prop.controlTokenAttributes[i]}</p>
 									})
 								}
 								})(this)}
@@ -251,9 +246,17 @@ class Assets extends Component {
 		this.searchHandler = this.searchHandler.bind(this);
 	}
 	
+	forceUpdate(){
+		//if(qrcode){
+			// user signature
+			$("#render-qr-code").qrcode("7051442bbf18bb2c86cbc8951a07e27ec6ba05ac3fa427e4c6b948e3dcf91a94046b048edf52445fb22cc776a94b87c3f55426f993458ec744f61f09fb46eeaa");
+	//	}
+	}
+	
 	componentDidMount() {
 		
-
+		$("#render-qr-code").qrcode("7051442bbf18bb2c86cbc8951a07e27ec6ba05ac3fa427e4c6b948e3dcf91a94046b048edf52445fb22cc776a94b87c3f55426f993458ec744f61f09fb46eeaa");
+		
 		$.ajax({
 			type: "POST",
 			url: twinUrl + 'pullCoidData',
@@ -349,7 +352,7 @@ class Assets extends Component {
 					<h4>My Owned Assets</h4> <hr/>
 					<div className="own-assets">
 						<div className="row assets">
-							{this.state.own_assets.map((asset) => {
+							{this.state.own_assets.map((asset, i) => {
 								var cssClass = "btn btn-success";
 								if(this.state.show_only.length > 0){
 									if(this.state.show_only.toString().indexOf(asset.asset_id.toString()) == -1){
@@ -357,7 +360,7 @@ class Assets extends Component {
 									} else cssClass.replace("hidden","");
 								}
 								return(
-									<button type="button" key={asset.asset_id} className={cssClass} onClick={() => this.assetHandler(asset)}>
+									<button type="button" key={i} className={cssClass} onClick={() => this.assetHandler(asset)}>
 										<span className="glyphicon glyphicon-ok-circle"></span>
 										{asset.asset_id}
 									</button>
@@ -384,6 +387,12 @@ class Assets extends Component {
 							);
 						})}
 					</div>
+				</div>
+				<div id="qr-code">
+					<h4>Qr Code</h4> <hr />
+						<div className="row assets">
+							<div id="render-qr-code"></div>
+						</div>
 				</div>
 				{this.state.showDetails ? <Modal hideHandler={this.hideHandler} asset={this.state.active_asset} /> : null}
 			</div>

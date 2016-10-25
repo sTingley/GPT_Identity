@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import { Link } from 'react-router';
 import TagsInput from 'react-tagsinput';
 
+
+import QRCode from 'qrcode.react';
 import AssetTags from './classAndSubClass.js';
 
 // TODO: Static public/private keys has to be changed
@@ -17,8 +19,7 @@ class Modal extends Component {
 			asset_class: this.tags.getAssetData("classes"),
 			asset_subclass: this.tags.getAssetData("subclasses")
 		};
-		this.handleClassChange = this.handleClassChange.bind(this);
-		console.log(JSON.stringify(props.asset.asset_id))
+		this.handleClassChange = this.handleClassChange.bind(this);;
 	}
 	
 	componentDidMount(){
@@ -45,7 +46,6 @@ class Modal extends Component {
 			fontSize: '12.5px'
 		}
 		
-		console.log("In render: " + JSON.stringify(prop));
 		var classInput = {
 			addKeys: [13,188],	// Enter and comma
 			value: this.state.asset_class,
@@ -58,15 +58,38 @@ class Modal extends Component {
 			onChange: this.handleSubClassChange.bind(this),
 			inputProps: {placeholder: ""}
 		};
+
+
+		var qrConfig = JSON.stringify({
+			pubKey: prop.pubKey,
+			msgHash: "",
+			sig: prop.sig,
+			uniqueId: prop.uniqueId,
+			name: prop.uniqueIdAttributes[0],
+			bigchainID: prop.bigchainID,
+			bigchainHash: prop.bigchainHash,
+			endpoint:twinUrl + "validateQrCode"
+		});
+
+		var qrStyle = {
+			maxWidth: "100%",
+			textAlign: "center"
+		};
+
 		return(
 			<div className="modal fade" id="assetDetails" key={this.props.asset.asset_id} tabIndex="-1" role="dialog" aria-labelledby="asset">
 			  <div className="modal-dialog modal-lg" role="document">
 				<div className="modal-content">
 				  <div className="modal-header">
 					<button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-					<h4 className="modal-title" id="asset">Asset Details</h4>
+					<ul className="nav nav-pills" role="tablist">
+					    <li role="presentation" className="active"><a href="#asset_details" role="tab" data-toggle="tab">Asset Details</a></li>
+					    <li role="presentation"><a href="#qrcode" role="tab" data-toggle="tab">QR Code</a></li>
+				 	</ul>
 				  </div>
 				  <div className="modal-body">
+				  	<div className="tab-content">
+				  	<div role="tabpanel" className="tab-pane active" id="asset_details">
 					<table className="table table-striped table-hover" style={style}>
 						<tbody>
 							<tr>
@@ -95,7 +118,6 @@ class Modal extends Component {
 							{(() => {
 								var ipfs_url = "http://10.101.114.231:8080/ipfs/";
 								if(!$.isEmptyObject(prop)){
-									console.log("**", prop.uniqueIdAttributes)
 									return prop.uniqueIdAttributes.map((ids,i) => {
 										return(
 											<tr key={i}>
@@ -209,6 +231,11 @@ class Modal extends Component {
 								
 						</tbody>
 					</table>
+						</div> 
+					<div role="tabpanel" className="tab-pane center-block" id="qrcode" style={qrStyle}>
+						<QRCode value={qrConfig} size={200} />
+					</div>
+					</div> 
 				  </div>
 				</div>
 			  </div>
@@ -246,40 +273,18 @@ class Assets extends Component {
 		this.searchHandler = this.searchHandler.bind(this);
 	}
 	
-	forceUpdate(){
-		//if(qrcode){
-			// user signature
-			$("#render-qr-code").qrcode("7051442bbf18bb2c86cbc8951a07e27ec6ba05ac3fa427e4c6b948e3dcf91a94046b048edf52445fb22cc776a94b87c3f55426f993458ec744f61f09fb46eeaa");
-	//	}
-	}
-	
 	componentDidMount() {
-		
-		$("#render-qr-code").qrcode("7051442bbf18bb2c86cbc8951a07e27ec6ba05ac3fa427e4c6b948e3dcf91a94046b048edf52445fb22cc776a94b87c3f55426f993458ec744f61f09fb46eeaa");
-		
 		$.ajax({
 			type: "POST",
 			url: twinUrl + 'pullCoidData',
 			data: {"pubKey": localStorage.getItem("pubKey")},
-			success: function (result) {			
-
-				if ($.type(result) == "object") {
-					//TODO: Change asset_name tag to asset_data
-					this.setState({ own_assets: [{asset_id: result.assetID,asset_name:result}]})
-					
-					console.log(JSON.stringify(result))
-					
-					//console.log(result)
-					//console.log("is object")
-					//console.log(JSON.stringify(this.state.own_assets))
-					//return result;
+			success: function (result) {
+				var data = result;
+				if ($.type(result) != "object") {
+					data = JSON.parseJSON(result)
 				}
-				else {
-					console.log("****************")
-					//console.log(JSON.stringify(this.state.own_assets))
-					
-					//do something else
-				}
+				this.setState({ own_assets: [{asset_id: result.assetID,asset_name:result}]});
+				
 			}.bind(this),
 			complete: function () {
 				// do something

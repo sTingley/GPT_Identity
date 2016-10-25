@@ -90,7 +90,7 @@ app.get('/ballot/readExpiredProposal/:pubKey', expiredNotification.fetchExpiredP
 app.post('/ipfs/upload', IPFS.uploadFile);
 app.get('/ipfs/alldocs/:pubKey', IPFS.getAllFiles);
 app.get('/ipfs/getfile/:hash', IPFS.getUrl);
-app.get('/ipfs/gethash/:ipfs_hash/:pubKey', IPFS.getHashFromIpfsFile);
+app.get('/ipfs/gethash/:ipfs_hash', IPFS.getHashFromIpfsFile);
 
 
 

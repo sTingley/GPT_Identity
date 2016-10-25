@@ -1,6 +1,6 @@
 'use strict';
 var app = require('express')(),
-        config = require('./config.json'),
+	config = require('./config.json'),
     proxy = require('http-proxy-middleware'),
     bodyParser = require('body-parser'),
     fileUpload = require('express-fileupload'),
@@ -28,109 +28,79 @@ var gkConfig = {
   changeOrigin: true,
 
   onProxyReq(proxyReq, req, res) {
-        if ( req.method == "POST" && req.body ) {
-//              req.body.txn_id = "requestCOID";
-//              req.body.msg = "8836a77b68579d1d8d4427c0cda24960f6c123f17ccf751328cc621d6237da22";
-                req.body.msg = config.endpoints.requestCOID.message;
-                //msg should be hash of txn_id
+	if ( req.method == "POST" && req.body ) {
+//		req.body.txn_id = "requestCOID";
+//		req.body.msg = "8836a77b68579d1d8d4427c0cda24960f6c123f17ccf751328cc621d6237da22";
+		req.body.msg = config.endpoints.requestCOID.message;
+	        //msg should be hash of txn_id
 
-                let body = req.body;
-                console.log("req.body: " + req.body);
-                // URI encode JSON object
-                body = Object.keys( body ).map(function( key ) {
-                        return  key  + '=' + body[ key ]
-                }).join('&');
+		let body = req.body;
+		console.log("req.body: " + req.body);
+		// URI encode JSON object
+		body = Object.keys( body ).map(function( key ) {
+			return  key  + '=' + body[ key ]
+		}).join('&');
+		
+		proxyReq.setHeader( 'content-type','application/x-www-form-urlencoded' );
+		proxyReq.setHeader( 'content-length', body.length );
 
-                proxyReq.setHeader( 'content-type','application/x-www-form-urlencoded' );
-                proxyReq.setHeader( 'content-length', body.length );
-
-                proxyReq.write( body );
-                proxyReq.end();
-        }
+		proxyReq.write( body );
+		proxyReq.end();
+	}
   },
   pathRewrite: function(path, req){
-          return path.replace("/requestCOID", config.endpoints.requestCOID.path);
+	  return path.replace("/requestCOID", config.endpoints.requestCOID.path);
   }
 };
 app.use('/requestCOID', proxy(gkConfig));
 
 
 var ballotConfig = {
-        target: config.env.ballot_url,
-        changeOrigin: true,
-        ws: true,
-        onProxyReq(proxyReq, req, res) {
+	target: config.env.ballot_url,
+	changeOrigin: true,
+	ws: true,
+	onProxyReq(proxyReq, req, res) {
+		if ( req.method == "POST" && req.body ) {
+			req.body.message = config.endpoints.voteonCOIDproposal.message;
+			req.body.txn_id = "voteonCOIDproposal";
+		   	console.log(JSON.stringify(req.body));
+			let body = req.body;
+			// URI encode JSON object
+			body = Object.keys( body ).map(function( key ) {
+				return encodeURIComponent( key ) + '=' + encodeURIComponent( body[ key ])
+			}).join('&');
+			
+			proxyReq.setHeader( 'content-type','application/x-www-form-urlencoded' );
+			proxyReq.setHeader( 'content-length', body.length );
 
-                if(req.method == "POST" && config.endpoints.getCoidData)
-                {
-                        req.body.msg = config.endpoints.voteonCOIDproposal.message;
-                        req.body.txn_id = "";
-                        console.log(JSON.stringify(req.body));
-                        let body = req.body;
-                        // URI encode JSON object
-                        body = Object.keys( body ).map(function( key ) {
-                                return encodeURIComponent( key ) + '=' + encodeURIComponent( body[ key ])
-                        }).join('&');
-
-                        proxyReq.setHeader( 'content-type','application/x-www-form-urlencoded' );
-                        proxyReq.setHeader( 'content-length', body.length );
-
-                        proxyReq.write( body );
-                        proxyReq.end();
-                }
-
-
-                if ( req.method == "POST" && req.body ) {
-                        req.body.msg = config.endpoints.voteonCOIDproposal.message;
-                        req.body.txn_id = "voteonCOIDproposal";
-                        console.log(JSON.stringify(req.body));
-                        let body = req.body;
-                        // URI encode JSON object
-                        body = Object.keys( body ).map(function( key ) {
-                                return encodeURIComponent( key ) + '=' + encodeURIComponent( body[ key ])
-                        }).join('&');
-
-                        proxyReq.setHeader( 'content-type','application/x-www-form-urlencoded' );
-                        proxyReq.setHeader( 'content-length', body.length );
-
-                        proxyReq.write( body );
-                        proxyReq.end();
-                }
-        },
-        pathRewrite: function(path, req){
-                return path.replace("/voteonCOIDproposal", config.endpoints.voteonCOIDproposal.path);
-        }
+			proxyReq.write( body );
+			proxyReq.end();
+		}
+	},
+	pathRewrite: function(path, req){
+		return path.replace("/voteonCOIDproposal", config.endpoints.voteonCOIDproposal.path);
+	}
 }
 app.use('/voteonCOIDproposal', proxy(ballotConfig));
-
-//this is for when a coid submission is done
-app.use('/getCoidData', proxy(ballotConfig));
-app.post('/pullCoidData', ballotCtrl.pullCoidData);
-
 app.post('/ballot/writeNotify', ballotCtrl.writeNotification);
-app.get('/ballot/deleteProposal/:pid/:pubKey', ballotCtrl.deleteNotification);
-app.get('/ballot/readNotify/:pubKey', ballotCtrl.fetchNotification);
-
 app.post('/ballot/writeExpiredProposal', expiredNotification.writeExpiredProposalNotification);
+app.get('/ballot/readNotify/:pubKey', ballotCtrl.fetchNotification);
 app.get('/ballot/readExpiredProposal/:pubKey', expiredNotification.fetchExpiredProposalNotification);
 
 app.post('/ipfs/upload', IPFS.uploadFile);
 app.get('/ipfs/alldocs/:pubKey', IPFS.getAllFiles);
 app.get('/ipfs/getfile/:hash', IPFS.getUrl);
+app.get('/ipfs/gethash/:ipfs_hash/:pubKey', IPFS.getHashFromIpfsFile);
 
 
 
-app.post('/coidCreation',ballotCtrl.coidCreation);
-
-
-app.post('/writeCoid', ballotCtrl.writeCoidData);
-
+//app.post('/ballot/writeCoid', ballotCtrl.writeCoidData);
 //app.get('/ballot/readCoid/:proposalID/publicKey/:pubKey/', ballotCtrl.fetchCoidData);
 
 
 for(var i=0; i<config.env.ports.length; i++){
-        var port = parseInt(config.env.ports[i]);
-        http.createServer(app).listen(port);
-        console.log("Digital Twin running at "+port);
+	var port = parseInt(config.env.ports[i]);
+	http.createServer(app).listen(port);
+	console.log("Digital Twin running at "+port);
 }
 

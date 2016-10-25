@@ -147,6 +147,17 @@ var IPFS = {
 			}
 		});
 	},
+
+	getHashFromIpfsFile(req, res) {
+		var ipfs_hash = req.params.ipfs_hash;
+		const ipfs = spawn('eris',['files','get', ipfs_hash, tmpPath+"ipfs_hash"]);
+		ipfs.on('close', (code) => {
+			IPFS.getFileHash(tmpPath+"ipfs_hash").then((data) => {
+				fs.unlinkSync(tmpPath+"ipfs_hash");
+				res.send(data);
+			});
+		});
+	},
 	
 	getFileHash: function(filePath){
 		var promise = new Promise((resolve, reject) => {

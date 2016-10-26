@@ -81,12 +81,45 @@ var ballotConfig = {
 		return path.replace("/voteonCOIDproposal", config.endpoints.voteonCOIDproposal.path);
 	}
 }
+
+
+
+var ballotConfig2 = {
+        target: config.env.ballot_url,
+        changeOrigin: true,
+        ws: true,
+        onProxyReq(proxyReq, req, res) {
+                if ( req.method == "POST" && req.body ) {
+                        req.body.message = config.endpoints.voteonCOIDproposal.message;
+                        req.body.txn_id = "voteonCOIDproposal";
+                        console.log(JSON.stringify(req.body));
+                        let body = req.body;
+                        // URI encode JSON object
+                        body = Object.keys( body ).map(function( key ) {
+                                return encodeURIComponent( key ) + '=' + encodeURIComponent( body[ key ])
+                        }).join('&');
+
+                        proxyReq.setHeader( 'content-type','application/x-www-form-urlencoded' );
+                        proxyReq.setHeader( 'content-length', body.length );
+
+                        proxyReq.write( body );
+                        proxyReq.end();
+                }
+        },
+        pathRewrite: function(path, req){
+                return path.replace("/", config.endpoints.voteonCOIDproposal.path);
+}}
+
+
+
+
 app.use('/voteonCOIDproposal', proxy(ballotConfig));
 app.post('/ballot/writeNotify', ballotCtrl.writeNotification);
 app.post('/ballot/writeExpiredProposal', expiredNotification.writeExpiredProposalNotification);
 app.get('/ballot/readNotify/:pubKey', ballotCtrl.fetchNotification);
 app.get('/ballot/readExpiredProposal/:pubKey', expiredNotification.fetchExpiredProposalNotification);
 
+app.post('/pullCoidData',ballotCtrl.pullCoidData);
 app.post('/ipfs/upload', IPFS.uploadFile);
 app.get('/ipfs/alldocs/:pubKey', IPFS.getAllFiles);
 app.get('/ipfs/getfile/:hash', IPFS.getUrl);
@@ -94,7 +127,11 @@ app.post('/ipfs/validateFiles', IPFS.getHashFromIpfsFile);
 
 
 
-//app.post('/ballot/writeCoid', ballotCtrl.writeCoidData);
+app.post('/coidCreation',ballotCtrl.coidCreation);
+  
+app.use('/getCoidData', proxy(ballotConfig));
+//removed /ballot
+app.post('/writeCoid', ballotCtrl.writeCoidData);
 //app.get('/ballot/readCoid/:proposalID/publicKey/:pubKey/', ballotCtrl.fetchCoidData);
 
 

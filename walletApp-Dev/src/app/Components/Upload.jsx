@@ -44,8 +44,9 @@ class UploadKeyStore extends React.Component {
 		$.get(this.getUrl(), this.onResponse);
 	}
 	
-	createStorage(pubKey){
+	createStorage(pubKey, private_key){
 		localStorage.setItem("pubKey", pubKey);
+		localStorage.setItem("privKey", private_key);
 		var now = new Date();
 		now.setMinutes(now.getMinutes() + 30);
 		localStorage.setItem("timestamp", now.getTime());
@@ -59,7 +60,7 @@ class UploadKeyStore extends React.Component {
 			var reader = new FileReader();
 			reader.onload = function(event){
 		        var obj = JSON.parse(event.target.result);
-				this.createStorage(obj.public_key);
+				this.createStorage(obj.public_key, obj.private_key);
 		        this.setState({pubKey:obj.public_key, priKey: obj.private_key, fileread:true });
 				this.props.loginHandler(this.state);
 		        this.toVote();

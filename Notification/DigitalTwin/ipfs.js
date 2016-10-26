@@ -149,14 +149,25 @@ var IPFS = {
 	},
 
 	getHashFromIpfsFile(req, res) {
-		var ipfs_hash = req.params.ipfs_hash;
-		const ipfs = spawn('eris',['files','get', ipfs_hash, tmpPath+"ipfs_hash"]);
-		ipfs.on('close', (code) => {
-			IPFS.getFileHash(tmpPath+"ipfs_hash").then((data) => {
-				fs.unlinkSync(tmpPath+"ipfs_hash");
-				res.send(data);
-			});
-		});
+		var param = req.body;
+		var file_hash = param.file_hash.split(",");
+		var ipfs_hash = param.ipfs_hash.split(",");
+		var final_result = [];
+		if(file_hash > 0 && ipfs_hash > 0){
+			for(var i=0; i<ipfs_hash.length; i++){
+				var hash = ipfs_hash[i];
+				const ipfs = spawn('eris',['files','get', hash, tmpPath+"ipfs_hash"]);
+				ipfs.on('close', (code) => {
+					IPFS.getFileHash(tmpPath+"ipfs_hash").then((data) => {
+						fs.unlinkSync(tmpPath+"ipfs_hash");
+						if(data != file_hash[i]){
+							final_result.push(false);
+						} else final_result.push(true);
+					});
+				});
+			}
+			if(final_result.indexOf(false)){ res.send("false"); } else { res.send("true"); }
+		} else res.send("false");
 	},
 	
 	getFileHash: function(filePath){

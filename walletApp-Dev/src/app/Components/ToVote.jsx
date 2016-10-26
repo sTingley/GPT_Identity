@@ -37,7 +37,7 @@ class ModalWin extends React.Component {
 							//alert("vote successfully submitted");
 							window.location.reload();
 							_this.setState({
-							proposal_data: result
+								proposal_data: result
 							});
 						}
 					});
@@ -48,9 +48,25 @@ class ModalWin extends React.Component {
 			}
 		});
 	}
+
+
+
 	
 	componentDidMount(){
 		var _this = this;
+		/*
+		$.ajax({
+			type: "POST",
+			url: twinUrl + "ipfs/validateFiles",
+			data: {
+				file_hash: "123,345,657",
+				ipfs_hash: "098,876,654"
+			},
+			success: function(res){
+				console.log("validation response....", res);
+			}
+		});	
+*/
 		$.ajax({
 			type: "POST",
 			url: twinUrl + 'getCoidData',
@@ -59,16 +75,13 @@ class ModalWin extends React.Component {
 				"proposalId": this.state.proposal.proposal_id,
 			},//.bind(this)d
 			success: function(result){
-				
+				var fileValidation = true;
 				// Fill up data in Modal window
 				//data.publicKey
-				//data.
 				if($.type(result) == "string"){
 					result = JSON.parse(result);	
 				}
-				console.log(result);
-                
-                var ownerArray = [];
+				var ownerArray = [];
                 for(var i = 0; i < result.ownershipTokenQuantity.length; i++)
                 {
                     var temp = [];
@@ -77,50 +90,12 @@ class ModalWin extends React.Component {
                     
                     ownerArray.push(temp)
                 }
-                
-                
-                //now add ownerArray to the JSON object.
                 result.ownerArray = ownerArray
                 console.log(result.ownerArray)
 				
-				/*
-				result.uniqueIdAttributes = result.uniqueIdAttributes.split(",");
-				result.ownerIdList = result.ownerIdList.split(",");
-				result.ownershipTokenAttributes = result.ownershipTokenAttributes.split(",");
-				result.ownershipTokenQuantity = result.ownershipTokenQuantity.split(",");
-				result.controlIdList = result.controlIdList.split(",");		
-				result.controlTokenAttributes = result.controlTokenAttributes.split(",");
-				result.controlTokenQuantity = result.controlTokenQuantity.split(",");
-				result.identityRecoveryIdList = result.identityRecoveryIdList.split(",");
-				*/
-				
-			//	var result = {
-					//pubkey = result.pubkey
-					
-	
-				// "pubkey": "1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740",
-				// "proposalId": "1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740",
-				// "official_ids" : [
-				// ["offical id label 1","QmSkRbQo8185yA1MFB3f8bHZGWnRpHchA8Y2XvyQdnGXkU", "c817b4aa73c282e20cf5405995fb9b49cd56b3f2391ff5f3eac92b223bb89393"],
-				// ["offical id label 2","QmWTdJzKWrXCzoDtV5hKq6q6SrrKtujsuERmra2fScQoWf", "a346d36f593eff4418b7c3f956f320f01f381725155bea112986e115d8cd9e72"],
-				// ["offical id label 3","QmQTozMdtTxg6ULPRXMJRJ56y7K3AzmeAfKui5qHbcUm64", "b48f6f1d4632dd21c2d4f86a4976832246815d844a450dd4dd7b029c55b0f98b"]
-				// ],
-				// "ownership_ids":["b48f6f1d4632dd21c2d4f86a4976832246815d844a450dd4dd7b029c55b0f98b","b48f6f1d4632dd21c2d4f86a4976832246815d844a450dd4dd7b029c55b0f98b"],
-				// "control_ids":["b48f6f1d4632dd21c2d4f86a4976832246815d844a450dd4dd7b029c55b0f98b","b48f6f1d4632dd21c2d4f86a4976832246815d844a450dd4dd7b029c55b0f98b"],
-				// "ownership_ids": ["b48f6f1d4632dd21c2d4f86a4976832246815d844a450dd4dd7b029c55b0f98b","b48f6f1d4632dd21c2d4f86a4976832246815d844a450dd4dd7b029c55b0f98b"],
-				// "control_ids":["b48f6f1d4632dd21c2d4f86a4976832246815d844a450dd4dd7b029c55b0f98b","b48f6f1d4632dd21c2d4f86a4976832246815d844a450dd4dd7b029c55b0f98b"],
-				// "identity_ids":["b48f6f1d4632dd21c2d4f86a4976832246815d844a450dd4dd7b029c55b0f98b","b48f6f1d4632dd21c2d4f86a4976832246815d844a450dd4dd7b029c55b0f98b"]
-				// };
-
 				_this.setState({
-				proposal_data: result
+					proposal_data: result
 				});
-				
-				// if(typeof(result) != "object"){
-				// 	var data = JSON.parse(result);	
-				// } else 
-				// 	var data = result;
-				// this.setState({coid: data.data.messages});
 				$("#proposalDetails").modal('show');
 				$("#proposalDetails").on('hidden.bs.modal', _this.props.hideHandler);
 			}

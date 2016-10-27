@@ -15,7 +15,7 @@ class Header extends React.Component {
               <span className="icon-bar"></span>
               <span className="icon-bar"></span>
             </button>
-            <a className="navbar-brand" href="#">Eris Wallet</a>
+            <a className="navbar-brand" href="#">Your Digital Identity Wallet</a>
           </div>
           <div id="navbar" className="navbar-collapse collapse">
              <ul className="nav navbar-nav hidden-lg">
@@ -29,7 +29,7 @@ class Header extends React.Component {
 				{ prop.loggedin ?  <li><Link to='/docs' activeClassName="active">My Documents</Link></li> : '' }
             </ul>
             <ul className="nav navbar-nav navbar-right">
-                <li><a href="#">Faq</a></li>
+                <li><a href="http://www.tcs.com">Powered by TCS, Monax, BigChainDB and IPFS</a></li>
             </ul>
           </div>
         </div>

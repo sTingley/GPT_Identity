@@ -102,160 +102,152 @@ class ModalWin extends React.Component {
 		});
     }
 	
-	render(){
-		var prop = this.state.proposal;
-		var style = {
-			fontSize: '12.5px'
-		}
-		return(
-			<div className="modal fade" id="proposalDetails" tabIndex="-1" role="dialog">
-			  <div className="modal-dialog modal-lg" role="document">
-				<div className="modal-content">
-				  <div className="modal-header">
-					<button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-					<h4 className="modal-title" id="asset">COID Proposal Details</h4>
-				  </div>
-				  <div className="modal-body">
-					<table className="table table-striped table-hover" style={style}>
-						<tbody>
-							<tr>
-								<td>Proposal ID</td>
-								<td>{prop.proposal_id}</td>
-							</tr>
-							<tr>
-								<td colSpan="2"><b>Official IDs</b></td>
-							</tr>
-							{(() => {
-								var ipfs_url = "http://10.101.114.231:8080/ipfs/";
-								if(!$.isEmptyObject(this.state.proposal_data)){
-									console.log("**", this.state.proposal_data.uniqueIdAttributes)
-									return this.state.proposal_data.uniqueIdAttributes.map((ids,i) => {
-										return(
-											<tr key={i}>
-												<td>{ids[0]}</td>
-												<td><p>File hash: {ids[2]}</p><p>IPFS hash: <a target="_blank" href={ipfs_url+"/"+ids[1]}>{ids[1]}</a></p></td>
-											</tr>
-										)
-									});
-									
-								} else {
-								return <tr><td colSpan="2">No Ids found</td></tr>
-							}
-						})(this)}
-							
-
-							<tr>
-								<td>Ownership ID</td>
-	                            
-								<td>{this.state.proposal_data.ownershipId}</td>
-							</tr>
-							<tr>
-								<td>Ownership ID Attributes</td>
-							 	<td>
-							 	{(() => {
-							 	if(!$.isEmptyObject(this.state.proposal_data)){
-							 		return this.state.proposal_data.ownerIdList.map((ids,i) => {
-							 		return <p key={i}> {this.state.proposal_data.ownerIdList[i]}</p>
-							 		})
-								}
+render(){
+        var prop = this.state.proposal;
+        var style = {
+            fontSize: '12.5px'
+        }
+        return(
+            <div className="modal fade" id="proposalDetails" tabIndex="-1" role="dialog">
+              <div className="modal-dialog modal-lg" role="document">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 className="modal-title" id="asset">COID Proposal Details</h4>
+                  </div>
+                  <div className="modal-body">
+                    <table className="table table-striped table-hover" style={style}>
+                        <tbody>
+                            <tr>
+                                <td>Proposal ID</td>
+                                <td>{prop.proposal_id}</td>
+                            </tr>
+                            <tr>
+                                <td colSpan="2"><b>Official IDs</b></td>
+                            </tr>
+                            {(() => {
+                                var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+                                if(!$.isEmptyObject(this.state.proposal_data)){
+                                    console.log("**", this.state.proposal_data.uniqueIdAttributes)
+                                    return this.state.proposal_data.uniqueIdAttributes.map((ids,i) => {
+                                        return(
+                                            <tr key={i}>
+                                                <td>{ids[0]}</td>
+                                                <td><p>File hash: {ids[2]}</p><p>IPFS hash: <a target="_blank" href={ipfs_url+"/"+ids[1]}>{ids[1]}</a></p></td>
+                                            </tr>
+                                        )
+                                    });
+                                    
+                                } else {
+                                return <tr><td colSpan="2">No Ids found</td></tr>
+                            }
+                        })(this)}
+                            <tr>
+                                <td>Ownership ID</td>
+                                
+                                <td>{this.state.proposal_data.ownershipId}</td>
+                            </tr>
+                            <tr>
+                                <td>Ownership ID List</td>
+                                <td>
+                                {(() => {
+                                if(!$.isEmptyObject(this.state.proposal_data)){
+                                    return this.state.proposal_data.ownerIdList.map((ids,i) => {
+                                    return <p key={i}> {this.state.proposal_data.ownerIdList[i]}</p>
+                                    })
+                                }
                                 else
                                 {
                                     return <p>No Ids found</p>
                                 }
-							 	})(this)}
-							 	</td>
-							 	
-							</tr>
-
-							<tr>
-								<td>Ownership Token ID</td>
-								<td><p> {this.state.proposal_data.ownershipTokenId}</p></td>
-							</tr>
-							<tr>
-								<td>Ownership Token Description</td>
-								<td>{(() => {
-								if(!$.isEmptyObject(this.state.proposal_data)){
-									return this.state.proposal_data.ownershipTokenAttributes.map((ids,i) => {
-									return <p key={i}> {this.state.proposal_data.ownershipTokenAttributes[i]}</p>
-									})
-								}
-								})(this)}
-								</td>
-							</tr>
-							<tr>
-								<td>Ownership Token Quantity</td>
-								<td><p> {this.state.proposal_data.ownershipTokenQuantity}</p></td>
-							</tr>
-                            
-                            
-                            
-							<tr>
-								<td>Control ID</td>
-								<td><p> {this.state.proposal_data.controlId}</p></td>
-							</tr>	
-							<tr>
-								<td>Control ID List</td>
-								<td>{(() => {
-								if(!$.isEmptyObject(this.state.proposal_data)){
-									return this.state.proposal_data.controlIdList.map((ids,i) => {
-									return <p key={i}> {this.state.proposal_data.controlIdList[i]}</p>
-									})
-								}
-								})(this)}
-								</td>
-							</tr>
-							<tr>
-								<td>Recovery IDs</td>
-								<td>{(() => {
-								if(!$.isEmptyObject(this.state.proposal_data)){
-									return this.state.proposal_data.identityRecoveryIdList.map((ids,i) => {
-									return <p key={i}> {this.state.proposal_data.identityRecoveryIdList[i]}</p>
-									})
-								}
-								})(this)}
-								</td>
-							</tr>
-							
-							<tr>
-								<td>Recovery Condition</td>
-								<td> <p> {this.state.proposal_data.recoveryCondition}</p></td>
-							</tr>
-							
-							<tr>
-								<td>Control Token ID</td>
-								<td> <p> {this.state.proposal_data.controlTokenId}</p></td>
-							</tr>
-							<tr>
-								<td>Control Token Description</td>
-								<td>{(() => {
-								if(!$.isEmptyObject(this.state.proposal_data)){
-									return this.state.proposal_data.controlTokenAttributes.map((ids,i) => {
-									return <p key={i}> {this.state.proposal_data.controlTokenAttributes[i]}</p>
-									})
-								}
-								})(this)}
-								</td>
-							</tr>
-							<tr>
-								<td>Control Token Quantity</td>
-								<td><p> {this.state.proposal_data.controlTokenQuantity}</p></td>
-							</tr>
-							<tr>
-								<td>Vote Description</td>
-								<td><textarea className="form-control"></textarea></td>
-							</tr>
-						</tbody>
-					</table>
-				  </div>
-				  <div className="modal-footer">
-					<button type="button" className="btn btn-primary" data-val="2" onClick={this.submitHandler.bind(this)}>Yes</button>
-					<button type="button" className="btn btn-default" data-val="1" onClick={this.submitHandler.bind(this)}>No</button>
-				  </div>
-				</div>
-			  </div>
-			</div>
-		)
-	}
+                                })(this)}
+                                </td>
+                                
+                            </tr>
+                            <tr>
+                                <td>Ownership Token ID</td>
+                                <td><p> {this.state.proposal_data.ownershipTokenId}</p></td>
+                            </tr>
+                            <tr>
+                                <td>Ownership Token Description</td>
+                                <td>{(() => {
+                                if(!$.isEmptyObject(this.state.proposal_data)){
+                                    return this.state.proposal_data.ownershipTokenAttributes.map((ids,i) => {
+                                    return <p key={i}> {this.state.proposal_data.ownershipTokenAttributes[i]}</p>
+                                    })
+                                }
+                                })(this)}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Ownership Token Quantity</td>
+                                <td><p> {this.state.proposal_data.ownershipTokenQuantity}</p></td>
+                            </tr>
+                            <tr>
+                                <td>Control ID</td>
+                                <td><p> {this.state.proposal_data.controlId}</p></td>
+                            </tr> 
+                            <tr>
+                                <td>Control ID List</td>
+                                <td>{(() => {
+                                if(!$.isEmptyObject(this.state.proposal_data)){
+                                    return this.state.proposal_data.controlIdList.map((ids,i) => {
+                                    return <p key={i}> {this.state.proposal_data.controlIdList[i]}</p>
+                                    })
+                                }
+                                })(this)}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Control Token ID</td>
+                                <td> <p> {this.state.proposal_data.controlTokenId}</p></td>
+                            </tr>
+                            <tr>
+                                <td>Control Token Description</td>
+                                <td>{(() => {
+                                if(!$.isEmptyObject(this.state.proposal_data)){
+                                    return this.state.proposal_data.controlTokenAttributes.map((ids,i) => {
+                                    return <p key={i}> {this.state.proposal_data.controlTokenAttributes[i]}</p>
+                                    })
+                                }
+                                })(this)}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Control Token Quantity</td>
+                                <td><p> {this.state.proposal_data.controlTokenQuantity}</p></td>
+                            </tr>
+                            <tr>
+                                <td>Recovery IDs</td>
+                                <td>{(() => {
+                                if(!$.isEmptyObject(this.state.proposal_data)){
+                                    return this.state.proposal_data.identityRecoveryIdList.map((ids,i) => {
+                                    return <p key={i}> {this.state.proposal_data.identityRecoveryIdList[i]}</p>
+                                    })
+                                }
+                                })(this)}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Recovery Condition</td>
+                                <td> <p> {this.state.proposal_data.recoveryCondition}</p></td>
+                            </tr>
+                            <tr>
+                                <td>Vote Description</td>
+                                <td><textarea className="form-control"></textarea></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                  </div>
+                  <div className="modal-footer">
+                    <button type="button" className="btn btn-primary" data-val="2" onClick={this.submitHandler.bind(this)}>Yes</button>
+                    <button type="button" className="btn btn-default" data-val="1" onClick={this.submitHandler.bind(this)}>No</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+        )
+    }
 };
 
 

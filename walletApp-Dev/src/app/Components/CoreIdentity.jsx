@@ -184,10 +184,6 @@ class UniqueIDAttributesForm extends React.Component {
 };
 
 
-
-
-
-
 class CoreIdentity extends React.Component {
 	
 	constructor(props){
@@ -466,8 +462,24 @@ class CoreIdentity extends React.Component {
 						<TagsInput {...inputAttrs} value={this.state.owner_id} onChange={(e)=>{ this.onFieldChange("owner_id", e) } } />
 					</div>
 					<div className="form-group">
-						<label htmlFor="control_id">Control ID</label>
+						<label htmlFor="owner_token_id">Enter Ownership Token Description. For example, 'Spencer tokens'.</label>
+						<TagsInput {...inputAttrs} value={this.state.owner_token_desc} onChange={(e)=>{ this.onFieldChange("owner_token_desc", e) } } />
+					</div>
+					<div className="form-group">
+						<label htmlFor="owner_token_id">Enter Ownership Token Quantity. For example, 1 token for an individual.</label>
+						<TagsInput {...inputAttrs} value={this.state.owner_token_quantity} onChange={(e)=>{ this.onFieldChange("owner_token_quantity", e) } } />
+					</div>
+					<div className="form-group">
+						<label htmlFor="control_id">Enter Control IDs. Control IDs are the public keys of the identity controllers.</label>
 						<TagsInput {...inputAttrs} value={this.state.control_id} onChange={(e)=>{ this.onFieldChange("control_id", e) } } />
+					</div>
+					<div className="form-group">
+						<label htmlFor="control_token_id">Control Token ID Description. For example, 'Spencer tokens'.</label>
+						<TagsInput {...inputAttrs} value={this.state.control_token_desc} onChange={(e)=>{ this.onFieldChange("control_token_desc", e) } } />
+					</div>
+					<div className="form-group">
+						<label htmlFor="control_token_id">Enter Control Token Quantity. For example, 1 token for an individual.</label>
+						<TagsInput {...inputAttrs} value={this.state.control_token_quantity} onChange={(e)=>{ this.onFieldChange("control_token_quantity", e) } } />
 					</div>
 					<div className="form-group">
 						<label htmlFor="recovery_id">Recovery IDs (public keys of individuals who will attest to lost/stolen identity)</label>
@@ -476,23 +488,6 @@ class CoreIdentity extends React.Component {
 					<div className="form-group">
 						<label htmlFor="recovery_id">Recovery Condition (# of digital signatures of recovery ID owners needed to recover identity)</label>
 						<TagsInput {...inputAttrs} value={this.state.recoveryCondition} onChange={(e)=>{ this.onFieldChange("recoveryCondition", e) } } />
-					</div>
-					<div className="form-group">
-						<label htmlFor="owner_token_id">Enter Ownership Token Description. For example, 'Spencer tokens'.</label>
-						<TagsInput {...inputAttrs} value={this.state.owner_token_desc} onChange={(e)=>{ this.onFieldChange("owner_token_desc", e) } } />
-					</div>
-					<div className="form-group">
-						<label htmlFor="owner_token_id">Enter Ownership Token Quantity. For example, 1 token for an individual.</label>
-						<TagsInput {...inputAttrs} value={this.state.owner_token_quantity} onChange={(e)=>{ this.onFieldChange("owner_token_quantity", e) } } />
-					</div>
-
-					<div className="form-group">
-						<label htmlFor="control_token_id">Control Token ID. Description. For example, 'Spencer tokens'.</label>
-						<TagsInput {...inputAttrs} value={this.state.control_token_desc} onChange={(e)=>{ this.onFieldChange("control_token_desc", e) } } />
-					</div>
-					<div className="form-group">
-						<label htmlFor="control_token_id">Enter Control Token Quantity. For example, 1 token for an individual.</label>
-						<TagsInput {...inputAttrs} value={this.state.control_token_quantity} onChange={(e)=>{ this.onFieldChange("control_token_quantity", e) } } />
 					</div>
 					<div className="form-group">
 					  <div className="col-sm-6">

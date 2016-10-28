@@ -267,7 +267,7 @@ class CoreIdentity extends React.Component {
 		console.log();
 		var inputObj = {
 				"pubKey": this.refs.pubKey.value,
-				"sig": this.refs.signature.value,
+				//"sig": this.refs.signature.value,
 				
 				//"msg": this.refs.message.value,
 				//"name": this.refs.nameReg.value,		no longer standalone part of JSON object (it is part of unique attributes)
@@ -420,6 +420,7 @@ class CoreIdentity extends React.Component {
 		console.log(typeof(signature1))
 		
 		json.sig = signature1;
+		json.msg = msg_hash_buffer.toString("hex");
 		//this.setState({signature: signature1})
 		
 		console.log(json)

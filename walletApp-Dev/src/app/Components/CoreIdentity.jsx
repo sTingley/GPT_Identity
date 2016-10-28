@@ -1,6 +1,9 @@
 import React from 'react';
 import TagsInput from 'react-tagsinput';
 import { sha3_256 } from 'js-sha3';
+var crypto = require('crypto');
+var secp256k1 = require('secp256k1');
+var keccak_256 = require('js-sha3').keccak_256;
 
 //TODO : Namespace validation 
 
@@ -206,7 +209,9 @@ class CoreIdentity extends React.Component {
 			control_token_quantity:[],
 			showModal: false,
 			tmpFile:'',
-			pubKey: localStorage.getItem("pubKey")
+			pubKey: localStorage.getItem("pubKey"),
+			privKey: localStorage.getItem("privKey"),
+			signature:''
 		};
 		
 		this.maxUniqAttr = 10;
@@ -396,6 +401,27 @@ class CoreIdentity extends React.Component {
 	submitCoid(e){
 		e.preventDefault();
 		var json = this.prepareJsonToSubmit();
+		
+		var privKey1 = new Buffer(this.state.privKey,"hex");
+		
+		var msg_hash = keccak_256(JSON.stringify(json));
+		
+		var msg_hash_buffer = new Buffer(msg_hash,"hex");
+
+		var signature1 = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1))
+		
+		signature1 = JSON.parse(signature1).signature;
+		 signature1 = JSON.stringify(signature1);
+		 signature1 = JSON.parse(signature1).data;
+		 signature1 = new Buffer(signature1,"hex");
+		 signature1 = signature1.toString("hex");
+		
+		console.log("sig" + signature1)
+		console.log(typeof(signature1))
+		
+		json.sig = signature1;
+		//this.setState({signature: signature1})
+		
 		console.log(json)
 		$.ajax({
 			url: twinUrl + 'requestCOID',
@@ -492,7 +518,7 @@ class CoreIdentity extends React.Component {
 					<div className="form-group">
 					  <div className="col-sm-6">
 					  <br/>
-						<input className="form-control" ref="signature" type="hidden" value="7051442bbf18bb2c86cbc8951a07e27ec6ba05ac3fa427e4c6b948e3dcf91a94046b048edf52445fb22cc776a94b87c3f55426f993458ec744f61f09fb46eeaa" />
+						<input className="form-control" ref="signature" type="hidden" value={this.state.signature} />
 						<input type="hidden" name="pubkey" ref="pubKey" value={localStorage.getItem("pubKey")} />
 						<button className="btn btn-primary" data-loading-text="Submit Identity" name="submit-form" type="button" onClick={this.submitCoid.bind(this)}>Submit Identity</button>
 					  </div>

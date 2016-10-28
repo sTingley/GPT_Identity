@@ -187,6 +187,54 @@ class UniqueIDAttributesForm extends React.Component {
 };
 
 
+class TokenDistributionForm extends React.Component {
+    
+    constructor(props){
+        super(props)
+        this.state = {
+            controltoken_quantity: [],
+            controltoken_list: [],
+            
+            showModal: false
+        };
+        this.maxUniqAttr = 10;
+        //this.onFieldChange = this.onFieldChange.bind(this);
+        this.handleHideModal = this.handleHideModal.bind(this);
+    }
+    handleShowModal(e){
+        this.setState({showModal: true, tmpFile: $(e.target).attr('data-id')});
+    }
+    
+    handleHideModal(){
+        this.setState({showModal: false});
+    }
+    render(){
+        var style = {
+            fontSize: '12.5px'
+        }
+        return(
+            <div className="form-group col-md-12">
+                <div className="col-md-10">
+                <table className="table table-striped table-hover" style={style}>
+                        <tbody>
+                        <tr>
+                        <th><b>Public Key of Controller</b></th>
+						<th><b>Control Token Quantity</b></th>
+                        </tr>
+                        <tr>
+                        <td><input name={'label1-'+this.props.labelref} className="form-control col-md-4" type="text" placeholder="Public Key of Controller"  /></td>
+                        <td><input name={'label1-'+this.props.labelref} className="form-control col-md-4" type="text" placeholder="Control Token Quantity"  /></td>
+                        </tr>
+                        </tbody>
+                </table>
+                
+                </div>
+            </div>    
+        );
+    }
+};
+
+
 class CoreIdentity extends React.Component {
 	
 	constructor(props){
@@ -194,7 +242,7 @@ class CoreIdentity extends React.Component {
 		this.state = {
 			file_attrs:[],
 			inputs: ['input-0'], //removed input-1
-			inputs_name:['input-0'],
+			inputs_name:['input1-0'],
 			official_id:[],		//first official ID is name (see identity spec v1.3)
 			owner_id:[],
 			control_id:[],
@@ -258,6 +306,23 @@ class CoreIdentity extends React.Component {
 		return labelVals;
 	}
 	
+	//used in token form class for control token distribution list.. is called by appendInput2()
+	getLabelValues1(){
+        var labelVals1 = []
+		$.each($("input[name^='label1-']"), function(obj){
+			var value = $.trim($(this).val());
+			if(value.length > 0){
+				labelVals1.push({
+					//replace the 'label' with the entered unique attribute descriptor, for example 'Name' or 'US SSN'
+					[$(this).attr('name').replace("label1-","")] : value
+				});
+			}
+			console.log("obj: " + JSON.stringify(obj))
+		});
+        return labelVals1;
+    }
+	
+
 	//TODO:
 	//0)Check that controllers pubkeys are valid
 	//1)NEED TO DISTINGUISH COID for person or thing---DONE
@@ -265,6 +330,7 @@ class CoreIdentity extends React.Component {
 	
 	prepareJsonToSubmit(){
 		console.log();
+		this.prepareControlTokenDistribution();
 		var inputObj = {
 				"pubKey": this.refs.pubKey.value,
 				//"sig": this.refs.signature.value,
@@ -372,7 +438,7 @@ class CoreIdentity extends React.Component {
 	
 	prepareUniqueIdAttrs(){
 		var newArr = [],
-			labels = this.getLabelValues();	//look at this
+			labels = this.getLabelValues();
 		for(var i=0; i<labels.length; i++){
 			var tmpArr = [];
 			for(var key in labels[i]){
@@ -386,6 +452,21 @@ class CoreIdentity extends React.Component {
 		}
 		return newArr;
 	}
+	
+	
+	prepareControlTokenDistribution(){
+		var labels = this.getLabelValues1();
+		for(var i=0; i<labels.length; i+=2){	
+			for(var key in labels[i]){
+				this.state.control_id.push(labels[i][key]);
+				this.state.control_token_quantity.push(labels[i+1][key]);
+			}	
+		}
+		console.log("control_id: " + JSON.stringify(this.state.control_id))
+		console.log("control_token_quantity: " + JSON.stringify(this.state.control_token_quantity))
+	}
+	
+	
 	
 	//hashing the pubkeys
 	prepareTokenDistribution(value){
@@ -454,8 +535,19 @@ class CoreIdentity extends React.Component {
 		if(inputLen < this.maxUniqAttr){
 			var newInput = `input-${inputLen}`;
         	this.setState({ inputs: this.state.inputs.concat([newInput]) });
+			
 		}
+		console.log("inputs: " + JSON.stringify(this.state.inputs))
+		console.log("inputs values: " + JSON.stringify(this.getLabelValues()))
     }
+	
+	appendInput2() {
+		var inputLen = this.state.inputs_name.length;
+		if(inputLen < this.maxUniqAttr){
+			var newInput1 = `input1-${inputLen}`;
+        	this.setState({ inputs_name: this.state.inputs_name.concat([newInput1]) });
+		}
+	}
 	
 	render () {
 		var inputAttrs = {
@@ -497,16 +589,20 @@ class CoreIdentity extends React.Component {
 						<TagsInput {...inputAttrs} value={this.state.owner_token_quantity} onChange={(e)=>{ this.onFieldChange("owner_token_quantity", e) } } />
 					</div>
 					<div className="form-group">
-						<label htmlFor="control_id">Enter Control IDs. Control IDs are the public keys of the identity controllers.</label>
-						<TagsInput {...inputAttrs} value={this.state.control_id} onChange={(e)=>{ this.onFieldChange("control_id", e) } } />
-					</div>
-					<div className="form-group">
 						<label htmlFor="control_token_id">Control Token ID Description. For example, 'Spencer tokens'.</label>
 						<TagsInput {...inputAttrs} value={this.state.control_token_desc} onChange={(e)=>{ this.onFieldChange("control_token_desc", e) } } />
 					</div>
 					<div className="form-group">
-						<label htmlFor="control_token_id">Enter Control Token Quantity. For example, 1 token for an individual.</label>
-						<TagsInput {...inputAttrs} value={this.state.control_token_quantity} onChange={(e)=>{ this.onFieldChange("control_token_quantity", e) } } />
+						<label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
+						{this.state.inputs_name.map(input => <TokenDistributionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+					</div>
+					<div className="form-group"> 
+						<div className="col-md-offset-6 col-md-6 "> 
+							<p></p>
+							<button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInput2.bind(this)}>
+								<span className="glyphicon glyphicon-plus"></span>Add More
+							</button>
+						</div>
 					</div>
 					<div className="form-group">
 						<label htmlFor="recovery_id">Recovery IDs (public keys of individuals who will attest to lost/stolen identity)</label>

@@ -1,4 +1,7 @@
 import React from 'react';
+var crypto = require('crypto');
+var secp256k1 = require('secp256k1');
+var keccak_256 = require('js-sha3').keccak_256;
 
 
 class ModalWin extends React.Component {
@@ -15,9 +18,44 @@ class ModalWin extends React.Component {
 		e.preventDefault();
 		var ele = $(e.target);
 		
+        //get private key from local storage
+		var privKey = localStorage.getItem("privKey");
+        
+        //make private key hex buffer
+		var privKey1 = new Buffer(privKey,"hex");
+		
+        //message is "vote_transaction"
+        var msg = "vote_transaction"
+        
+        //get hash of message
+		var msg_hash = keccak_256(msg);
+        
+		//make msg_hash a hex buffer
+		var msg_hash_buffer = new Buffer(msg_hash,"hex");
+
+        //sign the message
+		var signature1 = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1))
+		
+        //get json object with key "signature"
+		signature1 = JSON.parse(signature1).signature;
+		signature1 = JSON.stringify(signature1);
+        
+        //get json object with key "data" in side the json object with key "signature"
+		signature1 = JSON.parse(signature1).data;
+        
+        //make the signature a buffer, then a string, to emit the commas
+		signature1 = new Buffer(signature1,"hex");
+		signature1 = signature1.toString("hex");
+		
+        //log for testing
+		console.log("sig" + signature1)
+		console.log(typeof(signature1))
+		
+        
 		var json = {
 			"txnDesc": "sampleDesc",
-			"signature": '7051442bbf18bb2c86cbc8951a07e27ec6ba05ac3fa427e4c6b948e3dcf91a94046b048edf52445fb22cc776a94b87c3f55426f993458ec744f61f09fb46eeaa',
+			"signature": signature1,
+            "msg": msg_hash_buffer.toString("hex"),
 			"publicKey": localStorage.getItem("pubKey"),
 			"proposalID": this.state.proposal.proposal_id,
 			"vote": parseInt(ele.attr("data-val"))

@@ -13,6 +13,9 @@ contract CoreIdentity
     //(3) Call setControl
     //(4) Call setRecovery
     //(5) Call StartCoid. IMPORTANT: Only call this after (1-4) have been called!
+    //AF: These functions can only be called from the IDF gatekeeper contract ... will have to hardcode the address 
+    //of the IDF gatekeeper contract in a modifier
+    //AF: We should also set a LOCAL variable that is checked after these functions are called for the first time to avvoid accidental or malicious calling
 
 
 
@@ -108,6 +111,7 @@ contract CoreIdentity
 
    //END CONSTRUCTOR
    //START CONSTRUCTOR HELPER FUNCTION
+   //AF: I presume that the commented out lines will be added in.
    function StartCoid()
    {
         bytes32[10] memory owners = ownershipStruct.ownerIDList;

@@ -1,0 +1,40 @@
+
+jobs:
+
+- name: ControlToken
+  job:
+    deploy:
+      contract: ControlToken.sol
+      wait: true
+
+
+- name: OwnershipToken
+  job:
+    deploy:
+      contract: OwnershipToken.sol
+      wait: true
+
+- name: CoreIdentity
+  job:
+    deploy:
+      contract: CoreIdentity.sol
+      wait: true
+
+- name: ballot
+  job:
+    deploy:
+      contract: ballot.sol
+      wait: true
+
+
+- name: MyGateKeeper
+  job:
+    deploy:
+      contract: MyGatekeeper.sol
+      wait: true
+
+- name: GateKeeper
+  job:
+    deploy:
+      contract: GateKeeper.sol
+      wait: true

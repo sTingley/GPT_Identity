@@ -1,0 +1,29 @@
+{
+  "name": "gatekeeper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "async": "^2.0.1",
+    "body-parser": "^1.15.2",
+    "crypto": "0.0.3",
+    "deasync": "^0.1.8",
+    "ed25519": "0.0.4",
+    "eris-contracts": "^0.13.3",
+    "express": "^4.14.0",
+    "http-proxy": "^1.14.0",
+    "js-sha3": "^0.5.5",
+    "morgan": "^1.7.0",
+    "node-rest-client": "^2.0.1",
+    "path": "^0.12.7",
+    "seq": "^0.3.5",
+    "solc": "^0.3.5",
+    "synchronize": "^2.0.0",
+    "web3": "^0.17.0-alpha"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node ballot.js && node gatekeeper_v7.js" },
+  "author": "",
+  "license": "ISC"
+}

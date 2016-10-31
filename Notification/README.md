@@ -1,4 +1,4 @@
-# Digital Twin / Ballot
+# Digital Twin / Ballot / Gatekeeper&Dao
 
 ## Ballot (ballot.js)
 - [ ] TODO : Should create Ballot.sol instance
@@ -17,7 +17,7 @@
 - ballotCtrl.js is a controller file which has Ballot Read/Write functionality(in future may have multiple controller file for Digital Twin).
 - Sample JSON file exists in [public_key.json](https://github.com/sTingley/GPT_Identity/blob/master/Notification/DigitalTwin/notifications/1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740.json)
 
-## Gatekeeper (gatekeeper_v7.js
+## Gatekeeper (gatekeeper_v7.js)
 
 - Runs on port 3000
 

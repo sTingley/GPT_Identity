@@ -1,0 +1,36 @@
+jobs:
+
+- name: setinput
+  job:
+    set:
+      val: NamespaceRegister
+
+- name: setname
+  job:
+    set:
+      val: Spencer
+
+- name: validator
+  job:
+    deploy:
+      contract: validate.sol
+      wait: true
+
+- name: nameReg
+  job:
+    deploy:
+      contract: nameReg.sol
+      wait: true
+
+- name: checkTxs
+  job:
+    call:
+      destination: $validator
+      data: checkTxs $setinput $setname
+      wait: true
+
+- name: identity
+  job:
+    deploy:
+      contract: identity.sol
+      wait: true

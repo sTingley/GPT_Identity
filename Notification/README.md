@@ -9,13 +9,21 @@
 - Ballot app submit the data via HTTP request (POST) request to Digital Twin
 - runs in 8082 port
 
-## Digital Twin
+## Digital Twin (index.js)
 
 - Runs on 5050 port
 - Digital Twin is now capabale of handle multiple contract through (route, filter, rewritePath)
 - As of now, there Two api's created for Ballot App and redirection for GateKeeper
 - ballotCtrl.js is a controller file which has Ballot Read/Write functionality(in future may have multiple controller file for Digital Twin).
 - Sample JSON file exists in [public_key.json](https://github.com/sTingley/GPT_Identity/blob/master/Notification/DigitalTwin/notifications/1dc99871943ad3a715f022273513a393564f9b060c4c047920fc1425b90b7740.json)
+
+## Gatekeeper (gatekeeper_v7.js
+
+- Runs on port 3000
+
+## Dao
+
+- Populates validator (voter) list
 
 ### API Style
 _Example: http://localhost:5050/ballot/notify_
@@ -40,10 +48,6 @@ _Example: http://localhost:5050/ballot/notify_
 - public key is madatory
 - Responsible to send proposals to the wallet if exists
 
-## WalletApp
-
-- [x] TODO : If notification exists that has to be shown in wallet app
-- [ ] TODO : Yes/No votting functionality has to be done
 
 
 

@@ -1,0 +1,10 @@
+
+jobs:
+
+- name: TXcheck
+  job:
+    deploy:
+      contract: TXcheck.sol
+      wait: true
+
+

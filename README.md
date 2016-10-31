@@ -1,2 +1,7 @@
 # GPT_Identity
-repo for GPT platform
+Repository for GPT platform
+
+In /Notification ,
+      /Ballot ,
+      /DigitalTwin
+      /Gatekeeper

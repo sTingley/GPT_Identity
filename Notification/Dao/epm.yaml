@@ -1,0 +1,10 @@
+
+jobs:
+
+- name: Dao
+  job:
+    deploy:
+      contract: Dao.sol
+      wait: true
+
+

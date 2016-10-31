@@ -1,0 +1,13 @@
+jobs:
+
+- name: setStorageBase
+  job:
+    set:
+      val: 5
+
+- name: deployStorageK
+  job:
+    deploy:
+      contract: ErisBigchainRequester.sol
+      wait: true
+

@@ -1,0 +1,24 @@
+jobs:
+
+- name: setStorageBase
+  job:
+    set:
+      val: 5
+
+- name: deployStorageK
+  job:
+    deploy:
+      contract: Verification.sol
+      wait: true
+
+- name: deployStorageK2
+  job:
+    deploy:
+      contract: Verification2.sol
+      wait: true
+
+- name: testECRecover
+  job:
+    query-contract:
+      destination: $deployStorageK2
+      data: test_v0

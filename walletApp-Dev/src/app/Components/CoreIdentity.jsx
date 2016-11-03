@@ -349,12 +349,12 @@ class CoreIdentity extends React.Component {
 				//calculated. should be one time hashing of ownershipTokenAttributes and ownership token quantity
 				"ownershipTokenId": this.getHash(this.joinValuesOwnership()),	
 				//attributes should not be hashed, they should be readable.
-				"ownershipTokenAttributes":this.state.owner_token_desc,					
+				"ownershipTokenAttributes":this.hexEncodeOwnerTokenAttrs(),					
 				"ownershipTokenQuantity": this.state.owner_token_quantity,
 				
 				//calculated. should be one time hashing of controlTokenAttributes and control token quantity
 				"controlTokenId": this.getHash(this.joinValuesControl()),
-				"controlTokenAttributes": this.state.control_token_desc,
+				"controlTokenAttributes": this.hexEncodeControlTokenAttrs(),
 				"controlTokenQuantity": this.state.control_token_quantity,
 				
 				//pubkeys used for recovery in the event COID is lost or stolen			
@@ -396,6 +396,31 @@ class CoreIdentity extends React.Component {
 		tempArr = tempArr.join();
         return tempArr;
 		}
+		
+	hexEncodeOwnerTokenAttrs() {
+		var desc = this.state.owner_token_desc;
+		desc = desc[0];
+		var temp = "";
+		for(var k=0; k<desc.length;k++)
+		{
+			temp = temp + desc[k].charCodeAt(0).toString(16);
+		}
+		return temp;
+		
+	}
+	
+	hexEncodeControlTokenAttrs() {
+		var desc = this.state.control_token_desc;
+		//desc.length is 1 because state var control_token_desc is an array!!
+		desc = desc[0];
+		var temp = "";
+		for(var k=0; k<desc.length;k++)
+		{
+			temp = temp + desc[k].charCodeAt(0).toString(16);
+		}
+		return temp;
+		
+	}
 		
 		
 	createHashAttribute(values){
@@ -462,8 +487,8 @@ class CoreIdentity extends React.Component {
 				this.state.control_token_quantity.push(labels[i+1][key]);
 			}	
 		}
-		console.log("control_id: " + JSON.stringify(this.state.control_id))
-		console.log("control_token_quantity: " + JSON.stringify(this.state.control_token_quantity))
+		//console.log("control_id: " + JSON.stringify(this.state.control_id))
+		//console.log("control_token_quantity: " + JSON.stringify(this.state.control_token_quantity))
 	}
 	
 	
@@ -482,13 +507,9 @@ class CoreIdentity extends React.Component {
 	submitCoid(e){
 		e.preventDefault();
 		var json = this.prepareJsonToSubmit();
-		
 		var privKey1 = new Buffer(this.state.privKey,"hex");
-		
 		var msg_hash = keccak_256(JSON.stringify(json));
-		
 		var msg_hash_buffer = new Buffer(msg_hash,"hex");
-
 		var signature1 = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1))
 		
 		signature1 = JSON.parse(signature1).signature;
@@ -537,8 +558,8 @@ class CoreIdentity extends React.Component {
         	this.setState({ inputs: this.state.inputs.concat([newInput]) });
 			
 		}
-		console.log("inputs: " + JSON.stringify(this.state.inputs))
-		console.log("inputs values: " + JSON.stringify(this.getLabelValues()))
+		//console.log("inputs: " + JSON.stringify(this.state.inputs))
+		//console.log("inputs values: " + JSON.stringify(this.getLabelValues()))
     }
 	
 	appendInput2() {
@@ -575,14 +596,14 @@ class CoreIdentity extends React.Component {
 								<span className="glyphicon glyphicon-plus"></span>Add More
 							</button>
 						</div>
-					</div>					
-					<div className="form-group">
-						<label htmlFor="owner_id">Enter Owner IDs. Owner IDs are the public keys of the identity owners. Only one owner for an individual (self).</label>
-						<TagsInput {...inputAttrs} value={this.state.owner_id} onChange={(e)=>{ this.onFieldChange("owner_id", e) } } />
 					</div>
 					<div className="form-group">
 						<label htmlFor="owner_token_id">Enter Ownership Token Description. For example, 'Spencer tokens'.</label>
 						<TagsInput {...inputAttrs} value={this.state.owner_token_desc} onChange={(e)=>{ this.onFieldChange("owner_token_desc", e) } } />
+					</div>				
+					<div className="form-group">
+						<label htmlFor="owner_id">Enter Owner IDs. Owner IDs are the public keys of the identity owners. Only one owner for an individual (self).</label>
+						<TagsInput {...inputAttrs} value={this.state.owner_id} onChange={(e)=>{ this.onFieldChange("owner_id", e) } } />
 					</div>
 					<div className="form-group">
 						<label htmlFor="owner_token_id">Enter Ownership Token Quantity. For example, 1 token for an individual.</label>

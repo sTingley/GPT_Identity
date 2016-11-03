@@ -120,6 +120,9 @@ app.get('/ballot/readNotify/:pubKey', ballotCtrl.fetchNotification);
 app.get('/ballot/readExpiredProposal/:pubKey', expiredNotification.fetchExpiredProposalNotification);
 
 app.post('/pullCoidData',ballotCtrl.pullCoidData);
+app.post('/qrcode',(req, res) => {
+    res.send(req.body);
+});
 app.post('/ipfs/upload', IPFS.uploadFile);
 app.get('/ipfs/alldocs/:pubKey', IPFS.getAllFiles);
 app.get('/ipfs/getfile/:hash', IPFS.getUrl);

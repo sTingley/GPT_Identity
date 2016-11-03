@@ -1,3 +1,4 @@
+'use strict';
 var spawn = require('child_process').spawn,
 	crypt = require('./cryptoCtr.js'),
 	crypto = require('crypto'),

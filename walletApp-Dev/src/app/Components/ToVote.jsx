@@ -188,7 +188,7 @@ class ModalWin extends React.Component {
 								<td>{this.state.proposal_data.ownershipId}</td>
 							</tr>
 							<tr>
-								<td>Ownership ID Attributes</td>
+								<td>Ownership ID List</td>
 							 	<td>
 							 	{(() => {
 							 	if(!$.isEmptyObject(this.state.proposal_data)){
@@ -243,23 +243,6 @@ class ModalWin extends React.Component {
 								</td>
 							</tr>
 							<tr>
-								<td>Recovery IDs</td>
-								<td>{(() => {
-								if(!$.isEmptyObject(this.state.proposal_data)){
-									return this.state.proposal_data.identityRecoveryIdList.map((ids,i) => {
-									return <p key={i}> {this.state.proposal_data.identityRecoveryIdList[i]}</p>
-									})
-								}
-								})(this)}
-								</td>
-							</tr>
-							
-							<tr>
-								<td>Recovery Condition</td>
-								<td> <p> {this.state.proposal_data.recoveryCondition}</p></td>
-							</tr>
-							
-							<tr>
 								<td>Control Token ID</td>
 								<td> <p> {this.state.proposal_data.controlTokenId}</p></td>
 							</tr>
@@ -277,6 +260,22 @@ class ModalWin extends React.Component {
 							<tr>
 								<td>Control Token Quantity</td>
 								<td><p> {this.state.proposal_data.controlTokenQuantity}</p></td>
+							</tr>
+							<tr>
+								<td>Recovery IDs</td>
+								<td>{(() => {
+								if(!$.isEmptyObject(this.state.proposal_data)){
+									return this.state.proposal_data.identityRecoveryIdList.map((ids,i) => {
+									return <p key={i}> {this.state.proposal_data.identityRecoveryIdList[i]}</p>
+									})
+								}
+								})(this)}
+								</td>
+							</tr>
+							
+							<tr>
+								<td>Recovery Condition</td>
+								<td> <p> {this.state.proposal_data.recoveryCondition}</p></td>
 							</tr>
 							<tr>
 								<td>Vote Description</td>

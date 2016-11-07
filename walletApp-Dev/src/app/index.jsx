@@ -22,6 +22,7 @@ import Notifications from './Components/Notifications.jsx';
 import Assets from './Components/Assets.jsx';
 
 import Documents from './Components/Documents.jsx';
+import MyGateKeeper from './Components/MyGateKeeper.jsx';
 
 class App extends React.Component {
 
@@ -86,6 +87,7 @@ render((
 			<Route path="identity" component={CoreIdentity} onEnter={validateLogin} />
 			<Route path="assets" component={Assets} onEnter={validateLogin} />
 			<Route path="docs" component={Documents} onEnter={validateLogin} />
+			<Route path="myGateKeeper" component={MyGateKeeper} onEnter={validateLogin} />
       	</Route>
     </Router>
 ), document.getElementById('app'));

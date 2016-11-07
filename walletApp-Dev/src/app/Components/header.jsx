@@ -27,6 +27,7 @@ class Header extends React.Component {
 				{ prop.loggedin ?  <li><Link to='/identity' activeClassName="active">Core Identity</Link></li> : '' }
 				{ prop.loggedin ?  <li><Link to='/assets' activeClassName="active">Assets</Link></li> : '' }
 				{ prop.loggedin ?  <li><Link to='/docs' activeClassName="active">My Documents</Link></li> : '' }
+        { prop.loggedin ?  <li><Link to='/myGatekeeper' activeClassName="active">My Gatekeeper</Link></li> : '' }
             </ul>
             <ul className="nav navbar-nav navbar-right">
                 <li><a href="http://www.tcs.com">Powered by TCS, Monax, BigChainDB and IPFS</a></li>

@@ -1,4 +1,0 @@
-#Fri Nov 04 01:31:32 IST 2016
-base.0=/Users/arunkumar/app/platforms/android/build/intermediates/transforms/dex/debug/folders/1000/1f/main
-renamed.0=classes.dex
-file.0=/Users/arunkumar/app/platforms/android/build/intermediates/transforms/dex/debug/folders/1000/1f/main/classes.dex

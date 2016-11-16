@@ -8,7 +8,7 @@ class DownloadFile extends React.Component{
 		this.state = {
 			download_url: props.params[1],
 			pwd: props.params[0],
-			priv_key: props.params[2]
+			pub_key: props.params[2]
 		};
 	}
 
@@ -18,14 +18,14 @@ class DownloadFile extends React.Component{
 			<h1>Success! Your wallet has been generated.</h1>
 			<div className="col-md-6">
 				<div className="form-group">
-					<label htmlFor="download_button">Keystore/JSON File(Encrypted)</label>
+					<label htmlFor="download_button">Keystore/JSON File (Encrypted)</label>
 					<a href={this.state.download_url} download="keypairs.json" name="download_button" className="btn btn-primary btn-block">DOWNLOAD</a>
 				</div>
 			</div>
 			<div className="col-md-6">
 				<div className="form-group">
-					<label htmlFor="private_key">Private Key</label>
-					<textarea name="private_key" className="form-control" id="private_key" disabled>{this.state.priv_key}</textarea>
+					<label htmlFor="private_key">Public Key</label>
+					<textarea name="private_key" className="form-control" id="pub_key" disabled>{this.state.pub_key}</textarea>
 				</div>
 			</div>
 		   </div>	
@@ -59,7 +59,7 @@ class Home extends React.Component {
 		this.wallet.generateKeys();
 		if(this.wallet.getPubKey()) {
 			var url = this.wallet.makeWalletFile();
-			this.setState({ pwd: password, hashCreated: true, download_url: url, private_key: this.wallet.getPrivateKey() });
+			this.setState({ pwd: password, hashCreated: true, download_url: url, private_key: this.wallet.getPrivateKey(), public_key: this.wallet.getPubKey() });
 			console.log(url);
 		} else {
 			console.log("Error: creating key pairs");
@@ -80,7 +80,7 @@ class Home extends React.Component {
 						<button className="btn btn-primary" type="submit">Generate Keypair</button>
 					</div>
 				</form>
-				{ this.state.hashCreated ? <DownloadFile params={[this.state.pwd, this.state.download_url, this.state.private_key]} /> : null }
+				{ this.state.hashCreated ? <DownloadFile params={[this.state.pwd, this.state.download_url, this.state.public_key]} /> : null }
 	    	</div>
 	    );
    }

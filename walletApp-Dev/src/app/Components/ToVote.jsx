@@ -4,6 +4,16 @@ var secp256k1 = require('secp256k1');
 var keccak_256 = require('js-sha3').keccak_256;
 
 
+function hex_to_ascii(str1){
+    var hex  = str1.toString();  
+    var str = [];  
+    for (var n = 0; n < hex.length; n += 1) {  
+        str.push(String.fromCharCode(parseInt(hex.substr(n, 2), 16)));  
+    	}  
+    return str;
+	}
+
+
 class ModalWin extends React.Component {
 	
 	constructor(props){
@@ -13,7 +23,8 @@ class ModalWin extends React.Component {
 			proposal_data:{}
 		};
 	}
-	
+	 
+
 	submitHandler(e){
 		e.preventDefault();
 		var ele = $(e.target);
@@ -86,9 +97,8 @@ class ModalWin extends React.Component {
 			}
 		});
 	}
-
-
-
+	
+	
 	
 	componentDidMount(){
 		var _this = this;
@@ -125,12 +135,11 @@ class ModalWin extends React.Component {
                     var temp = [];
                     temp[0] = result.ownerIdList[i];
                     temp[1] = result.ownershipTokenQuantity[i];
-                    
                     ownerArray.push(temp)
                 }
                 result.ownerArray = ownerArray
-                console.log(result.ownerArray)
-				
+                //console.log(result.ownerArray)
+
 				_this.setState({
 					proposal_data: result
 				});
@@ -139,6 +148,8 @@ class ModalWin extends React.Component {
 			}
 		});
     }
+	
+	
 	
 	render(){
 		var prop = this.state.proposal;
@@ -211,14 +222,7 @@ class ModalWin extends React.Component {
 							</tr>
 							<tr>
 								<td>Ownership Token Description</td>
-								<td>{(() => {
-								if(!$.isEmptyObject(this.state.proposal_data)){
-									return this.state.proposal_data.ownershipTokenAttributes.map((ids,i) => {
-									return <p key={i}> {this.state.proposal_data.ownershipTokenAttributes[i]}</p>
-									})
-								}
-								})(this)}
-								</td>
+								<td><p>{this.state.proposal_data.ownershipTokenAttributes}</p></td>
 							</tr>
 							<tr>
 								<td>Ownership Token Quantity</td>
@@ -248,14 +252,7 @@ class ModalWin extends React.Component {
 							</tr>
 							<tr>
 								<td>Control Token Description</td>
-								<td>{(() => {
-								if(!$.isEmptyObject(this.state.proposal_data)){
-									return this.state.proposal_data.controlTokenAttributes.map((ids,i) => {
-									return <p key={i}> {this.state.proposal_data.controlTokenAttributes[i]}</p>
-									})
-								}
-								})(this)}
-								</td>
+								<td><p>{this.state.proposal_data.controlTokenAttributes}</p></td>
 							</tr>
 							<tr>
 								<td>Control Token Quantity</td>

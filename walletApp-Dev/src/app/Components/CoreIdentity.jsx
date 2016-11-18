@@ -349,12 +349,16 @@ class CoreIdentity extends React.Component {
 				//calculated. should be one time hashing of ownershipTokenAttributes and ownership token quantity
 				"ownershipTokenId": this.getHash(this.joinValuesOwnership()),	
 				//attributes should not be hashed, they should be readable.
-				"ownershipTokenAttributes":this.hexEncodeOwnerTokenAttrs(),					
+				//"ownershipTokenAttributes":this.hexEncodeOwnerTokenAttrs(),
+				
+				"ownershipTokenAttributes": this.state.owner_token_desc,					
 				"ownershipTokenQuantity": this.state.owner_token_quantity,
 				
 				//calculated. should be one time hashing of controlTokenAttributes and control token quantity
 				"controlTokenId": this.getHash(this.joinValuesControl()),
-				"controlTokenAttributes": this.hexEncodeControlTokenAttrs(),
+				//"controlTokenAttributes": this.hexEncodeControlTokenAttrs(),
+				
+				"controlTokenAttributes": this.state.control_token_desc,
 				"controlTokenQuantity": this.state.control_token_quantity,
 				
 				//pubkeys used for recovery in the event COID is lost or stolen			
@@ -399,6 +403,7 @@ class CoreIdentity extends React.Component {
 		
 	hexEncodeOwnerTokenAttrs() {
 		var desc = this.state.owner_token_desc;
+		console.log(typeof(desc))
 		desc = desc[0];
 		var temp = "";
 		for(var k=0; k<desc.length;k++)

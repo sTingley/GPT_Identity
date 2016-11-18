@@ -38,6 +38,7 @@ class Modal extends Component {
 		var qrCode_Object = JSON.stringify({
 			uniqueId: prop.uniqueId,
 			name: prop.uniqueIdAttributes[0],
+			ownershipId: prop.ownershipId,
 			bigchainID: prop.bigchainID,
 			bigchainHash: prop.bigchainHash,
 			endpoint: twinUrl + "validateQrCode"
@@ -106,6 +107,7 @@ class Modal extends Component {
 			msgHash: this.state.qrCode_signature.msgHash,
 			sig: this.state.qrCode_signature.signature,
 			uniqueId: prop.uniqueId,
+			ownershipId: prop.ownershipId,
 			name: prop.uniqueIdAttributes[0][0],
 			bigchainID: prop.bigchainID,
 			bigchainHash: prop.bigchainHash,
@@ -174,19 +176,27 @@ class Modal extends Component {
 											})(this) }
 
 											<tr>
+												<td>Ownership ID</td>
+												<td><p> {prop.ownershipId}</p></td>
+											</tr>
+											<tr>
+												<td>Ownership ID List</td>
+												<td>{(() => {
+													if (!$.isEmptyObject(prop)) {
+														return prop.ownerIdList.map((ids, i) => {
+															return <p key={i}> {prop.ownerIdList[i]}</p>
+														})
+													}
+												})(this) }
+												</td>
+											</tr>
+											<tr>
 												<td>Ownership Token ID</td>
 												<td><p> {prop.ownershipTokenId}</p></td>
 											</tr>
 											<tr>
 												<td>Ownership Token Description</td>
-												<td>{(() => {
-													if (!$.isEmptyObject(prop.ownershipTokenAttributes)) {
-														return prop.ownershipTokenAttributes.map((ids, i) => {
-															return <p key={i}> {prop.ownershipTokenAttributes[i]}</p>
-														})
-													}
-												})(this) }
-												</td>
+												<td><p>{prop.ownershipTokenAttributes}</p></td>
 											</tr>
 											<tr>
 												<td>Ownership Token Quantity</td>
@@ -208,6 +218,18 @@ class Modal extends Component {
 												</td>
 											</tr>
 											<tr>
+												<td>Control Token ID</td>
+												<td> <p> {prop.controlTokenId}</p></td>
+											</tr>
+											<tr>
+												<td>Control Token Description</td>
+												<td><p>{prop.controlTokenAttributes}</p></td>
+											</tr>
+											<tr>
+												<td>Control Token Quantity</td>
+												<td><p> {prop.controlTokenQuantity}</p></td>
+											</tr>
+											<tr>
 												<td>Recovery IDs</td>
 												<td>{(() => {
 													if (!$.isEmptyObject(prop)) {
@@ -218,48 +240,9 @@ class Modal extends Component {
 												})(this) }
 												</td>
 											</tr>
-
 											<tr>
 												<td>Recovery Condition</td>
 												<td> <p> {prop.recoveryCondition}</p></td>
-											</tr>
-											<tr>
-												<td>Ownership Token ID</td>
-												<td><p> {prop.ownershipTokenId}</p></td>
-											</tr>
-											<tr>
-												<td>Ownership Token Description</td>
-												<td>{(() => {
-													if (!$.isEmptyObject(prop)) {
-														return prop.ownershipTokenAttributes.map((ids, i) => {
-															return <p key={i}> {prop.ownershipTokenAttributes[i]}</p>
-														})
-													}
-												})(this) }
-												</td>
-											</tr>
-											<tr>
-												<td>Ownership Token Quantity</td>
-												<td><p> {prop.ownershipTokenQuantity}</p></td>
-											</tr>
-											<tr>
-												<td>Control Token ID</td>
-												<td> <p> {prop.controlTokenId}</p></td>
-											</tr>
-											<tr>
-												<td>Control Token Description</td>
-												<td>{(() => {
-													if (!$.isEmptyObject(prop)) {
-														return prop.controlTokenAttributes.map((ids, i) => {
-															return <p key={i}> {prop.controlTokenAttributes[i]}</p>
-														})
-													}
-												})(this) }
-												</td>
-											</tr>
-											<tr>
-												<td>Control Token Quantity</td>
-												<td><p> {prop.controlTokenQuantity}</p></td>
 											</tr>
 											<tr>
 												<td>BigchainDB Transaction ID</td>
@@ -269,7 +252,6 @@ class Modal extends Component {
 												<td>BigchainDB Transaction Hash</td>
 												<td><p> {prop.bigchainHash} </p></td>
 											</tr>
-
 										</tbody>
 									</table>
 								</div>

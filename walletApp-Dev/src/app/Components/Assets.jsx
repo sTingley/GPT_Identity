@@ -1,8 +1,6 @@
 import React, {Component} from 'react';
 import { Link } from 'react-router';
 import TagsInput from 'react-tagsinput';
-
-
 import QRCode from 'qrcode.react';
 import AssetTags from './classAndSubClass.js';
 //import wallet from './wallet.js';
@@ -35,6 +33,8 @@ class Modal extends Component {
 		
 		var prop = this.props.asset.asset_name;
 
+		var theTime = (new Date()).toString()
+		
 		var qrCode_Object = JSON.stringify({
 			uniqueId: prop.uniqueId,
 			name: prop.uniqueIdAttributes[0],
@@ -45,13 +45,11 @@ class Modal extends Component {
 		})
 		console.log("**" + qrCode_Object)
 		
-		var qrCode_Object_hash = keccak_256(qrCode_Object);
-		console.log(qrCode_Object_hash)
+		var qrCode_Object_hash = keccak_256(theTime);
 		
 		this.privKey = new Buffer(this.privKey,"hex");
 		
 		var qrCode_Object_hash_buffer = new Buffer(qrCode_Object_hash,"hex");
-		//console.log(qrCode_Object_hash_buffer)
 		
 		 var signature = JSON.stringify(secp256k1.sign(qrCode_Object_hash_buffer, this.privKey));
 		 signature = JSON.parse(signature).signature;
@@ -60,13 +58,7 @@ class Modal extends Component {
 		 signature = new Buffer(signature,"hex");
 		 signature = signature.toString("hex")
 		 
-		 this.setState({qrCode_signature: {"msgHash": qrCode_Object_hash, "signature":signature}})
-		
-		console.log("sig" + signature)
-		console.log(typeof(signature))
-
-
-
+		 this.setState({qrCode_signature: {"msgHash": qrCode_Object_hash, "signature":signature, "timestamp": theTime}})
     }
 
 	handleClassChange(tags) {
@@ -80,7 +72,6 @@ class Modal extends Component {
 	}
 
 	render() {
-		
 		
 		var prop = this.props.asset.asset_name;
 		var style = {
@@ -111,6 +102,7 @@ class Modal extends Component {
 			name: prop.uniqueIdAttributes[0][0],
 			bigchainID: prop.bigchainID,
 			bigchainHash: prop.bigchainHash,
+			timestamp: this.state.qrCode_signature.timestamp,
 			endpoint: twinUrl + "validateQrCode"
 		});
 
@@ -169,12 +161,10 @@ class Modal extends Component {
 															</tr>
 														)
 													});
-
 												} else {
 													return <tr><td colSpan="2">No Ids found</td></tr>
 												}
 											})(this) }
-
 											<tr>
 												<td>Ownership ID</td>
 												<td><p> {prop.ownershipId}</p></td>

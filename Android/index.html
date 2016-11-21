@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <title>QRCode Reader APP</title>
+</head>
+
+<style>
+    #verified {
+    width: 320px;
+    height: 320px;
+    background-color: lightblue;
+}
+</style>
+
+<body>
+
+    <div data-role="page" id="home">
+        <div data-role="header">
+            <h2>Digital Identity Verification</h2>
+        </div>
+
+        <div data-role="main" class="ui-content">
+            <p>
+                <a target="_blank" href="javascript:scan();" style="text-decoration: none"><button>Scan QR Code</button></a>
+            </p>
+        </div>
+    </div>
+
+    <div data-role="page" id="display">
+        <div data-role="header">
+            <h3>Validate Identity</h3>
+            <div id="verified" style="display: none">Verified</div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script src="js/jquery-3.1.1.min.js"></script>
+
+    <script>
+            function scan()
+            {
+                cordova.plugins.barcodeScanner.scan(
+                    function (result) {
+                        if(!result.cancelled)
+                        {
+                            if(result.format == "QR_CODE")
+                            {
+                                    var value = result.text;
+                                    console.log("result.text: " + value);
+                                    alert("Done");
+                                    getScan(value)              
+                            }
+                        }
+                    },
+                    function (error) {
+                        alert("Scanning failed: " + error);
+                    }
+               );
+            }//end of scan
+
+            function getScan(str){
+                console.log("getScan recvd data: " + str)
+                var bigchainID = JSON.parse(str).bigchainID
+                var name = JSON.parse(str).name
+                localStorage.setItem("name", name)
+
+                $.ajax({
+                    type: "POST",
+                    headers: {'Content-Type':'application/json',
+                            "Access-Control-Allow-Origin":'*'},
+                    url:  "http://10.100.98.218:3333/QRValidation",
+                    data: str,
+                    success: function(result)
+                    {
+                        console.log("result of ajax call: " + JSON.stringify(result));
+                        toggleResult(result.Result);
+                    }
+                });
+            }//end getScan
+
+
+            function toggleResult(res)
+            {
+            console.log("res: " + res)
+	        var verify = document.getElementById("verified");
+            //var pubKey = localStorage.getItem("pubKey")
+            var name = localStorage.getItem("name")
+            
+            //if response is 1
+	        if(res == "1")
+                {
+                    verify.style.display = "block";
+		            verify.innerHTML = (name + " has been validated.");
+  	            }
+            //if response is 0
+	        else
+                {
+                    verify.style.display = "block";
+		            verify.innerHTML = (name + " has been REJECTED.");
+	            }
+            } 
+
+    </script>
+</body>
+
+</html>

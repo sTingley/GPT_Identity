@@ -324,7 +324,6 @@ class CoreIdentity extends React.Component {
 	
 
 	//TODO:
-	//0)Check that controllers pubkeys are valid
 	//1)NEED TO DISTINGUISH COID for person or thing---DONE
 	//2)CONTROLLERS need to be able to upload documents---LATER
 	
@@ -427,7 +426,6 @@ class CoreIdentity extends React.Component {
 		
 	}
 		
-		
 	createHashAttribute(values){
 		if($.isArray(values) && values.length > 0){
 			if($.isPlainObject(values[0])){
@@ -483,7 +481,6 @@ class CoreIdentity extends React.Component {
 		return newArr;
 	}
 	
-	
 	prepareControlTokenDistribution(){
 		var labels = this.getLabelValues1();
 		for(var i=0; i<labels.length; i+=2){	
@@ -492,11 +489,7 @@ class CoreIdentity extends React.Component {
 				this.state.control_token_quantity.push(labels[i+1][key]);
 			}	
 		}
-		//console.log("control_id: " + JSON.stringify(this.state.control_id))
-		//console.log("control_token_quantity: " + JSON.stringify(this.state.control_token_quantity))
 	}
-	
-	
 	
 	//hashing the pubkeys
 	prepareTokenDistribution(value){
@@ -506,8 +499,6 @@ class CoreIdentity extends React.Component {
 		}
 		return tempArr;
 	}
-	
-	
 	
 	submitCoid(e){
 		e.preventDefault();
@@ -528,7 +519,6 @@ class CoreIdentity extends React.Component {
 		
 		json.sig = signature1;
 		json.msg = msg_hash_buffer.toString("hex");
-		//this.setState({signature: signature1})
 		
 		console.log(json)
 		$.ajax({
@@ -563,8 +553,6 @@ class CoreIdentity extends React.Component {
         	this.setState({ inputs: this.state.inputs.concat([newInput]) });
 			
 		}
-		//console.log("inputs: " + JSON.stringify(this.state.inputs))
-		//console.log("inputs values: " + JSON.stringify(this.getLabelValues()))
     }
 	
 	appendInput2() {

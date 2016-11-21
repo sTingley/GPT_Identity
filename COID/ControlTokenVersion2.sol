@@ -36,6 +36,7 @@ contract ControlToken
         //set the indexer to the first empty value in the arrays:
         //QUESTION: is "" the null bytes32?
 
+
         //set indexer for controllerHashes:
         for(uint i = 0; i < theControllerHashes.length; i++)
         {
@@ -47,9 +48,9 @@ contract ControlToken
         }
 
         //set indexer for tokensOwned:
-        for(uint j = 0; j < theTokensOwned.length; j++)
+        for(uint j = 0; j < theControllerHashes.length; j++)
         {
-            if(theTokensOwned[j] != 0)
+            if(tokensOwnedIndexer < controllerHashesIndexer)
             {
                 tokensOwned.push(theTokensOwned[j]);
                 tokensOwnedIndexer++;
@@ -118,13 +119,13 @@ contract ControlToken
 
     }
 
-    function spendMyTokens(bytes32 delegateeHash, uint amount)
+    function spendMyTokens(bytes32 delegateeHash, uint amount) returns (bool val1)
     {
 
         uint indexD; //index of delegatee
         bool wasFoundD; //if the delegatee was found
         (indexD,wasFoundD) = findIndexOfDelegatee(delegateeHash);
-
+        val1 = wasFoundD;
         if(wasFoundD)
         {
             if(myAmount(delegateeHash) >= amount)
@@ -135,7 +136,7 @@ contract ControlToken
                 uint amountLeftToSpend = amount;
                 while(stop == false)
                 {
-                    if(relations[indexer][indexD] > amountLeftToSpend)
+                    if(relations[indexer][indexD] >= amountLeftToSpend)
                     {
                         relations[indexer][indexD] = relations[indexer][indexD] - amountLeftToSpend;
 
@@ -154,7 +155,7 @@ contract ControlToken
             }
         }
 
-        clearUnusedDelegatees();
+      //  clearUnusedDelegatees();
     }
 
 
@@ -293,6 +294,7 @@ contract ControlToken
         //only proceed if they are both controllers
         if(foundOrigC && foundNewC)
         {
+            success = true;
             //make sure original controller possesses amount he wants to give
             if(tokensOwned[indexOrigC] >= amount)
             {
@@ -308,7 +310,7 @@ contract ControlToken
                 bool stop = false;
                 uint indexer = 0;
                 uint amountLeft = amount;
-                while(stop && indexer < delegateeHashes.length-1)
+                while(stop && indexer < delegateeHashes.length-1&&false==true)
                 {
                     if(relations[indexOrigC][indexer] > 0)
                     {
@@ -363,7 +365,7 @@ contract ControlToken
 
     function addController(bytes32 controllerHash) returns (bool success)
     {
-        success = true;
+        success = false;
 
         //are they actually a controller? check:
 
@@ -382,6 +384,7 @@ contract ControlToken
             tokensOwned.push(0);
             tokensOwnedIndexer++;
 
+            success = true;
 
             //first create zero delegations:
             temp2.length = 0;
@@ -397,7 +400,7 @@ contract ControlToken
 
     }
 
-    function removeController(bytes32 controllerHash) returns (bool success)
+    function removeController(bytes32 controllerHash) returns (bool success, uint minIndex)
     {
         success = true;
 
@@ -416,7 +419,7 @@ contract ControlToken
             //find controller with least amount of tokens
             if(controllerHashes.length > 1)
             {
-                uint minIndex;
+                //uint minIndex;
                 if(indexC == 0)
                 {
                     minIndex = 1;
@@ -429,7 +432,7 @@ contract ControlToken
                 for(uint i = 0; i < controllerHashes.length; i++)
                 {
 
-                    if(i != indexC && (tokensOwned[minIndex] < tokensOwned[i]))
+                    if(i != indexC && (tokensOwned[minIndex] > tokensOwned[i]))
                     {
                         minIndex = i;
                     }
@@ -631,3 +634,4 @@ contract ControlToken
 
 
 }
+

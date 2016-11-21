@@ -238,12 +238,10 @@ var gatekeeper = function () {
         var myControlIdList = [];
         myControlIdList = formdata.controlIdList.split(",");
         var myOwnershipTokenId = formdata.ownershipTokenId;
-        var myOwnershipTokenAttributes = [];
-        myOwnershipTokenAttributes = formdata.ownershipTokenAttributes.split(",");
+        var myOwnershipTokenAttributes = formdata.ownershipTokenAttributes;
         var myOwnershipTokenQuantity = formdata.ownershipTokenQuantity.split(",");
         var myControlTokenId = formdata.controlTokenId;
-        var myControlTokenAttributes = [];
-        myControlTokenAttributes = formdata.controlTokenAttributes.split(",");
+        var myControlTokenAttributes = formdata.controlTokenAttributes;
         var myControlTokenQuantity = formdata.controlTokenQuantity.split(",");
         var myIdentityRecoveryIdList = [];
         myIdentityRecoveryIdList = formdata.identityRecoveryIdList.split(",");
@@ -481,13 +479,13 @@ var gatekeeper = function () {
     this.setmyOwnershipTokenID = function (requester, proposalId, myOwnershipTokenId, myOwnershipTokenAttributes, myOwnershipTokenQuantity) {
 
         var sync = true;
-        var len = myOwnershipTokenAttributes.length;
+        //var len = myOwnershipTokenAttributes.length;
 
-        if (myOwnershipTokenAttributes.length < 10) {
-            for (var i = len; i < 10; i++) {
-                myOwnershipTokenAttributes[i] = "0";
-            }
-        }
+        //if (myOwnershipTokenAttributes.length < 10) {
+        //    for (var i = len; i < 10; i++) {
+        //        myOwnershipTokenAttributes[i] = "0";
+        //    }
+       // }
 
         var len2 = myOwnershipTokenQuantity.length;
         if (myOwnershipTokenQuantity.length < 10) {
@@ -520,13 +518,13 @@ var gatekeeper = function () {
 
     this.setmyControlTokenID = function (requester, proposalId, myControlTokenId, myControlTokenAttributes, myControlTokenQuantity) {
         var sync = true;
-        var len = myControlTokenAttributes.length;
+       // var len = myControlTokenAttributes.length;
 
-        if (myControlTokenAttributes.length < 10) {
-            for (var i = len; i < 10; i++) {
-                myControlTokenAttributes[i] = "0";
-            }
-        }
+       // if (myControlTokenAttributes.length < 10) {
+        //    for (var i = len; i < 10; i++) {
+        //        myControlTokenAttributes[i] = "0";
+        //    }
+        //}
 
 
         var len2 = myControlTokenQuantity.length;
@@ -750,7 +748,7 @@ var eventListener = function () {
         };//end json struct
 
 
-        bigchainInput = JSON.stringify(bigchainInput)
+        bigchainInput = JSON.stringify({"data":bigchainInput})
         console.log("In function bigchainIt, the input to be sent to bigchain is: " + bigchainInput)
 
 
@@ -776,6 +774,7 @@ var eventListener = function () {
                             var bigchainID = JSON.parse(result).response;
                             bigchainID = JSON.parse(bigchainID).id;
                             var bigchainHash = keccak_256(JSON.parse(result).response);
+		 	    console.log("************: " + JSON.parse(result).response);
 
                             var signature = JSON.parse(result).signature
                             var msg = JSON.parse(result).msg

@@ -367,7 +367,7 @@ class CoreIdentity extends React.Component {
 				"yesVotesRequiredToPass": 2,	//needs to be taken out and hardcoded in app
 				
 				"isHuman": true,
-				"time": "",
+				"timestamp": "",
 				"assetID": "COID",
 				"Type": "non_cash",
 				"bigchainHash":  "",

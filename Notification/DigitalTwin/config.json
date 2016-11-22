@@ -1,12 +1,14 @@
 {
 	"env": {
 		"allowed_orgins": "*",
-		"ipfs_file_tmp_path": "D:/Source/GPT_Identity-master/Notification/DigitalTwin/tmp/",
-		"notification_folder_path": "D:/Source/GPT_Identity-master/Notification/DigitalTwin/notifications/",
+		"ipfs_file_tmp_path": "/home/demoadmin/DigitalTwin/tmp/",
+		"notification_folder_path": "/home/demoadmin/DigitalTwin/notifications/",
 		"ipfs_file_read_url": "http://192.168.99.101:8080/ipfs/",
-		"gatekeeper_url": "http://localhost:8081/",
-		"ballot_url": "http://localhost:8081/",
-		"ports": [5050]
+		"gatekeeper_url": "http://localhost:3000/",
+		"my_gatekeeper_url": "http://localhost:3002/",
+		"ballot_url": "http://localhost:8082/",
+		"mycoid_url": "http://localhost:3012/",
+		"ports": [5050,5051,5052]
 	},
 	"suffix": {
 		"ipfs_file": "_files",
@@ -15,12 +17,18 @@
 	},
 	"endpoints": {
 		"requestCOID": {
-			"message": "08788f857ead2deac6b9ee7e2c1b97484c3fa785e227687d60109018a0b2deea",
+			"message": "d4bc7d13ed5a9354868fd19b94b63962bad8accafbb8f3e84578ae81b506cfcc",
 			"path": "/gatekeeper"
 		},
+		"request_new_COID": {
+			"path": "/MyGatekeeper"
+		},
 		"voteonCOIDproposal": {
-			"message": "7835d621178da6d43d3975f414236567f7031aa2737ff9a9ae5aeada7f7f2cc3",
+			"message": "b81db4be41ebb01a662d4ae5445332177fd31506505e22f8bba48558e3c433e4",
 			"path": "/vote"
+		},
+		"MyCOID":{
+			"MyTokenAmount": "/myTokenAmount"
 		}
 	}
 }

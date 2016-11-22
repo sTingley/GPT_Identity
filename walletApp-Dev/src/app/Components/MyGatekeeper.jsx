@@ -1,11 +1,12 @@
 import React from 'react';
 import TagsInput from 'react-tagsinput';
-import { sha3_256 } from 'js-sha3';
+import { keccak_256 } from 'js-sha3';
 var crypto = require('crypto');
 var secp256k1 = require('secp256k1');
-var keccak_256 = require('js-sha3').keccak_256;
 
-//TODO : Namespace validation 
+//TODO : Namespace validation
+//TODO:
+//CONTROLLERS need to be able to upload documents---LATER
 
 class UploadIpfsFile extends React.Component {
 
@@ -144,8 +145,7 @@ class UploadIpfsFile extends React.Component {
 	}
 };
 
-
-//form where we can add addtional labels (uniqueIDAttrs)
+//form where we can add additional uniqueIDAttrs
 class UniqueIDAttributesForm extends React.Component {
 
 	constructor(props){
@@ -158,7 +158,6 @@ class UniqueIDAttributesForm extends React.Component {
 		showModal: false,
 		pubKey: localStorage.getItem("pubKey")
 		};
-	
 	}
 	
 	handleShowModal(e){
@@ -186,17 +185,16 @@ class UniqueIDAttributesForm extends React.Component {
 
 };
 
-
-class TokenDistributionForm extends React.Component {
+class ControlTokenDistributionForm extends React.Component {
     
     constructor(props){
         super(props)
         this.state = {
             controltoken_quantity: [],
             controltoken_list: [],
-            
             showModal: false
         };
+		
         this.maxUniqAttr = 10;
         //this.onFieldChange = this.onFieldChange.bind(this);
         this.handleHideModal = this.handleHideModal.bind(this);
@@ -226,14 +224,58 @@ class TokenDistributionForm extends React.Component {
                         <td><input name={'label1-'+this.props.labelref} className="form-control col-md-4" type="text" placeholder="Control Token Quantity"  /></td>
                         </tr>
                         </tbody>
-                </table>
-                
+                </table> 
                 </div>
             </div>    
         );
     }
 };
 
+class OwnerTokenDistributionForm extends React.Component {
+    
+    constructor(props){
+        super(props)
+        this.state = {
+            ownertoken_quantity: [],
+            ownertoken_list: [],
+            showModal: false
+        };
+		
+        this.maxUniqAttr = 10;
+        //this.onFieldChange = this.onFieldChange.bind(this);
+        this.handleHideModal = this.handleHideModal.bind(this);
+    }
+    handleShowModal(e){
+        this.setState({showModal: true, tmpFile: $(e.target).attr('data-id')});
+    }
+    
+    handleHideModal(){
+        this.setState({showModal: false});
+    }
+    render(){
+        var style = {
+            fontSize: '12.5px'
+        }
+        return(
+            <div className="form-group col-md-12">
+                <div className="col-md-10">
+                <table className="table table-striped table-hover" style={style}>
+                        <tbody>
+                        <tr>
+                        <th><b>Public Key of Owner</b></th>
+						<th><b>Ownership Token Quantity</b></th>
+                        </tr>
+                        <tr>
+                        <td><input name={'label2-'+this.props.labelref} className="form-control col-md-4" type="text" placeholder="Public Key of Owner"  /></td>
+                        <td><input name={'label2-'+this.props.labelref} className="form-control col-md-4" type="text" placeholder="Ownership Token Quantity"  /></td>
+                        </tr>
+                        </tbody>
+                </table>
+                </div>
+            </div>    
+        );
+    }
+};
 
 class MyGatekeeper extends React.Component {
 	
@@ -243,6 +285,7 @@ class MyGatekeeper extends React.Component {
 			file_attrs:[],
 			inputs: ['input-0'], //removed input-1
 			inputs_name:['input1-0'],
+			inputs_ownership:['input1-0'],
 			official_id:[],		//first official ID is name (see identity spec v1.3)
 			owner_id:[],
 			control_id:[],
@@ -259,6 +302,7 @@ class MyGatekeeper extends React.Component {
 			tmpFile:'',
 			pubKey: localStorage.getItem("pubKey"),
 			privKey: localStorage.getItem("privKey"),
+			validators:[],
 			signature:''
 		};
 		
@@ -280,7 +324,7 @@ class MyGatekeeper extends React.Component {
 	getHash(input){
 		var input = $.trim(input);
 		if(input){
-			var hash = sha3_256.update(input).hex();
+			var hash = keccak_256(input)
 			return hash;
 		}
 		return input;
@@ -306,8 +350,8 @@ class MyGatekeeper extends React.Component {
 		return labelVals;
 	}
 	
-	//used in token form class for control token distribution list.. is called by appendInput2()
-	getLabelValues1(){
+	//used in token form class for control token distribution list.. is called by appendInputControllers()
+	getLabelValuesController(){
         var labelVals1 = []
 		$.each($("input[name^='label1-']"), function(obj){
 			var value = $.trim($(this).val());
@@ -322,19 +366,30 @@ class MyGatekeeper extends React.Component {
         return labelVals1;
     }
 	
-
-	//TODO:
-	//0)Check that controllers pubkeys are valid
-	//1)NEED TO DISTINGUISH COID for person or thing---DONE
-	//2)CONTROLLERS need to be able to upload documents---LATER
+	//used in token form class for control token distribution list.. is called by appendInputOwners()
+	getLabelValuesOwner(){
+        var labelVals2 = []
+		$.each($("input[name^='label2-']"), function(obj){
+			var value = $.trim($(this).val());
+			if(value.length > 0){
+				labelVals2.push({
+					//replace the 'label' with the entered unique attribute descriptor, for example 'Name' or 'US SSN'
+					[$(this).attr('name').replace("label2-","")] : value
+				});
+			}
+			console.log("obj: " + JSON.stringify(obj))
+		});
+        return labelVals2;
+    }
 	
 	prepareJsonToSubmit(){
 		console.log();
 		this.prepareControlTokenDistribution();
+		this.prepareOwnershipTokenDistrbution();
+		this.prepareValidators(this.state.validators)
 		var inputObj = {
 				"pubKey": this.refs.pubKey.value,
-				//"sig": this.refs.signature.value,
-				
+				//"sig": this.refs.signature.value,	
 				//"msg": this.refs.message.value,
 				//"name": this.refs.nameReg.value,		no longer standalone part of JSON object (it is part of unique attributes)
 
@@ -348,13 +403,14 @@ class MyGatekeeper extends React.Component {
 				
 				//calculated. should be one time hashing of ownershipTokenAttributes and ownership token quantity
 				"ownershipTokenId": this.getHash(this.joinValuesOwnership()),	
-				//attributes should not be hashed, they should be readable.
-				"ownershipTokenAttributes":this.hexEncodeOwnerTokenAttrs(),					
+				
+				"ownershipTokenAttributes": this.state.owner_token_desc,					
 				"ownershipTokenQuantity": this.state.owner_token_quantity,
 				
 				//calculated. should be one time hashing of controlTokenAttributes and control token quantity
 				"controlTokenId": this.getHash(this.joinValuesControl()),
-				"controlTokenAttributes": this.hexEncodeControlTokenAttrs(),
+				
+				"controlTokenAttributes": this.state.control_token_desc,
 				"controlTokenQuantity": this.state.control_token_quantity,
 				
 				//pubkeys used for recovery in the event COID is lost or stolen			
@@ -362,8 +418,10 @@ class MyGatekeeper extends React.Component {
 				"recoveryCondition": this.state.recoveryCondition,
 				"yesVotesRequiredToPass": 2,	//needs to be taken out and hardcoded in app
 				
-				"isHuman": true,
-				"time": "",
+				"validators":  this.state.validators,
+				
+				"isHuman": false,
+				"timestamp": "",
 				"assetID": "COID",
 				"Type": "non_cash",
 				"bigchainHash":  "",
@@ -375,8 +433,7 @@ class MyGatekeeper extends React.Component {
 		return inputObj;
 	}
 	
-		joinValuesOwnership()
-		{
+	joinValuesOwnership(){
 		var value1 = this.state.owner_token_desc;
 		var value2 = this.state.owner_token_quantity;
         var tempArr = [];
@@ -386,8 +443,7 @@ class MyGatekeeper extends React.Component {
         return tempArr;
 		}
 		
-		joinValuesControl()
-		{
+	joinValuesControl(){
 		var value1 = this.state.control_token_desc;
 		var value2 = this.state.control_token_quantity;
         var tempArr = [];
@@ -396,32 +452,6 @@ class MyGatekeeper extends React.Component {
 		tempArr = tempArr.join();
         return tempArr;
 		}
-		
-	hexEncodeOwnerTokenAttrs() {
-		var desc = this.state.owner_token_desc;
-		desc = desc[0];
-		var temp = "";
-		for(var k=0; k<desc.length;k++)
-		{
-			temp = temp + desc[k].charCodeAt(0).toString(16);
-		}
-		return temp;
-		
-	}
-	
-	hexEncodeControlTokenAttrs() {
-		var desc = this.state.control_token_desc;
-		//desc.length is 1 because state var control_token_desc is an array!!
-		desc = desc[0];
-		var temp = "";
-		for(var k=0; k<desc.length;k++)
-		{
-			temp = temp + desc[k].charCodeAt(0).toString(16);
-		}
-		return temp;
-		
-	}
-		
 		
 	createHashAttribute(values){
 		if($.isArray(values) && values.length > 0){
@@ -478,20 +508,36 @@ class MyGatekeeper extends React.Component {
 		return newArr;
 	}
 	
-	
 	prepareControlTokenDistribution(){
-		var labels = this.getLabelValues1();
+		var labels = this.getLabelValuesController();
 		for(var i=0; i<labels.length; i+=2){	
 			for(var key in labels[i]){
 				this.state.control_id.push(labels[i][key]);
 				this.state.control_token_quantity.push(labels[i+1][key]);
 			}	
 		}
-		//console.log("control_id: " + JSON.stringify(this.state.control_id))
-		//console.log("control_token_quantity: " + JSON.stringify(this.state.control_token_quantity))
 	}
 	
+	prepareOwnershipTokenDistrbution(){
+		var labels = this.getLabelValuesOwner();
+		for(var i=0; i<labels.length; i+=2){
+			for(var key in labels[i]){
+				this.state.owner_id.push(labels[i][key]);
+				this.state.owner_token_quantity.push(labels[i+1][key]);
+			}
+		}
+		console.log("owner_ID: " + JSON.stringify(this.state.owner_id))
+		console.log("owner_token_quantity: " + JSON.stringify(this.state.owner_token_quantity))
+	}
 	
+	prepareValidators(value) {
+		var tempArr = value;
+		for(var i=0; i<tempArr.length; i++){
+			tempArr[i] = this.getHash(tempArr[i]);
+		}
+		return tempArr;
+		
+	}
 	
 	//hashing the pubkeys
 	prepareTokenDistribution(value){
@@ -501,8 +547,6 @@ class MyGatekeeper extends React.Component {
 		}
 		return tempArr;
 	}
-	
-	
 	
 	submitCoid(e){
 		e.preventDefault();
@@ -527,7 +571,7 @@ class MyGatekeeper extends React.Component {
 		
 		console.log(json)
 		$.ajax({
-			url: twinUrl + 'requestCOID',
+			url: twinUrl + 'request_new_COID',
 			type: 'POST',
 			data: json,
 			success: function(res){
@@ -550,7 +594,8 @@ class MyGatekeeper extends React.Component {
 	handleShowModal(e){
         this.setState({showModal: true, tmpFile: $(e.target).attr('data-id')});
     }
-
+	
+	//used in uniqueIdAttributesForm
 	appendInput() {
 		var inputLen = this.state.inputs.length;
 		if(inputLen < this.maxUniqAttr){
@@ -558,15 +603,22 @@ class MyGatekeeper extends React.Component {
         	this.setState({ inputs: this.state.inputs.concat([newInput]) });
 			
 		}
-		//console.log("inputs: " + JSON.stringify(this.state.inputs))
-		//console.log("inputs values: " + JSON.stringify(this.getLabelValues()))
     }
 	
-	appendInput2() {
+	appendInputControllers() {
 		var inputLen = this.state.inputs_name.length;
 		if(inputLen < this.maxUniqAttr){
 			var newInput1 = `input1-${inputLen}`;
         	this.setState({ inputs_name: this.state.inputs_name.concat([newInput1]) });
+		}
+	}
+	
+	appendInputOwners(){
+		var inputLen = this.state.inputs_ownership.length;
+		console.log("ownerlsit length: " + inputLen)
+		if(inputLen < this.maxUniqAttr){
+			var newInput2 = `input1-${inputLen}`;
+			this.setState({ inputs_ownership: this.state.inputs_ownership.concat([newInput2]) });
 		}
 	}
 	
@@ -602,25 +654,29 @@ class MyGatekeeper extends React.Component {
 						<TagsInput {...inputAttrs} value={this.state.owner_token_desc} onChange={(e)=>{ this.onFieldChange("owner_token_desc", e) } } />
 					</div>				
 					<div className="form-group">
-						<label htmlFor="owner_id">Enter Owner IDs. Owner IDs are the public keys of the identity owners. Only one owner for an individual (self).</label>
-						<TagsInput {...inputAttrs} value={this.state.owner_id} onChange={(e)=>{ this.onFieldChange("owner_id", e) } } />
-					</div>
-					<div className="form-group">
-						<label htmlFor="owner_token_id">Enter Ownership Token Quantity. For example, 1 token for an individual.</label>
-						<TagsInput {...inputAttrs} value={this.state.owner_token_quantity} onChange={(e)=>{ this.onFieldChange("owner_token_quantity", e) } } />
-					</div>
-					<div className="form-group">
-						<label htmlFor="control_token_id">Control Token ID Description. For example, 'Spencer tokens'.</label>
-						<TagsInput {...inputAttrs} value={this.state.control_token_desc} onChange={(e)=>{ this.onFieldChange("control_token_desc", e) } } />
-					</div>
-					<div className="form-group">
-						<label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
-						{this.state.inputs_name.map(input => <TokenDistributionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+						<label htmlFor="owner_dist">Enter Owners and their ownership token(s).</label>
+						{this.state.inputs_ownership.map(input => <OwnerTokenDistributionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
 					</div>
 					<div className="form-group"> 
 						<div className="col-md-offset-6 col-md-6 "> 
 							<p></p>
-							<button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInput2.bind(this)}>
+							<button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInputOwners.bind(this)}>
+								<span className="glyphicon glyphicon-plus"></span>Add More
+							</button>
+						</div>
+					</div>
+					<div className="form-group">
+						<label htmlFor="control_token_id">Enter Control Token Description. For example, 'Spencer tokens'.</label>
+						<TagsInput {...inputAttrs} value={this.state.control_token_desc} onChange={(e)=>{ this.onFieldChange("control_token_desc", e) } } />
+					</div>
+					<div className="form-group">
+						<label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
+						{this.state.inputs_name.map(input => <ControlTokenDistributionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+					</div>
+					<div className="form-group"> 
+						<div className="col-md-offset-6 col-md-6 "> 
+							<p></p>
+							<button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInputControllers.bind(this)}>
 								<span className="glyphicon glyphicon-plus"></span>Add More
 							</button>
 						</div>
@@ -632,6 +688,11 @@ class MyGatekeeper extends React.Component {
 					<div className="form-group">
 						<label htmlFor="recovery_id">Recovery Condition (# of digital signatures of recovery ID owners needed to recover identity)</label>
 						<TagsInput {...inputAttrs} value={this.state.recoveryCondition} onChange={(e)=>{ this.onFieldChange("recoveryCondition", e) } } />
+					</div>
+					
+					<div className="form-group">
+						<label htmlFor="validators">Validators (public keys of the accounts which will verify this identity/asset)</label>
+						<TagsInput {...inputAttrs} value={this.state.validators} onChange={(e)=>{ this.onFieldChange("validators", e) } } />
 					</div>
 					<div className="form-group">
 					  <div className="col-sm-6">

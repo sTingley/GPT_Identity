@@ -1,9 +1,8 @@
 import React from 'react';
 import TagsInput from 'react-tagsinput';
-import { sha3_256 } from 'js-sha3';
+import { keccak_256 } from 'js-sha3';
 var crypto = require('crypto');
 var secp256k1 = require('secp256k1');
-var keccak_256 = require('js-sha3').keccak_256;
 
 //TODO : Namespace validation 
 
@@ -150,7 +149,6 @@ class UniqueIDAttributesForm extends React.Component {
 
 	constructor(props){
 		super(props);
-		
 		this.state = {
 		file_attrs:[],
 		inputs: ['input-0'],
@@ -185,7 +183,6 @@ class UniqueIDAttributesForm extends React.Component {
 	}
 
 };
-
 
 class TokenDistributionForm extends React.Component {
     
@@ -234,7 +231,6 @@ class TokenDistributionForm extends React.Component {
     }
 };
 
-
 class CoreIdentity extends React.Component {
 	
 	constructor(props){
@@ -280,7 +276,7 @@ class CoreIdentity extends React.Component {
 	getHash(input){
 		var input = $.trim(input);
 		if(input){
-			var hash = sha3_256.update(input).hex();
+			var hash = keccak_256(input)
 			return hash;
 		}
 		return input;
@@ -291,6 +287,7 @@ class CoreIdentity extends React.Component {
 		this.setState({file_attrs: this.state.file_attrs.concat([obj])});
 	}
 	
+	//used for uniqueID attributes
 	getLabelValues(){
 		var labelVals = []
 		var _this = this;
@@ -347,15 +344,12 @@ class CoreIdentity extends React.Component {
 				
 				//calculated. should be one time hashing of ownershipTokenAttributes and ownership token quantity
 				"ownershipTokenId": this.getHash(this.joinValuesOwnership()),	
-				//attributes should not be hashed, they should be readable.
-				//"ownershipTokenAttributes":this.hexEncodeOwnerTokenAttrs(),
 				
 				"ownershipTokenAttributes": this.state.owner_token_desc,					
 				"ownershipTokenQuantity": this.state.owner_token_quantity,
 				
 				//calculated. should be one time hashing of controlTokenAttributes and control token quantity
 				"controlTokenId": this.getHash(this.joinValuesControl()),
-				//"controlTokenAttributes": this.hexEncodeControlTokenAttrs(),
 				
 				"controlTokenAttributes": this.state.control_token_desc,
 				"controlTokenQuantity": this.state.control_token_quantity,
@@ -378,8 +372,7 @@ class CoreIdentity extends React.Component {
 		return inputObj;
 	}
 	
-		joinValuesOwnership()
-		{
+	joinValuesOwnership(){
 		var value1 = this.state.owner_token_desc;
 		var value2 = this.state.owner_token_quantity;
         var tempArr = [];
@@ -389,8 +382,7 @@ class CoreIdentity extends React.Component {
         return tempArr;
 		}
 		
-		joinValuesControl()
-		{
+	joinValuesControl(){
 		var value1 = this.state.control_token_desc;
 		var value2 = this.state.control_token_quantity;
         var tempArr = [];
@@ -399,32 +391,6 @@ class CoreIdentity extends React.Component {
 		tempArr = tempArr.join();
         return tempArr;
 		}
-		
-	hexEncodeOwnerTokenAttrs() {
-		var desc = this.state.owner_token_desc;
-		console.log(typeof(desc))
-		desc = desc[0];
-		var temp = "";
-		for(var k=0; k<desc.length;k++)
-		{
-			temp = temp + desc[k].charCodeAt(0).toString(16);
-		}
-		return temp;
-		
-	}
-	
-	hexEncodeControlTokenAttrs() {
-		var desc = this.state.control_token_desc;
-		//desc.length is 1 because state var control_token_desc is an array!!
-		desc = desc[0];
-		var temp = "";
-		for(var k=0; k<desc.length;k++)
-		{
-			temp = temp + desc[k].charCodeAt(0).toString(16);
-		}
-		return temp;
-		
-	}
 		
 	createHashAttribute(values){
 		if($.isArray(values) && values.length > 0){
@@ -509,10 +475,10 @@ class CoreIdentity extends React.Component {
 		var signature1 = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1))
 		
 		signature1 = JSON.parse(signature1).signature;
-		 signature1 = JSON.stringify(signature1);
-		 signature1 = JSON.parse(signature1).data;
-		 signature1 = new Buffer(signature1,"hex");
-		 signature1 = signature1.toString("hex");
+		signature1 = JSON.stringify(signature1);
+		signature1 = JSON.parse(signature1).data;
+		signature1 = new Buffer(signature1,"hex");
+		signature1 = signature1.toString("hex");
 		
 		console.log("sig" + signature1)
 		console.log(typeof(signature1))
@@ -551,10 +517,10 @@ class CoreIdentity extends React.Component {
 		if(inputLen < this.maxUniqAttr){
 			var newInput = `input-${inputLen}`;
         	this.setState({ inputs: this.state.inputs.concat([newInput]) });
-			
 		}
     }
 	
+	//used in tokendistrubtionform
 	appendInput2() {
 		var inputLen = this.state.inputs_name.length;
 		if(inputLen < this.maxUniqAttr){

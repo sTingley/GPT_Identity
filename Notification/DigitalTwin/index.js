@@ -93,10 +93,7 @@ var MyCoidConfig =
 };
 
 
-
 app.use('/requestCOID', proxy(gkConfig));
-
-
 
 
 var myGatekeeper = {
@@ -106,6 +103,7 @@ var myGatekeeper = {
   onProxyReq(proxyReq, req, res) {
         if ( req.method == "POST" && req.body ) {
 //              req.body.txn_id = "request_new_COID";
+		console.log("got myGatekeeper POST rq.. ")
 
                 let body = req.body;
                 console.log("req.body: " + req.body);
@@ -128,14 +126,6 @@ var myGatekeeper = {
 
 
 app.use('/request_new_COID', proxy(myGatekeeper));
-
-
-
-
-
-
-
-
 
 
 var ballotConfig = {

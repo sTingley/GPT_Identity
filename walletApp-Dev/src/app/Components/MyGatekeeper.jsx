@@ -302,6 +302,7 @@ class MyGatekeeper extends React.Component {
 			tmpFile:'',
 			pubKey: localStorage.getItem("pubKey"),
 			privKey: localStorage.getItem("privKey"),
+			MyGatekeeperAddr: localStorage.getItem("MyGatekeeperAddr"),
 			validators:[],
 			signature:''
 		};
@@ -309,6 +310,27 @@ class MyGatekeeper extends React.Component {
 		this.maxUniqAttr = 10;
 		this.onFieldChange = this.onFieldChange.bind(this);
 		this.handleHideModal = this.handleHideModal.bind(this);
+	}
+	
+	componentDidMount() {
+		$.ajax({
+			type: "POST",
+			url: twinUrl + 'pullCoidData',
+			data: { "pubKey": localStorage.getItem("pubKey") },
+			success: function (result) {
+				var data = result;
+				if ($.type(result) != "object") {
+					data = JSON.parseJSON(result)
+				}
+				localStorage.setItem("MyGatekeeperAddr", result.gatekeeperAddr) 
+
+			}.bind(this),
+			complete: function () {
+				
+			},
+			//console.log(result)	
+		})
+
 	}
 	
 	onFieldChange(inputField, e){
@@ -427,7 +449,7 @@ class MyGatekeeper extends React.Component {
 				"bigchainHash":  "",
 				"bigchainID": "",
 				"coidAddr": "",
-				"gatekeeperAddr": ""
+				"MyGatekeeperAddr": this.state.MyGatekeeperAddr
 
 		};
 		return inputObj;

@@ -24,3 +24,21 @@ app.all('/*', function(req, res, next) {
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
   next();
 });
+
+
+
+//START IPFS FUNCTIONS
+app.post('/ipfs/upload', IPFS.uploadFile);
+app.get('/ipfs/alldocs/:pubKey', IPFS.getAllFiles);
+app.get('/ipfs/getfile/:hash', IPFS.getUrl);
+app.post('/ipfs/validateFiles', IPFS.getHashFromIpfsFile);
+//END IPFS FUNCTIONS
+
+//START MYCOID FUNCTIONS
+//END MYCOID FUNCTIONS
+
+//START MYGATEKEEPER FUNCTIONS
+//END MYGATEKEEPER FUNCTIONS
+
+//START GATEKEEPER FUNCTIONS
+//END GATEKEEPER FUNCTIONS

@@ -3,14 +3,45 @@
 var fs = require ('fs');
 var Crypto = require('./cryptoCtr.js'),
         keccak_256 = require('js-sha3').keccak_256,
-        config = require('./config.json');
-//DEFINE PATH (NOTIFICATION PATH)
+        configuration = require('./AssetCtrlConfig.json');
 
-//TO DEFINE:
-//PATH
-//ControlDirectory
-//OwnershipDirectory
-//DelegateDirectory
+
+var PATH = configuration.PATH;
+var ControlDirectory = configuration.ControlDirectory;
+var OwnershipDirectory = configuration.OwnershipDirectory;
+var DelegateDirectory = configuration.DelegateDirectory;
+
+
+//maps ints to directories
+var flagMap = [];
+flagMap[0] = OwnershipDirectory;
+flagMap[1] = ControlDirectory;
+flagMap[2] = DelegateDirectory;
+
+
+//Makes the user's directories in case they don't exist
+var directoryManager = function(pubKey)
+{
+    var sync = true;
+    
+    //uer's folder path:
+    var currentPath = PATH + "/" + keccak_256(pubKey).toUpperCase();
+    
+    //make the user's folder:
+    fs.existsSync(currentPath) || fs.mkdirSync(currentPath);
+    
+    //TODO: CHECK -- will this cause an async error?
+    //make the ownership, control and delegate folders:
+    for(let i = 0; i < flagMap.length; i++)
+    {
+        fs.existsSync(currentPath + flagMap[i]) || fs.mkdirSync(currentPath + flagMap[i]);
+    }
+    
+    sync = false;
+    
+    while (sync) {require('deasync').sleep(100);}
+};
+
 
 
 var AssetCtrl = 
@@ -21,6 +52,9 @@ var AssetCtrl =
         {
             //get public key
             var pubKey = req.body.pubKey;
+            
+            //call in case their folders have not been created:
+            var manager = new directoryManager(pubKey);
             
             //debugging
             console.log("INPUT, pubKey: " + pubKey)
@@ -55,6 +89,9 @@ var AssetCtrl =
         {
             //get public key
             var pubKey = req.body.pubKey;
+            
+            //call in case their folders have not been created:
+            var manager = new directoryManager(pubKey);
             
             //debugging
             console.log("INPUT, pubKey: " + pubKey)
@@ -91,6 +128,9 @@ var AssetCtrl =
             //get public key
             var pubKey = req.body.pubKey;
             
+            //call in case their folders have not been created:
+            var manager = new directoryManager(pubKey);
+            
             //debugging
             console.log("INPUT, pubKey: " + pubKey)
             
@@ -125,6 +165,9 @@ var AssetCtrl =
         {
             //get public key
             var pubKey = req.body.pubKey;
+            
+            //call in case their folders have not been created:
+            var manager = new directoryManager(pubKey);
             
             //get flag
             var flag = req.body.flag;
@@ -183,6 +226,9 @@ var AssetCtrl =
         {
             //get public key
             var pubKey = req.body.pubKey;
+            
+            //call in case their folders have not been created:
+            var manager = new directoryManager(pubKey);
             
             //get flag
             var flag = req.body.flag;
@@ -266,4 +312,6 @@ var AssetCtrl =
         }
 }
 module.exports = AssetCtrl;
+
+
 

@@ -140,14 +140,18 @@ function CoidMaker(coidAddr,formdata)
     var myControlId = formdata.controlId;
     var myControlIdList = [];
     myControlIdList = formdata.controlIdList.split(",");
+    
     var myOwnershipTokenId = formdata.ownershipTokenId;
     var myOwnershipTokenAttributes = [];
     myOwnershipTokenAttributes = formdata.ownershipTokenAttributes.split(",");
     var myOwnershipTokenQuantity = formdata.ownershipTokenQuantity.split(",");
+    
     var myControlTokenId = formdata.controlTokenId;
     var myControlTokenAttributes = [];
     myControlTokenAttributes = formdata.controlTokenAttributes.split(",");
     var myControlTokenQuantity = formdata.controlTokenQuantity.split(",");
+    
+    
     var myIdentityRecoveryIdList = [];
     myIdentityRecoveryIdList = formdata.identityRecoveryIdList.split(",");
     var myRecoveryCondition = formdata.recoveryCondition; // number of recoveryList needed
@@ -319,14 +323,17 @@ var gatekeeper = function (MyGKaddr) {
 
 
     this.checkUnique = function (formdata) {
+	console.log("inside checkUnique, formdata: " + JSON.stringify(formdata))
+	console.log("inside checkUnique, formdata.uniqueId is: " + formdata.uniqueId)
         var myUniqueId = formdata.uniqueId;
+	console.log("myUniqueId: " + myUniqueId)
         var sync = true;
         var isUniqueResult = false;
         _this.gateKeeperContract.isUnique(myUniqueId, function (error, result) {
 
             if (error) {
                 console.log("error returned from isUnique function of gatekeeper contract");
-                console.log(err);
+                console.log(error);
 
             }
             else {
@@ -360,20 +367,23 @@ var gatekeeper = function (MyGKaddr) {
         var myControlId = formdata.controlId;
         var myControlIdList = [];
         myControlIdList = formdata.controlIdList.split(",");
+
         var myOwnershipTokenId = formdata.ownershipTokenId;
-        var myOwnershipTokenAttributes = [];
-        myOwnershipTokenAttributes = formdata.ownershipTokenAttributes.split(",");
+        var myOwnershipTokenAttributes = formdata.ownershipTokenAttributes;
         var myOwnershipTokenQuantity = formdata.ownershipTokenQuantity.split(",");
+
         var myControlTokenId = formdata.controlTokenId;
-        var myControlTokenAttributes = [];
-        myControlTokenAttributes = formdata.controlTokenAttributes.split(",");
+        var myControlTokenAttributes = formdata.controlTokenAttributes;
         var myControlTokenQuantity = formdata.controlTokenQuantity.split(",");
+
         var myIdentityRecoveryIdList = [];
         myIdentityRecoveryIdList = formdata.identityRecoveryIdList.split(",");
         var myRecoveryCondition = formdata.recoveryCondition; // number of recoveryList needed
 
         var ballotContractAddr = this.ballotAddress;
-        var validators = formdata.validatorList.split(",");
+
+	var validators = [];
+        validators = formdata.validatorList.split(",");
         var yesVotesRequiredToPass = formdata.yesVotesRequiredToPass;
 
 
@@ -585,13 +595,6 @@ var gatekeeper = function (MyGKaddr) {
     this.setmyOwnershipTokenID = function (requester, proposalId, myOwnershipTokenId, myOwnershipTokenAttributes, myOwnershipTokenQuantity) {
 
         var sync = true;
-        var len = myOwnershipTokenAttributes.length;
-
-        if (myOwnershipTokenAttributes.length < 10) {
-            for (var i = len; i < 10; i++) {
-                myOwnershipTokenAttributes[i] = "0";
-            }
-        }
 
         var len2 = myOwnershipTokenQuantity.length;
         if (myOwnershipTokenQuantity.length < 10) {
@@ -600,13 +603,15 @@ var gatekeeper = function (MyGKaddr) {
             }
         }
 
-        console.log(myOwnershipTokenQuantity + " is quantity");
         console.log("ownershiptokenID is " + myOwnershipTokenId);
+        console.log("myOwnershipTokenAttributes :",myOwnershipTokenAttributes);
+        console.log("myOwnershipTokenQuantity : ",myOwnershipTokenQuantity);
+
         _this.gateKeeperContract.setmyOwnershipTokenID(requester, proposalId, myOwnershipTokenId, myOwnershipTokenAttributes, myOwnershipTokenQuantity, function (err, res) {
 
 
             if (err) {
-                console.log("Error4");
+                console.log("Error4",err);
                 //res.send("Error");
             }
             else {
@@ -627,15 +632,6 @@ var gatekeeper = function (MyGKaddr) {
 
     this.setmyControlTokenID = function (requester, proposalId, myControlTokenId, myControlTokenAttributes, myControlTokenQuantity) {
         var sync = true;
-        var len = myControlTokenAttributes.length;
-
-        if (myControlTokenAttributes.length < 10) {
-            for (var i = len; i < 10; i++) {
-                myControlTokenAttributes[i] = "0";
-            }
-        }
-
-
         var len2 = myControlTokenQuantity.length;
         if (myControlTokenQuantity.length < 10) {
             for (var i = len2; i < 10; i++) {
@@ -951,6 +947,7 @@ var eventListener = function(MyGKAddr)
         },
         function (error, result)
         {
+	    console.log("result.args (line 950): " + result.args)
             var expiredProposalId = (result.args).expiredProposalId;
             var isExpired = (result.args).isExpired;
 
@@ -1185,16 +1182,18 @@ app.post("/MyGatekeeper", function (req, res) {
 
 
     //Uncomment the line below
-    // var formdata = req.body;
+      var formdata = req.body;
+      console.log('request body...' + JSON.stringify(formdata))
+     
 
 
     //for testing
-    var formdata =
+/*    var formdata =
         {
             "pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
             "sig": "7051442bbf18bb2c86cbc8951a07e27ec6ba05ac3fa427e4c6b948e3dcf91a94046b048edf52445fb22cc776a94b87c3f55426f993458ec744f61f09fb46eeaa",
             "msg": "8836a77b68579d1d8d4427c0cda24960f6c123f17ccf751328cc621d6237da22",
-            "uniqueId": "DCC1AACAFBD191C791CAC02DBFCCCACAB35C1AF1ABA1CED1AC9EC6CAD2",
+            "uniqueId": "E171AACAFBD191C791CAC02DBFCCCACAB35C1AF1ABA1CED1AC9EC6CAD2",
             "uniqueIdAttributes": "AB12321AA,313113A32,EF313131,133131F,311313A,31223F,12321,12222222,11341",
             "ownershipId": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C399B28C66",
             "ownerIdList": "4A56E33E9D718571CED220A7347B96FE43DF4E51,A7576C8A328EEE4BF69589DDB71099250316FF19",
@@ -1212,6 +1211,7 @@ app.post("/MyGatekeeper", function (req, res) {
             "MyGatekeeperAddr": "29EE74E62B739C254B4C3F9AE8E8CFF15A206B4F",
             "validatorList": "8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,AAE858DE3899D2FF096DDB5384365C6A86CE7964F1C4F1F22878944D39BD943A,46B6F98E9E34CAF4B66CFA6D2BCF3ED743C1ACCADFC3787F95DFE47ADDA7A661"
         }
+*/
 
     console.log(formdata.MyGatekeeperAddr)
     var gatekeeperApp = new gatekeeper(formdata.MyGatekeeperAddr);
@@ -1227,6 +1227,7 @@ app.post("/MyGatekeeper", function (req, res) {
 
             gatekeeperApp.getProposalId(formdata, res, function (err, res) {
                 if (err) {
+		    console.log("got an error inside gatekeeperApp.getPRoposalID")
                     res.json({ "error": err });
                     console.log("Error");
                 }

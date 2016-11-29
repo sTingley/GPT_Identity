@@ -302,7 +302,7 @@ class MyGatekeeper extends React.Component {
 			tmpFile:'',
 			pubKey: localStorage.getItem("pubKey"),
 			privKey: localStorage.getItem("privKey"),
-			MyGatekeeperAddr: localStorage.getItem("MyGatekeeperAddr"),
+			//MyGatekeeperAddr: localStorage.getItem("MyGatekeeperAddr"),
 			validators:[],
 			signature:''
 		};
@@ -440,7 +440,7 @@ class MyGatekeeper extends React.Component {
 				"recoveryCondition": this.state.recoveryCondition,
 				"yesVotesRequiredToPass": 2,	//needs to be taken out and hardcoded in app
 				
-				"validators":  this.state.validators,
+				"validatorList":  this.state.validators,
 				
 				"isHuman": false,
 				"timestamp": "",
@@ -449,7 +449,7 @@ class MyGatekeeper extends React.Component {
 				"bigchainHash":  "",
 				"bigchainID": "",
 				"coidAddr": "",
-				"MyGatekeeperAddr": this.state.MyGatekeeperAddr
+
 
 		};
 		return inputObj;
@@ -589,6 +589,7 @@ class MyGatekeeper extends React.Component {
 		
 		json.sig = signature1;
 		json.msg = msg_hash_buffer.toString("hex");
+		json.MyGatekeeperAddr =	localStorage.getItem("MyGatekeeperAddr")
 		//this.setState({signature: signature1})
 		
 		console.log(json)
@@ -598,7 +599,7 @@ class MyGatekeeper extends React.Component {
 			data: json,
 			success: function(res){
 				$.ajax({
-					url: twinUrl + 'writeCoid',
+					url: twinUrl + 'writeCoid_myGK',
 					type: 'POST',
 					data: json
 				})

@@ -1,0 +1,6 @@
+{
+    "PATH": "/home/demoadmin/DigitalTwin/assets",
+    "ControlDirectory": "controlled",
+    "OwnershipDirectory": "owned",
+    "DelegateDirectory": "delegated"
+}

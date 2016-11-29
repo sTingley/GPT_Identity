@@ -1,0 +1,22 @@
+{
+    "GK_CONFIG": 
+    {
+        "TARGET": "http://localhost:3000/",
+        "ENDPOINT":"/gatekeeper"
+    },
+    "BALLOT_CONFIG":
+    {
+        "TARGET": "http://localhost:8082/",
+        "ENDPOINT": "/vote"
+    },
+    "MY_GK_CONFIG":
+    {
+        "TARGET": "http://localhost:3002/",
+        "ENDPOINT": "/MyGatekeeper"
+    },
+    "MY_COID_CONFIG":
+    {
+        "TARGET": "http://localhost:3012/",
+        "ENDPOINT": {"TokenAmount":"/myTokenAmount"}
+    }
+}

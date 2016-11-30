@@ -72,6 +72,9 @@ function getConfiguration(theTarget, oldEndpoint, newEndpoint, txnID)
 }
 
 
+// -> -> -> START NOTIFICATION FUNCTIONS -> -> ->
+
+// <- <- <- END NOTIFICATION FUNCTIONS <- <- <-
 
 // -> -> -> START ASSET FUNCTIONS -> -> ->
 //*Note: These are all POST
@@ -104,12 +107,17 @@ app.use('/requestCOID', proxy(proxyGK))
 
 
 // -> -> -> START BALLOT FUNCTIONS -> -> ->
-
+var proxyBallot = getConfiguration(TwinConfig.BALLOT_CONFIG.TARGET,'/voteonCOIDproposal',TwinConfig.BALLOT_CONFIG.ENDPOINT,'voteonCOIDproposal');
+app.use('/voteonCOIDproposal', proxy(proxyBallot))
 // <- <- <- END BALLOT FUNCTIONS <- <- <-
 
 
 //START MYCOID FUNCTIONS
+var proxyMyCOID = getConfiguration(TwinConfig.MY_COID_CONFIG.TARGET,"/MyCOID/myTokenAmount",TwinConfig.My_COID_CONFIG.ENDPOINT.TOKENAMOUNT,"MyCOID/myTokenAmount" )
+app.use('/voteonCOIDproposal', proxy(proxyBallot))
 //END MYCOID FUNCTIONS
 
 //START MYGATEKEEPER FUNCTIONS
+var proxyMyGK = getConfiguration(TwinConfig.MY_GK_CONFIG.TARGET,'/request_new_COID',TwinConfig.MY_GK_CONFIG.ENDPOINT,'request_new_COID');
+app.use('/request_new_COID', proxy(proxyMyGK));
 //END MYGATEKEEPER FUNCTIONS

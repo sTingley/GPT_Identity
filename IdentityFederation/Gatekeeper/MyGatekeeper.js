@@ -124,12 +124,12 @@ function CoidMaker(coidAddr, formdata) {
 
     var myOwnershipTokenId = formdata.ownershipTokenId;
     var myOwnershipTokenAttributes = [];
-    myOwnershipTokenAttributes = formdata.ownershipTokenAttributes.split(",");
+    var myOwnershipTokenAttributes = formdata.ownershipTokenAttributes;
     var myOwnershipTokenQuantity = formdata.ownershipTokenQuantity.split(",");
 
     var myControlTokenId = formdata.controlTokenId;
     var myControlTokenAttributes = [];
-    myControlTokenAttributes = formdata.controlTokenAttributes.split(",");
+    var myControlTokenAttributes = formdata.controlTokenAttributes;
     var myControlTokenQuantity = formdata.controlTokenQuantity.split(",");
 
     var myIdentityRecoveryIdList = [];

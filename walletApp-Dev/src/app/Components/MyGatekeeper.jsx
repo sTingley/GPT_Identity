@@ -425,21 +425,19 @@ class MyGatekeeper extends React.Component {
 				
 				//calculated. should be one time hashing of ownershipTokenAttributes and ownership token quantity
 				"ownershipTokenId": this.getHash(this.joinValuesOwnership()),	
-				
 				"ownershipTokenAttributes": this.state.owner_token_desc,					
 				"ownershipTokenQuantity": this.state.owner_token_quantity,
 				
 				//calculated. should be one time hashing of controlTokenAttributes and control token quantity
 				"controlTokenId": this.getHash(this.joinValuesControl()),
-				
 				"controlTokenAttributes": this.state.control_token_desc,
 				"controlTokenQuantity": this.state.control_token_quantity,
 				
 				//pubkeys used for recovery in the event COID is lost or stolen			
 				"identityRecoveryIdList": this.valueIntoHash(this.state.recovery_id),
 				"recoveryCondition": this.state.recoveryCondition,
-				"yesVotesRequiredToPass": 2,	//needs to be taken out and hardcoded in app
 				
+				"yesVotesRequiredToPass": 2,	//needs to be taken out and hardcoded in app
 				"validatorList":  this.state.validators,
 				
 				"isHuman": false,
@@ -449,7 +447,6 @@ class MyGatekeeper extends React.Component {
 				"bigchainHash":  "",
 				"bigchainID": "",
 				"coidAddr": "",
-
 
 		};
 		return inputObj;

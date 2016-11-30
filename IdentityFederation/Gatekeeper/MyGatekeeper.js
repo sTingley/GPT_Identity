@@ -6,10 +6,8 @@ var express = require('express')
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
 
-
 //for sending a notification
 var superAgent = require("superagent");
-
 
 //for verification
 var crypto = require("crypto")
@@ -17,7 +15,6 @@ var ed25519 = require("ed25519")
 
 //this library is needed to calculate hash of blockchain id (chain name) and bigchain response
 var keccak_256 = require('js-sha3').keccak_256;
-
 
 //These variables are for creating the server
 var hostname = 'localhost';
@@ -27,9 +24,7 @@ var app = express();
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 
-
 app.set('trust proxy', true);
-
 
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -41,81 +36,67 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json())
 app.use(morgan('dev'));
 
-
-
-
-
 //These hold
 var formdataArray = [];
 var proposalIDArray = [];
 var indexer = 0;
 
 
-
 //this function is intended to send a notification
-var notifier = function()
-{
-        //location of digital twin
-        this.twinUrl = "http://localhost:5050";
+var notifier = function () {
+    //location of digital twin
+    this.twinUrl = "http://localhost:5050";
 
-        //for grabbing the appropriate scope
-        var _this = this;
+    //for grabbing the appropriate scope
+    var _this = this;
 
+    //function to send a notification:
+    //TODO: CHANGE THE ENDPOINT:
 
-        //function to send a notification:
-        //TODO: CHANGE THE ENDPOINT:
+    //NOTE: THE DIGITAL TWIN will reject it without pubKey
+    this.notifyCoidCreation = function (pubKey, txnID, txnHash, gkAddr, coidAddr) {
+        superAgent.post(this.twinUrl + "/coidCreation")
+            .send({
+                "pubKey": pubKey,
+                "txnID": txnID,
+                "txnHash": txnHash,
+                "gkAddr": gkAddr,
+                "coidAddr": coidAddr
+            })
+            .set('Accept', 'application/json')
+            .end((err, res) => {
+                // if(res.status == 200){
+                // do something
+                // }
+            });
+    };
 
-        //NOTE: THE DIGITAL TWIN will reject it without pubKey
-        this.notifyCoidCreation = function(pubKey,txnID,txnHash,gkAddr,coidAddr){
-            superAgent.post(this.twinUrl + "/coidCreation")
-                    .send({"pubKey":pubKey,
-                           "txnID":txnID,
-                           "txnHash":txnHash,
-                           "gkAddr":gkAddr,
-                           "coidAddr":coidAddr})
-                    .set('Accept', 'application/json')
-                    .end((err,res) => {
-                           // if(res.status == 200){
-                                    // do something
-                           // }
-                    });
-         };
-
-
-       this.createProposalPendingNotification = function(requester,proposalId){
-
+    this.createProposalPendingNotification = function (requester, proposalId) {
 
         superAgent.post(this.twinUrl + "/ballot/writeNotify")
-                .send({
-                        "notificationType":"proposalPending",
-                        "pubKey": requester,
-                        "proposalID": proposalId,
-                        "message":"Your proposal is pending for validation"
-                   })
-                .set('Accept', 'application/json')
-                .end((err,res) => {
-                        //if(res.status == 200){
-                        //    console.log("proposalPending message sent successfully");
-                       // }
-                });
-        };
+            .send({
+                "notificationType": "proposalPending",
+                "pubKey": requester,
+                "proposalID": proposalId,
+                "message": "Your proposal is pending for validation"
+            })
+            .set('Accept', 'application/json')
+            .end((err, res) => {
+                //if(res.status == 200){
+                //    console.log("proposalPending message sent successfully");
+                // }
+            });
+    };
 
-
-
-}
-
+}//end of notifier
 
 var theNotifier = new notifier();
 
-
-
-
 //makes a coid
-function CoidMaker(coidAddr,formdata)
-{
+function CoidMaker(coidAddr, formdata) {
 
     //get params for their COID contract
-    console.log("hi")
+    console.log("Inside CoidMaker function")
     var contrData = require("./epm.json");
     var abiAddr = "D7EB5C125F29367C5E906D9EE735691B972F286C";
     var abi_COID = JSON.parse(fs.readFileSync('./abi/' + abiAddr, 'utf8'))
@@ -124,10 +105,10 @@ function CoidMaker(coidAddr,formdata)
     var manager = erisContracts.newContractManagerDev(chainUrl, accounts.newchain4_full_000)
     var contract = manager.newContractFactory(abi_COID).at(coidAddr)
 
-        contract.getIt(function(error,result)
-        {
-                console.log(result + " is the result")
-        })
+    contract.getIt(function (error, result) {
+        console.log(result + " is the result")
+    })
+    
     //parse the form data
     var sig = formdata.sig;
     var msg = formdata.msg;
@@ -140,34 +121,29 @@ function CoidMaker(coidAddr,formdata)
     var myControlId = formdata.controlId;
     var myControlIdList = [];
     myControlIdList = formdata.controlIdList.split(",");
-    
+
     var myOwnershipTokenId = formdata.ownershipTokenId;
     var myOwnershipTokenAttributes = [];
     myOwnershipTokenAttributes = formdata.ownershipTokenAttributes.split(",");
     var myOwnershipTokenQuantity = formdata.ownershipTokenQuantity.split(",");
-    
+
     var myControlTokenId = formdata.controlTokenId;
     var myControlTokenAttributes = [];
     myControlTokenAttributes = formdata.controlTokenAttributes.split(",");
     var myControlTokenQuantity = formdata.controlTokenQuantity.split(",");
-    
-    
+
     var myIdentityRecoveryIdList = [];
     myIdentityRecoveryIdList = formdata.identityRecoveryIdList.split(",");
     var myRecoveryCondition = formdata.recoveryCondition; // number of recoveryList needed
 
-
     var isHumanValue = false;
     var theUniqueIDAttributes = myUniqueIdAttributes;
 
-    for(var i = 0; i < theUniqueIDAttributes.length; i = i + 3)
-    {
+    for (var i = 0; i < theUniqueIDAttributes.length; i = i + 3) {
         theUniqueIDAttributes[i] = myUniqueIdAttributes[i];
     }
 
-
-
-    setTimeout(function(){
+    setTimeout(function () {
 
         theUniqueIDAttributes = theUniqueIDAttributes.concat(Array(10 - theUniqueIDAttributes.length).fill("0"));
         myOwnerIdList = myOwnerIdList.concat(Array(10 - myOwnerIdList.length).fill("0"));
@@ -176,71 +152,59 @@ function CoidMaker(coidAddr,formdata)
         myControlTokenQuantity = myControlTokenQuantity.concat(Array(10 - myControlTokenQuantity.length).fill("0"));
         myIdentityRecoveryIdList = myIdentityRecoveryIdList.concat(Array(10 - myIdentityRecoveryIdList.length).fill("0"));
 
+        //instantiate coid
+        var _this = this;
+        contract.setUniqueID(myUniqueId, theUniqueIDAttributes, isHumanValue, function (error) {
+            //debugging function (getIt)
+            contract.getIt(function (error, result) {
+                console.log("setUniqueID: " + result);
 
-    //instantiate coid
-    var _this = this;
-    contract.setUniqueID(myUniqueId,theUniqueIDAttributes,isHumanValue, function(error)
-    {
-        //debugging function (getIt)
-        contract.getIt(function(error,result)
-        {
-            console.log("setUniqueID: "+result);
+                contract.setOwnership(myOwnerIdList, myOwnershipTokenQuantity, function (error) {
+                    //debugging function (getIt)
+                    contract.getIt(function (error, result) {
+                        console.log("setOwnership: " + result);
 
-            contract.setOwnership(myOwnerIdList, myOwnershipTokenQuantity, function(error)
-            {
-                //debugging function (getIt)
-                contract.getIt(function(error,result)
-                {
-                    console.log("setOwnership: "+result);
+                        contract.setControl(myControlTokenQuantity, myControlIdList, function (error) {
 
-                    contract.setControl(myControlTokenQuantity,myControlIdList, function(error){
+                            //debugging function (getIt)
+                            contract.getIt(function (error, result) {
+                                console.log("setControl" + result);
 
-                        //debugging function (getIt)
-                        contract.getIt(function(error,result)
-                        {
-                            console.log("setControl"+result);
+                                contract.setRecovery(myIdentityRecoveryIdList, myRecoveryCondition, function (error, result) {
 
-                            contract.setRecovery(myIdentityRecoveryIdList,myRecoveryCondition,function(error,result)
-                            {
+                                    //debugging function (getIt)
+                                    contract.getIt(function (error, result) {
+                                        console.log("setRecovery: " + result);
 
-                                //debugging function (getIt)
-                                contract.getIt(function(error,result)
-                                {
-                                    console.log("setRecovery: "+result);
+                                        contract.StartCoid(function (error, result) {
+                                            console.log("startCoid1: " + result);
 
-                                    contract.StartCoid(function(error,result)
-                                    {
-                                        console.log("startCoid1: " + result);
+                                            //debugging function (getIt)
+                                            contract.getIt(function (Error, result) {
+                                                console.log("startCoid: " + result);
 
-                                        //debugging function (getIt)
-                                        contract.getIt(function(Error,result)
-                                        {
-                                            console.log("startCoid: " + result);
+                                            })//end getIT
 
-                                        })//end getIT
+                                        })//end StartCoid
 
-                                    })//end StartCoid
+                                    })//end getIT
 
-                                })//end getIT
+                                })//end setRecovery
 
-                            })//end setRecovery
+                            })//end getIT
 
-                        })//end getIT
+                        })//end setControl
 
-                    })//end setControl
+                    })//end getIT
 
-                })//end getIT
+                })//end setOwnership
 
-            })//end setOwnership
+            })//end getIT
 
-        })//end getIT
-
-    })//end setUniqueID
-        },3000)
+        })//end setUniqueID
+    }, 3000)
 
 }
-
-
 
 
 //Instantiate one of these
@@ -248,7 +212,6 @@ var gatekeeper = function (MyGKaddr) {
 
     //Debugging Comment:
     console.log("A gatekeeper object has just been instantiated")
-
 
     this.chain = 'newchain4_full_000';
     this.erisdburl = "http://10.100.98.218:1337/rpc";
@@ -259,13 +222,11 @@ var gatekeeper = function (MyGKaddr) {
     this.contractMgr = erisContracts.newContractManagerDev(this.erisdburl, this.accountData[this.chain]);
     this.gateKeeperContract = this.contractMgr.newContractFactory(this.erisAbi).at(MyGKaddr);
 
-
     //ballot contract
     this.ballotAddress = this.contractData['ballot'];
     // console.log("this is the ballot address: " + this.ballotAddress);
     this.ballotAbi = JSON.parse(fs.readFileSync("./abi/" + this.ballotAddress));
     this.ballotContract = this.contractMgr.newContractFactory(this.ballotAbi).at(this.ballotAddress);
-
 
     //verification contract (oraclizer)
     this.VerificationAddress = require('/home/demoadmin/Migration_from_Eris/VerifyOraclizerEthereum/wallet2/epm.json').deployStorageK;
@@ -278,12 +239,8 @@ var gatekeeper = function (MyGKaddr) {
     this.bigchain_abi = JSON.parse(fs.readFileSync('/home/demoadmin/Migration_from_Eris/BigchainOraclizer/abi/' + this.bigchain_query_addr, 'utf8'))
     this.bigchain_contract = this.contractMgr.newContractFactory(this.bigchain_abi).at(this.bigchain_query_addr)
 
-
-
     //use this to have the gatekeeper scope inside functions
     var _this = this;
-
-
 
     //for verification
     this.verifyIt = function (formdata) {
@@ -321,12 +278,11 @@ var gatekeeper = function (MyGKaddr) {
     } //end verification
 
 
-
     this.checkUnique = function (formdata) {
-	console.log("inside checkUnique, formdata: " + JSON.stringify(formdata))
-	console.log("inside checkUnique, formdata.uniqueId is: " + formdata.uniqueId)
+        console.log("inside checkUnique, formdata: " + JSON.stringify(formdata))
+        console.log("inside checkUnique, formdata.uniqueId is: " + formdata.uniqueId)
         var myUniqueId = formdata.uniqueId;
-	console.log("myUniqueId: " + myUniqueId)
+        console.log("myUniqueId: " + myUniqueId)
         var sync = true;
         var isUniqueResult = false;
         _this.gateKeeperContract.isUnique(myUniqueId, function (error, result) {
@@ -334,7 +290,6 @@ var gatekeeper = function (MyGKaddr) {
             if (error) {
                 console.log("error returned from isUnique function of gatekeeper contract");
                 console.log(error);
-
             }
             else {
                 console.log("received response from isUnique :" + result);
@@ -354,7 +309,6 @@ var gatekeeper = function (MyGKaddr) {
     this.setcoidData = function (proposalId, formdata, res, callback) {
 
         //local variables for API calls
-
         // var proposalId = formdata.proposalId;
         var sig = formdata.sig;
         var msg = formdata.msg;
@@ -367,25 +321,19 @@ var gatekeeper = function (MyGKaddr) {
         var myControlId = formdata.controlId;
         var myControlIdList = [];
         myControlIdList = formdata.controlIdList.split(",");
-
         var myOwnershipTokenId = formdata.ownershipTokenId;
         var myOwnershipTokenAttributes = formdata.ownershipTokenAttributes;
         var myOwnershipTokenQuantity = formdata.ownershipTokenQuantity.split(",");
-
         var myControlTokenId = formdata.controlTokenId;
         var myControlTokenAttributes = formdata.controlTokenAttributes;
         var myControlTokenQuantity = formdata.controlTokenQuantity.split(",");
-
         var myIdentityRecoveryIdList = [];
         myIdentityRecoveryIdList = formdata.identityRecoveryIdList.split(",");
-        var myRecoveryCondition = formdata.recoveryCondition; // number of recoveryList needed
-
+        var myRecoveryCondition = formdata.recoveryCondition;
         var ballotContractAddr = this.ballotAddress;
-
-	var validators = [];
+        var validators = [];
         validators = formdata.validatorList.split(",");
         var yesVotesRequiredToPass = formdata.yesVotesRequiredToPass;
-
 
         try {
             this.setCoidRequester(requester, proposalId, sig, msg);
@@ -399,7 +347,7 @@ var gatekeeper = function (MyGKaddr) {
 
             this.initiateCoidProposalSubmission(ballotContractAddr, proposalId, yesVotesRequiredToPass);
 
-            theNotifier.createProposalPendingNotification(requester,proposalId);
+            theNotifier.createProposalPendingNotification(requester, proposalId);
 
             callback(false, res);
         }
@@ -410,7 +358,6 @@ var gatekeeper = function (MyGKaddr) {
         return;
 
     };
-
 
 
     this.getProposalId = function (formdata, res, callback) {
@@ -449,8 +396,6 @@ var gatekeeper = function (MyGKaddr) {
     }; //end of function
 
 
-
-
     this.setCoidRequester = function (requester, proposalId, sig, msg) {
 
         var sync = true;
@@ -460,7 +405,6 @@ var gatekeeper = function (MyGKaddr) {
                 console.log("Error0");
             }
             else {
-
                 console.log("Result0:" + res);
                 console.log("sig: " + sig);
                 console.log("msg: " + msg);
@@ -476,9 +420,6 @@ var gatekeeper = function (MyGKaddr) {
         while (sync) { require('deasync').sleep(100); }
     }; // end of function setCoidRequester
 
-
-
-
     this.setmyUniqueID = function (requester, proposalId, myUniqueID, myUniqueIdAttributes) {
 
         var len = myUniqueIdAttributes.length;
@@ -487,38 +428,28 @@ var gatekeeper = function (MyGKaddr) {
         console.log(len + myUniqueIdAttributes + "*MYUNIQUEIDATTRIBUTESARRAY")
         //set vals in gatekeeper contract one at a time
         //NOTE the let statemnt (not var!)
-        for(let index = 0; index < (len)/3; index++)
-        {
-         _this.gateKeeperContract.setmyUniqueID(requester, proposalId, myUniqueID, myUniqueIdAttributes[3*index], myUniqueIdAttributes[(3*index)+1], myUniqueIdAttributes[(3*index)+2],index,function(err,result)
-        {
+        for (let index = 0; index < (len) / 3; index++) {
+            _this.gateKeeperContract.setmyUniqueID(requester, proposalId, myUniqueID, myUniqueIdAttributes[3 * index], myUniqueIdAttributes[(3 * index) + 1], myUniqueIdAttributes[(3 * index) + 2], index, function (err, result) {
 
-
-            if (err)
-            {
-                console.log("Error1" + err);
-            }
-            else {
-                if(index < len-1)
-                {
+                if (err) {
+                    console.log("Error1" + err);
+                }
+                else {
+                    if (index < len - 1) {
                         console.log(result + " index is: " + index);
                         sync = true;
-                }
-                else
-                {
+                    }
+                    else {
                         console.log(result + "  index<> is: " + index);
                         sync = false;
+                    }
                 }
-            }
-
-        });
-        }
+            }); //end of setmyUniqueID
+            
+        } //end of for loop
 
         //while (sync) { require('deasync').sleep(100); }
     };
-
-
-
-
 
     this.setmyOwnershipID = function (requester, proposalId, myOwnershipId, myOwnerIdList) {
 
@@ -555,19 +486,14 @@ var gatekeeper = function (MyGKaddr) {
         while (sync) { require('deasync').sleep(100); }
     }; //end of function setmyOwnershipID
 
-
-
     this.setmyControlID = function (requester, proposalId, myControlId, myControlIdList) {
         var sync = true;
         var len = myControlIdList.length;
 
-        if (myControlIdList.length < 10)
-        {
+        if (myControlIdList.length < 10) {
             for (var i = len; i < 10; i++) {
                 myControlIdList[i] = "0";
             }
-
-
         }
         _this.gateKeeperContract.setmyControlID(requester, proposalId, myControlId, myControlIdList, function (err, res) {
             if (err) {
@@ -590,8 +516,6 @@ var gatekeeper = function (MyGKaddr) {
 
     }; //end of function
 
-
-
     this.setmyOwnershipTokenID = function (requester, proposalId, myOwnershipTokenId, myOwnershipTokenAttributes, myOwnershipTokenQuantity) {
 
         var sync = true;
@@ -604,14 +528,13 @@ var gatekeeper = function (MyGKaddr) {
         }
 
         console.log("ownershiptokenID is " + myOwnershipTokenId);
-        console.log("myOwnershipTokenAttributes :",myOwnershipTokenAttributes);
-        console.log("myOwnershipTokenQuantity : ",myOwnershipTokenQuantity);
+        console.log("myOwnershipTokenAttributes :", myOwnershipTokenAttributes);
+        console.log("myOwnershipTokenQuantity : ", myOwnershipTokenQuantity);
 
         _this.gateKeeperContract.setmyOwnershipTokenID(requester, proposalId, myOwnershipTokenId, myOwnershipTokenAttributes, myOwnershipTokenQuantity, function (err, res) {
 
-
             if (err) {
-                console.log("Error4",err);
+                console.log("Error4", err);
                 //res.send("Error");
             }
             else {
@@ -661,8 +584,6 @@ var gatekeeper = function (MyGKaddr) {
         while (sync) { require('deasync').sleep(100); }
     }; // end of function
 
-
-
     this.setmyIdentityRecoveryIdList = function (requester, proposalId, myIdentityRecoveryIdList, myRecoveryCondition) {
         var sync = true;
         var len = myIdentityRecoveryIdList.length;
@@ -710,7 +631,6 @@ var gatekeeper = function (MyGKaddr) {
             if (err) {
 
                 console.log("Error to selectValidators: " + err);
-
             }
 
             else {
@@ -725,16 +645,13 @@ var gatekeeper = function (MyGKaddr) {
                 return;
             }
 
-
         })// end of callback
 
         while (sync) { require('deasync').sleep(100); }
 
     }; // end of function
 
-
-
-
+    //after all the COID data has been set
     this.initiateCoidProposalSubmission = function (ballotAddress, proposalId, yesVotesRequiredToPass) {
         var sync = true;
         _this.gateKeeperContract.initiateCoidProposalSubmission(ballotAddress, proposalId, yesVotesRequiredToPass, function (err, res) {
@@ -748,9 +665,7 @@ var gatekeeper = function (MyGKaddr) {
                 return;
             }
 
-
         })// end of callback
-
 
         while (sync) { require('deasync').sleep(100); }
 
@@ -759,29 +674,9 @@ var gatekeeper = function (MyGKaddr) {
 }
 
 
-
-
-
-//***WHAT IS THIS FOR?
-app.get("/", function (req, res) {
-
-    var value = req;
-    this.verifyIt(value.msg, value.sig, value.pubKey, function (result) {
-        if (result == 'true') {
-            res.render("index", { status: obj.data });
-
-        }
-    })
-
-
-});
-
-
 //NOTE: Event listening must be done outside each gatekeeper app instance continuously
 //This way, new instances are not done per each instance
-var eventListener = function(MyGKAddr)
-{
-
+var eventListener = function (MyGKAddr) {
 
     this.chain = 'newchain4_full_000';
     this.erisdburl = "http://10.100.98.218:1337/rpc";
@@ -792,13 +687,10 @@ var eventListener = function(MyGKAddr)
     this.contractMgr = erisContracts.newContractManagerDev(this.erisdburl, this.accountData[this.chain]);
     this.gateKeeperContract = this.contractMgr.newContractFactory(this.erisAbi).at(this.contractAddress);
 
-
     //ballot contract
     this.ballotAddress = this.contractData['ballot'];
-    // console.log("this is the ballot address: " + this.ballotAddress);
     this.ballotAbi = JSON.parse(fs.readFileSync("./abi/" + this.ballotAddress));
     this.ballotContract = this.contractMgr.newContractFactory(this.ballotAbi).at(this.ballotAddress);
-
 
     //verification contract (oraclizer)
     this.VerificationAddress = require('/home/demoadmin/Migration_from_Eris/VerifyOraclizerEthereum/wallet2/epm.json').deployStorageK;
@@ -811,28 +703,22 @@ var eventListener = function(MyGKAddr)
     this.bigchain_abi = JSON.parse(fs.readFileSync('/home/demoadmin/Migration_from_Eris/BigchainOraclizer/abi/' + this.bigchain_query_addr, 'utf8'))
     this.bigchain_contract = this.contractMgr.newContractFactory(this.bigchain_abi).at(this.bigchain_query_addr)
 
-
-
     //use this to have the gatekeeper scope inside functions
     var _this = this;
 
-
     //This is for signature generation:
-    this.createSignature = function(nonHashedMessage, callback)
-    {
+    this.createSignature = function (nonHashedMessage, callback) {
         //make message hash
         var hash = crypto.createHash('sha256').update(nonHashedMessage).digest('hex')
 
         var pubKey = _this.accountData.newchain4_full_000.pubKey;
         var privKey = _this.accountData.newchain4_full_000.privKey;
-
-        var keyPair = {"publicKey": new Buffer(pubKey,"hex"), "privateKey": new Buffer(privKey,"hex")}
+        var keyPair = { "publicKey": new Buffer(pubKey, "hex"), "privateKey": new Buffer(privKey, "hex") }
 
         var signature = ed25519.Sign(new Buffer(hash), keyPair)
-
         signature = signature.toString('hex')
 
-        var result = {"signature": signature, "pubKey": pubKey, "msg": hash}
+        var result = { "signature": signature, "pubKey": pubKey, "msg": hash }
 
         callback(signature, pubKey, hash)
     }
@@ -840,36 +726,34 @@ var eventListener = function(MyGKAddr)
 
     //this is for bigchain writing
     //see the note (above var bigchainInput) for how to input data in this function
-    this.bigchainIt = function(proposalID,coidData,coidGKAddress,coidAddr,blockNumber,blockHash,blockchainID,timestamp,validatorSigs,gatekeeperSig,callback)
-    {
+    this.bigchainIt = function (proposalID, coidData, coidGKAddress, coidAddr, blockNumber, blockHash, blockchainID, timestamp, validatorSigs, gatekeeperSig, callback) {
 
         //get public key
-         var thePubkey = this.ErisAddress;
+        var thePubkey = this.ErisAddress;
         //var thePubkey = _this.ErisAddress;
-         console.log("In function bigchainIt, pubKey of eris account is: " + thePubkey)
+        console.log("In function bigchainIt, pubKey of eris account is: " + thePubkey)
 
         var description = "Core Identity"
 
         //NOTE: signatures inputted to this object should include msg hash, signature and public key
         //NOTE: Coid_Data should include uniqueID and the signature of the one requesting a core identity
-        var bigchainInput = {"Description": description,
-                             "proposalID": proposalID,
-                             "Coid_Data": coidData,
-                             "coidGK_Address": coidGKAddress,
-                             "coid_Address": coidAddr,
-                             "blockNumber": blockNumber,
-                             "blockHash": blockHash,
-                             "blockchainID": blockchainID,
-                             "blockchain_timestamp": timestamp,
-                             "validator_signatures": validatorSigs,
-                             "GateKeeper_signature": gatekeeperSig
-                            };//end json struct
+        var bigchainInput = {
+            "Description": description,
+            "proposalID": proposalID,
+            "Coid_Data": coidData,
+            "coidGK_Address": coidGKAddress,
+            "coid_Address": coidAddr,
+            "blockNumber": blockNumber,
+            "blockHash": blockHash,
+            "blockchainID": blockchainID,
+            "blockchain_timestamp": timestamp,
+            "validator_signatures": validatorSigs,
+            "GateKeeper_signature": gatekeeperSig
+        };//end json struct
 
 
-        bigchainInput = JSON.stringify(bigchainInput)
+        bigchainInput = JSON.stringify({ "data": bigchainInput })
         console.log("In function bigchainIt, the input to be sent to bigchain is: " + bigchainInput)
-
-
 
         var bigchainEndpoint = 'addData/' + thePubkey + '/1'
         var theobj = { "method": "POST", "stringJsonData": bigchainInput, "endpoint": bigchainEndpoint }
@@ -877,20 +761,15 @@ var eventListener = function(MyGKAddr)
 
         _this.bigchain_contract.BigChainQuery(JSON.stringify(theobj), function (error, result) {
 
-           // console.log("A million stars ***************************************************************************************")
             var theEvent;
-            _this.bigchain_contract.CallbackReady(function(error, result)
-                {
-                     theEvent = result;
-                },
-                function (error, result)
-                {
+            _this.bigchain_contract.CallbackReady(function (error, result) {
+                theEvent = result;
+            },
+                function (error, result) {
 
-                    if (thePubkey == result.args.addr)
-                    {
+                    if (thePubkey == result.args.addr) {
 
-                        _this.bigchain_contract.myCallback(function(error, result)
-                        {
+                        _this.bigchain_contract.myCallback(function (error, result) {
 
                             console.log("RESULT: " + result);
                             var bigchainID = JSON.parse(result).response;
@@ -907,31 +786,26 @@ var eventListener = function(MyGKAddr)
                             console.log(logme)
 
                             //for debugging--ignore:
-                            if (logme == true)
-                            {
+                            if (logme == true) {
                                 console.log("logme is the bool true");
                             }
-                            else
-                            {
+                            else {
                                 console.log("logme is not bool true but if this says true, it is a string: " + logme)
                             }
 
-                            callback(result,bigchainID,bigchainHash)
+                            callback(result, bigchainID, bigchainHash)
 
                             //stop event listening
                             theEvent.stop();
 
                         })//end calling of myCallback
 
-                }//end if statement
+                    }//end if statement
 
-            })//end callback listening
-
+                })//end callback listening
 
         })//end bigchain query
     }
-
-
 
 
     //
@@ -941,31 +815,23 @@ var eventListener = function(MyGKAddr)
     var eventBallotProposalExpired;
 
     _this.ballotContract.proposalExpired(
-        function (error, result)
-        {
+        function (error, result) {
             eventBallotProposalExpired = result;
         },
-        function (error, result)
-        {
-	    console.log("result.args (line 950): " + result.args)
+        function (error, result) {
+            console.log("result.args (line 950): " + result.args)
             var expiredProposalId = (result.args).expiredProposalId;
             var isExpired = (result.args).isExpired;
 
             //delete the proposal from gatekeeper
-            _this.gateKeeperContract.deleteProposal(expiredProposalId, function(error, result)
-            {
-                if (error)
-                {
+            _this.gateKeeperContract.deleteProposal(expiredProposalId, function (error, result) {
+                if (error) {
                     console.log("error from Gatekeeper Contract function deleteProposal:" + error);
-                } else
-                {
+                } else {
                     console.log("The Gatekeeper Contract function deleteProposal has been called with no error");
                 }
             })
         })
-
-
-
 
     //
     // Listening of the resultReady event in gatekeeper:
@@ -975,8 +841,7 @@ var eventListener = function(MyGKAddr)
     var eventGatekeeperResultReady;
 
     _this.gateKeeperContract.resultReady(
-        function (error, result)
-        {
+        function (error, result) {
             eventGatekeeperResultReady = result;
         },
         function (error, result) {
@@ -1005,32 +870,26 @@ var eventListener = function(MyGKAddr)
             console.log(JSON.stringify(result.args));
 
             //implement logic if and only if votingResult is true:
-            if(votingResult)
-            {
+            if (votingResult) {
                 //find data given proposalId
                 var index = -1;
-                for(var k = 0; k < indexer; k++)
-                {
-                        if(proposalIDArray[index] = proposalId)
-                        {
-                            index = k;
-                        }
+                for (var k = 0; k < indexer; k++) {
+                    if (proposalIDArray[index] = proposalId) {
+                        index = k;
+                    }
                 }
 
                 console.log("index is: " + index);
 
-                if(index != -1)
-                {
+                if (index != -1) {
                     //TODO (to make cleaner): un-hardcode m -- grab number of validators from
                     //NOTE: notice the use of let for m, rather than var!
                     var validatorSigs = [];
                     var indexSigs = 0;
-                    for(let m = 0; m < 3; m++)
-                    {
-                        _this.ballotContract.getValidatorSignature_byIndex(proposalId, m, function(error,result)
-                        {
+                    for (let m = 0; m < 3; m++) {
+                        _this.ballotContract.getValidatorSignature_byIndex(proposalId, m, function (error, result) {
                             //TODO: Create labels for validator sigs
-                            console.log("This is the result: "  + JSON.stringify(result))
+                            console.log("This is the result: " + JSON.stringify(result))
                             validatorSigs[indexSigs] = result;
                             indexSigs++;
                             console.log("m is: " + m);
@@ -1039,185 +898,154 @@ var eventListener = function(MyGKAddr)
 
                     console.log("validator sigs are: " + validatorSigs);
 
-
                     //gatekeeper needs to sign this:
-                    setTimeout(function()
-                    {
-                     _this.createSignature("GatekeeperAppVerified",function(signatureGK,pubkeyGK,hashGK)
-                     {
+                    setTimeout(function () {
+                        _this.createSignature("GatekeeperAppVerified", function (signatureGK, pubkeyGK, hashGK) {
 
-                              var GKSig = {"signature": signatureGK, "pubkeyGK": pubkeyGK, "hashGK": hashGK}
-                              console.log("GK Sig: " + JSON.stringify(GKSig));
-                               _this.bigchainIt(proposalId,formdataArray[index],coidGKAddr,coidAddr,blockNumber,blockHashVal,blockchainID,timestamp,validatorSigs,GKSig,function(result,theId,theHash)
-                               {
-                                     // console.log(result);
-                                      console.log("THE TXN ID: " + theId)
-                                      console.log("THE HASH: " + theHash)
-                                      console.log("GK ADDR: " + coidGKAddr)
-                                      console.log("COID ADDR: " + coidAddr)
-                                      theNotifier.notifyCoidCreation(formdataArray[index].pubKey,theId,theHash,coidGKAddr,coidAddr)
+                            var GKSig = { "signature": signatureGK, "pubkeyGK": pubkeyGK, "hashGK": hashGK }
+                            console.log("GK Sig: " + JSON.stringify(GKSig));
+                            _this.bigchainIt(proposalId, formdataArray[index], coidGKAddr, coidAddr, blockNumber, blockHashVal, blockchainID, timestamp, validatorSigs, GKSig, function (result, theId, theHash) {
+                                // console.log(result);
+                                console.log("THE TXN ID: " + theId)
+                                console.log("THE HASH: " + theHash)
+                                console.log("GK ADDR: " + coidGKAddr)
+                                console.log("COID ADDR: " + coidAddr)
+                                theNotifier.notifyCoidCreation(formdataArray[index].pubKey, theId, theHash, coidGKAddr, coidAddr)
 
 
-                                      //make the core identity
-                                      CoidMaker(coidAddr,formdataArray[index])
+                                //make the core identity
+                                CoidMaker(coidAddr, formdataArray[index])
 
-                                      //delete the proposal
-                                      deleteProposal(proposalId);
-                               })
-                     })
+                                //delete the proposal
+                                deleteProposal(proposalId);
+                            })
+                        })
                     },
-                    5000);
-
-
-
-
-                  }
-                  else
-                  {
-                      console.log("error finding form data--could not write acceptance to bigchaindb!")
-                      deleteProposal(proposalId);
-                  }
+                        5000);
+                }
+                else {
+                    console.log("error finding form data--could not write acceptance to bigchaindb!")
+                    deleteProposal(proposalId);
+                }
             }
 
         })
 
-
-
-
-        //
-        // Listening of the resultIsReady event in the ballot:
-        // When the event is ready, it calls the function in gatekeeper, result is ready
-        // Note that after the function is called in gatekeeper, it triggers the gatekeeper resultReady event
-        //
-        var eventBallotResultIsReady;
-        _this.ballotContract.resultIsReady
+    
+    // Listening of the resultIsReady event in the ballot:
+    // When the event is ready, it calls the function in gatekeeper, result is ready
+    // Note that after the function is called in gatekeeper, it triggers the gatekeeper resultReady event
+    
+    var eventBallotResultIsReady;
+    _this.ballotContract.resultIsReady
         (
-            function (error, result)
-            {
-                eventBallotResultIsReady = result
-            },
-            function (error, result)
-            {
-                var proposalId = result.args.proposalId;
-                var requestResult = result.args.requestResult;
-                var chainID = keccak_256(_this.chain);
+        function (error, result) {
+            eventBallotResultIsReady = result
+        },
+        function (error, result) {
+            var proposalId = result.args.proposalId;
+            var requestResult = result.args.requestResult;
+            var chainID = keccak_256(_this.chain);
 
-                //debugging statements
-                console.log("ballot contract event -- ResultIsReady")
-                console.log("proposalId from event is: " + proposalId)
-                console.log("requestResult from event is: " + requestResult)
+            //debugging statements
+            console.log("ballot contract event -- ResultIsReady")
+            console.log("proposalId from event is: " + proposalId)
+            console.log("requestResult from event is: " + requestResult)
 
 
-
-                _this.gateKeeperContract.ResultIsReady(requestResult,proposalId,chainID, function (error, result) {
-                    if (error)
-                    {
-                        console.log("error from Gatekeeper Contract function ResultIsReady:" + error);
-                    } else
-                    {
-                        console.log("ResultIsReady function in gatekeeper successfully called.")
-                    }
-                });
-            }
-            )
+            _this.gateKeeperContract.ResultIsReady(requestResult, proposalId, chainID, function (error, result) {
+                if (error) {
+                    console.log("error from Gatekeeper Contract function ResultIsReady:" + error);
+                } else {
+                    console.log("ResultIsReady function in gatekeeper successfully called.")
+                }
+            });
+        }
+        )// end of _this.ballotContract.resultIsReady
 
 
+    //this is the event listening. the event is just for debugging purposes.
+    _this.ballotContract.proposalExpired(
+        function (error, result) {
 
-            //this is the event listening. the event is just for debugging purposes.
-            _this.ballotContract.proposalExpired(
-                function(error,result){
-
-                },
-                function(error,result){
-                    console.log(JSON.stringify(result.args) + "... is the result from event ballotContract.proposalExpired");
-                })
-
-
-            //for checking expiry of proposals
-            //contract function will delete proposal for you
-            function isExpired()
-            {
-                    _this.ballotContract.IsProposalExpired(function(error,result)
-                    {
-                       console.log(JSON.stringify(result) + "...is from isproposalexpired function in ballot")
-                        setTimeout(function()
-                        {
-                            //recursively check every 9 seconds. in the future make this a day.
-                            isExpired()
-                        },9000)
-                    })
-            }
-
-            //start the recursive checking
-
-            setTimeout(function()
-                {isExpired()
-                },500000);
+        },
+        function (error, result) {
+            console.log(JSON.stringify(result.args) + "... is the result from event ballotContract.proposalExpired");
+        })
 
 
-            //this is to delete the proposal in the ballot and gatekeeper, upon consensus (rejection and acceptance)
-            function deleteProposal(proposalId)
-            {
-                _this.ballotContract.deleteProposal(proposalId,function(error,result)
-                {
-                    console.log(proposalId + " is the proposalId. Error in delete proposal from ballot? " + error)
-                })
+    //for checking expiry of proposals
+    //contract function will delete proposal for you
+    function isExpired() {
+        _this.ballotContract.IsProposalExpired(function (error, result) {
+            console.log(JSON.stringify(result) + "...is from isproposalexpired function in ballot")
+            setTimeout(function () {
+                //recursively check every 9 seconds. in the future make this a day.
+                isExpired()
+            }, 9000)
+        })
+    }
 
-                _this.gateKeeperContract.deleteProposal(proposalId, function (error, result)
-                {
-                    console.log(proposalId + " is the proposalId. Error in delete proposal from gatekeepr? " + error)
-                });
-            }
+    //start the recursive checking
+    setTimeout(function () {
+        isExpired()
+    }, 500000);
+
+
+    //this is to delete the proposal in the ballot and gatekeeper, upon consensus (rejection and acceptance)
+    function deleteProposal(proposalId) {
+        _this.ballotContract.deleteProposal(proposalId, function (error, result) {
+            console.log(proposalId + " is the proposalId. Error in delete proposal from ballot? " + error)
+        })
+
+        _this.gateKeeperContract.deleteProposal(proposalId, function (error, result) {
+            console.log(proposalId + " is the proposalId. Error in delete proposal from gatekeepr? " + error)
+        });
+    }
 
 }
 
 
-
-
-
-
-
+/*******************************************************
+ *      THIS IS CALLED BY MYGATEKEEPER.JSX
+*******************************************************/
 
 app.post("/MyGatekeeper", function (req, res) {
 
 
-    //Uncomment the line below
-      var formdata = req.body;
-      console.log('request body...' + JSON.stringify(formdata))
-     
+    //Make sure this line is uncommented to test with wallet
+    var formdata = req.body;
+    console.log('request body...' + JSON.stringify(formdata))
 
-
-    //for testing
-/*    var formdata =
-        {
-            "pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
-            "sig": "7051442bbf18bb2c86cbc8951a07e27ec6ba05ac3fa427e4c6b948e3dcf91a94046b048edf52445fb22cc776a94b87c3f55426f993458ec744f61f09fb46eeaa",
-            "msg": "8836a77b68579d1d8d4427c0cda24960f6c123f17ccf751328cc621d6237da22",
-            "uniqueId": "E171AACAFBD191C791CAC02DBFCCCACAB35C1AF1ABA1CED1AC9EC6CAD2",
-            "uniqueIdAttributes": "AB12321AA,313113A32,EF313131,133131F,311313A,31223F,12321,12222222,11341",
-            "ownershipId": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C399B28C66",
-            "ownerIdList": "4A56E33E9D718571CED220A7347B96FE43DF4E51,A7576C8A328EEE4BF69589DDB71099250316FF19",
-            "controlId": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C66",
-            "controlIdList": "4A56E33E9D718571CED220A7347B96FE43DF4E51,A7576C8A328EEE4BF69589DDB71099250316FF19",
-            "ownershipTokenId": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C66",
-            "ownershipTokenAttributes": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C65,83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C61",
-            "ownershipTokenQuantity": "0,0",
-            "controlTokenId": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C66",
-            "controlTokenAttributes": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C65,83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C61",
-            "controlTokenQuantity": "0,0",
-            "identityRecoveryIdList": "4A56E33E9D718571CED220A7347B96FE43DF4E51,A7576C8A328EEE4BF69589DDB71099250316FF19",
-            "recoveryCondition": 2,
-            "yesVotesRequiredToPass": 2,
-            "MyGatekeeperAddr": "29EE74E62B739C254B4C3F9AE8E8CFF15A206B4F",
-            "validatorList": "8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,AAE858DE3899D2FF096DDB5384365C6A86CE7964F1C4F1F22878944D39BD943A,46B6F98E9E34CAF4B66CFA6D2BCF3ED743C1ACCADFC3787F95DFE47ADDA7A661"
-        }
-*/
+    //for testing with hardcoded data
+    /*    var formdata =
+            {
+                "pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+                "sig": "7051442bbf18bb2c86cbc8951a07e27ec6ba05ac3fa427e4c6b948e3dcf91a94046b048edf52445fb22cc776a94b87c3f55426f993458ec744f61f09fb46eeaa",
+                "msg": "8836a77b68579d1d8d4427c0cda24960f6c123f17ccf751328cc621d6237da22",
+                "uniqueId": "E171AACAFBD191C791CAC02DBFCCCACAB35C1AF1ABA1CED1AC9EC6CAD2",
+                "uniqueIdAttributes": "AB12321AA,313113A32,EF313131,133131F,311313A,31223F,12321,12222222,11341",
+                "ownershipId": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C399B28C66",
+                "ownerIdList": "4A56E33E9D718571CED220A7347B96FE43DF4E51,A7576C8A328EEE4BF69589DDB71099250316FF19",
+                "controlId": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C66",
+                "controlIdList": "4A56E33E9D718571CED220A7347B96FE43DF4E51,A7576C8A328EEE4BF69589DDB71099250316FF19",
+                "ownershipTokenId": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C66",
+                "ownershipTokenAttributes": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C65,83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C61",
+                "ownershipTokenQuantity": "0,0",
+                "controlTokenId": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C66",
+                "controlTokenAttributes": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C65,83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C61",
+                "controlTokenQuantity": "0,0",
+                "identityRecoveryIdList": "4A56E33E9D718571CED220A7347B96FE43DF4E51,A7576C8A328EEE4BF69589DDB71099250316FF19",
+                "recoveryCondition": 2,
+                "yesVotesRequiredToPass": 2,
+                "MyGatekeeperAddr": "29EE74E62B739C254B4C3F9AE8E8CFF15A206B4F",
+                "validatorList": "8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,AAE858DE3899D2FF096DDB5384365C6A86CE7964F1C4F1F22878944D39BD943A,46B6F98E9E34CAF4B66CFA6D2BCF3ED743C1ACCADFC3787F95DFE47ADDA7A661"
+            } */
 
     console.log(formdata.MyGatekeeperAddr)
     var gatekeeperApp = new gatekeeper(formdata.MyGatekeeperAddr);
     var isValid = gatekeeperApp.verifyIt(formdata);
     var isUnique = gatekeeperApp.checkUnique(formdata);
-
 
     var listening = new eventListener(formdata.MyGatekeeperAddr);//WILL THIS EXPIRE AT THE END OF THEIR POST REQUEST?
 
@@ -1227,18 +1055,16 @@ app.post("/MyGatekeeper", function (req, res) {
 
             gatekeeperApp.getProposalId(formdata, res, function (err, res) {
                 if (err) {
-		    console.log("got an error inside gatekeeperApp.getPRoposalID")
+                    console.log("got an error inside gatekeeperApp.getPRoposalID")
                     res.json({ "error": err });
                     console.log("Error");
                 }
                 else {
-
                     res.json({ "Method": "POST", "msg": "COID data submitted successfully" });
                 }
             });
         }
         else {
-
             res.send("The uniqueId is not unique.")
         }
     }
@@ -1248,10 +1074,7 @@ app.post("/MyGatekeeper", function (req, res) {
 
 });
 
-
-
-app.listen(3002, function ()
-{
+app.listen(3002, function () {
     console.log("Connected to contract http://10.101.114.231:1337/rpc");
     console.log("Listening on port 3002");
 });

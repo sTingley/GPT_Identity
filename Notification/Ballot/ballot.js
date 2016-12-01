@@ -10,20 +10,16 @@ var erisC = require('eris-contracts');
 var fs = require('fs')
 var bodyParser = require('body-parser')
 
-
-
-        // eris:chain id with full privilages
-    var chain = 'newchain4_full_000';
-    // Change eris:db url
-    var erisdburl = "http://10.100.98.218:1337/rpc";
-
-    var contractData = require("./epm.json");
-    var contractAddress = contractData['GateKeeper'];
-    var erisAbi = JSON.parse(fs.readFileSync("./abi/"+contractAddress));
-    var accountData = require("./accounts.json");
-    var contractMgr = erisC.newContractManagerDev(erisdburl, accountData[chain]);
-    var gateKeeper = contractMgr.newContractFactory(erisAbi).at(contractAddress);
-
+// eris:chain id with full privilages
+var chain = 'newchain4_full_000';
+// Change eris:db url
+var erisdburl = "http://10.100.98.218:1337/rpc";
+var contractData = require("./epm.json");
+var contractAddress = contractData['GateKeeper'];
+var erisAbi = JSON.parse(fs.readFileSync("./abi/"+contractAddress));
+var accountData = require("./accounts.json");
+var contractMgr = erisC.newContractManagerDev(erisdburl, accountData[chain]);
+var gateKeeper = contractMgr.newContractFactory(erisAbi).at(contractAddress);
 
 
 var ballotApp = function(){
@@ -105,7 +101,7 @@ var _this = this;
 
         }, function(error,result){
         if(error){
-                console.log("Notification event exists with err", err);
+                console.log("Notification event exists with err", error);
         }
         console.log("notifyValidator evet reached")
         var proposal = result.args.proposalIdToVote;
@@ -113,7 +109,6 @@ var _this = this;
         _this.createNotification({"pubKey": validator, "proposalID": proposal, "message": "You have been selected to vote on the proposal."});
         console.log("pass on err check");
         })
-
 
 
 
@@ -214,10 +209,10 @@ function retrieveData(callback)
         "ownershipTokenId": "",
         "controlId": "",
         "controlIdList": [],
-        "ownershipTokenAttributes": [],
+        "ownershipTokenAttributes": "",
         "ownershipTokenQuantity": [],
         "controlTokenId": "",
-        "controlTokenAttributes": [],
+        "controlTokenAttributes": "",
         "controlTokenQuantity": [],
         "identityRecoveryIdList": [],
         "recoveryCondition": [],
@@ -309,7 +304,7 @@ function retrieveData(callback)
             err_detected = true;
         } else if(Array.isArray(result)){
             response.ownershipTokenId = result[1];
-            response.ownershipTokenAttributes = (result[2].filter(_this.filterFunction));
+            response.ownershipTokenAttributes = "" + result[2];
             for(var i = 0; i < response.ownerIdList.length; i++)
             {
                 response.ownershipTokenQuantity[i] = result[3][i] + " ";
@@ -344,7 +339,7 @@ function retrieveData(callback)
             err_detected = true;
         } else if(Array.isArray(result)){
             response.controlTokenId = result[1];
-            response.controlTokenAttributes = (result[2].filter(_this.filterFunction));
+            response.controlTokenAttributes = ""+result[2];
             for(var i = 0; i < response.controlIdList.length; i++)
             {
                 response.controlTokenQuantity[i] = result[3][i] + " ";
@@ -415,11 +410,7 @@ function retrieveData(callback)
     }
 
 
-
 }
-
-
-
 
 
 })
@@ -485,7 +476,6 @@ ballot.ballotContract.IsProposalExpired(function(error,result){
 });
 
 });
-
 
 
 app.listen(8082);

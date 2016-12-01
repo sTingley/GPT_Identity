@@ -402,7 +402,9 @@ function giveRightToVote(bytes32 proposalId, bytes32 validator) returns (bool re
     function IsProposalExpired() {
 
 
-        for (uint i = 1; i <= proposalIdList.length; i++)
+	if(proposalIdList.length > 0)
+	{
+        for (uint i = 0; i <= proposalIdList.length; i++)
         {
 
             //weeks is the avaible unit can be used to convert between units of time
@@ -410,26 +412,34 @@ function giveRightToVote(bytes32 proposalId, bytes32 validator) returns (bool re
             //AF: If myProposal[proposalIdList[i]].time was 10 days and 1 week is hardcoded
             //then we need now > myProposal[proposalIdList[i]].time - 1 weeks in the if statement!!!
 
-            if (myProposal[proposalIdList[i]].time >= now + 1 weeks)
-
-
+            if (myProposal[proposalIdList[i]].time + 1 weeks >=  now)
              {
 
               proposalExpired(proposalIdList[i], true); // proposalIdList[i]-> proposalId
+
+	      //deletes the array value and removes validator list
               deleteProposal(proposalIdList[i]);
+	     
+	      //restructures the size of the array for the removed proposal
+	      removeFromArray(i);
 
              }
-
-             // No need to trigger the event in this case
-            //else
-              //{
-              //isExpired = false;
-
-              //proposalExpired(0x0, false);
-             //}
-
         }
+	}
     }
+
+    function removeFromArray(uint i)
+    {
+        for(uint j = 0; j < proposalIdList.length-1; j++)
+        {
+                if(j >= i)
+                {
+                        proposalIdList[j] = proposalIdList[j+1];
+                }
+        }
+        proposalIdList.length--;
+    }
+
 
 
 
@@ -499,19 +509,13 @@ function giveRightToVote(bytes32 proposalId, bytes32 validator) returns (bool re
 
        for (i=0; i < proposalIdList.length; i++ )
        {
-
-
          if (proposalId == proposalIdList[i])
          isproposalIdValid = true;
-
-
        }
 
        return isproposalIdValid;
 
     }
-
-
 
 
     // Generate a random number between a range,

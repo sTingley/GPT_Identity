@@ -412,7 +412,7 @@ function giveRightToVote(bytes32 proposalId, bytes32 validator) returns (bool re
             //AF: If myProposal[proposalIdList[i]].time was 10 days and 1 week is hardcoded
             //then we need now > myProposal[proposalIdList[i]].time - 1 weeks in the if statement!!!
 
-            if (myProposal[proposalIdList[i]].time + 1 weeks >=  now)
+            if (myProposal[proposalIdList[i]].time + 1 weeks <=  now)
              {
 
               proposalExpired(proposalIdList[i], true); // proposalIdList[i]-> proposalId

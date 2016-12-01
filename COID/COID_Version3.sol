@@ -13,9 +13,6 @@ contract CoreIdentity
     //(3) Call setControl
     //(4) Call setRecovery
     //(5) Call StartCoid. IMPORTANT: Only call this after (1-4) have been called!
-    //AF: These functions can only be called from the IDF gatekeeper contract ... will have to hardcode the address 
-    //of the IDF gatekeeper contract in a modifier
-    //AF: We should also set a LOCAL variable that is checked after these functions are called for the first time to avvoid accidental or malicious calling
 
 
 
@@ -57,7 +54,7 @@ contract CoreIdentity
     bool hasEmpty;
     uint index;
     Utils myUtils;
-
+    bytes32[] hashMe;//helper
 
     //instantiate coid struct & tokens
     OwnershipToken OT;
@@ -111,7 +108,6 @@ contract CoreIdentity
 
    //END CONSTRUCTOR
    //START CONSTRUCTOR HELPER FUNCTION
-   //AF: I presume that the commented out lines will be added in.
    function StartCoid()
    {
         bytes32[10] memory owners = ownershipStruct.ownerIDList;
@@ -119,18 +115,21 @@ contract CoreIdentity
         myUtils = new Utils();
         (ownershipStruct.ownerIDList, controlStruct.controlIDList) = myUtils.AtoSubsetOfB(owners, controllers);
 
+        //TODO: REMOVE AND UNCOMMENT BELOW
+        ownershipStruct.ownershipID = 0x0;
+        controlStruct.controlTokenID = 0x0;
 
-//        ownershipStruct.ownershipID = calculateOwnershipID(ownershipStruct.ownerIDList,uniqueIdStruct.uniqueID);
-//        controlStruct.controlTokenID = calculateControlID(controlStruct.controlIDList,uniqueIdStruct.uniqueID);
-//      testIt = 15;
+        ownershipStruct.ownershipID = calculateOwnershipID(ownershipStruct.ownerIDList,uniqueIdStruct.uniqueID);
+        controlStruct.controlTokenID = calculateControlID(controlStruct.controlIDList,uniqueIdStruct.uniqueID);
+        testIt = 15;
         //instantiate ownership token:
-//        OT = new OwnershipToken(isHuman,ownershipStruct.ownershipID);
+        OT = new OwnershipToken(isHuman,ownershipStruct.ownershipID);
 
         // This is required to set ownership stake values for all owners
-//        OT.setOwnershipTokenVals(ownershipStruct.ownerIDList,ownershipStruct.ownershipStakes);
+        OT.setOwnershipTokenVals(ownershipStruct.ownerIDList,ownershipStruct.ownershipStakes);
 
          //instantiate Control tokens:
-//        CT = new ControlToken(controlStruct.controlIDList,controlStruct.controlTokensOwned);
+        CT = new ControlToken(controlStruct.controlIDList,controlStruct.controlTokensOwned);
 
         testIt = 34;
    }
@@ -140,11 +139,18 @@ contract CoreIdentity
 
 
 
+   //for debugging
+   function findIndex(bytes32 hashC) returns (uint indexC,bool  wasFoundC)
+   {
+        (indexC,wasFoundC) = CT.findIndexOfController(hashC);
+   }
 
 
 
-
-
+   function getList() returns (uint[10] vals)
+   {
+        vals = CT.getControllerVal();
+   }
 
 
 
@@ -153,9 +159,9 @@ contract CoreIdentity
    {
        success = CT.revokeDelegation(controllerHash,delegateeHash,amount);
    }
-   function spendMyTokens(bytes32 delegateeHash, uint amount)
+   function spendMyTokens(bytes32 delegateeHash, uint amount) returns (bool result)
    {
-       CT.spendMyTokens(delegateeHash,amount);
+       result = CT.spendMyTokens(delegateeHash,amount);
    }
    function myAmount(bytes32 delegateeHash) returns (uint amount)
    {
@@ -178,37 +184,40 @@ contract CoreIdentity
    }
    function amountDelegated(bytes32 controllerHash) returns (uint val)
    {
-       val = amountDelegated(controllerHash);
+       val = CT.amountDelegated(controllerHash);
    }
-   function addController(bytes32 controllerHash) returns (bool success)
+   function addController(bytes32 controllerHash) returns (bytes32[10] listo)
    {
-       //TODO: make sure controllerHash is in ownersList
-       for(uint i=0; i< ownershipStruct.ownerIDList[i].length; i++){
-           if(ownershipStruct.ownerIDList[i] == controllerHash)
-           {
-               success = CT.addController(controllerHash);
-           }
-       }
-       //success = CT.addController(controllerHash);
+        bool success = false;
+       //TODO: make sure the person ADDING controllerHash is in ownersList!!
+        //The oraclizer will have to verify this
+//       for(uint i=0; i< ownershipStruct.ownerIDList.length; i++){
+//           if(ownershipStruct.ownerIDList[i] == controllerHash)
+//           {
+//               success = CT.addController(controllerHash);
+//          }
+//       }
+       success = CT.addController(controllerHash);
        if(success)
        {
         //TODO: update controller list in COID and amounts
         controlStruct.controlTokensOwned = CT.getControllerVal();
         controlStruct.controlIDList = CT.getControllersList();
-
+        listo = CT.getControllersList();
         //TODO: recompute controlID
         controlStruct.controlTokenID = calculateControlID(controlStruct.controlIDList,uniqueIdStruct.uniqueID);
        }
    }
-   function removeController(bytes32 controllerHash) returns (bool success)
+   function removeController(bytes32 controllerHash) returns (bool success, uint minInd)
    {
+    //TODO: make sure the person removing controllerHash is in the ownerslist via the oraclizer
     //TODO: make sure controllerHash is in ownersList
-        for(uint i=0; i< ownershipStruct.ownerIDList[i].length; i++){
-            if(ownershipStruct.ownerIDList[i] == controllerHash){
-                success = CT.removeController(controllerHash);
-            }
-        }
-        //success = CT.removeController(controllerHash);
+    //    for(uint i=0; i< ownershipStruct.ownerIDList[i].length; i++){
+    //        if(ownershipStruct.ownerIDList[i] == controllerHash){
+    //            success = CT.removeController(controllerHash);
+    //        }
+    //    }
+        (success,minInd) = CT.removeController(controllerHash);
         if(success)
         {
     //TODO: update controller list in COID and controller amount
@@ -216,7 +225,7 @@ contract CoreIdentity
     controlStruct.controlIDList = CT.getControllersList();
 
     //TODO: recompute controlID
-            controlStruct.controlTokenID = calculateControlID(controlStruct.controlIDList,uniqueIdStruct.uniqueID);
+  //          controlStruct.controlTokenID = calculateControlID(controlStruct.controlIDList,uniqueIdStruct.uniqueID);
         }
    }
    //END CONTROL FUNCTIONS
@@ -252,10 +261,10 @@ contract CoreIdentity
    {
        val = OT.getOwnershipVal(ownershipHash);
    }
-   function giveTokens(bytes32 originalOwner, bytes32 newOwner, uint amount) returns (bool success)
+   function giveTokens(bytes32 originalOwner, bytes32 newOwner, uint amount) returns (bool success,bool isOwner1,bool isOwner2)
    {
-       bool isOwner1;
-       bool isOwner2;
+       //bool isOwner1;
+       //bool isOwner2;
 
        isOwner1 = OT.isOwner(originalOwner);
        isOwner2 = OT.isOwner(newOwner);
@@ -263,6 +272,8 @@ contract CoreIdentity
        success = false;
        if(isOwner1 && isOwner2)
        {
+
+           success = true;
         //TODO: get val1 and val2 from the coid struct (find their indices)
            uint val1 = myTokenAmount(originalOwner);
            uint val2 = myTokenAmount(newOwner);
@@ -306,102 +317,83 @@ contract CoreIdentity
 
         hasEmpty = stop;
    }
+
+
+
       function calculateOwnershipID(bytes32[10] owners, bytes32 uniqueID) returns (bytes32 ownershipID)
    {
 
             ownershipID = 0;
-            //make a clone of owners so we don't change it
-              //  bytes32[100] ownersClone = owners;
 
+            hashMe.length = 0;
+            for(uint k = 0; k < owners.length;k++)
+            {
+                if(owners[k] != 0)
+                {
+                   hashMe.push(owners[k]);
+                }
+            }
 
-                //although the array has 100 spots, some of them are empty. So we only include the spots before nonempty spots.
-              //  uint emptyIndex = this.firstEmptyIndex(ownersClone);
-              //  uint lastNonemptyIndex;
+            bytes32 myVal;
+            uint j = 0;
 
-              //  if(emptyIndex == 0)
-              //  {
-            //            throw; //we have no owners if emptyIndex is zero
-              //  }
-              //  else
-            //    {
-             //           lastNonemptyIndex = emptyIndex - 1;
-               // }
+            if(hashMe.length > 1)
+            {
+                for(uint i = 1; i < hashMe.length; i++)
+                {
+                        myVal = hashMe[i];
 
-              //  bytes32[lastNonemptyIndex] hashMe;
-                //create a newlist. this is the one we will hash           
-                //sort the list in descending order
-              //  bytes32 max = 0x0;
-               // for(uint j = 0; j < emptyIndex; j++)
-               // {
-                        //find current max
-                      //  for(uint i = 0; i < emptyIndex; i++)
-                      //  {
-                           //     if(ownersClone[i] >= max)
-                         //       {
-                       //                 max = ownersClone[i];
-                     //           }
-                   //     }
+                        j = i -1;
+                        while(j >= 0 && hashMe[j] > myVal)
+                        {
+                                hashMe[j+1] = hashMe[j];
+                                j = j -1;
+                        }
 
-                        //set current value in list
-                 //       hashMe[j] = max;
+                        hashMe[j+1] = myVal;
+                }
+            }
 
-                        //reset max
-               //         max = 0x0;
-              //  }
-
-
-                //now, set the ownershipID as the hash:
-              //  ownershipID = sha3(uniqueID,hashMe);
-
+            ownershipID = sha3(uniqueID,hashMe);
    }
 
    function calculateControlID(bytes32[10] controllers, bytes32 uniqueID) returns (bytes32 controlID)
    {
 
-                controlID = 0;
-                //make a clone of owners so we don't change it
-              //  address[100] controllersClone = controllers;
-            /// This should be controllers instead of owners
+            controlID = 0;
 
-                //although the array has 100 spots, some of them are empty. So we only include the spots before nonempty spots.
-              //  uint emptyIndex = 1;
-              //  emptyIndex = this.firstEmptyIndex(controllersClone);
-               // uint lastNonemptyIndex;
+            hashMe.length = 0;
+            for(uint k = 0; k < controllers.length;k++)
+            {
+                if(controllers[k] != 0)
+                {
+                   hashMe.push(controllers[k]);
+                }
+            }
 
-              //  if(emptyIndex == 0)
-              //  {
-              //          throw; //we have no owners if emptyIndex is zero
-              //  }
-              //  else
-              //  {
-              //          lastNonemptyIndex = emptyIndex - 1;
-               // }
+            bytes32 myVal;
+            uint j = 0;
 
-               // address[lastNonemptyIndex] hashMe; //create a newlist. this is the one we will hash;
+            if(hashMe.length > 1)
+            {
+                for(uint i = 1; i < hashMe.length; i++)
+                {
+                        myVal = hashMe[i];
 
-                //sort the list in descending order
-               // address max = 0x0;
-               // for(uint j = 0; j < emptyIndex; j++)
-               // {
-                        //find current max
-                       // for(uint i = 0; i < emptyIndex; i++)
-                       // {
-                           //     if(controllersClone[i] >= max)
-                         //       {
-                       //                 max = controllersClone[i];
-                     //           }
-                   //     }
+                        j = i -1;
+                        while(j >= 0 && hashMe[j] > myVal)
+                        {
+                                hashMe[j+1] = hashMe[j];
+                                j = j -1;
+                        }
 
-                        //set current value in list
-                 //       hashMe[j] = max;
+                        hashMe[j+1] = myVal;
+                }
+            }
 
-                        //reset max
-                //        max = 0x0;
-               // }
+            controlID = sha3(uniqueID,hashMe);
 
 
-                //now, set the ownershipID as the hash:
-               // controlID = sha3(uniqueID,hashMe);
    }
    //END HELPER FUNCTIONS
 

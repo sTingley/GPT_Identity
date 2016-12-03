@@ -5,7 +5,7 @@ var Crypto = require('./cryptoCtr.js'),
         configuration = require('./NotificationCtrlConfig.json');
 
 //TODO: PATH DEFINE 
-
+var PATH = configuration.path;
 
 //TODO: DEFINE NOTIFY_SUFFIX
 var notify_suffix = configuration.notifications_file;

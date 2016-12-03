@@ -73,6 +73,12 @@ function getConfiguration(theTarget, oldEndpoint, newEndpoint, txnID)
 
 
 // -> -> -> START NOTIFICATION FUNCTIONS -> -> ->
+//INHERITED FROM INDEX.JS -- MODIFY***
+app.post('/ballot/writeNotify', ballotCtrl.writeNotification);
+app.post('/ballot/writeExpiredProposal', expiredNotification.writeExpiredProposalNotification);
+app.get('/ballot/readNotify/:pubKey', ballotCtrl.fetchNotification);
+app.get('/ballot/readExpiredProposal/:pubKey', expiredNotification.fetchExpiredProposalNotification);
+
 
 // <- <- <- END NOTIFICATION FUNCTIONS <- <- <-
 
@@ -114,7 +120,7 @@ app.use('/voteonCOIDproposal', proxy(proxyBallot))
 
 //START MYCOID FUNCTIONS
 var proxyMyCOID = getConfiguration(TwinConfig.MY_COID_CONFIG.TARGET,"/MyCOID/myTokenAmount",TwinConfig.My_COID_CONFIG.ENDPOINT.TOKENAMOUNT,"MyCOID/myTokenAmount" )
-app.use('/voteonCOIDproposal', proxy(proxyBallot))
+app.use('/MyCOID/myTokenAmount', proxy(proxyBallot))
 //END MYCOID FUNCTIONS
 
 //START MYGATEKEEPER FUNCTIONS

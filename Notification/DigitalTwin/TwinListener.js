@@ -123,3 +123,9 @@ app.use('/MyCOID/myTokenAmount', proxy(proxyBallot))
 var proxyMyGK = getConfiguration(TwinConfig.MY_GK_CONFIG.TARGET,'/request_new_COID',TwinConfig.MY_GK_CONFIG.ENDPOINT,'request_new_COID');
 app.use('/request_new_COID', proxy(proxyMyGK));
 //END MYGATEKEEPER FUNCTIONS
+
+for(var i=0; i<TwinConfig.ports.length; i++){
+	var port = parseInt(TwinConfig.ports[i]);
+	http.createServer(app).listen(port);
+	console.log("Digital Twin running at "+port);
+}

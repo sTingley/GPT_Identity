@@ -2,7 +2,7 @@
 var fs = require ('fs');
 var Crypto = require('./cryptoCtr.js'),
         keccak_256 = require('js-sha3').keccak_256,
-        configuration = require('./AssetConfig.json');
+        configuration = require('./NotificationCtrlConfig.json');
 
 //TODO: PATH DEFINE 
 

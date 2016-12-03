@@ -27,10 +27,6 @@ app.all('/*', function(req, res, next) {
 
 
 
-//environment variables:
-TwinConfig
-AssetCtrl
-
 
 //Returns a proxy configuration
 //This is for re-routing a request
@@ -73,10 +69,10 @@ function getConfiguration(theTarget, oldEndpoint, newEndpoint, txnID)
 
 
 // -> -> -> START NOTIFICATION FUNCTIONS -> -> ->
-//INHERITED FROM INDEX.JS -- MODIFY***
-app.post('/ballot/writeNotify', ballotCtrl.writeNotification);
+//INHERITED FROM INDEX.JS
+app.post('/ballot/writeNotify', AssetCtrl.writeNotification);
 app.post('/ballot/writeExpiredProposal', expiredNotification.writeExpiredProposalNotification);
-app.get('/ballot/readNotify/:pubKey', ballotCtrl.fetchNotification);
+app.get('/ballot/readNotify/:pubKey', AssetCtrl.fetchNotification);
 app.get('/ballot/readExpiredProposal/:pubKey', expiredNotification.fetchExpiredProposalNotification);
 
 

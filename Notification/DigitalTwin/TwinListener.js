@@ -1,5 +1,6 @@
 'use strict';
 var app = require('express')(),
+    config = require('./config.json),
     proxy = require('http-proxy-middleware'),
     bodyParser = require('body-parser'),
     fileUpload = require('express-fileupload'),
@@ -69,9 +70,9 @@ function getConfiguration(theTarget, oldEndpoint, newEndpoint, txnID)
 
 // -> -> -> START NOTIFICATION FUNCTIONS -> -> ->
 //INHERITED FROM INDEX.JS
-app.post('/ballot/writeNotify', AssetCtrl.writeNotification);
+app.post('/ballot/writeNotify', NotificationCtrl.writeNotification);
 app.post('/ballot/writeExpiredProposal', expiredNotification.writeExpiredProposalNotification);
-app.get('/ballot/readNotify/:pubKey', AssetCtrl.fetchNotification);
+app.get('/ballot/readNotify/:pubKey', NotificationCtrl.fetchNotification);
 app.get('/ballot/readExpiredProposal/:pubKey', expiredNotification.fetchExpiredProposalNotification);
 
 

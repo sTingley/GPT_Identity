@@ -67,14 +67,12 @@ function getConfiguration(theTarget, oldEndpoint, newEndpoint, txnID)
 }
 
 
+//TODO: expiredNotification
 // -> -> -> START NOTIFICATION FUNCTIONS -> -> ->
-//INHERITED FROM INDEX.JS
 app.post('/ballot/writeNotify', NotificationCtrl.writeNotification);
 app.post('/ballot/writeExpiredProposal', expiredNotification.writeExpiredProposalNotification);
 app.get('/ballot/readNotify/:pubKey', NotificationCtrl.fetchNotification);
 app.get('/ballot/readExpiredProposal/:pubKey', expiredNotification.fetchExpiredProposalNotification);
-
-
 // <- <- <- END NOTIFICATION FUNCTIONS <- <- <-
 
 // -> -> -> START ASSET FUNCTIONS -> -> ->
@@ -99,11 +97,9 @@ app.post('/ipfs/validateFiles', IPFS.getHashFromIpfsFile);
 
 
 // -> -> -> START GATEKEEPER FUNCTIONS -> -> ->
-
 //This is to request a Core Identity (isHuman = true) from the gatekeeper:
 var proxyGK = getConfiguration(TwinConfig.GK_CONFIG.TARGET,'/requestCOID',TwinConfig.GK_CONFIG.ENDPOINT,'requestCOID');
 app.use('/requestCOID', proxy(proxyGK))
-
 // <- <- <- END GATEKEEPER FUNCTIONS <- <- <-
 
 
@@ -113,17 +109,20 @@ app.use('/voteonCOIDproposal', proxy(proxyBallot))
 // <- <- <- END BALLOT FUNCTIONS <- <- <-
 
 
-//START MYCOID FUNCTIONS
+// -> -> -> START MYCOID FUNCTIONS -> -> ->
 var proxyMyCOID = getConfiguration(TwinConfig.MY_COID_CONFIG.TARGET,"/MyCOID/myTokenAmount",TwinConfig.My_COID_CONFIG.ENDPOINT.TOKENAMOUNT,"MyCOID/myTokenAmount" )
 app.use('/MyCOID/myTokenAmount', proxy(proxyBallot))
-//END MYCOID FUNCTIONS
+// <- <- <- END MYCOID FUNCTIONS <- <- <- 
 
-//START MYGATEKEEPER FUNCTIONS
+// -> -> -> START MYGATEKEEPER FUNCTIONS -> -> ->
 var proxyMyGK = getConfiguration(TwinConfig.MY_GK_CONFIG.TARGET,'/request_new_COID',TwinConfig.MY_GK_CONFIG.ENDPOINT,'request_new_COID');
 app.use('/request_new_COID', proxy(proxyMyGK));
-//END MYGATEKEEPER FUNCTIONS
+// <- <- <- END MYGATEKEEPER FUNCTIONS <- <- <- 
 
-for(var i=0; i<TwinConfig.ports.length; i++){
+
+//For three wallets, this has a port for each. To update.
+for(var i=0; i<TwinConfig.ports.length; i++)
+{
 	var port = parseInt(TwinConfig.ports[i]);
 	http.createServer(app).listen(port);
 	console.log("Digital Twin running at "+port);

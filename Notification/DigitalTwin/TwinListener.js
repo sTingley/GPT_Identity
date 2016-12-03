@@ -1,6 +1,5 @@
 'use strict';
 var app = require('express')(),
-        config = require('./config.json'),
     proxy = require('http-proxy-middleware'),
     bodyParser = require('body-parser'),
     fileUpload = require('express-fileupload'),
@@ -8,7 +7,7 @@ var app = require('express')(),
     http = require('http'),
     expiredNotification = require('./expiredNotification.js'),
     IPFS = require('./ipfs.js'),
-    TwinConfig = require('./TwinConfig.json'),
+    Twin = require('./TwinConfig.json'),
     AssetCtrl = require('./AssetCtrl.js');
 
  // for parsing application/json
@@ -20,7 +19,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(fileUpload());
 
 app.all('/*', function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", config.env.allowed_orgins);
+  res.header("Access-Control-Allow-Origin", TwinConfig.allowed_orgins);
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
   next();
 });

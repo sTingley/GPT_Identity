@@ -1,9 +1,10 @@
-File					            Dependency
+File, Dependency
 
-IPFS.js				            config.json
-expiredNotification.js	  config.json
-NotificationCtrl.js		    NotificationCtrlConfig.json
-AssetCtrl.js			        AssetCtrlConfig.json
+IPFS.js, config.json
+expiredNotification.js, config.json
+NotificationCtrl.js, NotificationCtrlConfig.json
+AssetCtrl.js, AssetCtrlConfig.json
 
-TwinListener.js		      	TwinConfig.json (also IPFS.js,expiredNotification.js,NotificationCtrl.js,AssetCtrl.js)
+TwinListener.js, TwinConfig.json (also IPFS.js,expiredNotification.js,NotificationCtrl.js,AssetCtrl.js)
  
+TODO: Remove unused data from config.json

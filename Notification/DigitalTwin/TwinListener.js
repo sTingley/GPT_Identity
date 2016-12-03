@@ -1,6 +1,5 @@
 'use strict';
 var app = require('express')(),
-    config = require('./config.json'),
     proxy = require('http-proxy-middleware'),
     bodyParser = require('body-parser'),
     fileUpload = require('express-fileupload'),

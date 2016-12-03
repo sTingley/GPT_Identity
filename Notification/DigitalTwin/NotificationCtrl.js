@@ -2,10 +2,13 @@
 var fs = require ('fs');
 var Crypto = require('./cryptoCtr.js'),
         keccak_256 = require('js-sha3').keccak_256,
-        config = require('./config.json');
+        configuration = require('./AssetConfig.json');
 
 //TODO: PATH DEFINE 
+
+
 //TODO: DEFINE NOTIFY_SUFFIX
+var notify_suffix = configuration.notifications_file;
 
 //Functions inherited from BallotCtrl
 //TODO: Change for folder structure

@@ -106,6 +106,7 @@ app.use('/requestCOID', proxy(proxyGK))
 // -> -> -> START BALLOT FUNCTIONS -> -> ->
 var proxyBallot = getConfiguration(TwinConfig.BALLOT_CONFIG.TARGET,'/voteonCOIDproposal',TwinConfig.BALLOT_CONFIG.ENDPOINT,'voteonCOIDproposal');
 app.use('/voteonCOIDproposal', proxy(proxyBallot))
+app.use('/getCoidData',proxy(proxyBallot))
 // <- <- <- END BALLOT FUNCTIONS <- <- <-
 
 

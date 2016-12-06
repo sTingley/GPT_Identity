@@ -313,10 +313,11 @@ class MyGatekeeper extends React.Component {
 	}
 	
 	componentDidMount() {
+        //TODO********** add fileName.json********put in localstorage!
 		$.ajax({
 			type: "POST",
-			url: twinUrl + 'pullCoidData',
-			data: { "pubKey": localStorage.getItem("pubKey") },
+			url: twinUrl + 'getAsset'
+			data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": },
 			success: function (result) {
 				var data = result;
 				if ($.type(result) != "object") {
@@ -569,7 +570,7 @@ class MyGatekeeper extends React.Component {
 	
 	submitCoid(e){
 		e.preventDefault();
-		var json = this.prepareJsonToSubmit();
+		var json = this.prepareJsonToSubmi();
 		var privKey1 = new Buffer(this.state.privKey,"hex");
 		var msg_hash = keccak_256(JSON.stringify(json));
 		var msg_hash_buffer = new Buffer(msg_hash,"hex");
@@ -593,10 +594,17 @@ class MyGatekeeper extends React.Component {
 		$.ajax({
 			url: twinUrl + 'request_new_COID',
 			type: 'POST',
-			data: json,
+			data: json
 			success: function(res){
+                var sendMe = {};
+                sendMe.flag = 0; //owned asset
+                sendMe.fileName = ""; //TODO!!!!!!!!
+                sendMe.pubKey = localStorage.getItem("pubKey");
+                snedMe.data = json;
+                sendMe.updateFlag = 0;
 				$.ajax({
-					url: twinUrl + 'writeCoid_myGK',
+                    //****************TODO
+					url: twinUrl + 'setAsset',
 					type: 'POST',
 					data: json
 				})
@@ -729,3 +737,4 @@ class MyGatekeeper extends React.Component {
    }
 }
 export default MyGatekeeper;
+

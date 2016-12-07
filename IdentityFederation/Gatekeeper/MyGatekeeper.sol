@@ -36,12 +36,12 @@ contract MyGateKeeper
     }
     struct OwnershipTokenId {
         bytes32 ownershipTokenId;
-        bytes32[10] ownershipTokenAttributes;
+        string ownershipTokenAttributes;
         uint[10] ownershipTokenQuantity;
     }
     struct ControlTokenId {
         bytes32 controlTokenId;
-        bytes32[10] controlTokenAttributes;
+        string controlTokenAttributes;
         uint[10] controlTokenQuantity;
     }
     struct IdentityRecoveryIdList {
@@ -135,6 +135,12 @@ contract MyGateKeeper
        // chairperson = msg.sender;
     }
 
+
+    //debugging the uniqueIdList
+    function debugIt(uint i) returns (bytes32 val)
+    {
+	val = uniqueIdList[i];
+    }
 
 
 
@@ -243,7 +249,7 @@ contract MyGateKeeper
     }
 
     //AF: Update types and condition on msg.sender
-    function setmyOwnershipTokenID(string requesterVal, bytes32 proposalId, bytes32 ownershipTokenIdVal, bytes32[10] ownershipTokenAttributesVal, uint[10] ownershipTokenQuantityVal) returns (bool result)
+    function setmyOwnershipTokenID(string requesterVal, bytes32 proposalId, bytes32 ownershipTokenIdVal, string ownershipTokenAttributesVal, uint[10] ownershipTokenQuantityVal) returns (bool result)
     {
 
     if (msg.sender == chairperson) {
@@ -268,7 +274,7 @@ contract MyGateKeeper
     }
 
     //AF: change types and condition for msg.sender
-    function setmyControlTokenID(string requesterVal, bytes32 proposalId, bytes32 controlTokenIdVal, bytes32[10] controlTokenAttributesVal, uint[10] controlTokenQuantityVal) returns (bool result)
+    function setmyControlTokenID(string requesterVal, bytes32 proposalId, bytes32 controlTokenIdVal, string controlTokenAttributesVal, uint[10] controlTokenQuantityVal) returns (bool result)
     {
 
     if (msg.sender == chairperson) {
@@ -314,7 +320,7 @@ contract MyGateKeeper
 
    // This is going to be used by the gatekeeper contract to submit the COID proposal
    // true if the coidproposal has been initiated, flse, if the
-    function initiateCoidProposalSubmission(address ballotAddr, bytes32 proposalId, uint yesVotesRequiredToPass) returns (bool result)
+    function initiateCoidProposalSubmission(address ballotAddr, bytes32 proposalId, uint yesVotesRequiredToPass, bool isHuman, address myGKaddr) returns (bool result)
     {
 
         if (msg.sender == chairperson)  // the chairperson == gatekeeper
@@ -324,11 +330,12 @@ contract MyGateKeeper
 
             proposals[proposalId].yesVotesRequiredToPass = yesVotesRequiredToPass;
             proposals[proposalId].numberOfVoters = validatorsToVote.length;
+	    proposals[proposalId].isHuman = isHuman;
 
             Ballot B = Ballot(ballotAddr); // Instantiate the ballot contract, and allows it to talk to the ballot contract
 
             // Send the proposal to ballot contract with proposalId, numbers of voters for that proposal and yesVotesRequiredToPass
-            B.setMyProposalID(proposalId, validatorsToVote.length, yesVotesRequiredToPass); // trigger the event COIDRequest in ballot.sol
+            B.setMyProposalID(proposalId, validatorsToVote.length, yesVotesRequiredToPass, isHuman,myGKaddr); // trigger the event COIDRequest in ballot.sol
 
             proposals[proposalId].coidproposal_check = true;
 
@@ -409,7 +416,7 @@ contract MyGateKeeper
     }
 
     //AF: Updated type for requesterVal
-    function getmyOwnershipTokenID(bytes32 proposalId, string requesterVal) returns (bool result, bytes32 ownershipTokenIdRet, bytes32[10] ownershipTokenAttributesRet, uint[10] ownershipTokenQuantityRet)
+    function getmyOwnershipTokenID(bytes32 proposalId, string requesterVal) returns (bool result, bytes32 ownershipTokenIdRet, string ownershipTokenAttributesRet, uint[10] ownershipTokenQuantityRet)
 
     {
         if (sha3(requesterVal) == proposals[proposalId].requester || msg.sender == chairperson) {
@@ -425,7 +432,7 @@ contract MyGateKeeper
 
 
     //AF: Updated type for requesterVal
-    function getmyControlTokenID(bytes32 proposalId, string requesterVal) returns (bool result, bytes32 controlTokenIdRet, bytes32[10] controlTokenAttributesRet, uint[10] controlTokenQuantityRet)
+    function getmyControlTokenID(bytes32 proposalId, string requesterVal) returns (bool result, bytes32 controlTokenIdRet, string controlTokenAttributesRet, uint[10] controlTokenQuantityRet)
     {
 
         if (sha3(requesterVal) == proposals[proposalId].requester || msg.sender == chairperson) {
@@ -461,17 +468,23 @@ contract MyGateKeeper
     {
        isUniqueRet = true;
 
-       for (uint i = 0; i< uniqueIdList.length; i++ )
-       {
-           if (uniqueIdVal == uniqueIdList[i])
+	if(uniqueIdList.length > 0)
+	{
+       	for (uint i = 0; i< uniqueIdList.length; i++ )
+       	{
+         	  if (uniqueIdVal == uniqueIdList[i])
+		{
+        	   isUniqueRet = false;
+		}
 
-           isUniqueRet = false;
+       	}
+	}
 
-       }
-
+	if(isUniqueRet)
+	{
           // Store uniqueId into the array uniqueIdList[]
-       uniqueIdList.push(uniqueIdVal);// if the uniqueID is unique Id is unique, then add to the uniqueID list
-
+       	uniqueIdList.push(uniqueIdVal);// if the uniqueID is unique Id is unique, then add to the uniqueID list
+	}
        return isUniqueRet;
     }
 

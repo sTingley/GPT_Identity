@@ -55,7 +55,7 @@ var notifier = function () {
 
     //NOTE: THE DIGITAL TWIN will reject it without pubKey
     this.notifyCoidCreation = function (pubKey, txnID, txnHash, gkAddr, coidAddr) {
-        superAgent.post(this.twinUrl + "/coidCreation")
+        superAgent.post(this.twinUrl + "/coidGKCreation")
             .send({
                 "pubKey": pubKey,
                 "txnID": txnID,
@@ -71,13 +71,15 @@ var notifier = function () {
             });
     };
 
-    this.createProposalPendingNotification = function (requester, proposalId) {
+    this.createProposalPendingNotification = function (requester, proposalId, isHumanVal, gkAddr) {
 
         superAgent.post(this.twinUrl + "/ballot/writeNotify")
             .send({
                 "notificationType": "proposalPending",
                 "pubKey": requester,
                 "proposalID": proposalId,
+		"isHuman": isHumanVal,
+		"gatekeeperAddr": gkAddr,
                 "message": "Your proposal is pending for validation"
             })
             .set('Accept', 'application/json')
@@ -281,11 +283,11 @@ var gatekeeper = function (MyGKaddr) {
     this.checkUnique = function (formdata) {
         console.log("inside checkUnique, formdata: " + JSON.stringify(formdata))
         console.log("inside checkUnique, formdata.uniqueId is: " + formdata.uniqueId)
-        var myUniqueId = formdata.uniqueId;
+        var myUniqueId = formdata.uniqueId;//async error second time?
         console.log("myUniqueId: " + myUniqueId)
         var sync = true;
         var isUniqueResult = false;
-        _this.gateKeeperContract.isUnique(myUniqueId, function (error, result) {
+        _this.gateKeeperContract.isUnique(formdata.uniqueId, function (error, result) {
 
             if (error) {
                 console.log("error returned from isUnique function of gatekeeper contract");
@@ -334,6 +336,7 @@ var gatekeeper = function (MyGKaddr) {
         var validators = [];
         validators = formdata.validatorList.split(",");
         var yesVotesRequiredToPass = formdata.yesVotesRequiredToPass;
+	var isHuman = formdata.isHuman;
 
         try {
             this.setCoidRequester(requester, proposalId, sig, msg);
@@ -345,9 +348,9 @@ var gatekeeper = function (MyGKaddr) {
             this.setmyIdentityRecoveryIdList(requester, proposalId, myIdentityRecoveryIdList, myRecoveryCondition);
             this.setValidators(proposalId, validators, ballotContractAddr);
 
-            this.initiateCoidProposalSubmission(ballotContractAddr, proposalId, yesVotesRequiredToPass);
+            this.initiateCoidProposalSubmission(ballotContractAddr, proposalId, yesVotesRequiredToPass, isHuman, MyGKaddr);
 
-            theNotifier.createProposalPendingNotification(requester, proposalId);
+            theNotifier.createProposalPendingNotification(requester, proposalId,isHuman,MyGKaddr);
 
             callback(false, res);
         }
@@ -358,6 +361,16 @@ var gatekeeper = function (MyGKaddr) {
         return;
 
     };
+
+
+
+    this.debugging = function(val)
+    {
+	_this.gateKeeperContract.debugIt(val,function(error,result)
+	{
+		console.log("DEBUGIT: " + val);
+	})
+    }
 
 
     this.getProposalId = function (formdata, res, callback) {
@@ -652,9 +665,9 @@ var gatekeeper = function (MyGKaddr) {
     }; // end of function
 
     //after all the COID data has been set
-    this.initiateCoidProposalSubmission = function (ballotAddress, proposalId, yesVotesRequiredToPass) {
+    this.initiateCoidProposalSubmission = function (ballotAddress, proposalId, yesVotesRequiredToPass, isHuman, gkaddr) {
         var sync = true;
-        _this.gateKeeperContract.initiateCoidProposalSubmission(ballotAddress, proposalId, yesVotesRequiredToPass, function (err, res) {
+        _this.gateKeeperContract.initiateCoidProposalSubmission(ballotAddress, proposalId, yesVotesRequiredToPass,isHuman,gkaddr, function (err, res) {
 
             if (err) {
                 console.log("Error for initiateCoidProposalSubmission: " + err);
@@ -819,7 +832,7 @@ var eventListener = function (MyGKAddr) {
             eventBallotProposalExpired = result;
         },
         function (error, result) {
-            console.log("result.args (line 950): " + result.args)
+            console.log("result.args (line 950): " + JSON.stringify(result.args))
             var expiredProposalId = (result.args).expiredProposalId;
             var isExpired = (result.args).isExpired;
 
@@ -978,8 +991,8 @@ var eventListener = function (MyGKAddr) {
     //contract function will delete proposal for you
     function isExpired() {
         _this.ballotContract.IsProposalExpired(function (error, result) {
-            console.log(JSON.stringify(result) + "...is from isproposalexpired function in ballot")
-            setTimeout(function () {
+            console.log("is proposal expired has just been called")
+	    setTimeout(function () {
                 //recursively check every 9 seconds. in the future make this a day.
                 isExpired()
             }, 9000)
@@ -1018,7 +1031,7 @@ app.post("/MyGatekeeper", function (req, res) {
     console.log('request body...' + JSON.stringify(formdata))
 
     //for testing with hardcoded data
-    /*    var formdata =
+     /*   var formdata =
             {
                 "pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
                 "sig": "7051442bbf18bb2c86cbc8951a07e27ec6ba05ac3fa427e4c6b948e3dcf91a94046b048edf52445fb22cc776a94b87c3f55426f993458ec744f61f09fb46eeaa",
@@ -1044,6 +1057,9 @@ app.post("/MyGatekeeper", function (req, res) {
 
     console.log(formdata.MyGatekeeperAddr)
     var gatekeeperApp = new gatekeeper(formdata.MyGatekeeperAddr);
+
+    console.log("AT INDEX 0: " + gatekeeperApp.debugging(0))
+
     var isValid = gatekeeperApp.verifyIt(formdata);
     var isUnique = gatekeeperApp.checkUnique(formdata);
 

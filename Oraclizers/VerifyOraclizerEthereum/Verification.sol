@@ -1,8 +1,6 @@
 contract Verification
 {
 
-
-
     //this is analagous to "chairperson" in "Ballot"
     //this makes sure only the application can call functions,
     //which requesters should not be able to call:
@@ -24,23 +22,13 @@ contract Verification
     }
 
 
-
-
-
-
-
-
     //Mappings (could have put callbacks in requestStruct?)
     mapping (address => requestStruct) requests;
     mapping (address => string) callbacks;
 
 
-
-
     //This information is needed to implement first-in-first-out
     address[] indexer;
-
-
 
 
     //string msg, string sig, string pubKey
@@ -57,25 +45,18 @@ contract Verification
             throw;
         }
 
-
-
         //no previous request, add to the mapping of requests
         requests[sender1].txnInProgress = 1;
         requests[sender1].message = message;
         requests[sender1].sig = sig;
         requests[sender1].pubKey = pubKey;
 
-
         //create the callback!
         callbacks[sender1] = "Your transaction is in progress.";
 
-
         //push into the indexer
         indexer.push(sender1);
-
     }
-
-
 
 
     function removeMyRequest()
@@ -123,13 +104,11 @@ contract Verification
     }
 
 
-
     function myCallback() returns (string userCallback)
     {
 	//this.setSender();
         userCallback = callbacks[msg.sender];
     }
-
 
 
     //this function is intended for requesterApp.js
@@ -155,9 +134,6 @@ contract Verification
             }
         }
     }
-
-
-
 
 
     //this function is intended for requesterApp.js
@@ -190,9 +166,6 @@ contract Verification
     }
 
 
-
-
-
     //this function is intended for requesterApp.js
     //this passes the request by address
     function getRequestByAddress(address addr) returns (string message, string sig, string pubKey)
@@ -204,9 +177,7 @@ contract Verification
         }
     }
 
-
-
-
+	
     //allows the javascript application to set values
     function setCurrentInList(address addr, string response)
     {

@@ -103,8 +103,12 @@ var ballotApp = function () {
         console.log("notifyValidator evet reached")
         var proposal = result.args.proposalIdToVote;
         var validator = result.args.validator;
-        _this.createNotification({ "pubKey": validator, "proposalID": proposal, "message": "You have been selected to vote on the proposal." });
-        console.log("pass on err check");
+	var isHuman = result.args.isHuman;
+	console.log("isHuman val: " + isHuman);
+	var address = result.args.myGKaddr;
+	console.log("address is: " + address);
+        _this.createNotification({ "pubKey": validator, "proposalID": proposal, "message": "You have been selected to vote on the proposal.", "isHuman":isHuman,"gatekeeeperAddr":address });
+        console.log("pass on err check: ballot contract notify event");
     })
 } //end of ballotApp
 

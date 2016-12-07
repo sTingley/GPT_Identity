@@ -1,14 +1,10 @@
 contract ErisBigchainRequester
 {
-
-
-
     //this is analagous to "chairperson" in "Ballot"
     //this makes sure only the application can call functions,
     //which requesters should not be able to call:
     //this will be hardcoded in this contract
     address chairperson = 0xBB6724FE1A9A2A6D4F95B9969EAC59FDA94838AD;
-    
 
     event CallbackReady(address addr);
     event requestMade(address addr);	
@@ -20,34 +16,17 @@ contract ErisBigchainRequester
         uint txnInProgress;
         string theRequest;
     }
-
-
-
-
-
-
-
     
     //Mappings (could have put callbacks in requestStruct?)
     mapping (address => requestStruct) requests;
     mapping (address => string) callbacks;
-
-
-
     
     //This information is needed to implement first-in-first-out
     address[] indexer;
 
 
-
-
-
-
-
     function BigChainQuery(string requestInfo)    
     {
-
-
 
         //check there is no previous request with msg.sender
         if(requests[msg.sender].txnInProgress != 0)
@@ -55,35 +34,27 @@ contract ErisBigchainRequester
             throw;
         }
 
-
-
-
         //no previous request, add to the mapping of requests
         requests[msg.sender].txnInProgress = 1;
         requests[msg.sender].theRequest = requestInfo;
         
-        
         //create the callback!
         callbacks[msg.sender] = "Your transaction is in progress.";
 
-
         //push into the indexer
         indexer.push(msg.sender);
-
 
 	requestMade(msg.sender);        
         
     }
 
-
-
-
+	
     function removeMyRequest()
     {
 	
         //(1) FIND index of msg.sender (there can be only one):
         uint theIndex = 0;
-	bool check = false;
+		bool check = false;
 
         for (uint i = 0; i < indexer.length; i++)
         {
@@ -109,7 +80,7 @@ contract ErisBigchainRequester
         delete(indexer[indexer.length - 1]);	
 	}	
 
-
+	
 	address addr = msg.sender;
 	
 		
@@ -120,12 +91,10 @@ contract ErisBigchainRequester
     }
 
 
-
     function myCallback() returns (string userCallback)
     {
 	userCallback = callbacks[msg.sender];
     }	
-
 
 
     //this function is intended for requesterApp.js
@@ -150,9 +119,6 @@ contract ErisBigchainRequester
 	    }
         }
     }
-
-
-
 
 
     //this function is intended for requesterApp.js
@@ -184,9 +150,6 @@ contract ErisBigchainRequester
     }
 
 
-
-
-
     //this function is intended for requesterApp.js
     //this passes the request by address    
     function getRequestByAddress(address addr) returns (string request)
@@ -196,8 +159,6 @@ contract ErisBigchainRequester
             return requests[addr].theRequest;
         } 
     }
-
-
 
 
     //allows the javascript application to set values
@@ -212,4 +173,3 @@ contract ErisBigchainRequester
         }            
     }
 }
-

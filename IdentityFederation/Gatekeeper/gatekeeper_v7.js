@@ -88,13 +88,15 @@ var notifier = function () {
                 "notificationType": "proposalPending",
                 "pubKey": requester,
                 "proposalID": proposalId,
+		"isHuman": true,
+		"gatekeeperAddr":"",
                 "message": "Your proposal is pending for validation"
         	   })
             .set('Accept', 'application/json')
             .end((err, res) => {
-                //if(res.status == 200){
-                //    console.log("proposalPending message sent successfully");
-                // }
+                if(res.status == 200){
+                    console.log("proposalPending message sent successfully");
+                 }
             });
     };
 
@@ -262,10 +264,10 @@ var gatekeeper = function () {
             this.setmyOwnershipTokenID(requester, proposalId, myOwnershipTokenId, myOwnershipTokenAttributes, myOwnershipTokenQuantity);
             this.setmyControlTokenID(requester, proposalId, myControlTokenId, myControlTokenAttributes, myControlTokenQuantity);
             this.setmyIdentityRecoveryIdList(requester, proposalId, myIdentityRecoveryIdList, myRecoveryCondition);
-            this.selectValidators(proposalId, DaoContractAddr, ballotContractAddr);
+           // this.selectValidators(proposalId, DaoContractAddr, ballotContractAddr);
 
-            this.initiateCoidProposalSubmission(ballotContractAddr, proposalId, yesVotesRequiredToPass);
-            // this.selectValidators(proposalId, DaoContractAddr, ballotContractAddr);
+            this.initiateCoidProposalSubmission(ballotContractAddr, proposalId, yesVotesRequiredToPass, isHuman);
+            this.selectValidators(proposalId, DaoContractAddr, ballotContractAddr);
             theNotifier.createProposalPendingNotification(requester, proposalId);
 
             callback(false, res);
@@ -630,9 +632,9 @@ var gatekeeper = function () {
 
 
 
-    this.initiateCoidProposalSubmission = function (ballotAddress, proposalId, yesVotesRequiredToPass) {
+    this.initiateCoidProposalSubmission = function (ballotAddress, proposalId, yesVotesRequiredToPass,isHuman) {
         var sync = true;
-        _this.gateKeeperContract.initiateCoidProposalSubmission(ballotAddress, proposalId, yesVotesRequiredToPass, function (err, res) {
+        _this.gateKeeperContract.initiateCoidProposalSubmission(ballotAddress, proposalId, yesVotesRequiredToPass,isHuman, function (err, res) {
 
             if (err) {
                 console.log("Error for initiateCoidProposalSubmission: " + err);

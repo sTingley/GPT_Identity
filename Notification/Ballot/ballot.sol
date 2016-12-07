@@ -3,7 +3,7 @@
     // Notify selected validator to vote based on the proposalId
     //AF: If we have multiple proposals that might be completed at the same time we have to make the proposalID
     //in the event searchable through "indexed" ... so bytes32 indexed proposalIdToVote
-    event notifyValidator(bytes32 proposalIdToVote, bytes32 validator);
+    event notifyValidator(bytes32 proposalIdToVote, bytes32 validator, bool isHuman, address myGKaddr);
 
     // Notify selected validator or coid requester  that the proposal is expired
     //AF: Same as above, need indexed for expiredProposalID
@@ -53,6 +53,8 @@
         uint yesVotesRequiredToPass; //total # votes required to pass
       //  bytes32[3] selectedValidatorList; // validator list from gatekeeper contract
                                        //This list will be the hashes of the validators
+	bool isHuman;
+	address myGKaddr;
         Voter[3] selectedValidatorList;
 
 
@@ -70,12 +72,12 @@ address public ballot;
 //external permisisons contract
 function Ballot()
 {
+
     ballot = msg.sender;
 }
 
 // Called by gatekeeper contract to set proposal
-function setMyProposalID(bytes32 proposalId, uint numOfVoters, uint yesVotesRequiredToPass)
-
+function setMyProposalID(bytes32 proposalId, uint numOfVoters, uint yesVotesRequiredToPass, bool isHuman, address gkaddr)
 {
     if(isproposalIdValid(proposalId) == true)
     {
@@ -83,8 +85,9 @@ function setMyProposalID(bytes32 proposalId, uint numOfVoters, uint yesVotesRequ
     myProposal[proposalId].votersTrue = 0;
     myProposal[proposalId].votersFalse = 0;
     myProposal[proposalId].yesVotesRequiredToPass = yesVotesRequiredToPass;
-
-    myProposal[proposalId].time = now; //JJ set proposal time to current block timestamp (in milliseconds)
+    myProposal[proposalId].isHuman = isHuman;
+    myProposal[proposalId].myGKaddr = gkaddr;
+    myProposal[proposalId].time = now; //current block timestamp (milliseconds)
     }
 
     else
@@ -95,11 +98,13 @@ function setMyProposalID(bytes32 proposalId, uint numOfVoters, uint yesVotesRequ
 }
 
 
+
 // Check if validator present among selected validators
 // The input validator is validator's pubkey, the function will check the hash of the validator's pubkey against
 // the hashes of stored selected validators
 function isValidatorPresent(bytes32 proposalId, bytes32 validator) returns (bool result)
 {
+
     result = false;
 
     for(uint i=0; i < myProposal[proposalId].NumOfVoters; i++)
@@ -127,6 +132,7 @@ function giveRightToVote(bytes32 proposalId, bytes32 validator) returns (bool re
           }
       }
 
+
         myProposal[proposalId].selectedValidatorList[index].weight = 1;
 
 
@@ -144,6 +150,7 @@ function giveRightToVote(bytes32 proposalId, bytes32 validator) returns (bool re
     // Called by function giveRightToVote() and stored the selected validators as an array
     function addSelectedValidator(bytes32 proposalId, bytes32[3] validator) returns (bool isSet) {
 
+
     if(tx.origin== ballot) // internal function call, only can be called by the owner of ballot contract
       {
 
@@ -156,14 +163,18 @@ function giveRightToVote(bytes32 proposalId, bytes32 validator) returns (bool re
                 myProposal[proposalId].selectedValidatorList[i].voted = false;
 
                 giveRightToVote(proposalId,validator[i]);
-                notifyValidator(proposalId,validator[i]);
+                notifyValidator(proposalId,validator[i], myProposal[proposalId].isHuman, myProposal[proposalId].myGKaddr);
          }
          isSet = true;
+
       }
       else
         {
                 isSet = false;
         }
+
+
+
 
         return isSet;
     }
@@ -183,6 +194,7 @@ function giveRightToVote(bytes32 proposalId, bytes32 validator) returns (bool re
       else
         {
           isValidatorListDeleted = false;
+
         }
 
          return isValidatorListDeleted;
@@ -194,6 +206,8 @@ function giveRightToVote(bytes32 proposalId, bytes32 validator) returns (bool re
         // assigns reference
         bytes32 from = sha3(from1);
         bytes32 to = sha3(to1);
+
+
 
         if (isValidatorPresent(proposalId, from) != true)
            result = false;
@@ -261,6 +275,7 @@ function giveRightToVote(bytes32 proposalId, bytes32 validator) returns (bool re
     }
 
 
+
     //by putting index, since you know the number of validators, you save look ups in getting validator pub key if that was a parameter
     function getValidatorSignature_byIndex(bytes32 proposalId, uint index) returns (string msg1, string sig1, string pubkey1)
     {
@@ -296,6 +311,7 @@ function giveRightToVote(bytes32 proposalId, bytes32 validator) returns (bool re
            pubkey1 = myProposal[proposalId].selectedValidatorList[index].pubKey;
        }
     }
+
 
 
 
@@ -390,7 +406,7 @@ function giveRightToVote(bytes32 proposalId, bytes32 validator) returns (bool re
 
 	if(proposalIdList.length > 0)
 	{
-        for (uint i = 0; i <= proposalIdList.length; i++)
+        for (uint i = 0; i < proposalIdList.length; i++)
         {
 
             //weeks is the avaible unit can be used to convert between units of time
@@ -416,15 +432,20 @@ function giveRightToVote(bytes32 proposalId, bytes32 validator) returns (bool re
 
     function removeFromArray(uint i)
     {
-        for(uint j = 0; j < proposalIdList.length-1; j++)
-        {
-                if(j >= i)
-                {
-                        proposalIdList[j] = proposalIdList[j+1];
-                }
-        }
+	if(proposalIdList.length > 1)
+	{
+        	for(uint j = 0; j < proposalIdList.length-1; j++)
+        	{
+                	if(j >= i)
+                	{
+                	        proposalIdList[j] = proposalIdList[j+1];
+               	 	}
+        	}
+	}
         proposalIdList.length--;
     }
+
+
 
 
 
@@ -450,6 +471,8 @@ function giveRightToVote(bytes32 proposalId, bytes32 validator) returns (bool re
         throw;
         }
     }
+
+
 
 
 
@@ -480,7 +503,6 @@ function giveRightToVote(bytes32 proposalId, bytes32 validator) returns (bool re
 
     }
 
-
     //added this function for ToVote.jsx (needs to know which gk contract to pull coid data from)
     function getIsHuman(bytes32 proposalId) returns (bool)
     {
@@ -488,10 +510,10 @@ function giveRightToVote(bytes32 proposalId, bytes32 validator) returns (bool re
 
        if (isproposalIdValid(proposalId) == true)
        {
-        res = myProposal[proposalId].isHuman;
+       	res = myProposal[proposalId].isHuman;
        }
        return res;
-
+       
     }
 
 
@@ -505,13 +527,19 @@ function giveRightToVote(bytes32 proposalId, bytes32 validator) returns (bool re
 
        for (i=0; i < proposalIdList.length; i++ )
        {
+
+
          if (proposalId == proposalIdList[i])
          isproposalIdValid = true;
+
+
        }
 
        return isproposalIdValid;
 
     }
+
+
 
 
     // Generate a random number between a range,

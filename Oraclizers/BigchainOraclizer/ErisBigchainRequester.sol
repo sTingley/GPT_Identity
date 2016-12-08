@@ -4,7 +4,7 @@ contract ErisBigchainRequester
     //this makes sure only the application can call functions,
     //which requesters should not be able to call:
     //this will be hardcoded in this contract
-    address chairperson = 0xBB6724FE1A9A2A6D4F95B9969EAC59FDA94838AD;
+    address chairperson = 0xE6A299E460649D658504E1D887AE738321EDBD5B;
 
     event CallbackReady(address addr);
     event requestMade(address addr);	

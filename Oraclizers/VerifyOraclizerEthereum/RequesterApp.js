@@ -20,7 +20,7 @@ var ed25519 = require('ed25519')//for oraclizer signature generation
 //API for chain
 chainUrl = 'http://localhost:1337/rpc'
 //instantiate contract object manager (uses chain URL and account data)
-manager = contracts.newContractManagerDev(chainUrl, accounts.newchain4_full_000)
+manager = contracts.newContractManagerDev(chainUrl, accounts.coidchain_full_000)
 //Make the contract object using ABI and address of deployed contract
 contract = manager.newContractFactory(abi).at(address)
 

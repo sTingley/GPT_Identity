@@ -316,8 +316,8 @@ class MyGatekeeper extends React.Component {
         //TODO********** add fileName.json********put in localstorage!
 		$.ajax({
 			type: "POST",
-			url: twinUrl + 'getAsset'
-			data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": },
+			url: twinUrl + 'getAsset',
+			data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": "test.json" },
 			success: function (result) {
 				var data = result;
 				if ($.type(result) != "object") {
@@ -594,7 +594,7 @@ class MyGatekeeper extends React.Component {
 		$.ajax({
 			url: twinUrl + 'request_new_COID',
 			type: 'POST',
-			data: json
+			data: json,
 			success: function(res){
                 var sendMe = {};
                 sendMe.flag = 0; //owned asset

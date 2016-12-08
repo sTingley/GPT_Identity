@@ -320,6 +320,7 @@ class ToVote extends React.Component {
 				} else 
 					var data = result;
 				this.setState({coid: data.data.messages});
+				console.log("ToVote state: " + JSON.stringify(this.state))
 			}.bind(this)
 		});
 	}

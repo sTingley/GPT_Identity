@@ -302,7 +302,7 @@ class MyGatekeeper extends React.Component {
 			tmpFile:'',
 			pubKey: localStorage.getItem("pubKey"),
 			privKey: localStorage.getItem("privKey"),
-			//MyGatekeeperAddr: localStorage.getItem("MyGatekeeperAddr"),
+			//gatekeeperAddr: localStorage.getItem("gatekeeperAddr"),
 			validators:[],
 			signature:''
 		};
@@ -316,14 +316,16 @@ class MyGatekeeper extends React.Component {
         //TODO********** add fileName.json********put in localstorage!
 		$.ajax({
 			type: "POST",
-			url: twinUrl + 'getAsset',
-			data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": "test.json" },
+			url: twinUrl + 'pullCoidData',
+			data: { "pubKey": localStorage.getItem("pubKey") },
+			//url: twinUrl + 'getAsset',
+			//data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": "test.json" },
 			success: function (result) {
 				var data = result;
 				if ($.type(result) != "object") {
 					data = JSON.parseJSON(result)
 				}
-				localStorage.setItem("MyGatekeeperAddr", result.gatekeeperAddr) 
+				localStorage.setItem("gatekeeperAddr", result.gatekeeperAddr) 
 
 			}.bind(this),
 			complete: function () {
@@ -570,7 +572,7 @@ class MyGatekeeper extends React.Component {
 	
 	submitCoid(e){
 		e.preventDefault();
-		var json = this.prepareJsonToSubmi();
+		var json = this.prepareJsonToSubmit();
 		var privKey1 = new Buffer(this.state.privKey,"hex");
 		var msg_hash = keccak_256(JSON.stringify(json));
 		var msg_hash_buffer = new Buffer(msg_hash,"hex");
@@ -587,7 +589,7 @@ class MyGatekeeper extends React.Component {
 		
 		json.sig = signature1;
 		json.msg = msg_hash_buffer.toString("hex");
-		json.MyGatekeeperAddr =	localStorage.getItem("MyGatekeeperAddr")
+		json.gatekeeperAddr = localStorage.getItem("gatekeeperAddr")
 		//this.setState({signature: signature1})
 		
 		console.log(json)
@@ -596,15 +598,16 @@ class MyGatekeeper extends React.Component {
 			type: 'POST',
 			data: json,
 			success: function(res){
-                var sendMe = {};
-                sendMe.flag = 0; //owned asset
-                sendMe.fileName = ""; //TODO!!!!!!!!
-                sendMe.pubKey = localStorage.getItem("pubKey");
-                snedMe.data = json;
-                sendMe.updateFlag = 0;
+                // var sendMe = {};
+                // sendMe.flag = 0; //owned asset
+                // sendMe.fileName = ""; //TODO!!!!!!!!
+                // sendMe.pubKey = localStorage.getItem("pubKey");
+                // snedMe.data = json;
+                // sendMe.updateFlag = 0;
 				$.ajax({
                     //****************TODO
-					url: twinUrl + 'setAsset',
+					//url: twinUrl + 'setAsset','
+					url: twinUrl + 'writeCoid_myGK',
 					type: 'POST',
 					data: json
 				})

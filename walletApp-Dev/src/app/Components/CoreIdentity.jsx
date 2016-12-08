@@ -492,17 +492,20 @@ class CoreIdentity extends React.Component {
 			type: 'POST',
 			data: json,
 			success: function(res){
+				//uncomment when done with vote screen
+				/*
                 var sendMe = {};
                 sendMe.flag = 0; //owned core identity
                 sendMe.fileName = "MyCOID.json" //*********TODO: PUT IN LOCAL STORAGE
                 sendMe.updateFlag = 0; //new identity
                 sendMe.data = json;
                 sendMe.pubKey = localStorage.getItem("pubKey");
-                
+                */
 				$.ajax({
-					url: twinUrl + 'setAsset',
+					//url: twinUrl + 'setAsset',
+					url: twinUrl + 'writeCoid',
 					type: 'POST',
-					data: sendMe
+					data: json//sendMe
 				})
 			},
 			complete: function(){

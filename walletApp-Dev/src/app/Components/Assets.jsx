@@ -288,60 +288,60 @@ class Assets extends Component {
 
 	componentDidMount() {
         
-        //get all assets, OWNED, CONTROLLED, DELEGATAED:        
-        $.ajax({
-			type: "POST",
-			url: twinUrl + 'getOwnedAssets',
-			data: { "pubKey": localStorage.getItem("pubKey") },
-			success: function (result) {
-				var data = result;
-				if ($.type(result) != "object") {
-					data = JSON.parseJSON(result)
-				}
-				//this.setState({ own_assets: [{ asset_id: result.assetID, asset_name: result }] });
+        // //get all assets, OWNED, CONTROLLED, DELEGATAED:        
+        // $.ajax({
+		// 	type: "POST",
+		// 	url: twinUrl + 'getOwnedAssets',
+		// 	data: { "pubKey": localStorage.getItem("pubKey") },
+		// 	success: function (result) {
+		// 		var data = result;
+		// 		if ($.type(result) != "object") {
+		// 			data = JSON.parseJSON(result)
+		// 		}
+		// 		//this.setState({ own_assets: [{ asset_id: result.assetID, asset_name: result }] });
 
-			}.bind(this),
-			complete: function () {
-				// do something
-			},
-			//console.log(result)	
-		})
+		// 	}.bind(this),
+		// 	complete: function () {
+		// 		// do something
+		// 	},
+		// 	//console.log(result)	
+		// })
         
-        $.ajax({
-			type: "POST",
-			url: twinUrl + 'getControlledAssets',
-			data: { "pubKey": localStorage.getItem("pubKey") },
-			success: function (result) {
-				var data = result;
-				if ($.type(result) != "object") {
-					data = JSON.parseJSON(result)
-				}
-				//this.setState({ own_assets: [{ asset_id: result.assetID, asset_name: result }] });
+        // $.ajax({
+		// 	type: "POST",
+		// 	url: twinUrl + 'getControlledAssets',
+		// 	data: { "pubKey": localStorage.getItem("pubKey") },
+		// 	success: function (result) {
+		// 		var data = result;
+		// 		if ($.type(result) != "object") {
+		// 			data = JSON.parseJSON(result)
+		// 		}
+		// 		//this.setState({ own_assets: [{ asset_id: result.assetID, asset_name: result }] });
 
-			}.bind(this),
-			complete: function () {
-				// do something
-			},
-			//console.log(result)	
-		})
+		// 	}.bind(this),
+		// 	complete: function () {
+		// 		// do something
+		// 	},
+		// 	//console.log(result)	
+		// })
         
-        $.ajax({
-			type: "POST",
-			url: twinUrl + 'getDelegatedAssets',
-			data: { "pubKey": localStorage.getItem("pubKey") },
-			success: function (result) {
-				var data = result;
-				if ($.type(result) != "object") {
-					data = JSON.parseJSON(result)
-				}
-				//this.setState({ own_assets: [{ asset_id: result.assetID, asset_name: result }] });
+        // $.ajax({
+		// 	type: "POST",
+		// 	url: twinUrl + 'getDelegatedAssets',
+		// 	data: { "pubKey": localStorage.getItem("pubKey") },
+		// 	success: function (result) {
+		// 		var data = result;
+		// 		if ($.type(result) != "object") {
+		// 			data = JSON.parseJSON(result)
+		// 		}
+		// 		//this.setState({ own_assets: [{ asset_id: result.assetID, asset_name: result }] });
 
-			}.bind(this),
-			complete: function () {
-				// do something
-			},
-			//console.log(result)	
-		})
+		// 	}.bind(this),
+		// 	complete: function () {
+		// 		// do something
+		// 	},
+		// 	//console.log(result)	
+		// })
         
         
         

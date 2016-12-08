@@ -120,7 +120,7 @@ var gatekeeper = function () {
     console.log("A gatekeeper object has just been instantiated")
 
 
-    this.chain = 'newchain4_full_000';
+    this.chain = 'coidchain_full_000';
     this.erisdburl = "http://10.100.98.218:1337/rpc";
     this.contractData = require("./epm.json");
     this.contractAddress = this.contractData['GateKeeper'];
@@ -663,7 +663,7 @@ var gatekeeper = function () {
 var eventListener = function () {
 
 
-    this.chain = 'newchain4_full_000';
+    this.chain = 'coidchain_full_000';
     this.erisdburl = "http://10.100.98.218:1337/rpc";
     this.contractData = require("./epm.json");
     this.contractAddress = this.contractData['GateKeeper'];
@@ -707,8 +707,8 @@ var eventListener = function () {
         //make message hash
         var hash = crypto.createHash('sha256').update(nonHashedMessage).digest('hex')
 
-        var pubKey = _this.accountData.newchain4_full_000.pubKey;
-        var privKey = _this.accountData.newchain4_full_000.privKey;
+        var pubKey = _this.accountData.coidchain_full_000.pubKey;
+        var privKey = _this.accountData.coidchain_full_000.privKey;
 
         var keyPair = { "publicKey": new Buffer(pubKey, "hex"), "privateKey": new Buffer(privKey, "hex") }
 

@@ -104,7 +104,7 @@ function CoidMaker(coidAddr, formdata) {
     var abi_COID = JSON.parse(fs.readFileSync('./abi/' + abiAddr, 'utf8'))
     var accounts = require('./accounts.json')
     var chainUrl = 'http://localhost:1337/rpc'
-    var manager = erisContracts.newContractManagerDev(chainUrl, accounts.newchain4_full_000)
+    var manager = erisContracts.newContractManagerDev(chainUrl, accounts.coidchain_full_000)
     var contract = manager.newContractFactory(abi_COID).at(coidAddr)
 
     contract.getIt(function (error, result) {
@@ -215,7 +215,7 @@ var gatekeeper = function (MyGKaddr) {
     //Debugging Comment:
     console.log("A gatekeeper object has just been instantiated")
 
-    this.chain = 'newchain4_full_000';
+    this.chain = 'coidchain_full_000';
     this.erisdburl = "http://10.100.98.218:1337/rpc";
     this.contractData = require("./epm.json");
     this.contractAbiAddress = this.contractData['MyGateKeeper'];
@@ -691,7 +691,7 @@ var gatekeeper = function (MyGKaddr) {
 //This way, new instances are not done per each instance
 var eventListener = function (MyGKAddr) {
 
-    this.chain = 'newchain4_full_000';
+    this.chain = 'coidchain_full_000';
     this.erisdburl = "http://10.100.98.218:1337/rpc";
     this.contractData = require("./epm.json");
     this.contractAddress = this.contractData['MyGateKeeper'];
@@ -724,8 +724,8 @@ var eventListener = function (MyGKAddr) {
         //make message hash
         var hash = crypto.createHash('sha256').update(nonHashedMessage).digest('hex')
 
-        var pubKey = _this.accountData.newchain4_full_000.pubKey;
-        var privKey = _this.accountData.newchain4_full_000.privKey;
+        var pubKey = _this.accountData.coidchain_full_000.pubKey;
+        var privKey = _this.accountData.coidchain_full_000.privKey;
         var keyPair = { "publicKey": new Buffer(pubKey, "hex"), "privateKey": new Buffer(privKey, "hex") }
 
         var signature = ed25519.Sign(new Buffer(hash), keyPair)

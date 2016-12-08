@@ -12,7 +12,7 @@ var fs = require('fs')
 var bodyParser = require('body-parser')
 
 // eris:chain id with full privilages
-var chain = 'newchain4_full_000';
+var chain = 'coidchain_full_000';
 // Change eris:db url
 var erisdburl = "http://10.100.98.218:1337/rpc";
 
@@ -27,7 +27,7 @@ var gateKeeper = contractMgr.newContractFactory(erisAbi).at(contractAddress);
 var ballotApp = function () {
 
     // eris:chain id with full privilages
-    this.chain = 'newchain4_full_000';
+    this.chain = 'coidchain_full_000';
     // Change eris:db url
     this.erisdburl = "http://10.100.98.218:1337/rpc";
 

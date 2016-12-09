@@ -22,7 +22,7 @@ var bigchainServer = 'http://10.100.98.217:5000/'
 //API for chain
 chainUrl = 'http://localhost:1337/rpc'
 //instantiate contract object manager (uses chain URL and account data)
-manager = contracts.newContractManagerDev(chainUrl, accounts.newchain4_full_000)
+manager = contracts.newContractManagerDev(chainUrl, accounts.coidchain_full_000)
 //Make the contract object using ABI and address of deployed contract
 contract = manager.newContractFactory(abi).at(address)
 
@@ -32,8 +32,8 @@ function createSignature(nonHashedMessage, callback) {
     //make message hash
     var hash = crypto.createHash('sha256').update(nonHashedMessage).digest('hex')
 
-    var pubKey = accounts.newchain4_full_000.pubKey;
-    var privKey = accounts.newchain4_full_000.privKey;
+    var pubKey = accounts.coidchain_full_000.pubKey;
+    var privKey = accounts.coidchain_full_000.privKey;
 
     var keyPair = { "publicKey": new Buffer(pubKey, "hex"), "privateKey": new Buffer(privKey, "hex") }
 

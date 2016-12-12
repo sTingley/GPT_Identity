@@ -121,6 +121,8 @@ class ModalWin extends React.Component {
 			data: {
 				"publicKey": localStorage.getItem("pubKey"),
 				"proposalId": this.state.proposal.proposal_id,
+				"gatekeeperAddr": this.state.proposal.gatekeeperAddr,
+				"isHuman": this.state.proposal.isHuman
 			},//.bind(this)d
 			success: function(result){
 				var fileValidation = true;
@@ -148,7 +150,6 @@ class ModalWin extends React.Component {
 			}
 		});
     }
-	
 	
 	
 	render(){

@@ -128,7 +128,7 @@ contract MyGateKeeper
 
     mapping(bytes32 => bool) calledBefore;
 
-    address chairperson = 0xBB6724FE1A9A2A6D4F95B9969EAC59FDA94838AD;
+    address chairperson = 0xE6A299E460649D658504E1D887AE738321EDBD5B;
         //This sets the Eris account that deployed the gatekeeper contract as the chairperson of a proposal
     function MyGateKeeper()
     {

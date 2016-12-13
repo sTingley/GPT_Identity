@@ -1,34 +1,34 @@
 {
-	"env": {
-		"allowed_orgins": "*",
-		"ipfs_file_tmp_path": "/home/demoadmin/DigitalTwin/tmp/",
-		"notification_folder_path": "/home/demoadmin/DigitalTwin/notifications/",
-		"ipfs_file_read_url": "http://192.168.99.101:8080/ipfs/",
-		"gatekeeper_url": "http://localhost:3000/",
-		"my_gatekeeper_url": "http://localhost:3002/",
-		"ballot_url": "http://localhost:8082/",
-		"mycoid_url": "http://localhost:3012/",
-		"ports": [5050,5051,5052]
-	},
-	"suffix": {
-		"ipfs_file": "_files",
-		"coid_file": "_coid",
-		"notifications_file": "_notify"
-	},
-	"endpoints": {
-		"requestCOID": {
-			"message": "d4bc7d13ed5a9354868fd19b94b63962bad8accafbb8f3e84578ae81b506cfcc",
-			"path": "/gatekeeper"
-		},
-		"request_new_COID": {
-			"path": "/MyGatekeeper"
-		},
-		"voteonCOIDproposal": {
-			"message": "b81db4be41ebb01a662d4ae5445332177fd31506505e22f8bba48558e3c433e4",
-			"path": "/vote"
-		},
-		"MyCOID":{
-			"MyTokenAmount": "/myTokenAmount"
-		}
-	}
+        "env": {
+                "allowed_orgins": "*",
+                "ipfs_file_tmp_path": "/home/demoadmin/DigitalTwin/tmp/",
+                "notification_folder_path": "/home/demoadmin/DigitalTwin/notifications/",
+                "ipfs_file_read_url": "http://192.168.99.101:8080/ipfs/",
+                "gatekeeper_url": "http://10.100.99.207:3000/",
+                "my_gatekeeper_url": "http://10.100.99.207:3002/",
+                "ballot_url": "http://10.100.99.207:8082/",
+                "mycoid_url": "http://10.100.99.207:3012/",
+                "ports": [5050,5051,5052]
+        },
+        "suffix": {
+                "ipfs_file": "_files",
+                "coid_file": "_coid",
+                "notifications_file": "_notify"
+        },
+        "endpoints": {
+                "requestCOID": {
+                        "message": "d4bc7d13ed5a9354868fd19b94b63962bad8accafbb8f3e84578ae81b506cfcc",
+                        "path": "/gatekeeper"
+                },
+                "request_new_COID": {
+                        "path": "/MyGatekeeper"
+                },
+                "voteonCOIDproposal": {
+                        "message": "b81db4be41ebb01a662d4ae5445332177fd31506505e22f8bba48558e3c433e4",
+                        "path": "/vote"
+                },
+                "MyCOID":{
+                        "MyTokenAmount": "/myTokenAmount"
+                }
+        }
 }

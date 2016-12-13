@@ -1,23 +1,23 @@
 {
     "ports": [5050,5051,5052],
-    "GK_CONFIG": 
+    "GK_CONFIG":
     {
-        "TARGET": "http://localhost:3000/",
+        "TARGET": "http://10.100.99.207:3000/",
         "ENDPOINT":"/gatekeeper"
     },
     "BALLOT_CONFIG":
     {
-        "TARGET": "http://localhost:8082/",
+        "TARGET": "http://10.100.99.207:8082/",
         "ENDPOINT": "/vote"
     },
     "MY_GK_CONFIG":
     {
-        "TARGET": "http://localhost:3002/",
+        "TARGET": "http://10.100.99.207:3002/",
         "ENDPOINT": "/MyGatekeeper"
     },
     "MY_COID_CONFIG":
     {
-        "TARGET": "http://localhost:3012/",
+        "TARGET": "http://10.100.99.207:3012/",
         "ENDPOINT": {"TokenAmount":"/myTokenAmount"}
     }
 }

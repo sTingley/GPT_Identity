@@ -1,4 +1,7 @@
 'use strict'
+
+var chainConfig = require('/home/demoadmin/.eris/ErisChainConfig.json');
+
 var erisContracts = require('eris-contracts')
 var fs = require('fs')
 var http = require('http')
@@ -72,14 +75,15 @@ var notifier = function () {
     };
 
     this.createProposalPendingNotification = function (requester, proposalId, isHumanVal, gkAddr) {
+        console.log("proposal pending event caught.. mygk addr:  " + gkAddr)
 
         superAgent.post(this.twinUrl + "/ballot/writeNotify")
             .send({
                 "notificationType": "proposalPending",
                 "pubKey": requester,
                 "proposalID": proposalId,
-		"isHuman": isHumanVal,
-		"gatekeeperAddr": gkAddr,
+                "isHuman": isHumanVal,
+                "gatekeeperAddr": gkAddr,
                 "message": "Your proposal is pending for validation"
             })
             .set('Accept', 'application/json')
@@ -100,17 +104,17 @@ function CoidMaker(coidAddr, formdata) {
     //get params for their COID contract
     console.log("Inside CoidMaker function")
     var contrData = require("./epm.json");
-    var abiAddr = "D7EB5C125F29367C5E906D9EE735691B972F286C";
+    var abiAddr = contrData['CoreIdentity'];
     var abi_COID = JSON.parse(fs.readFileSync('./abi/' + abiAddr, 'utf8'))
     var accounts = require('./accounts.json')
-    var chainUrl = 'http://localhost:1337/rpc'
-    var manager = erisContracts.newContractManagerDev(chainUrl, accounts.coidchain_full_000)
+    var chainUrl = chainConfig.chainURL;
+    var manager = erisContracts.newContractManagerDev(chainUrl, chainConfig.primaryAccount)
     var contract = manager.newContractFactory(abi_COID).at(coidAddr)
 
     contract.getIt(function (error, result) {
         console.log(result + " is the result")
     })
-    
+
     //parse the form data
     var sig = formdata.sig;
     var msg = formdata.msg;
@@ -215,13 +219,13 @@ var gatekeeper = function (MyGKaddr) {
     //Debugging Comment:
     console.log("A gatekeeper object has just been instantiated")
 
-    this.chain = 'coidchain_full_000';
-    this.erisdburl = "http://10.100.98.218:1337/rpc";
+    this.chain = 'primaryAccount';
+    this.erisdburl = chainConfig.chainURL;
     this.contractData = require("./epm.json");
     this.contractAbiAddress = this.contractData['MyGateKeeper'];
     this.erisAbi = JSON.parse(fs.readFileSync("./abi/" + this.contractAbiAddress));
     this.accountData = require("./accounts.json");
-    this.contractMgr = erisContracts.newContractManagerDev(this.erisdburl, this.accountData[this.chain]);
+    this.contractMgr = erisContracts.newContractManagerDev(this.erisdburl, chainConfig[this.chain]);
     this.gateKeeperContract = this.contractMgr.newContractFactory(this.erisAbi).at(MyGKaddr);
 
     //ballot contract
@@ -231,14 +235,14 @@ var gatekeeper = function (MyGKaddr) {
     this.ballotContract = this.contractMgr.newContractFactory(this.ballotAbi).at(this.ballotAddress);
 
     //verification contract (oraclizer)
-    this.VerificationAddress = require('/home/demoadmin/Migration_from_Eris/VerifyOraclizerEthereum/wallet2/epm.json').deployStorageK;
-    this.VerificationAbi = JSON.parse(fs.readFileSync('/home/demoadmin/Migration_from_Eris/VerifyOraclizerEthereum/wallet2/abi/' + this.VerificationAddress, 'utf8'))
+    this.VerificationAddress = require('/home/demoadmin/.eris/apps/VerifyOraclizerEthereum/wallet2/epm.json').deployStorageK;
+    this.VerificationAbi = JSON.parse(fs.readFileSync('/home/demoadmin/.eris/apps/VerifyOraclizerEthereum/wallet2/abi/' + this.VerificationAddress, 'utf8'))
     this.VerificationContract = this.contractMgr.newContractFactory(this.VerificationAbi).at(this.VerificationAddress)
-    this.ErisAddress = this.accountData[this.chain].address;
+    this.ErisAddress = chainConfig[this.chain].address;
 
     //bigchain contract (oraclizer)
-    this.bigchain_query_addr = require('/home/demoadmin/Migration_from_Eris/BigchainOraclizer/epm.json').deployStorageK
-    this.bigchain_abi = JSON.parse(fs.readFileSync('/home/demoadmin/Migration_from_Eris/BigchainOraclizer/abi/' + this.bigchain_query_addr, 'utf8'))
+    this.bigchain_query_addr = require('/home/demoadmin/.eris/apps/BigchainOraclizer/epm.json').deployStorageK
+    this.bigchain_abi = JSON.parse(fs.readFileSync('/home/demoadmin/.eris/apps/BigchainOraclizer/abi/' + this.bigchain_query_addr, 'utf8'))
     this.bigchain_contract = this.contractMgr.newContractFactory(this.bigchain_abi).at(this.bigchain_query_addr)
 
     //use this to have the gatekeeper scope inside functions
@@ -336,7 +340,8 @@ var gatekeeper = function (MyGKaddr) {
         var validators = [];
         validators = formdata.validatorList.split(",");
         var yesVotesRequiredToPass = formdata.yesVotesRequiredToPass;
-	var isHuman = formdata.isHuman;
+        var isHuman = formdata.isHuman;
+        var gatekeeperAddr = formdata.gatekeeperAddr;
 
         try {
             this.setCoidRequester(requester, proposalId, sig, msg);
@@ -350,7 +355,7 @@ var gatekeeper = function (MyGKaddr) {
 
             this.initiateCoidProposalSubmission(ballotContractAddr, proposalId, yesVotesRequiredToPass, isHuman, MyGKaddr);
 
-            theNotifier.createProposalPendingNotification(requester, proposalId,isHuman,MyGKaddr);
+            theNotifier.createProposalPendingNotification(requester, proposalId, isHuman, gatekeeperAddr);
 
             callback(false, res);
         }
@@ -363,13 +368,10 @@ var gatekeeper = function (MyGKaddr) {
     };
 
 
-
-    this.debugging = function(val)
-    {
-	_this.gateKeeperContract.debugIt(val,function(error,result)
-	{
-		console.log("DEBUGIT: " + val);
-	})
+    this.debugging = function (val) {
+        _this.gateKeeperContract.debugIt(val, function (error, result) {
+            console.log("DEBUGIT: " + val);
+        })
     }
 
 
@@ -458,7 +460,7 @@ var gatekeeper = function (MyGKaddr) {
                     }
                 }
             }); //end of setmyUniqueID
-            
+
         } //end of for loop
 
         //while (sync) { require('deasync').sleep(100); }
@@ -667,7 +669,7 @@ var gatekeeper = function (MyGKaddr) {
     //after all the COID data has been set
     this.initiateCoidProposalSubmission = function (ballotAddress, proposalId, yesVotesRequiredToPass, isHuman, gkaddr) {
         var sync = true;
-        _this.gateKeeperContract.initiateCoidProposalSubmission(ballotAddress, proposalId, yesVotesRequiredToPass,isHuman,gkaddr, function (err, res) {
+        _this.gateKeeperContract.initiateCoidProposalSubmission(ballotAddress, proposalId, yesVotesRequiredToPass, isHuman, gkaddr, function (err, res) {
 
             if (err) {
                 console.log("Error for initiateCoidProposalSubmission: " + err);
@@ -691,13 +693,13 @@ var gatekeeper = function (MyGKaddr) {
 //This way, new instances are not done per each instance
 var eventListener = function (MyGKAddr) {
 
-    this.chain = 'coidchain_full_000';
-    this.erisdburl = "http://10.100.98.218:1337/rpc";
+    this.chain = 'primaryAccount';
+    this.erisdburl = chainConfig.chainURL;
     this.contractData = require("./epm.json");
     this.contractAddress = this.contractData['MyGateKeeper'];
     this.erisAbi = JSON.parse(fs.readFileSync("./abi/" + this.contractAddress));
     this.accountData = require("./accounts.json");
-    this.contractMgr = erisContracts.newContractManagerDev(this.erisdburl, this.accountData[this.chain]);
+    this.contractMgr = erisContracts.newContractManagerDev(this.erisdburl, chainConfig[this.chain]);
     this.gateKeeperContract = this.contractMgr.newContractFactory(this.erisAbi).at(this.contractAddress);
 
     //ballot contract
@@ -706,14 +708,14 @@ var eventListener = function (MyGKAddr) {
     this.ballotContract = this.contractMgr.newContractFactory(this.ballotAbi).at(this.ballotAddress);
 
     //verification contract (oraclizer)
-    this.VerificationAddress = require('/home/demoadmin/Migration_from_Eris/VerifyOraclizerEthereum/wallet2/epm.json').deployStorageK;
-    this.VerificationAbi = JSON.parse(fs.readFileSync('/home/demoadmin/Migration_from_Eris/VerifyOraclizerEthereum/wallet2/abi/' + this.VerificationAddress, 'utf8'))
+    this.VerificationAddress = require('/home/demoadmin/.eris/apps/VerifyOraclizerEthereum/wallet2/epm.json').deployStorageK;
+    this.VerificationAbi = JSON.parse(fs.readFileSync('/home/demoadmin/.eris/apps/VerifyOraclizerEthereum/wallet2/abi/' + this.VerificationAddress, 'utf8'))
     this.VerificationContract = this.contractMgr.newContractFactory(this.VerificationAbi).at(this.VerificationAddress)
-    this.ErisAddress = this.accountData[this.chain].address;
+    this.ErisAddress = chainConfig[this.chain].address;
 
     //bigchain contract (oraclizer)
-    this.bigchain_query_addr = require('/home/demoadmin/Migration_from_Eris/BigchainOraclizer/epm.json').deployStorageK
-    this.bigchain_abi = JSON.parse(fs.readFileSync('/home/demoadmin/Migration_from_Eris/BigchainOraclizer/abi/' + this.bigchain_query_addr, 'utf8'))
+    this.bigchain_query_addr = require('/home/demoadmin/.eris/apps/BigchainOraclizer/epm.json').deployStorageK
+    this.bigchain_abi = JSON.parse(fs.readFileSync('/home/demoadmin/.eris/apps/BigchainOraclizer/abi/' + this.bigchain_query_addr, 'utf8'))
     this.bigchain_contract = this.contractMgr.newContractFactory(this.bigchain_abi).at(this.bigchain_query_addr)
 
     //use this to have the gatekeeper scope inside functions
@@ -944,11 +946,11 @@ var eventListener = function (MyGKAddr) {
 
         })
 
-    
+
     // Listening of the resultIsReady event in the ballot:
     // When the event is ready, it calls the function in gatekeeper, result is ready
     // Note that after the function is called in gatekeeper, it triggers the gatekeeper resultReady event
-    
+
     var eventBallotResultIsReady;
     _this.ballotContract.resultIsReady
         (
@@ -992,7 +994,7 @@ var eventListener = function (MyGKAddr) {
     function isExpired() {
         _this.ballotContract.IsProposalExpired(function (error, result) {
             console.log("is proposal expired has just been called")
-	    setTimeout(function () {
+            setTimeout(function () {
                 //recursively check every 9 seconds. in the future make this a day.
                 isExpired()
             }, 9000)
@@ -1025,45 +1027,45 @@ var eventListener = function (MyGKAddr) {
 
 app.post("/MyGatekeeper", function (req, res) {
 
-
     //Make sure this line is uncommented to test with wallet
     var formdata = req.body;
     console.log('request body...' + JSON.stringify(formdata))
 
     //for testing with hardcoded data
-     /*   var formdata =
-            {
-                "pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
-                "sig": "7051442bbf18bb2c86cbc8951a07e27ec6ba05ac3fa427e4c6b948e3dcf91a94046b048edf52445fb22cc776a94b87c3f55426f993458ec744f61f09fb46eeaa",
-                "msg": "8836a77b68579d1d8d4427c0cda24960f6c123f17ccf751328cc621d6237da22",
-                "uniqueId": "E171AACAFBD191C791CAC02DBFCCCACAB35C1AF1ABA1CED1AC9EC6CAD2",
-                "uniqueIdAttributes": "AB12321AA,313113A32,EF313131,133131F,311313A,31223F,12321,12222222,11341",
-                "ownershipId": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C399B28C66",
-                "ownerIdList": "4A56E33E9D718571CED220A7347B96FE43DF4E51,A7576C8A328EEE4BF69589DDB71099250316FF19",
-                "controlId": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C66",
-                "controlIdList": "4A56E33E9D718571CED220A7347B96FE43DF4E51,A7576C8A328EEE4BF69589DDB71099250316FF19",
-                "ownershipTokenId": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C66",
-                "ownershipTokenAttributes": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C65,83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C61",
-                "ownershipTokenQuantity": "0,0",
-                "controlTokenId": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C66",
-                "controlTokenAttributes": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C65,83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C61",
-                "controlTokenQuantity": "0,0",
-                "identityRecoveryIdList": "4A56E33E9D718571CED220A7347B96FE43DF4E51,A7576C8A328EEE4BF69589DDB71099250316FF19",
-                "recoveryCondition": 2,
-                "yesVotesRequiredToPass": 2,
-                "MyGatekeeperAddr": "29EE74E62B739C254B4C3F9AE8E8CFF15A206B4F",
-                "validatorList": "8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,AAE858DE3899D2FF096DDB5384365C6A86CE7964F1C4F1F22878944D39BD943A,46B6F98E9E34CAF4B66CFA6D2BCF3ED743C1ACCADFC3787F95DFE47ADDA7A661"
-            } */
+    /*   var formdata =
+           {
+               "pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+               "sig": "7051442bbf18bb2c86cbc8951a07e27ec6ba05ac3fa427e4c6b948e3dcf91a94046b048edf52445fb22cc776a94b87c3f55426f993458ec744f61f09fb46eeaa",
+               "msg": "8836a77b68579d1d8d4427c0cda24960f6c123f17ccf751328cc621d6237da22",
+               "uniqueId": "E171AACAFBD191C791CAC02DBFCCCACAB35C1AF1ABA1CED1AC9EC6CAD2",
+               "uniqueIdAttributes": "AB12321AA,313113A32,EF313131,133131F,311313A,31223F,12321,12222222,11341",
+               "ownershipId": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C399B28C66",
+               "ownerIdList": "4A56E33E9D718571CED220A7347B96FE43DF4E51,A7576C8A328EEE4BF69589DDB71099250316FF19",
+               "controlId": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C66",
+               "controlIdList": "4A56E33E9D718571CED220A7347B96FE43DF4E51,A7576C8A328EEE4BF69589DDB71099250316FF19",
+               "ownershipTokenId": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C66",
+               "ownershipTokenAttributes": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C65,83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C61",
+               "ownershipTokenQuantity": "0,0",
+               "controlTokenId": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C66",
+               "controlTokenAttributes": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C65,83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C61",
+               "controlTokenQuantity": "0,0",
+               "identityRecoveryIdList": "4A56E33E9D718571CED220A7347B96FE43DF4E51,A7576C8A328EEE4BF69589DDB71099250316FF19",
+               "recoveryCondition": 2,
+               "yesVotesRequiredToPass": 2,
+               "gatekeeperAddr": "29EE74E62B739C254B4C3F9AE8E8CFF15A206B4F",
+               "validatorList": "8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,AAE858DE3899D2FF096DDB5384365C6A86CE7964F1C4F1F22878944D39BD943A,46B6F98E9E34CAF4B66CFA6D2BCF3ED743C1ACCADFC3787F95DFE47ADDA7A661"
+           } */
 
-    console.log(formdata.MyGatekeeperAddr)
-    var gatekeeperApp = new gatekeeper(formdata.MyGatekeeperAddr);
+    console.log(formdata.gatekeeperAddr)
+    var gatekeeperApp = new gatekeeper(formdata.gatekeeperAddr);
 
-    console.log("AT INDEX 0: " + gatekeeperApp.debugging(0))
+    //ONLY ON SECOND REQUEST
+    // console.log("AT INDEX 0: " + gatekeeperApp.debugging(0))
 
     var isValid = gatekeeperApp.verifyIt(formdata);
     var isUnique = gatekeeperApp.checkUnique(formdata);
 
-    var listening = new eventListener(formdata.MyGatekeeperAddr);//WILL THIS EXPIRE AT THE END OF THEIR POST REQUEST?
+    var listening = new eventListener(formdata.gatekeeperAddr);//WILL THIS EXPIRE AT THE END OF THEIR POST REQUEST?
 
     if (isValid) {
         console.log("Is valid value: " + (isValid == "true"))

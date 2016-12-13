@@ -1,5 +1,10 @@
 'use strict'
 
+//grab the chain configuration:
+var chainConfig = require('/home/demoadmin/.eris/ErisChainConfig.json')
+console.log("Chain Configuration Account: " + chainConfig.primaryAccount)
+console.log("Chain URL: " + chainConfig.chainURL)
+
 //for calling contract:
 var contracts = require('eris-contracts')
 var fs = require('fs')
@@ -20,20 +25,18 @@ var request = require('request');
 var bigchainServer = 'http://10.100.98.217:5000/'
 
 //API for chain
-chainUrl = 'http://localhost:1337/rpc'
+chainUrl = chainConfig.chainURL;
 //instantiate contract object manager (uses chain URL and account data)
-manager = contracts.newContractManagerDev(chainUrl, accounts.coidchain_full_000)
+manager = contracts.newContractManagerDev(chainUrl, chainConfig.primaryAccount)
 //Make the contract object using ABI and address of deployed contract
 contract = manager.newContractFactory(abi).at(address)
-
 
 //This is for signature generation:
 function createSignature(nonHashedMessage, callback) {
     //make message hash
     var hash = crypto.createHash('sha256').update(nonHashedMessage).digest('hex')
-
-    var pubKey = accounts.coidchain_full_000.pubKey;
-    var privKey = accounts.coidchain_full_000.privKey;
+    var pubKey = chainConfig.primaryAccount.pubKey;
+    var privKey = chainConfig.primaryAccount.privKey;
 
     var keyPair = { "publicKey": new Buffer(pubKey, "hex"), "privateKey": new Buffer(privKey, "hex") }
 

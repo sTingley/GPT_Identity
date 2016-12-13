@@ -4,6 +4,8 @@
  *      TODO: Proposal expiary notification
  */
 
+var chainConfig = require('/home/demoadmin/.eris/ErisChainConfig.json');
+
 var app = require("express")();
 var request = require("superagent");
 var erisC = require('eris-contracts');
@@ -12,30 +14,32 @@ var fs = require('fs')
 var bodyParser = require('body-parser')
 
 // eris:chain id with full privilages
-var chain = 'coidchain_full_000';
+var chain = "primaryAccount";
 // Change eris:db url
-var erisdburl = "http://10.100.98.218:1337/rpc";
+var erisdburl = chainConfig.chainURL;
 
 var contractData = require("./epm.json");
 var contractAddress = contractData['GateKeeper'];
 var erisAbi = JSON.parse(fs.readFileSync("./abi/" + contractAddress));
+var myGKaddressABI = contractData['MyGateKeeper'];
+var myGK_Abi = JSON.parse(fs.readFileSync("./abi/" + myGKaddressABI));
 var accountData = require("./accounts.json");
-var contractMgr = erisC.newContractManagerDev(erisdburl, accountData[chain]);
+var contractMgr = erisC.newContractManagerDev(erisdburl, chainConfig[chain]);
 var gateKeeper = contractMgr.newContractFactory(erisAbi).at(contractAddress);
 
 
 var ballotApp = function () {
 
     // eris:chain id with full privilages
-    this.chain = 'coidchain_full_000';
+    this.chain = 'primaryAccount';
     // Change eris:db url
-    this.erisdburl = "http://10.100.98.218:1337/rpc";
+    this.erisdburl = chainConfig.chainURL;
 
     this.contractData = require("./epm.json");
     this.contractAddress = this.contractData['ballot'];
     this.erisAbi = JSON.parse(fs.readFileSync("./abi/" + this.contractAddress));
     this.accountData = require("./accounts.json");
-    this.contractMgr = erisC.newContractManagerDev(this.erisdburl, this.accountData[this.chain]);
+    this.contractMgr = erisC.newContractManagerDev(this.erisdburl, chainConfig[this.chain]);
     this.ballotContract = this.contractMgr.newContractFactory(this.erisAbi).at(this.contractAddress);
     //console.log(this.ballotContract);
 
@@ -46,7 +50,7 @@ var ballotApp = function () {
             console.log("hello");
         })
 
-    this.twinUrl = "http://localhost:5050";
+    this.twinUrl = "http://10.100.98.218:5050";
     var self = this;
 
     this.createNotification = function (inputs) {
@@ -100,14 +104,16 @@ var ballotApp = function () {
         if (error) {
             console.log("Notification event exists with err", error);
         }
-        console.log("notifyValidator evet reached")
+        console.log("notifyValidator event reached")
+        console.log(JSON.stringify(result.args))
         var proposal = result.args.proposalIdToVote;
         var validator = result.args.validator;
-	var isHuman = result.args.isHuman;
-	console.log("isHuman val: " + isHuman);
-	var address = result.args.myGKaddr;
-	console.log("address is: " + address);
-        _this.createNotification({ "pubKey": validator, "proposalID": proposal, "message": "You have been selected to vote on the proposal.", "isHuman":isHuman,"gatekeeeperAddr":address });
+        var isHuman = result.args.isHuman;
+        var address = result.args.myGKaddr;
+
+        console.log("isHuman val: " + isHuman);
+        console.log("address is: " + address);
+        _this.createNotification({ "pubKey": validator, "proposalID": proposal, "message": "You have been selected to vote on the proposal.", "isHuman":isHuman, "gatekeeperAddr": address });
         console.log("pass on err check: ballot contract notify event");
     })
 } //end of ballotApp
@@ -182,16 +188,34 @@ app.post("/vote", function (req, res) {
 //TODO: Add Verification
 app.post("/getCoidData", function (req, res) {
 
-    retrieveData(function (result) {
-        res.json(result);
-    });
+    
+    if(req.body.isHuman || req.body.isHuman == "true")
+    {
+        retrieveData(gateKeeper, function (result) {
+            res.json(result);
+        });
+    }
+    else
+    {
+        var theAddr = req.body.gatekeeperAddr;
+        var myGK = contractMgr.newContractFactory(myGK_Abi).at(theAddr);
+        
+        retrieveData(myGK, function (result) {
+            res.json(result);
+        });
+    }
 
-    function retrieveData(callback) {
+    function retrieveData(theContract, callback) {
+
+
+        //because a local variable supercedes global variable in this scope:
+        var gateKeeper = theContract;
 
         //get input:
         var params = req.body;
         var proposalId = params.proposalId;
         var requesterVal = params.publicKey;
+        //var gatekeeperAddr = params.gatekeeperAddr;
         var response = {
             "pubKey": "",
             "sig": "",

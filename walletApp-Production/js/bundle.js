@@ -49250,7 +49250,9 @@
 					url: twinUrl + 'getCoidData',
 					data: {
 						"publicKey": localStorage.getItem("pubKey"),
-						"proposalId": this.state.proposal.proposal_id
+						"proposalId": this.state.proposal.proposal_id,
+						"gatekeeperAddr": this.state.proposal.gatekeeperAddr,
+						"isHuman": this.state.proposal.isHuman
 					}, //.bind(this)d
 					success: function success(result) {
 						var fileValidation = true;

@@ -1,5 +1,10 @@
 'use strict'
 
+//grab the chain configuration:
+var chainConfig = require('/home/demoadmin/.eris/ErisChainConfig.json')
+console.log("Chain configuration account: " + chainConfig.primaryAccount)
+console.log("Chain URL: " + chainConfig.chainURL)
+
 //for calling contract:
 var contracts = require('eris-contracts')
 var fs = require('fs')
@@ -18,9 +23,9 @@ var keccak_256 = require('js-sha3').keccak_256
 var ed25519 = require('ed25519')//for oraclizer signature generation
 
 //API for chain
-chainUrl = 'http://localhost:1337/rpc'
+chainUrl = chainConfig.chainURL;
 //instantiate contract object manager (uses chain URL and account data)
-manager = contracts.newContractManagerDev(chainUrl, accounts.coidchain_full_000)
+manager = contracts.newContractManagerDev(chainUrl, chainConfig.primaryAccount)
 //Make the contract object using ABI and address of deployed contract
 contract = manager.newContractFactory(abi).at(address)
 
@@ -127,6 +132,3 @@ function verify(msg, signature, pubKey) {
     return verified;
     
 }
-
-
-

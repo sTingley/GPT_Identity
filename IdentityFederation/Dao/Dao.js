@@ -3,6 +3,8 @@ var contracts = require('eris-contracts')
 var fs = require('fs')
 var http = require('http')
 
+var chainConfig = require('/home/demoadmin/.eris/ErisChainConfig.json')
+
 //Set up addresses for deployed contracts
 var address_Dao = require('./epm.json').Dao
 // Set up abis for deployed contracts
@@ -17,9 +19,9 @@ var hostname = 'localhost';
 var port = 8002;
 
 //URL to the rpc endpoint of the eris-db server
-chainUrl = 'http://localhost:1337/rpc'
+chainUrl = chainConfig.chainURL;
 //Instantiate the contract object manager using the chain URL and the account data.
-var manager_full = contracts.newContractManagerDev(chainUrl, accounts.coidchain_full_000)
+var manager_full = contracts.newContractManagerDev(chainUrl, chainConfig.primaryAccount)
 // Instantiate the contract object using the ABI and the address.
 var contract_Dao = manager_full.newContractFactory(abi_Dao).at(address_Dao)
 
@@ -171,7 +173,6 @@ server = http.createServer(function (request, response) {
         }) //request.on
 
     } //end of '/removeValidator'
-
 
 }) //end of server
 

@@ -358,7 +358,7 @@ contract GateKeeper {
 
             proposals[proposalId].yesVotesRequiredToPass = yesVotesRequiredToPass;
             proposals[proposalId].numberOfVoters = validatorsToVote.length;
-	    proposals[proposalId].isHuman = isHuman;
+            proposals[proposalId].isHuman = isHuman;
 
             Ballot B = Ballot(ballotAddr); // Instantiate the ballot contract, and allows it to talk to the ballot contract
 

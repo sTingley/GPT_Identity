@@ -403,7 +403,7 @@ var gatekeeper = function (MyGKaddr) {
             }
         }) // end of callback
 
-        while (sync) { require('deasync').sleep(100); }
+        while (sync) { require('deasync').sleep(1000); }
 
         this.setcoidData(proposalId, formdata, res, callback);
         console.log("right after set coid data....");
@@ -432,7 +432,7 @@ var gatekeeper = function (MyGKaddr) {
         }) // end of callback
 
 
-        while (sync) { require('deasync').sleep(100); }
+        while (sync) { require('deasync').sleep(1000); }
     }; // end of function setCoidRequester
 
     this.setmyUniqueID = function (requester, proposalId, myUniqueID, myUniqueIdAttributes) {
@@ -463,7 +463,7 @@ var gatekeeper = function (MyGKaddr) {
 
         } //end of for loop
 
-        //while (sync) { require('deasync').sleep(100); }
+        //while (sync) { require('deasync').sleep(1000); }
     };
 
     this.setmyOwnershipID = function (requester, proposalId, myOwnershipId, myOwnerIdList) {
@@ -498,7 +498,7 @@ var gatekeeper = function (MyGKaddr) {
 
         }); // end of callback
 
-        while (sync) { require('deasync').sleep(100); }
+        while (sync) { require('deasync').sleep(1000); }
     }; //end of function setmyOwnershipID
 
     this.setmyControlID = function (requester, proposalId, myControlId, myControlIdList) {
@@ -527,7 +527,7 @@ var gatekeeper = function (MyGKaddr) {
 
         });//end of callback
 
-        while (sync) { require('deasync').sleep(100); }
+        while (sync) { require('deasync').sleep(1000); }
 
     }; //end of function
 
@@ -564,7 +564,7 @@ var gatekeeper = function (MyGKaddr) {
             }
 
         });//end of callback
-        while (sync) { require('deasync').sleep(100); }
+        while (sync) { require('deasync').sleep(1000); }
 
     };//end of function
 
@@ -596,7 +596,7 @@ var gatekeeper = function (MyGKaddr) {
 
         });// end of callback
 
-        while (sync) { require('deasync').sleep(100); }
+        while (sync) { require('deasync').sleep(1000); }
     }; // end of function
 
     this.setmyIdentityRecoveryIdList = function (requester, proposalId, myIdentityRecoveryIdList, myRecoveryCondition) {
@@ -632,7 +632,7 @@ var gatekeeper = function (MyGKaddr) {
 
         }) // end of callback
 
-        while (sync) { require('deasync').sleep(100); }
+        while (sync) { require('deasync').sleep(1000); }
     }; // end of function
 
     this.setValidators = function (proposalId, validators, ballotAddress) {
@@ -662,7 +662,7 @@ var gatekeeper = function (MyGKaddr) {
 
         })// end of callback
 
-        while (sync) { require('deasync').sleep(100); }
+        while (sync) { require('deasync').sleep(1000); }
 
     }; // end of function
 
@@ -682,7 +682,7 @@ var gatekeeper = function (MyGKaddr) {
 
         })// end of callback
 
-        while (sync) { require('deasync').sleep(100); }
+        while (sync) { require('deasync').sleep(1000); }
 
     };// end of function
 
@@ -726,8 +726,8 @@ var eventListener = function (MyGKAddr) {
         //make message hash
         var hash = crypto.createHash('sha256').update(nonHashedMessage).digest('hex')
 
-        var pubKey = _this.accountData.coidchain_full_000.pubKey;
-        var privKey = _this.accountData.coidchain_full_000.privKey;
+        var pubKey = chainConfig.primaryAccount.pubKey;
+        var privKey = chainConfig.primaryAccount.privKey;
         var keyPair = { "publicKey": new Buffer(pubKey, "hex"), "privateKey": new Buffer(privKey, "hex") }
 
         var signature = ed25519.Sign(new Buffer(hash), keyPair)
@@ -1026,6 +1026,7 @@ var eventListener = function (MyGKAddr) {
 *******************************************************/
 
 app.post("/MyGatekeeper", function (req, res) {
+
 
     //Make sure this line is uncommented to test with wallet
     var formdata = req.body;

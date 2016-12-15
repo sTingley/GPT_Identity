@@ -189,8 +189,8 @@ app.post("/vote", function (req, res) {
 //TODO: Add Verification
 app.post("/getCoidData", function (req, res) {
 
-
-    if(req.body.isHuman || req.body.isHuman == "true")
+    console.log("ISHUMAN VALUE: " + req.body.isHuman);
+    if(req.body.isHuman == true || req.body.isHuman == "true")
     {
         retrieveData(gateKeeper, function (result) {
             res.json(result);
@@ -198,9 +198,10 @@ app.post("/getCoidData", function (req, res) {
     }
     else
     {
+	console.log("inside the else statement -- isHuman false")
         var theAddr = req.body.gatekeeperAddr;
         var myGK = contractMgr.newContractFactory(myGK_Abi).at(theAddr);
-
+        
         retrieveData(myGK, function (result) {
             res.json(result);
         });
@@ -489,5 +490,4 @@ app.get("/getIsProposalExpired", function (req, res) {/*
 
 app.listen(8082);
 console.log("running at 8082 port");
-
 

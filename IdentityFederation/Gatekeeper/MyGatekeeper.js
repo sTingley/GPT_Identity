@@ -346,18 +346,23 @@ var gatekeeper = function (MyGKaddr) {
         try {
             this.setCoidRequester(requester, proposalId, sig, msg);
             this.setmyUniqueID(requester, proposalId, myUniqueId, myUniqueIdAttributes);
-            this.setmyOwnershipID(requester, proposalId, myOwnershipId, myOwnerIdList);
-            this.setmyControlID(requester, proposalId, myControlId, myControlIdList);
-            this.setmyOwnershipTokenID(requester, proposalId, myOwnershipTokenId, myOwnershipTokenAttributes, myOwnershipTokenQuantity);
-            this.setmyControlTokenID(requester, proposalId, myControlTokenId, myControlTokenAttributes, myControlTokenQuantity);
-            this.setmyIdentityRecoveryIdList(requester, proposalId, myIdentityRecoveryIdList, myRecoveryCondition);
-            this.setValidators(proposalId, validators, ballotContractAddr);
+	    
+	    var this1 = this;
+	    setTimeout(function(){
+	    console.log("ISHUMAN VALUE: " + isHuman + "************************************************************************")
+            this1.setmyOwnershipID(requester, proposalId, myOwnershipId, myOwnerIdList);
+            this1.setmyControlID(requester, proposalId, myControlId, myControlIdList);
+            this1.setmyOwnershipTokenID(requester, proposalId, myOwnershipTokenId, myOwnershipTokenAttributes, myOwnershipTokenQuantity);
+            this1.setmyControlTokenID(requester, proposalId, myControlTokenId, myControlTokenAttributes, myControlTokenQuantity);
+            this1.setmyIdentityRecoveryIdList(requester, proposalId, myIdentityRecoveryIdList, myRecoveryCondition);
+            this1.setValidators(proposalId, validators, ballotContractAddr);
 
-            this.initiateCoidProposalSubmission(ballotContractAddr, proposalId, yesVotesRequiredToPass, isHuman, MyGKaddr);
+            this1.initiateCoidProposalSubmission(ballotContractAddr, proposalId, yesVotesRequiredToPass, false, MyGKaddr);
 
             theNotifier.createProposalPendingNotification(requester, proposalId, isHuman, gatekeeperAddr);
 
             callback(false, res);
+	   },3000)
         }
         catch (e) {
             callback(true, res);

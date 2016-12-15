@@ -245,9 +245,9 @@ var gatekeeper = function () {
             this.setCoidRequester(requester, proposalId, sig, msg);
             this.setisHuman(proposalId, isHuman);
             this.setmyUniqueID(requester, proposalId, myUniqueId, myUniqueIdAttributes);
-            var this1 = this;
-            setTimeout(function()
-            {
+	    var this1 = this;
+	    setTimeout(function()
+	    {
             this1.setmyOwnershipID(requester, proposalId, myOwnershipId, myOwnerIdList);
             this1.setmyControlID(requester, proposalId, myControlId, myControlIdList);
             this1.setmyOwnershipTokenID(requester, proposalId, myOwnershipTokenId, myOwnershipTokenAttributes, myOwnershipTokenQuantity);
@@ -260,7 +260,7 @@ var gatekeeper = function () {
             theNotifier.createProposalPendingNotification(requester, proposalId);
 
             callback(false, res);
-            },3000)
+	    },3000)
         }
         catch (e) {
             callback(true, res);

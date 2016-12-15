@@ -245,18 +245,22 @@ var gatekeeper = function () {
             this.setCoidRequester(requester, proposalId, sig, msg);
             this.setisHuman(proposalId, isHuman);
             this.setmyUniqueID(requester, proposalId, myUniqueId, myUniqueIdAttributes);
-            this.setmyOwnershipID(requester, proposalId, myOwnershipId, myOwnerIdList);
-            this.setmyControlID(requester, proposalId, myControlId, myControlIdList);
-            this.setmyOwnershipTokenID(requester, proposalId, myOwnershipTokenId, myOwnershipTokenAttributes, myOwnershipTokenQuantity);
-            this.setmyControlTokenID(requester, proposalId, myControlTokenId, myControlTokenAttributes, myControlTokenQuantity);
-            this.setmyIdentityRecoveryIdList(requester, proposalId, myIdentityRecoveryIdList, myRecoveryCondition);
-            // this.selectValidators(proposalId, DaoContractAddr, ballotContractAddr);
+            var this1 = this;
+            setTimeout(function()
+            {
+            this1.setmyOwnershipID(requester, proposalId, myOwnershipId, myOwnerIdList);
+            this1.setmyControlID(requester, proposalId, myControlId, myControlIdList);
+            this1.setmyOwnershipTokenID(requester, proposalId, myOwnershipTokenId, myOwnershipTokenAttributes, myOwnershipTokenQuantity);
+            this1.setmyControlTokenID(requester, proposalId, myControlTokenId, myControlTokenAttributes, myControlTokenQuantity);
+            this1.setmyIdentityRecoveryIdList(requester, proposalId, myIdentityRecoveryIdList, myRecoveryCondition);
+            this1.selectValidators(proposalId, DaoContractAddr, ballotContractAddr);
 
-            this.initiateCoidProposalSubmission(ballotContractAddr, proposalId, yesVotesRequiredToPass, isHuman);
-            this.selectValidators(proposalId, DaoContractAddr, ballotContractAddr);
+            this1.initiateCoidProposalSubmission(ballotContractAddr, proposalId, yesVotesRequiredToPass, isHuman);
+            //this.selectValidators(proposalId, DaoContractAddr, ballotContractAddr);
             theNotifier.createProposalPendingNotification(requester, proposalId);
 
             callback(false, res);
+            },3000)
         }
         catch (e) {
             callback(true, res);

@@ -276,6 +276,7 @@ class Assets extends Component {
 			//onComponentDidMount call
 			own_assets: [{}],
 			controlled_assets: [{ asset_id: 161718, asset_name: 'Parents House' }, { asset_id: 192021, asset_name: 'My Car' }],
+            delegated_assets: [{}]
 			active_asset: {},
 			show_only: []
 		};
@@ -288,82 +289,182 @@ class Assets extends Component {
 
 	componentDidMount() {
         
-        // //get all assets, OWNED, CONTROLLED, DELEGATAED:        
-        // $.ajax({
-		// 	type: "POST",
-		// 	url: twinUrl + 'getOwnedAssets',
-		// 	data: { "pubKey": localStorage.getItem("pubKey") },
-		// 	success: function (result) {
-		// 		var data = result;
-		// 		if ($.type(result) != "object") {
-		// 			data = JSON.parseJSON(result)
-		// 		}
-		// 		//this.setState({ own_assets: [{ asset_id: result.assetID, asset_name: result }] });
-
-		// 	}.bind(this),
-		// 	complete: function () {
-		// 		// do something
-		// 	},
-		// 	//console.log(result)	
-		// })
+        //get all assets, OWNED, CONTROLLED, DELEGATAED:        
         
-        // $.ajax({
-		// 	type: "POST",
-		// 	url: twinUrl + 'getControlledAssets',
-		// 	data: { "pubKey": localStorage.getItem("pubKey") },
-		// 	success: function (result) {
-		// 		var data = result;
-		// 		if ($.type(result) != "object") {
-		// 			data = JSON.parseJSON(result)
-		// 		}
-		// 		//this.setState({ own_assets: [{ asset_id: result.assetID, asset_name: result }] });
-
-		// 	}.bind(this),
-		// 	complete: function () {
-		// 		// do something
-		// 	},
-		// 	//console.log(result)	
-		// })
-        
-        // $.ajax({
-		// 	type: "POST",
-		// 	url: twinUrl + 'getDelegatedAssets',
-		// 	data: { "pubKey": localStorage.getItem("pubKey") },
-		// 	success: function (result) {
-		// 		var data = result;
-		// 		if ($.type(result) != "object") {
-		// 			data = JSON.parseJSON(result)
-		// 		}
-		// 		//this.setState({ own_assets: [{ asset_id: result.assetID, asset_name: result }] });
-
-		// 	}.bind(this),
-		// 	complete: function () {
-		// 		// do something
-		// 	},
-		// 	//console.log(result)	
-		// })
-        
-        
-        
-        
-        
-		$.ajax({
+        // -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
+        // -> -> -> START get OWNED assets -> -> ->
+        $.ajax({
 			type: "POST",
-			url: twinUrl + 'pullCoidData',
+			url: twinUrl + 'getOwnedAssets',
 			data: { "pubKey": localStorage.getItem("pubKey") },
 			success: function (result) {
 				var data = result;
-				if ($.type(result) != "object") {
+				if ($.type(result) != "object") 
+                {
 					data = JSON.parseJSON(result)
 				}
-				this.setState({ own_assets: [{ asset_id: result.assetID, asset_name: result }] });
+                
+                //get the array:
+                data = data.data;
+                
+                if(data.length > 0)
+                {
+                    //loop through OWNED assets
+                    for(let i = 0; i < data.length; i++)
+                    {
+                        //AJAX each asset:
+                        $.ajax({
+                            type: "POST",
+                            url: twinUrl + 'getAsset',
+                            data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": data[i]},
+                            success: function (result) 
+                            {
+                                var dataResult = result;
+                                if ($.type(result) != "object") 
+                                {
+                                    dataResult = JSON.parseJSON(result)
+                                }
+                                
+                                //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
+                                this.setState({ own_assets: [{ asset_id: dataResult.assetID, asset_name: dataResult }] });
 
+                            }.bind(this),
+                            complete: function () 
+                            {
+                                // do something
+                            },
+                            //console.log(result)	
+                        })
+                                  
+                    }
+                }
 			}.bind(this),
-			complete: function () {
+			complete: function () 
+            {
+			},	
+		})
+        // <- <- <- END get OWNED assets <- <- <-
+        // <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
+        
+        
+        // -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
+        // -> -> -> START get CONTROLLED assets -> -> ->
+        $.ajax({
+			type: "POST",
+			url: twinUrl + 'getControlledAssets',
+			data: { "pubKey": localStorage.getItem("pubKey") },
+			success: function (result) 
+            {
+				var data = result;
+				if ($.type(result) != "object") 
+                {
+					data = JSON.parseJSON(result)
+				}
+                
+                //get the array:
+                data = data.data;
+                
+                if(data.length > 0)
+                {
+                    //loop through OWNED assets
+                    for(let i = 0; i < data.length; i++)
+                    {
+                        //AJAX each asset:
+                        $.ajax({
+                            type: "POST",
+                            url: twinUrl + 'getAsset',
+                            data: { "pubKey": localStorage.getItem("pubKey"), "flag": 1, "fileName": data[i]},
+                            success: function (result) 
+                            {
+                                var dataResult = result;
+                                if ($.type(result) != "object") 
+                                {
+                                    dataResult = JSON.parseJSON(result)
+                                }
+                                
+                                //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
+                                this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_name: dataResult }] });
+
+                            }.bind(this),
+                            complete: function () 
+                            {
+                                // do something
+                            },
+                            //console.log(result)	
+                        })
+                                  
+                    }
+                }
+			}.bind(this),
+			complete: function () 
+            {
 				// do something
 			},
 			//console.log(result)	
 		})
+        // <- <- <- END get CONTROLLED assets <- <- <-
+        // <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
+        
+        
+        
+        // -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
+        // -> -> -> START get DELEGATED assets -> -> ->
+        $.ajax({
+			type: "POST",
+			url: twinUrl + 'getDelegatedAssets',
+			data: { "pubKey": localStorage.getItem("pubKey") },
+			success: function (result) 
+            {
+				var data = result;
+				if ($.type(result) != "object") 
+                {
+					data = JSON.parseJSON(result)
+				}
+                
+                //get the array:
+                data = data.data;
+                
+                if(data.length > 0)
+                {
+                    //loop through OWNED assets
+                    for(let i = 0; i < data.length; i++)
+                    {
+                        //AJAX each asset:
+                        $.ajax({
+                            type: "POST",
+                            url: twinUrl + 'getAsset',
+                            data: { "pubKey": localStorage.getItem("pubKey"), "flag": 2, "fileName": data[i]},
+                            success: function (result) 
+                            {
+                                var dataResult = result;
+                                if ($.type(result) != "object") 
+                                {
+                                    dataResult = JSON.parseJSON(result)
+                                }
+                                
+                                //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
+                                this.setState({ delegated_assets: [{ asset_id: dataResult.assetID, asset_name: dataResult }] });
+
+                            }.bind(this),
+                            complete: function () 
+                            {
+                                // do something
+                            },
+                            //console.log(result)	
+                        })
+                                  
+                    }
+                }
+			}.bind(this),
+			complete: function () 
+            {
+				// do something
+			},
+			//console.log(result)	
+		})
+        // <- <- <- END get DELEGATED assets <- <- <-
+        // <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
+
 
 	}
 
@@ -479,4 +580,3 @@ class Assets extends Component {
 }
 
 export default Assets;
-

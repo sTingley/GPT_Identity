@@ -302,9 +302,10 @@ class MyGatekeeper extends React.Component {
 			tmpFile:'',
 			pubKey: localStorage.getItem("pubKey"),
 			privKey: localStorage.getItem("privKey"),
-			//gatekeeperAddr: localStorage.getItem("gatekeeperAddr"),
+			//MyGatekeeperAddr: localStorage.getItem("MyGatekeeperAddr"),
 			validators:[],
-			signature:''
+			signature:'',
+            assetID: []
 		};
 		
 		this.maxUniqAttr = 10;
@@ -316,16 +317,14 @@ class MyGatekeeper extends React.Component {
         //TODO********** add fileName.json********put in localstorage!
 		$.ajax({
 			type: "POST",
-			url: twinUrl + 'pullCoidData',
-			data: { "pubKey": localStorage.getItem("pubKey") },
-			//url: twinUrl + 'getAsset',
-			//data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": "test.json" },
+			url: twinUrl + 'getAsset',
+			data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": "hi"},
 			success: function (result) {
 				var data = result;
 				if ($.type(result) != "object") {
 					data = JSON.parseJSON(result)
 				}
-				localStorage.setItem("gatekeeperAddr", result.gatekeeperAddr) 
+				localStorage.setItem("MyGatekeeperAddr", result.gatekeeperAddr) 
 
 			}.bind(this),
 			complete: function () {
@@ -445,7 +444,7 @@ class MyGatekeeper extends React.Component {
 				
 				"isHuman": false,
 				"timestamp": "",
-				"assetID": "COID",
+				"assetID": this.state.assetID,
 				"Type": "non_cash",
 				"bigchainHash":  "",
 				"bigchainID": "",
@@ -572,7 +571,7 @@ class MyGatekeeper extends React.Component {
 	
 	submitCoid(e){
 		e.preventDefault();
-		var json = this.prepareJsonToSubmit();
+		var json = this.prepareJsonToSubmi();
 		var privKey1 = new Buffer(this.state.privKey,"hex");
 		var msg_hash = keccak_256(JSON.stringify(json));
 		var msg_hash_buffer = new Buffer(msg_hash,"hex");
@@ -589,7 +588,7 @@ class MyGatekeeper extends React.Component {
 		
 		json.sig = signature1;
 		json.msg = msg_hash_buffer.toString("hex");
-		json.gatekeeperAddr = localStorage.getItem("gatekeeperAddr")
+		json.MyGatekeeperAddr =	localStorage.getItem("MyGatekeeperAddr")
 		//this.setState({signature: signature1})
 		
 		console.log(json)
@@ -598,18 +597,21 @@ class MyGatekeeper extends React.Component {
 			type: 'POST',
 			data: json,
 			success: function(res){
-                // var sendMe = {};
-                // sendMe.flag = 0; //owned asset
-                // sendMe.fileName = ""; //TODO!!!!!!!!
-                // sendMe.pubKey = localStorage.getItem("pubKey");
-                // snedMe.data = json;
-                // sendMe.updateFlag = 0;
+                var sendMe = {};
+                sendMe.flag = 0; //owned asset
+                sendMe.fileName = this.state.assetID + ".json"; 
+                sendMe.pubKey = localStorage.getItem("pubKey");
+                snedMe.data = json;
+                sendMe.updateFlag = 0;
 				$.ajax({
                     //****************TODO
-					//url: twinUrl + 'setAsset','
-					url: twinUrl + 'writeCoid_myGK',
+					url: twinUrl + 'setAsset',
 					type: 'POST',
-					data: json
+					data: sendMe,
+                    success: function(res)
+                    {
+                        console.log("response from setAsset: " + res)
+                    }
 				})
 			},
 			complete: function(){
@@ -680,6 +682,10 @@ class MyGatekeeper extends React.Component {
 							</button>
 						</div>
 					</div>
+                    <div className="form-group">
+						<label htmlFor="assetID">Name Your Asset. For example, 'My Diploma'.</label>
+						<TagsInput {...inputAttrs} value={this.state.assetID} onChange={(e)=>{ this.onFieldChange("assetID", e) } } />
+					</div>
 					<div className="form-group">
 						<label htmlFor="owner_token_id">Enter Ownership Token Description. For example, 'Spencer tokens'.</label>
 						<TagsInput {...inputAttrs} value={this.state.owner_token_desc} onChange={(e)=>{ this.onFieldChange("owner_token_desc", e) } } />
@@ -740,4 +746,3 @@ class MyGatekeeper extends React.Component {
    }
 }
 export default MyGatekeeper;
-

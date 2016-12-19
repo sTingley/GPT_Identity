@@ -7,7 +7,7 @@ var app = require('express')(),
     http = require('http'),
     expiredNotification = require('./expiredNotification.js'),
     IPFS = require('./ipfs.js'),
-    Twin = require('./TwinConfig.json'),
+    TwinConfig = require('./TwinConfig.json'),
     AssetCtrl = require('./AssetCtrl.js');
 
  // for parsing application/json
@@ -19,7 +19,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(fileUpload());
 
 app.all('/*', function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", TwinConfig.allowed_orgins);
+  res.header("Access-Control-Allow-Origin", TwinConfig.ALLOWED_ORIGINS);
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
   next();
 });
@@ -38,15 +38,15 @@ function getConfiguration(theTarget, oldEndpoint, newEndpoint, txnID)
         target: theTarget,
         changeOrigin: true,
         ws: true,
-        onProxyReq(proxyReq, req, res) 
+        onProxyReq(proxyReq, req, res)
         {
                 if ( req.method == "POST" && req.body ) {
-                       
+
                         req.body.txn_id = txnID;
-                        
+
                         console.log(JSON.stringify(req.body));
                         let body = req.body;
-                        
+
                         // URI encode JSON object
                         body = Object.keys( body ).map(function( key ) {
                                 return encodeURIComponent( key ) + '=' + encodeURIComponent( body[ key ])
@@ -111,20 +111,20 @@ app.use('/getCoidData',proxy(proxyBallot))
 
 
 // -> -> -> START MYCOID FUNCTIONS -> -> ->
-var proxyMyCOID = getConfiguration(TwinConfig.MY_COID_CONFIG.TARGET,"/MyCOID/myTokenAmount",TwinConfig.My_COID_CONFIG.ENDPOINT.TOKENAMOUNT,"MyCOID/myTokenAmount" )
+var proxyMyCOID = getConfiguration(TwinConfig.MY_COID_CONFIG.TARGET,"/MyCOID/myTokenAmount",TwinConfig.MY_COID_CONFIG.ENDPOINT.TOKENAMOUNT,"MyCOID/myTokenAmount" )
 app.use('/MyCOID/myTokenAmount', proxy(proxyBallot))
-// <- <- <- END MYCOID FUNCTIONS <- <- <- 
+// <- <- <- END MYCOID FUNCTIONS <- <- <-
 
 // -> -> -> START MYGATEKEEPER FUNCTIONS -> -> ->
 var proxyMyGK = getConfiguration(TwinConfig.MY_GK_CONFIG.TARGET,'/request_new_COID',TwinConfig.MY_GK_CONFIG.ENDPOINT,'request_new_COID');
 app.use('/request_new_COID', proxy(proxyMyGK));
-// <- <- <- END MYGATEKEEPER FUNCTIONS <- <- <- 
+// <- <- <- END MYGATEKEEPER FUNCTIONS <- <- <-
 
 
 //For three wallets, this has a port for each. To update.
 for(var i=0; i<TwinConfig.ports.length; i++)
 {
-	var port = parseInt(TwinConfig.ports[i]);
-	http.createServer(app).listen(port);
-	console.log("Digital Twin running at "+port);
+        var port = parseInt(TwinConfig.ports[i]);
+        http.createServer(app).listen(port);
+        console.log("Digital Twin running at "+port);
 }

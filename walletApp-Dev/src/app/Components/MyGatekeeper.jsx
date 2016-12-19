@@ -302,7 +302,7 @@ class MyGatekeeper extends React.Component {
 			tmpFile:'',
 			pubKey: localStorage.getItem("pubKey"),
 			privKey: localStorage.getItem("privKey"),
-			//MyGatekeeperAddr: localStorage.getItem("MyGatekeeperAddr"),
+			//gatekeeperAddr: localStorage.getItem("gatekeeperAddr"),
 			validators:[],
 			signature:'',
             assetID: []
@@ -324,7 +324,7 @@ class MyGatekeeper extends React.Component {
 				if ($.type(result) != "object") {
 					data = JSON.parseJSON(result)
 				}
-				localStorage.setItem("MyGatekeeperAddr", result.gatekeeperAddr) 
+				localStorage.setItem("gatekeeperAddr", result.gatekeeperAddr) 
 
 			}.bind(this),
 			complete: function () {
@@ -588,7 +588,7 @@ class MyGatekeeper extends React.Component {
 		
 		json.sig = signature1;
 		json.msg = msg_hash_buffer.toString("hex");
-		json.MyGatekeeperAddr =	localStorage.getItem("MyGatekeeperAddr")
+		json.gatekeeperAddr =	localStorage.getItem("gatekeeperAddr")
 		//this.setState({signature: signature1})
 		
 		console.log(json)

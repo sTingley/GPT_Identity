@@ -128,3 +128,4 @@ for(var i=0; i<TwinConfig.ports.length; i++)
         http.createServer(app).listen(port);
         console.log("Digital Twin running at "+port);
 }
+

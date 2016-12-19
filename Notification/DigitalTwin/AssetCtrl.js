@@ -23,28 +23,28 @@ flagMap[2] = DelegateDirectory;
 var directoryManager = function(pubKey)
 {
     var sync = true;
-    
+
     //uer's folder path:
     var currentPath = PATH + "/" + keccak_256(pubKey).toUpperCase();
-    
+
     //make the user's folder:
     fs.existsSync(currentPath) || fs.mkdirSync(currentPath);
-    
+
     //TODO: CHECK -- will this cause an async error?
     //make the ownership, control and delegate folders:
     for(let i = 0; i < flagMap.length; i++)
     {
-        fs.existsSync(currentPath + flagMap[i]) || fs.mkdirSync(currentPath + flagMap[i]);
+        fs.existsSync(currentPath + "/" + flagMap[i]) || fs.mkdirSync(currentPath + "/" + flagMap[i]);
     }
-    
+
     sync = false;
-    
+
     while (sync) {require('deasync').sleep(100);}
 };
 
 
 
-var AssetCtrl = 
+var AssetCtrl =
 {
         //returns all your files in your owned folder
         //INPUT: pubKey
@@ -52,111 +52,111 @@ var AssetCtrl =
         {
             //get public key
             var pubKey = req.body.pubKey;
-            
+
             //call in case their folders have not been created:
             var manager = new directoryManager(pubKey);
-            
+
             //debugging
             console.log("INPUT, pubKey: " + pubKey)
-            
+
             //get file path
             var filePath = PATH + "/" + keccak_256(pubKey).toUpperCase() + "/" + OwnershipDirectory;
-            
+
             //debugging
             console.log("FILE PATH: " + filePath)
-            
-            
-            
+
+
+
             var files = [];//to return
 
             //get all file names using file sync
-            if(fs.existsSync(files))
+            if(fs.existsSync(filePath))
             {
                 files = fs.readdirSync(filePath);
             }
-            
+
             //debugging
             console.log("FILES ARE: " + files)
-            
+
             //send json response
             res.json({"data":files})
-            
+
         },
-        
+
         //returns all your files in your controlled folder
         //INPUT: pubKey
         getControlledAssets: function(req,res)
         {
             //get public key
             var pubKey = req.body.pubKey;
-            
+
             //call in case their folders have not been created:
             var manager = new directoryManager(pubKey);
-            
+
             //debugging
             console.log("INPUT, pubKey: " + pubKey)
-            
+
             //get file path
             var filePath = PATH + "/" + keccak_256(pubKey).toUpperCase() + "/" + ControlDirectory;
-            
+
             //debugging
             console.log("FILE PATH: " + filePath)
-            
+
 
             var files = [];//to return
 
             //get all file names using file sync
-            if(fs.existsSync(files))
+            if(fs.existsSync(filePath))
             {
                 files = fs.readdirSync(filePath);
             }
 
 
-            
+
             //debugging
             console.log("FILES ARE: " + files)
-            
+
             //send json response
             res.json({"data":files})
-            
+
         },
-        
+
         //returns all your files in your delegated folder
         //INPUT: pubKey
         getDelegatedAssets: function(req,res)
         {
             //get public key
             var pubKey = req.body.pubKey;
-            
+
             //call in case their folders have not been created:
             var manager = new directoryManager(pubKey);
-            
+
             //debugging
             console.log("INPUT, pubKey: " + pubKey)
-            
+
             //get file path
             var filePath = PATH + "/" + keccak_256(pubKey).toUpperCase() + "/" + DelegateDirectory;
-            
+
             //debugging
             console.log("FILE PATH: " + filePath)
-            
-            
+
+
             var files = [];//to return
 
             //get all file names using file sync
-            if(fs.existsSync(files))
+            if(fs.existsSync(filePath))
             {
                 files = fs.readdirSync(filePath);
             }
-            
+
             //debugging
             console.log("FILES ARE: " + files)
-            
+
             //send json response
             res.json({"data":files})
-            
+
         },
-        
+
         //returns an asset
         //INPUT: pubKey
         //flag (0 = owned, 1 = controlled, 2 = delegated)
@@ -165,16 +165,16 @@ var AssetCtrl =
         {
             //get public key
             var pubKey = req.body.pubKey;
-            
+
             //call in case their folders have not been created:
             var manager = new directoryManager(pubKey);
-            
+
             //get flag
             var flag = req.body.flag;
-            
+
             //get fileName
             var fileName = req.body.fileName;
-            
+
             //get the directory
             var directory = PATH + "/" + keccak_256(pubKey).toUpperCase() + "/";
             if(flag == 0)
@@ -189,9 +189,9 @@ var AssetCtrl =
             {
                 directory = directory + DelegateDirectory + + "/" + fileName;
             }
-            
+
             var cryptoEncr = new Crypto({pubKey: pubKey});
-            
+
             //debugging
             var fileName = directory;
             console.log("FILE NAME: " + directory)
@@ -206,42 +206,47 @@ var AssetCtrl =
 
                 res.json(fileContent)
 
-             } 
+             }
              else
              {
                 res.json({"Msg":"Not found."})
              }
 
-            
+
         },
-        
+
         //sets an asset
         //INPUT: pubKey
         //flag (0 = owned, 1 = controlled, 2 = delegated)
         //fileName
         //updateFlag (0 = new, 1 = update)
         //data -- only input for a write
-        //keys,vals -- only input for an update
+        //keys,values -- only input for an update
         setAsset: function(req,res)
         {
             //get public key
             var pubKey = req.body.pubKey;
-            
+
             //call in case their folders have not been created:
             var manager = new directoryManager(pubKey);
-            
+
             //get flag
             var flag = req.body.flag;
-            
+
             //get fileName
             var fileName = req.body.fileName;
-            
+
             //get updateFlag
             var updateFlag = req.body.updateFlag;
-            
-            //data to write
-            var data = params.body.data;
-            
+
+
+            //debugging functions
+            console.log("setAsset endpoint hit");
+            console.log("pubKey is: " + pubKey);
+            console.log("flag is: " + flag);
+            console.log("filename is: " + fileName);
+            console.log("updateFlag is: " + updateFlag);
+
             //get the directory
             var directory = PATH + "/" + keccak_256(pubKey).toUpperCase() + "/";
             if(flag == 0)
@@ -256,22 +261,22 @@ var AssetCtrl =
             {
                 directory = directory + DelegateDirectory + + "/" + fileName;
             }
-            
+
             var cryptoEncr = new Crypto({pubKey: pubKey});
-            
-            
+
+
             //debugging
             var fileName = directory;
             console.log("FILE NAME: " + directory)
-            
-            
+
+
             //this is an update
-            if (fs.existsSync(fileName) && flag == 1) 
+            if (fs.existsSync(fileName) && updateFlag == 1)
             {
 
                 //file exists, so this is an update
-                var keys = params.body.keys;
-                var values = params.body.values;
+                var keys = req.body.keys;
+                var values = req.body.values;
 
                 //debugging
                 console.log("File exists: " + fs.existsSync(fileName))
@@ -293,13 +298,13 @@ var AssetCtrl =
 
 
                  fs.writeFileSync(fileName, cryptoEncr.encrypt(JSON.stringify(fileContent)));
-                
-                } 
-                else
+
+                }
+                else //this is a creation
                 {
 
-                        var data = params.body.data; //json input
-                        var cryptoData = cryptoEncr.encrypt(JSON.stringify(msg.data));
+                        var data = req.body.data; //json input
+                        var cryptoData = cryptoEncr.encrypt(JSON.stringify(data));
                         fs.writeFile(fileName, cryptoData, (err) => {
                                 if(err)
                                 {
@@ -312,6 +317,4 @@ var AssetCtrl =
         }
 }
 module.exports = AssetCtrl;
-
-
 

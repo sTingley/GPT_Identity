@@ -270,13 +270,9 @@ class Assets extends Component {
 		this.state = {
 			showDetails: false,
 			wallet: { pubKey: localStorage.getItem("pubKey") },
-
-			//assign local storage.getItem("COID") to own_assets
-			//!!!!!!!!!!!!!!!!!!!!!!!!
-			//onComponentDidMount call
-			own_assets: [{}],
+			own_assets: [],
 			controlled_assets: [{ asset_id: 161718, asset_name: 'Parents House' }, { asset_id: 192021, asset_name: 'My Car' }],
-            delegated_assets: [{}]
+            delegated_assets: [{}],
 			active_asset: {},
 			show_only: []
 		};
@@ -287,10 +283,10 @@ class Assets extends Component {
 		this.searchHandler = this.searchHandler.bind(this);
 	}
 
-	componentDidMount() {
+	componentWillMount() {
         
         //get all assets, OWNED, CONTROLLED, DELEGATAED:        
-        
+
         // -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
         // -> -> -> START get OWNED assets -> -> ->
         $.ajax({
@@ -306,6 +302,9 @@ class Assets extends Component {
                 
                 //get the array:
                 data = data.data;
+                
+                //DEBUGGING:
+                console.log("getOwnedAssets result: " + data);
                 
                 if(data.length > 0)
                 {
@@ -325,13 +324,20 @@ class Assets extends Component {
                                     dataResult = JSON.parseJSON(result)
                                 }
                                 
+
+                                
                                 //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-                                this.setState({ own_assets: [{ asset_id: dataResult.assetID, asset_name: dataResult }] });
+                                var theArray = this.state.own_assets;
+                                
+                                console.log("length is: " + theArray.length)
+                                console.log(theArray)
+                                theArray[theArray.length] = { asset_id: dataResult.assetID, asset_name: dataResult }
+                                this.setState({ own_assets: theArray });
 
                             }.bind(this),
                             complete: function () 
                             {
-                                // do something
+                                
                             },
                             //console.log(result)	
                         })
@@ -363,6 +369,9 @@ class Assets extends Component {
                 
                 //get the array:
                 data = data.data;
+                
+                //debugging:
+                console.log("Get Controlled Assets result: " + data);
                 
                 if(data.length > 0)
                 {
@@ -423,6 +432,9 @@ class Assets extends Component {
                 
                 //get the array:
                 data = data.data;
+                
+                //debugging:
+                console.log("Get Delegated Assets result: " + data)
                 
                 if(data.length > 0)
                 {
@@ -580,3 +592,4 @@ class Assets extends Component {
 }
 
 export default Assets;
+

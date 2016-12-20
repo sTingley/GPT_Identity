@@ -1,10 +1,9 @@
 'use strict'
 
-var fs = require ('fs');
+var fs = require('fs');
 var Crypto = require('./cryptoCtr.js'),
-        keccak_256 = require('js-sha3').keccak_256,
-        configuration = require('./AssetCtrlConfig.json');
-
+    keccak_256 = require('js-sha3').keccak_256,
+    configuration = require('./AssetCtrlConfig.json');
 
 var PATH = configuration.PATH;
 var ControlDirectory = configuration.ControlDirectory;
@@ -18,10 +17,8 @@ flagMap[0] = OwnershipDirectory;
 flagMap[1] = ControlDirectory;
 flagMap[2] = DelegateDirectory;
 
-
 //Makes the user's directories in case they don't exist
-var directoryManager = function(pubKey)
-{
+var directoryManager = function (pubKey) {
     var sync = true;
 
     //uer's folder path:
@@ -32,24 +29,21 @@ var directoryManager = function(pubKey)
 
     //TODO: CHECK -- will this cause an async error?
     //make the ownership, control and delegate folders:
-    for(let i = 0; i < flagMap.length; i++)
-    {
+    for (let i = 0; i < flagMap.length; i++) {
         fs.existsSync(currentPath + "/" + flagMap[i]) || fs.mkdirSync(currentPath + "/" + flagMap[i]);
     }
 
     sync = false;
 
-    while (sync) {require('deasync').sleep(100);}
+    while (sync) { require('deasync').sleep(100); }
 };
 
 
-
 var AssetCtrl =
-{
+    {
         //returns all your files in your owned folder
         //INPUT: pubKey
-        getOwnedAssets: function(req,res)
-        {
+        getOwnedAssets: function (req, res) {
             //get public key
             var pubKey = req.body.pubKey;
 
@@ -65,13 +59,10 @@ var AssetCtrl =
             //debugging
             console.log("FILE PATH: " + filePath)
 
-
-
             var files = [];//to return
 
             //get all file names using file sync
-            if(fs.existsSync(filePath))
-            {
+            if (fs.existsSync(filePath)) {
                 files = fs.readdirSync(filePath);
             }
 
@@ -79,14 +70,13 @@ var AssetCtrl =
             console.log("FILES ARE: " + files)
 
             //send json response
-            res.json({"data":files})
-
+            res.json({ "data": files })
         },
+        
 
         //returns all your files in your controlled folder
         //INPUT: pubKey
-        getControlledAssets: function(req,res)
-        {
+        getControlledAssets: function (req, res) {
             //get public key
             var pubKey = req.body.pubKey;
 
@@ -102,29 +92,24 @@ var AssetCtrl =
             //debugging
             console.log("FILE PATH: " + filePath)
 
-
             var files = [];//to return
 
             //get all file names using file sync
-            if(fs.existsSync(filePath))
-            {
+            if (fs.existsSync(filePath)) {
                 files = fs.readdirSync(filePath);
             }
-
-
 
             //debugging
             console.log("FILES ARE: " + files)
 
             //send json response
-            res.json({"data":files})
-
+            res.json({ "data": files })
         },
+        
 
         //returns all your files in your delegated folder
         //INPUT: pubKey
-        getDelegatedAssets: function(req,res)
-        {
+        getDelegatedAssets: function (req, res) {
             //get public key
             var pubKey = req.body.pubKey;
 
@@ -140,12 +125,10 @@ var AssetCtrl =
             //debugging
             console.log("FILE PATH: " + filePath)
 
-
             var files = [];//to return
 
             //get all file names using file sync
-            if(fs.existsSync(filePath))
-            {
+            if (fs.existsSync(filePath)) {
                 files = fs.readdirSync(filePath);
             }
 
@@ -153,16 +136,15 @@ var AssetCtrl =
             console.log("FILES ARE: " + files)
 
             //send json response
-            res.json({"data":files})
-
+            res.json({ "data": files })
         },
+
 
         //returns an asset
         //INPUT: pubKey
         //flag (0 = owned, 1 = controlled, 2 = delegated)
         //fileName
-        getAsset: function(req,res)
-        {
+        getAsset: function (req, res) {
             //get public key
             var pubKey = req.body.pubKey;
 
@@ -177,43 +159,39 @@ var AssetCtrl =
 
             //get the directory
             var directory = PATH + "/" + keccak_256(pubKey).toUpperCase() + "/";
-            if(flag == 0)
-            {
+            if (flag == 0) {
                 directory = directory + OwnershipDirectory + "/" + fileName;
             }
-            if(flag == 1)
-            {
+            if (flag == 1) {
                 directory = directory + ControlDirectory + "/" + fileName;
             }
-            if(flag == 2)
-            {
+            if (flag == 2) {
                 directory = directory + DelegateDirectory + + "/" + fileName;
             }
 
-            var cryptoEncr = new Crypto({pubKey: pubKey});
+            var cryptoEncr = new Crypto({ pubKey: pubKey });
 
             //debugging
             var fileName = directory;
             console.log("FILE NAME: " + directory)
 
-
-            if (fs.existsSync(fileName))
-            {
+            if (fs.existsSync(fileName)) {
                 console.log("File exists")
                 console.log(fs.existsSync(fileName))
                 var fileContent = cryptoEncr.decrypt(fs.readFileSync(fileName, 'utf8'));
+
+                console.log("debugging...file content is: " + fileContent)
+
                 fileContent = JSON.parse(fileContent)
 
                 res.json(fileContent)
 
-             }
-             else
-             {
-                res.json({"Msg":"Not found."})
-             }
-
-
+            }
+            else {
+                res.json({ "Msg": "Not found." })
+            }
         },
+        
 
         //sets an asset
         //INPUT: pubKey
@@ -222,8 +200,7 @@ var AssetCtrl =
         //updateFlag (0 = new, 1 = update)
         //data -- only input for a write
         //keys,values -- only input for an update
-        setAsset: function(req,res)
-        {
+        setAsset: function (req, res) {
             //get public key
             var pubKey = req.body.pubKey;
 
@@ -239,7 +216,6 @@ var AssetCtrl =
             //get updateFlag
             var updateFlag = req.body.updateFlag;
 
-
             //debugging functions
             console.log("setAsset endpoint hit");
             console.log("pubKey is: " + pubKey);
@@ -249,30 +225,24 @@ var AssetCtrl =
 
             //get the directory
             var directory = PATH + "/" + keccak_256(pubKey).toUpperCase() + "/";
-            if(flag == 0)
-            {
+            if (flag == 0) {
                 directory = directory + OwnershipDirectory + "/" + fileName;
             }
-            if(flag == 1)
-            {
+            if (flag == 1) {
                 directory = directory + ControlDirectory + "/" + fileName;
             }
-            if(flag == 2)
-            {
+            if (flag == 2) {
                 directory = directory + DelegateDirectory + + "/" + fileName;
             }
 
-            var cryptoEncr = new Crypto({pubKey: pubKey});
-
+            var cryptoEncr = new Crypto({ pubKey: pubKey });
 
             //debugging
             var fileName = directory;
             console.log("FILE NAME: " + directory)
 
-
             //this is an update
-            if (fs.existsSync(fileName) && updateFlag == 1)
-            {
+            if (fs.existsSync(fileName) && updateFlag == 1) {
 
                 //file exists, so this is an update
                 var keys = req.body.keys;
@@ -287,35 +257,29 @@ var AssetCtrl =
                 //debugging
                 console.log("Testing, File Pulled up: " + JSON.stringify(fileContent));
 
-
-                for(var i = 0; i < keys.length; i++)
-                {
+                for (var i = 0; i < keys.length; i++) {
                     var name = keys[i];
                     var val = values[i];
 
                     fileContent[name] = val;
-                 }
-
-
-                 fs.writeFileSync(fileName, cryptoEncr.encrypt(JSON.stringify(fileContent)));
-
-                }
-                else //this is a creation
-                {
-
-                        var data = req.body.data; //json input
-                        var cryptoData = cryptoEncr.encrypt(JSON.stringify(data));
-                        fs.writeFile(fileName, cryptoData, (err) => {
-                                if(err)
-                                {
-                                        res.status(400).json({"Error": "Unable to write message in " + fileName});
-                                }
-                                res.json({"Msg":"Proposal updated successfully" });
-                        });
                 }
 
-        }
-}
+                fs.writeFileSync(fileName, cryptoEncr.encrypt(JSON.stringify(fileContent)));
+
+            }
+            else //this is a creation
+            {
+                var data = req.body.data; //json input
+                var cryptoData = cryptoEncr.encrypt(JSON.stringify(data));
+                fs.writeFile(fileName, cryptoData, (err) => {
+                    if (err) {
+                        res.status(400).json({ "Error": "Unable to write message in " + fileName });
+                    }
+                    res.json({ "Msg": "Proposal updated successfully" });
+                });
+            }
+
+        }//end setAsset
+    }//end var AssetCtrl
+    
 module.exports = AssetCtrl;
-
-

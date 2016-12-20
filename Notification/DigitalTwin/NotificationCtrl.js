@@ -4,7 +4,7 @@ var Crypto = require('./cryptoCtr.js'),
         keccak_256 = require('js-sha3').keccak_256,
         configuration = require('./NotificationCtrlConfig.json');
 
-//TODO: PATH DEFINE 
+//TODO: PATH DEFINE
 var PATH = configuration.path;
 
 //TODO: DEFINE NOTIFY_SUFFIX
@@ -12,7 +12,7 @@ var notify_suffix = configuration.notifications_file;
 
 //Functions inherited from BallotCtrl
 //TODO: Change for folder structure
-var NotificationCtrl = 
+var NotificationCtrl =
 {
         //INPUT MUST CONTAIN:
         //message
@@ -23,23 +23,23 @@ var NotificationCtrl =
         {
                 //debugging
                 console.log("you have reached writeNotification");
-                
+
                 //grab request
                 var params = req.body;
-                
+
                 //debugging
                 console.log(params);
-                
+
                 //grab message
                 var message = params.message;
-                
+
                 //debugging
                 console.log("Message is: " + message);
-                
+
                 if(!params.pubKey) res.status(400).json({"Error": "Invalid input parameters"});
-                
+
                 var fileName = PATH + params.pubKey.toUpperCase() + notify_suffix + ".json";
-                
+
                 var timestamp = Number(new Date());
                 var cryptoEncr = new Crypto({pubKey: params.pubKey});
                 var dataFormat = () => {
@@ -48,7 +48,10 @@ var NotificationCtrl =
                                 "proposal_id": params.proposalID,
                                 "message": message,
                                 "read_status": false,
-                                "time": timestamp
+                                "time": timestamp,
+                                "gatekeeperAddr": params.gatekeeperAddr,
+                                "isHuman": params.isHuman
+
                         };
                 };
                 if (fs.existsSync(fileName)) {

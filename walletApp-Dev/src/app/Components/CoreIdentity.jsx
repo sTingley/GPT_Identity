@@ -492,20 +492,22 @@ class CoreIdentity extends React.Component {
 			type: 'POST',
 			data: json,
 			success: function(res){
-				//uncomment when done with vote screen
-				/*
+                console.log(JSON.stringify(json))
                 var sendMe = {};
                 sendMe.flag = 0; //owned core identity
-                sendMe.fileName = "MyCOID.json" //*********TODO: PUT IN LOCAL STORAGE
+                sendMe.fileName = "MyCOID.json" //
                 sendMe.updateFlag = 0; //new identity
                 sendMe.data = json;
                 sendMe.pubKey = localStorage.getItem("pubKey");
-                */
+                
 				$.ajax({
-					//url: twinUrl + 'setAsset',
-					url: twinUrl + 'writeCoid',
+					url: twinUrl + 'setAsset',
 					type: 'POST',
-					data: json//sendMe
+					data: sendMe,
+                    success: function(res)
+                    {
+                        console.log("response from setAsset: " + res)
+                    }
 				})
 			},
 			complete: function(){
@@ -617,3 +619,4 @@ class CoreIdentity extends React.Component {
    }
 }
 export default CoreIdentity;
+

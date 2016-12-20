@@ -302,7 +302,7 @@ class MyGatekeeper extends React.Component {
 			tmpFile:'',
 			pubKey: localStorage.getItem("pubKey"),
 			privKey: localStorage.getItem("privKey"),
-			//gatekeeperAddr: localStorage.getItem("gatekeeperAddr"),
+			//gatekeeperAddr: localStorage.getItem("MyGatekeeperAddr"),
 			validators:[],
 			signature:'',
             assetID: []
@@ -318,7 +318,7 @@ class MyGatekeeper extends React.Component {
 		$.ajax({
 			type: "POST",
 			url: twinUrl + 'getAsset',
-			data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": "hi"},
+			data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": "MyCOID.json"},
 			success: function (result) {
 				var data = result;
 				if ($.type(result) != "object") {
@@ -405,6 +405,8 @@ class MyGatekeeper extends React.Component {
 		});
         return labelVals2;
     }
+    
+
 	
 	prepareJsonToSubmit(){
 		console.log();
@@ -571,7 +573,7 @@ class MyGatekeeper extends React.Component {
 	
 	submitCoid(e){
 		e.preventDefault();
-		var json = this.prepareJsonToSubmi();
+		var json = this.prepareJsonToSubmit();
 		var privKey1 = new Buffer(this.state.privKey,"hex");
 		var msg_hash = keccak_256(JSON.stringify(json));
 		var msg_hash_buffer = new Buffer(msg_hash,"hex");
@@ -588,7 +590,7 @@ class MyGatekeeper extends React.Component {
 		
 		json.sig = signature1;
 		json.msg = msg_hash_buffer.toString("hex");
-		json.gatekeeperAddr =	localStorage.getItem("gatekeeperAddr")
+		json.gatekeeperAddr = localStorage.getItem("gatekeeperAddr")
 		//this.setState({signature: signature1})
 		
 		console.log(json)
@@ -599,9 +601,9 @@ class MyGatekeeper extends React.Component {
 			success: function(res){
                 var sendMe = {};
                 sendMe.flag = 0; //owned asset
-                sendMe.fileName = this.state.assetID + ".json"; 
+                sendMe.fileName = json.assetID[0] + ".json"; 
                 sendMe.pubKey = localStorage.getItem("pubKey");
-                snedMe.data = json;
+                sendMe.data = json;
                 sendMe.updateFlag = 0;
 				$.ajax({
                     //****************TODO

@@ -1,4 +1,3 @@
-
 'use strict'
 var chainConfig = require('/home/demoadmin/.eris/ErisChainConfig.json')
 var erisContracts = require('eris-contracts')
@@ -20,7 +19,6 @@ var keccak_256 = require('js-sha3').keccak_256;
 
 //These variables are for creating the server
 var hostname = 'localhost';
-var twinUrl = "http://localhost:5050";
 
 var app = express();
 app.use(morgan('dev'));

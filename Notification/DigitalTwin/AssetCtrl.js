@@ -72,7 +72,7 @@ var AssetCtrl =
             //send json response
             res.json({ "data": files })
         },
-        
+
 
         //returns all your files in your controlled folder
         //INPUT: pubKey
@@ -105,7 +105,7 @@ var AssetCtrl =
             //send json response
             res.json({ "data": files })
         },
-        
+
 
         //returns all your files in your delegated folder
         //INPUT: pubKey
@@ -191,7 +191,7 @@ var AssetCtrl =
                 res.json({ "Msg": "Not found." })
             }
         },
-        
+
 
         //sets an asset
         //INPUT: pubKey
@@ -279,7 +279,53 @@ var AssetCtrl =
                 });
             }
 
-        }//end setAsset
+        },//end setAsset
+
+
+        //To delete an asset
+        //INPUT: pubKey
+        //flag (0 = owned, 1 = controlled, 2 = delegated)
+        //fileName
+        deleteAsset: function (req, res) {
+            //get public key
+            var pubKey = req.body.pubKey;
+
+            //get flag
+            var flag = req.body.flag;
+
+            //get fileName
+            var fileName = req.body.fileName;
+
+            //get the directory
+            var directory = PATH + "/" + keccak_256(pubKey).toUpperCase() + "/";
+            if (flag == 0) {
+                directory = directory + OwnershipDirectory + "/" + fileName;
+            }
+            if (flag == 1) {
+                directory = directory + ControlDirectory + "/" + fileName;
+            }
+            if (flag == 2) {
+                directory = directory + DelegateDirectory + + "/" + fileName;
+            }
+
+            //debugging
+            var fileName = directory;
+            console.log("FILE NAME: " + directory)
+
+            if (fs.existsSync(fileName)) {
+                console.log("File exists")
+                console.log(fs.existsSync(fileName))
+
+                fs.unlinkSync(fileName);
+
+                res.json({ "Msg": "File Deleted." })
+
+            }
+            else {
+                res.json({ "Msg": "File Not found." })
+            }
+        }//end deleteAsset
+
     }//end var AssetCtrl
-    
+
 module.exports = AssetCtrl;

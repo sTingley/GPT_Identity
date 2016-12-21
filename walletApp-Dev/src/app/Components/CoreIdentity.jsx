@@ -361,7 +361,7 @@ class CoreIdentity extends React.Component {
 				
 				"isHuman": true,
 				"timestamp": "",
-				"assetID": "COID",
+				"assetID": "MyCOID",
 				"Type": "non_cash",
 				"bigchainHash":  "",
 				"bigchainID": "",

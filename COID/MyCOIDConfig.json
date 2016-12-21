@@ -1,0 +1,15 @@
+{
+    "getControllers" : "getControllers",
+    "revokeControlDelegation": "revokeControlDelegation",
+    "spendMyTokens": "spendMyTokens",
+    "myAmount": "myAmount",
+    "delegate": "delegate",
+    "changeTokenController": "changeTokenController",
+    "amountDelegated": "amountDelegated",
+    "addController": "addController",
+    "removeController": "removeController",
+    "myTokenAmount": "myTokenAmount",
+    "addOwner": "addOwner",
+    "removeOwner": "removeOwner",
+    "giveTokens": "giveTokens"
+}

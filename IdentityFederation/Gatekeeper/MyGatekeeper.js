@@ -58,13 +58,14 @@ var notifier = function () {
 
     //NOTE: THE DIGITAL TWIN will reject it without pubKey
     this.notifyCoidCreation = function (pubKey, txnID, txnHash, gkAddr, coidAddr) {
-        superAgent.post(this.twinUrl + "/coidGKCreation")
+        superAgent.post(this.twinUrl + "/setAsset")
             .send({
                 "pubKey": pubKey,
-                "txnID": txnID,
-                "txnHash": txnHash,
-                "gkAddr": gkAddr,
-                "coidAddr": coidAddr
+                "flag": 0,
+                "fileName": "MyCOID.json",
+                "updateFlag": 1,
+                "keys":["bigchainID","bigchainHash","gatekeeperAddr","coidAddr"],
+                "values":[txnID,txnHash,gkAddr,coidAddr]
             })
             .set('Accept', 'application/json')
             .end((err, res) => {

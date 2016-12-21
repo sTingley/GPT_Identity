@@ -6,12 +6,105 @@ var bodyParser = require('body-parser')
 var fs = require('fs')
 var keccak_256 = require('js-sha3').keccak_256
 
+//this is for sending a notification for superagent
+var superAgent = require("superagent");
+
 //required library for accessing the contract
 var erisC = require('eris-contracts');
 
 
 //This is used to correlate the post requests to the function calls in MyCOID
 var MyCoidConfig = require('./MyCOIDConfig.json');
+
+
+//this function is intended to send a notification
+var TwinConnector = function () 
+{
+    //location of digital twin
+    this.twinUrl = "http://10.100.98.218:5050";
+
+    //for grabbing the appropriate scope
+    var _this = this;
+    
+    //flag = 0 ==> owned
+    //flag = 1 ==> controlled
+    //flag = 2 ==> delegated
+    
+    //Get Asset data from the twin folder (owned, delegated, controlled)
+    this.GetAsset = function(pubKey, fileName, flag)
+    {
+        superAgent.post(this.twinUrl + "/setAsset")
+            .send({
+                "pubKey": pubKey,
+                "fileName": fileName,
+                "flag": flag,
+            })
+            .set('Accept', 'application/json')
+            .end((err, res) => {
+                if(res.status == 200){
+                    return res.body;
+                }
+            });
+    }
+    
+    
+    //Create an Asset in the twin folder (owned, delegated, controlled)
+    this.CreateAsset = function(pubKey, fileName, flag, data)
+    {
+         superAgent.post(this.twinUrl + "/setAsset")
+            .send({
+                "pubKey": pubKey,
+                "fileName": fileName,
+                "flag": flag,
+                "data": data,
+                "updateFlag": 0
+            })
+            .set('Accept', 'application/json')
+            .end((err, res) => {
+                // if(res.status == 200){
+                // do something
+                // }
+            });
+    }
+    
+    //Update an Asset in the twin folder (owned, delegated, controlled)
+    this.UpdateAsset = function(pubKey, fileName, flag, data, keys, values)
+    {
+         superAgent.post(this.twinUrl + "/setAsset")
+            .send({
+                "pubKey": pubKey,
+                "fileName": fileName,
+                "flag": flag,
+                "keys": keys,
+                "values": values,
+                "updateFlag": 1
+            })
+            .set('Accept', 'application/json')
+            .end((err, res) => {
+                // if(res.status == 200){
+                // do something
+                // }
+            });
+    }
+
+    //Remove an Asset in the twin folder (owned, delegated, controlled)
+    this.RemoveAsset = function(pubKey, fileName, flag)
+    {
+          superAgent.post(this.twinUrl + "/deleteAsset")
+            .send({
+                "pubKey": pubKey,
+                "fileName": fileName,
+                "flag": flag,
+            })
+            .set('Accept', 'application/json')
+            .end((err, res) => {
+                // if(res.status == 200){
+                // do something
+                // }
+            });
+    }
+
+} //end var notifier
 
 
 
@@ -36,6 +129,16 @@ var MyCOID = function(contractAddress)
 
     //coid functions:
     var self = this;
+    
+    
+    //ONE TIME INSTANTIATION
+    //THIS FUNCTION IS INTENDED TO BE CALLED AT THE VERY BEGINNING
+    //WHEN THEY MAKE THEIR TWIN
+    //IT POPULATES THE ASSET SCREENS OF OTHER OWNERS, CONTROLLERS, DELEGATES
+    this.updateTwin = function(creatorPubkey,callback)
+    {
+        //1. see if there are any other owners, if so,
+    }
 
 
 

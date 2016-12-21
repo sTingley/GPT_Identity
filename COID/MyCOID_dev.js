@@ -6,6 +6,9 @@ var bodyParser = require('body-parser')
 var fs = require('fs')
 var keccak_256 = require('js-sha3').keccak_256
 
+//configuration of the chain
+var chainConfig = require('/home/demoadmin/.eris/ErisChainConfig.json')
+
 //this is for sending a notification for superagent
 var superAgent = require("superagent");
 
@@ -116,15 +119,15 @@ var TwinConnector = function ()
 var MyCOID = function(contractAddress)
 {
     //get the contract:
-    this.chain = 'newchain4_full_000'
-    this.erisdburl = 'http://10.100.98.218:1337/rpc'
+    this.chain = 'primaryAccount'
+    this.erisdburl = chainConfig.chainURL
     this.contractData = require('./epm.json')
     var contractAddr = contractAddress
     console.log("contract addr: " + contractAddr)
     this.contractAbiAddress = this.contractData['CoreIdentity'];
     this.erisAbi = JSON.parse(fs.readFileSync("./abi/"+this.contractAbiAddress));
     this.accountData = require("./accounts.json");
-    this.contractMgr = erisC.newContractManagerDev(this.erisdburl, this.accountData[this.chain]);
+    this.contractMgr = erisC.newContractManagerDev(this.erisdburl, chainConfig[this.chain]);
     this.contract = this.contractMgr.newContractFactory(this.erisAbi).at(contractAddress);
 
     //coid functions:

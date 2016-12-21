@@ -22,7 +22,6 @@ var keccak_256 = require('js-sha3').keccak_256;
 
 //These variables are for creating the server
 var hostname = 'localhost';
-var twinUrl = "http://localhost:5050";
 
 var app = express();
 app.use(morgan('dev'));
@@ -53,7 +52,7 @@ var indexer = 0;
 var notifier = function()
 {
         //location of digital twin
-        this.twinUrl = "http://localhost:5050";
+        this.twinUrl = "http://10.100.98.218:5050";
 
         //for grabbing the appropriate scope
         var _this = this;
@@ -120,7 +119,7 @@ function CoidMaker(coidAddr,formdata)
     //get params for their COID contract
     console.log("hi")
     var contrData = require("./epm.json");
-    var abiAddr = "D7EB5C125F29367C5E906D9EE735691B972F286C";
+    var abiAddr = contrData['CoreIdentity'];
     var abi_COID = JSON.parse(fs.readFileSync('./abi/' + abiAddr, 'utf8'))
     var accounts = require('./accounts.json')
     var chainUrl = 'http://localhost:1337/rpc'

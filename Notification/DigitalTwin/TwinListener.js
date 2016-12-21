@@ -82,6 +82,7 @@ app.post('/getControlledAssets',AssetCtrl.getControlledAssets);
 app.post('/getDelegatedAssets',AssetCtrl.getDelegatedAssets);
 app.post('/getAsset',AssetCtrl.getAsset);
 app.post('/setAsset',AssetCtrl.setAsset);
+app.post('/deleteAsset',AssetCtrl.deleteAsset);
 // <- <- <- END ASSET FUNCTIONS <- <- <-
 
 
@@ -128,4 +129,3 @@ for(var i=0; i<TwinConfig.ports.length; i++)
         http.createServer(app).listen(port);
         console.log("Digital Twin running at "+port);
 }
-

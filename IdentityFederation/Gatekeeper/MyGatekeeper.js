@@ -21,7 +21,6 @@ var keccak_256 = require('js-sha3').keccak_256;
 
 //These variables are for creating the server
 var hostname = 'localhost';
-var twinUrl = "http://localhost:5050";
 
 var app = express();
 app.use(morgan('dev'));
@@ -48,7 +47,7 @@ var indexer = 0;
 //this function is intended to send a notification
 var notifier = function () {
     //location of digital twin
-    this.twinUrl = "http://localhost:5050";
+    this.twinUrl = "http://10.100.98.218:5050";
 
     //for grabbing the appropriate scope
     var _this = this;
@@ -58,6 +57,8 @@ var notifier = function () {
 
     //NOTE: THE DIGITAL TWIN will reject it without pubKey
     this.notifyCoidCreation = function (pubKey, assetID, txnID, txnHash, gkAddr, coidAddr) {
+
+	console.log("ASSET ID IS: " + assetID);
         superAgent.post(this.twinUrl + "/setAsset")
             .send({
                 "pubKey": pubKey,

@@ -4,7 +4,7 @@ Repository for GPT platform
 In /Notification you will see folders for ballot, digital twin
 In /IdentityFederation you will see DAO and gatekeeper (also BigchainRouter.js)
 
-CURRENT CHAIN: 'hercules'
+CURRENT CHAIN: 'tuesday4'
 
 NEW FILE: ErisChainConfig.json (for easier chain migration)
 

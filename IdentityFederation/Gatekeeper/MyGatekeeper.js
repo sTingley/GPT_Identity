@@ -57,12 +57,12 @@ var notifier = function () {
     //TODO: CHANGE THE ENDPOINT:
 
     //NOTE: THE DIGITAL TWIN will reject it without pubKey
-    this.notifyCoidCreation = function (pubKey, txnID, txnHash, gkAddr, coidAddr) {
+    this.notifyCoidCreation = function (pubKey, assetID, txnID, txnHash, gkAddr, coidAddr) {
         superAgent.post(this.twinUrl + "/setAsset")
             .send({
                 "pubKey": pubKey,
                 "flag": 0,
-                "fileName": "MyCOID.json",
+                "fileName": assetID + ".json",
                 "updateFlag": 1,
                 "keys":["bigchainID","bigchainHash","gatekeeperAddr","coidAddr"],
                 "values":[txnID,txnHash,gkAddr,coidAddr]
@@ -931,7 +931,7 @@ var eventListener = function (MyGKAddr) {
                                 console.log("THE HASH: " + theHash)
                                 console.log("GK ADDR: " + coidGKAddr)
                                 console.log("COID ADDR: " + coidAddr)
-                                theNotifier.notifyCoidCreation(formdataArray[index].pubKey, theId, theHash, coidGKAddr, coidAddr)
+                                theNotifier.notifyCoidCreation(formdataArray[index].pubKey, formdataArray[index].assetID, theId, theHash, coidGKAddr, coidAddr)
 
 
                                 //make the core identity

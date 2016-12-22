@@ -21,18 +21,18 @@ var MyCoidConfig = require('./MyCOIDConfig.json');
 
 
 //this function is intended to send a notification
-var TwinConnector = function () 
+var TwinConnector = function()
 {
     //location of digital twin
     this.twinUrl = "http://10.100.98.218:5050";
 
     //for grabbing the appropriate scope
     var _this = this;
-    
+
     //flag = 0 ==> owned
     //flag = 1 ==> controlled
     //flag = 2 ==> delegated
-    
+
     //Get Asset data from the twin folder (owned, delegated, controlled)
     this.GetAsset = function(pubKey, fileName, flag)
     {
@@ -49,8 +49,8 @@ var TwinConnector = function ()
                 }
             });
     }
-    
-    
+
+
     //Create an Asset in the twin folder (owned, delegated, controlled)
     this.CreateAsset = function(pubKey, fileName, flag, data)
     {
@@ -69,7 +69,7 @@ var TwinConnector = function ()
                 // }
             });
     }
-    
+
     //Update an Asset in the twin folder (owned, delegated, controlled)
     this.UpdateAsset = function(pubKey, fileName, flag, data, keys, values)
     {
@@ -118,6 +118,10 @@ var TwinConnector = function ()
 //The location will always be where gatekeeper deployed it.
 var MyCOID = function(contractAddress)
 {
+
+    //debugging:
+    console.log("You made a MyCOID object");
+
     //get the contract:
     this.chain = 'primaryAccount'
     this.erisdburl = chainConfig.chainURL
@@ -132,8 +136,8 @@ var MyCOID = function(contractAddress)
 
     //coid functions:
     var self = this;
-    
-    
+
+
     //ONE TIME INSTANTIATION
     //THIS FUNCTION IS INTENDED TO BE CALLED AT THE VERY BEGINNING
     //WHEN THEY MAKE THEIR TWIN
@@ -329,16 +333,19 @@ var MyCOID = function(contractAddress)
     //Tells an owner how many tokens they have.
     this.myTokenAmount = function(formdata,callback)
     {
+        console.log("DEBUGGING: YOU HIT MYTOKENAMOUNT");
+
         var msg = formdata.msg;
         var sig = formdata.sig;
         var owner = formdata.owner;
-
+        console.log("owner: " + owner);
         //TODO:
         var ownershipHash = keccak_256(owner).toUpperCase()
 
         self.contract.myTokenAmount(ownershipHash,function(error,result)
         {
-            callback(error,result)
+            console.log("DEBUGGING...RESULT,ERROR: " + ("" + result) + "..." + error)
+            callback(error,"" + result)
         })
     }
 
@@ -425,6 +432,9 @@ for(let endpoint in MyCoidConfig)
     console.log(endpoint)
     app.post('/'+endpoint,function(req,res)
     {
+
+        console.log("POSTED ENDPOINT: " + endpoint);
+
         //their contract address
         var contractAddress = req.body.address;
         console.log(contractAddress)
@@ -437,21 +447,21 @@ for(let endpoint in MyCoidConfig)
 
         console.log("function call is: " + functionCall)
 
-        res.json({'Status':'hi','Result':'hello'})
+       // res.json({'Status':'hi','Result':'hello'})
 
         //formulate the string of code for the function call
-       // var toExecute = "myCoid." + MyCoidConfig[endpoint] + "(formdata,function(error,result)"
-       // toExecute = toExecute + "{"
-       // toExecute = toExecute + "res.json({'Status':error,'Result':(''+result)});"
-       // toExecute = toExecute + "console.log(result + '');"
-       // toExecute = toExecute + "console.log('result is: ' + result);"
-       // toExecute = toExecute + "})"
+        var toExecute = "myCoid." + MyCoidConfig[endpoint] + "(formdata,function(error,result)"
+        toExecute = toExecute + "{"
+        toExecute = toExecute + "res.json({'Status':error,'Result':(''+result)});"
+        toExecute = toExecute + "console.log(result + '');"
+        toExecute = toExecute + "console.log('result is: ' + result);"
+        toExecute = toExecute + "})"
 
         //for debugging
-       // console.log(toExecute);
+        console.log(toExecute);
 
         //evaulate the given function
-       // eval(toExecute);
+        eval(toExecute);
     })
 }
 

@@ -20,9 +20,12 @@ import UploadKeyStore from './Components/Upload.jsx';
 import ToVote from './Components/ToVote.jsx';
 import Notifications from './Components/Notifications.jsx';
 import Assets from './Components/Assets.jsx';
+import MyCoreIdentity from './Components/MyCoreIdentity.jsx';
 
 import Documents from './Components/Documents.jsx';
 import MyGateKeeper from './Components/MyGateKeeper.jsx';
+
+
 
 class App extends React.Component {
 
@@ -74,7 +77,6 @@ function validateLogin(nextState, replace){
 		window.location.reload();
 	}
 }
-
 render((
 	<Router history={hashHistory}>
     	<Route path="/" component={App}>
@@ -88,6 +90,7 @@ render((
 			<Route path="assets" component={Assets} onEnter={validateLogin} />
 			<Route path="docs" component={Documents} onEnter={validateLogin} />
 			<Route path="myGateKeeper" component={MyGateKeeper} onEnter={validateLogin} />
+            <Route path="mycoreidentity" component={MyCoreIdentity} onEnter={validateLogin} />
       	</Route>
     </Router>
 ), document.getElementById('app'));

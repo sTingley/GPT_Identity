@@ -284,7 +284,7 @@ class MyGatekeeper extends React.Component {
 		this.state = {
 			file_attrs:[],
 			inputs: ['input-0'], //removed input-1
-			inputs_name:['input1-0'],
+			inputs_control:['input1-0'],
 			inputs_ownership:['input1-0'],
 			official_id:[],		//first official ID is name (see identity spec v1.3)
 			owner_id:[],
@@ -641,10 +641,10 @@ class MyGatekeeper extends React.Component {
     }
 	
 	appendInputControllers() {
-		var inputLen = this.state.inputs_name.length;
+		var inputLen = this.state.inputs_control.length;
 		if(inputLen < this.maxUniqAttr){
 			var newInput1 = `input1-${inputLen}`;
-        	this.setState({ inputs_name: this.state.inputs_name.concat([newInput1]) });
+        	this.setState({ inputs_control: this.state.inputs_control.concat([newInput1]) });
 		}
 	}
 	
@@ -710,7 +710,7 @@ class MyGatekeeper extends React.Component {
 					</div>
 					<div className="form-group">
 						<label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
-						{this.state.inputs_name.map(input => <ControlTokenDistributionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+						{this.state.inputs_control.map(input => <ControlTokenDistributionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
 					</div>
 					<div className="form-group"> 
 						<div className="col-md-offset-6 col-md-6 "> 

@@ -114,6 +114,9 @@ app.use('/getCoidData',proxy(proxyBallot))
 // -> -> -> START MYCOID FUNCTIONS -> -> ->
 var proxyMyCOID = getConfiguration(TwinConfig.MY_COID_CONFIG.TARGET,"/MyCOID/myTokenAmount",TwinConfig.MY_COID_CONFIG.ENDPOINT.TOKENAMOUNT,"MyCOID/myTokenAmount" )
 app.use('/MyCOID/myTokenAmount', proxy(proxyBallot))
+
+var proxyMyControllers = getConfiguration(TwinConfig.MY_COID_CONFIG.TARGET,"/MyCOID/getControllers",TwinConfig.MY_COID_CONFIG.ENDPOINT.CONTROLLERS,"MyCOID/getControllers" )
+app.use('/MyCOID/getControllers', proxy(proxyMyControllers))
 // <- <- <- END MYCOID FUNCTIONS <- <- <-
 
 // -> -> -> START MYGATEKEEPER FUNCTIONS -> -> ->

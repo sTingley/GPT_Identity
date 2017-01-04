@@ -1,4 +1,5 @@
 
+
 import "CoreIdentity.sol";
 import "IdentityDimension.sol"
 
@@ -9,12 +10,10 @@ contract IdentityDimensionControl
     
     address[] dimensions; //addresses of the dimension contract at index i
     bytes32[] IDs; //IDs of the dimension contract at index i
-    string[] dimensionDescriptors; //Descriptor of each dimension contract (example "financial history")
+    string[] dimensionType; //Descriptor of each dimension contract (example "financial history")
     
     struct delegation
     {
-        
-        
         bytes32 accessGranter; //sha3 of COID owner/controller to grant access
         bytes32 controller; //sha3 pubkey of delegate controller
         uint quantity;
@@ -56,10 +55,14 @@ contract IdentityDimensionControl
             if(found == false)
             {
                 dimensions.push(address(creation));
+                IDs.push(creation.getID());
+                dimensionTypes.push(descriptorInput);
             }
             else
             {
                 dimensions[i] = address(creation);
+                IDs[i] = creation.getID();
+                dimensionTypes[i] = descriptorInput;
             }
             success = true;
         }
@@ -81,7 +84,7 @@ contract IdentityDimensionControl
             //if it is not null descriptor, use this route to get the index
             if(descriptor != "")
             {
-                (found,index) = findIndexOfDescriptor(descriptor);
+                (found,index) = findIndexOfType(descriptor);
                 
                 if(found)
                 {
@@ -109,23 +112,158 @@ contract IdentityDimensionControl
         
     }
     
+    //NOTE: One of Type or ID can be null. To make it easier for the user to call this function.
+    //This function adds a (attribute/descriptor) entry to a dimension.
+    //They must be an Owner or Controller to call this function.
+    function addEntry(string pubKey, string type, bytes32 ID, string attribute, string descriptor, uint flag) returns (bool result)
+    {
+        result = false;    
+        
+        //params for accessing the relevant IdentityDimension Contract
+        bool found = false;
+        address addr = 0x0;
+        
+        
+        if(myCOID.isOwner(sha3(pubKey)) || myCOID.isController(sha3(pubKey)))
+        {
+            
+            (found,addr) = getDimensionAddress(type, ID);
+            
+            
+            //were able to find the identity contract:
+            if(found)
+            {
+                
+                //get the identity contract:
+                IdentityDimension current = IdentityDimension(addr);
+                
+                //add the entry to the identity contract:
+                result = current.addEntry(attribute, descriptor, flag);
+                
+            }
+        }
+
+    }
+    
+    
+    //NOTE: One of Type or ID can be null. To make it easier for the user to call this function.
+    //This function removes an (attribute/descriptor) entry from a dimension.
+    //They must be an Owner or Controller to call this function.
+    function removeEntry(string pubKey, string type, bytes32 ID, string attribute) returns (bool result)
+    {
+        result = false;    
+        
+        //params for accessing the relevant IdentityDimension Contract
+        bool found = false;
+        address addr = 0x0;
+        
+        
+        if(myCOID.isOwner(sha3(pubKey)) || myCOID.isController(sha3(pubKey)))
+        {
+            
+            (found,addr) = getDimensionAddress(type, ID);
+            
+            
+            //were able to find the identity contract:
+            if(found)
+            {
+                
+                //get the identity contract:
+                IdentityDimension current = IdentityDimension(addr);
+                
+                //add the entry to the identity contract:
+                result = current.deleteEntry(attribute);
+                
+            }
+        }
+
+    }
+    
+    
+    //NOTE: One of Type or ID can be null. To make it easier for the user to call this function.
+    //This function allows you to change the descriptor and/or flag of an entry.
+    //IMPORTANT: If you do not wish to change the descriptor, make it null.
+    //If you do not wish to change the flag, make it 2.
+    function updateEntry(string pubKey, string type, bytes32 ID, string attribute, string descriptor, uint flag) returns (bool result)
+    {
+        
+        result = false;    
+        
+        //params for accessing the relevant IdentityDimension Contract
+        bool found = false;
+        address addr = 0x0;
+        
+        
+        if(myCOID.isOwner(sha3(pubKey)) || myCOID.isController(sha3(pubKey)))
+        {
+            
+            (found,addr) = getDimensionAddress(type, ID);
+            
+            
+            //were able to find the identity contract:
+            if(found)
+            {
+                
+                //get the identity contract:
+                IdentityDimension current = IdentityDimension(addr);
+                
+                //add the entry to the identity contract:
+                result = current.update(attribute, descriptor, flag);
+                
+            }
+        }
+    }
+
+    
     //all through myCOID
     
     function delegate
     
+    // -> -> -> -> -> ->
+    // HELPER FUNCTIONS:
+    // -> -> -> -> -> ->
     
-    //helper functions:
+    
+    //gives you the address of a dimension contract. It is okay if one of the two parameters are null.
+    //This is itended to let the user access the contract either by knowing the type of the dimension
+    //("ex. financial history") or by knowing the ID of the dimension.
+    function getDimensionAddress(string type, bytes32 ID) returns (bool found, address addr)
+    {
+        found = false;
+        addr = 0x0;
+        
+        uint index = 0;
+        
+        //if the type is non-null, use this route:
+        if(type != "")
+        {
+            (index,found) = findIndexOfType(type);
+        }
+        else
+        {
+            if(ID != 0x0)
+            {
+                (index,found) = findIndexOfID(ID);
+            }
+        }
+        
+        if(found)
+        {
+            addr = dimensions[index];
+        }
+    }
+    
     //Finds index by Descriptor. The index can be used by dimensions (an array) to find the address of the contract on the blockchain.
-    function findIndexOfDescriptor(string descriptor) returns (bool found, uint index)
+    function findIndexOfType(string type) returns (bool found, uint index)
     {
         found = false;
         index = 0;
         
-        if(dimensionDescriptors.length > 0)
+        if(dimensionTypes.length > 0)
         {
-            for(uint i = 0; i < dimensionDescriptors.length; i++)
+            for(uint i = 0; i < dimensionTypes.length; i++)
             {
-                if(dimensionDescriptors[i] == descriptor)
+                if(dimensionTypes[i] == type)
                 {
                     found = true;
                     index = i;
@@ -156,12 +294,11 @@ contract IdentityDimensionControl
     //deletes the values at index i:
     function deleteDimensionIndex(uint index) returns (bool success)
     {
-        dimensions[i] = 0x0;
-        IDs[i] = 0x0;
-        dimensionDescriptors[i] = 0x0;
+        dimensions[index] = 0x0;
+        IDs[index] = 0x0;
+        dimensionTypes[index] = 0x0;
     }
 
 
 
 }
-

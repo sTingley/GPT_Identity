@@ -18,6 +18,6 @@
     "MY_COID_CONFIG":
     {
         "TARGET": "http://10.100.99.207:3012/",
-        "ENDPOINT": {"TokenAmount":"/myTokenAmount"}
+        "ENDPOINT": {"TokenAmount":"/myTokenAmount", "CONTROLLERS":"/getControllers"}
     }
 }

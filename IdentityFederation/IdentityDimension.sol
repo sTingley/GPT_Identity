@@ -6,8 +6,8 @@ contract IdentityDimension
     //Attributes
     struct Attributes
     {
+        string attribute;
         string descriptor;
-        string value;
         uint flag; //flag = 0 ==> public, flag = 1 ==> public
     }
     Attributes[] theAttributes;
@@ -19,20 +19,20 @@ contract IdentityDimension
         val = uint(sha3(nonce))%(min+max)-min;
     }
     //constructor — input information at instantiation
-    function IdentityDimension(bytes32 uniqueID, string typeInput, string descriptorInput, uint flag)
+    function IdentityDimension(bytes32 uniqueID, string attributeInput, string descriptorInput, uint flag)
     {
     
         nonce = 0;
         indexer = 0;
     
         ID = sha3(uniqueID + getRand(1,1000));
-        dimensionType = typeInput;
+        dimensionType = attributeInput;
         dimensionDescriptor = descriptorInput;
         
         //create the first Attribute/descriptor pair — is always “Owner"
-        Attribute temp;
-        temp.descriptor = “Owner";
-        temp.value = sha3(uniqueID);
+        Attributes temp;
+        temp.attribute = “Owner";
+        temp.descriptor = sha3(uniqueID);
         temp.flag = flag;
         
         //add the attribute to the array;
@@ -40,8 +40,16 @@ contract IdentityDimension
         //update the indexer
         indexer++;
     }
+    
+    function getID() returns (bytes32 theID)
+    {
+        theID = ID;
+    }
+    
+    
+    
     //Add attribute/descriptor
-    function addEntry(string descriptor, string value, uint flag) returns (bool success)
+    function addEntry(string attribute, string descriptor, uint flag) returns (bool success)
     {
         success = false;
         //see if there is an empty spot before indexer:
@@ -50,7 +58,7 @@ contract IdentityDimension
         uint theIndex = 0;
         for(uint i = 0; i < indexer; i++)
         {
-            if(theAttributes.descriptor == “”)
+            if(theAttributes.attribute == "")
             {
                 found = true;
                 theIndex = i;
@@ -58,14 +66,14 @@ contract IdentityDimension
         }
         if(found)
         {
+            theAttributes[theIndex].attribute = attribute;
             theAttributes[theIndex].descriptor = descriptor;
-            theAttributes[theIndex].value = value;
         }
         else //create a new spot in the array
         {
-            Attribute temp;
+            Attributes temp;
+            temp.attribute = attribute;
             temp.descriptor = descriptor;
-            temp.value = value;
             temp.flag = flag;
             //add the attribute to the array;
             theAttributes.push(temp);
@@ -74,42 +82,54 @@ contract IdentityDimension
         }
         success = true;
     }
-    function deleteEntry(string descriptor) returns (bool success)
+    function deleteEntry(string attribute) returns (bool success)
     {
         success = false;
         for(uint i = 0; i < indexer; i++)
         {
-            if(theAttributes[i].descriptor == descriptor))
+            if(theAttributes[i].attribute == attribute))
             {
                 success = true;
-                theAttributes.descriptor = “";
-                theAttributes.value = “";
+                theAttributes.attribute = "";
+                theAttributes.descriptor = "";
                 theAttributes.flag = 0;
             }
         }
     }
-    function update(string descriptor, string value, uint flag) returns (bool success)
+    
+    //If the descriptor is "", then leave it as it is
+    //if the flag is 2, then leave it as it is
+    function update(string attribute, string descriptor, uint flag) returns (bool success)
     {
         success = false;
         for(uint i = 0; i < indexer; i++)
         {
-            if(theAttributes[i].descriptor == descriptor)
+            if(theAttributes[i].attribute == attribute)
             {
                 success = true;
-                theAttributes.value = value;
-                theAttributes.flag = flag;
-            }           
+                if(descriptor != "")
+                {
+                    theAttributes.descriptor = descriptor;
+                    success = true;
+                }
+                if(flag != 2)
+                {
+                    theAttributes.flag = flag;
+                    success = true;
+                }   
+                
+            }    
         }
     }
-    function read(string descriptor) returns (string value)
+    function read(string attribute) returns (string value)
     {
         value = “”;
         
-            for(uint i = 0; i < indexer; i++)
+        for(uint i = 0; i < indexer; i++)
          {
-            if(theAttributes[i].descriptor == descriptor)
+            if(theAttributes[i].attribute == attribute)
             {
-                value = theAttributes.value;
+                value = theAttributes.attribute;
             }
         }
     
@@ -119,8 +139,5 @@ contract IdentityDimension
     {
         suicide(this);
     }
-    //TODO: Should the below access reading (from GPT Specification 1.4) be added to this contract or IdentityDimensionControl contract?
-    //1. Only a COID Owner can instantiate or kill an Identity Dimension Contract (function #1 & #6). Invoking #6 requires consensus of all owners
-    //2. Only a COID Owner or full controller can access functions #2 - #4
-    //3. COID onwers & controllers and delegate controllers specified in the Identity Dimension Control Token contract can access function #5
+
  }

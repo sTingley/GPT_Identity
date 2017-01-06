@@ -21,18 +21,18 @@ var MyCoidConfig = require('./MyCOIDConfig.json');
 
 
 //this function is intended to send a notification
-var TwinConnector = function()
+var TwinConnector = function() 
 {
     //location of digital twin
     this.twinUrl = "http://10.100.98.218:5050";
 
     //for grabbing the appropriate scope
     var _this = this;
-
+    
     //flag = 0 ==> owned
     //flag = 1 ==> controlled
     //flag = 2 ==> delegated
-
+    
     //Get Asset data from the twin folder (owned, delegated, controlled)
     this.GetAsset = function(pubKey, fileName, flag)
     {
@@ -49,8 +49,8 @@ var TwinConnector = function()
                 }
             });
     }
-
-
+    
+    
     //Create an Asset in the twin folder (owned, delegated, controlled)
     this.CreateAsset = function(pubKey, fileName, flag, data)
     {
@@ -69,7 +69,7 @@ var TwinConnector = function()
                 // }
             });
     }
-
+    
     //Update an Asset in the twin folder (owned, delegated, controlled)
     this.UpdateAsset = function(pubKey, fileName, flag, data, keys, values)
     {
@@ -136,8 +136,8 @@ var MyCOID = function(contractAddress)
 
     //coid functions:
     var self = this;
-
-
+    
+    
     //ONE TIME INSTANTIATION
     //THIS FUNCTION IS INTENDED TO BE CALLED AT THE VERY BEGINNING
     //WHEN THEY MAKE THEIR TWIN
@@ -153,8 +153,8 @@ var MyCOID = function(contractAddress)
     //
     //
 
-    //GET CONTROLLER LIST
-    this.getControllers = function(formdata,callback)
+    //GET CONTROLLER VALUES (from list)
+    this.getControllerTokens = function(formdata,callback)
     {
         var pubKey = formdata.pubKey;
         var msg = formdata.msg;
@@ -162,9 +162,26 @@ var MyCOID = function(contractAddress)
 
         self.contract.getList(function(error,result)
         {
+	    console.log("got controller tokens (inside function)")
             callback(error,result)
         })
     }
+
+
+    //GET CONTROLLER LIST
+    this.getControllerList = function(formdata,callback)
+    {
+        var pubKey = formdata.pubKey;
+        var msg = formdata.msg;
+        var sig = formdata.sig;
+
+        self.contract.getControllerList(function(error,result)
+        {
+	    console.log("get controller list...")
+            callback(error,result)
+        })
+    }
+
 
 
 
@@ -333,18 +350,18 @@ var MyCOID = function(contractAddress)
     //Tells an owner how many tokens they have.
     this.myTokenAmount = function(formdata,callback)
     {
-        console.log("DEBUGGING: YOU HIT MYTOKENAMOUNT");
+	console.log("DEBUGGING: YOU HIT MYTOKENAMOUNT");
 
         var msg = formdata.msg;
         var sig = formdata.sig;
         var owner = formdata.owner;
-        console.log("owner: " + owner);
+	console.log("owner: " + owner);
         //TODO:
         var ownershipHash = keccak_256(owner).toUpperCase()
 
         self.contract.myTokenAmount(ownershipHash,function(error,result)
         {
-            console.log("DEBUGGING...RESULT,ERROR: " + ("" + result) + "..." + error)
+	    console.log("DEBUGGING...RESULT,ERROR: " + ("" + result) + "..." + error)
             callback(error,"" + result)
         })
     }
@@ -433,7 +450,7 @@ for(let endpoint in MyCoidConfig)
     app.post('/'+endpoint,function(req,res)
     {
 
-        console.log("POSTED ENDPOINT: " + endpoint);
+	console.log("POSTED ENDPOINT: " + endpoint);
 
         //their contract address
         var contractAddress = req.body.address;

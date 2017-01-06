@@ -61,6 +61,7 @@ class ControlTokenDistributionForm extends React.Component {
     }
 };
 
+
 class OwnerTokenDistributionForm extends React.Component {
 
     constructor(props) {
@@ -108,11 +109,6 @@ class OwnerTokenDistributionForm extends React.Component {
 };
 
 
-
-
-
-
-
 class MyCoreIdentity extends React.Component {
     constructor(props) {
         super(props);
@@ -120,25 +116,38 @@ class MyCoreIdentity extends React.Component {
         this.state =
             {
                 pubKey: localStorage.getItem("pubKey"),
-                myContractAddress: "AA8EEA027ADD908040574442FBC259FB5546D28C",
+                myContractAddress: "BC3229FA258C55910B71D2955A8EEB492C712E2F",
                 myCoidEndpoint: "MyCOID/myTokenAmount",
-                controllerEndpoint: "MyCOID/getControllers",
+                controllerTokenEndpoint: "MyCOID/getControllerTokens",
+                controllerListEndpoint: "MyCOID/getControllerList",
                 twinURL: twinUrl,
-                requestResult: {},
+
+                myTokenAmount: {},
                 //amount: 3,
+                
+                //***************************************************************************************************************
+                //USED IN TOKEN CLASSESS for appending (appendInputControllers and appendInputOwners)
                 inputs_control: ['input1-0'], //the mapping of added controllers and their tokens
                 inputs_ownership: ['input1-0'], //the mapping of added owners and their tokens
-
+                
+                //these 4 state vars are utilized in prepareControlTokenDistribution() and prepareOwnershipTokenDistribution()
                 control_id: [],
                 owner_id: [],
                 owner_token_quantity: [],
                 control_token_quantity: [],
+                //***************************************************************************************************************
+                
+                //these 2 state vars are populated by AJAX requests to MyCOID_dev.js
+                controllers: [],
+                tokens: [],
+                
 
-                remove_controller: [],
-                remove_owner: [],
+                //remove_controller: [],
+                //remove_owner: [],
 
                 showModal: false,
-
+                testList: ["first_person", "second_person", "third_person"],
+                testValues: ["val1","val2","val3"]
             };
 
         //event handlers
@@ -166,7 +175,7 @@ class MyCoreIdentity extends React.Component {
     // FUNCTIONS TO PREPARE THE CONTROLLERS
     //************************************************************************
 
-    //used in token form class for control token distribution list.. is called by appendInputControllers()
+    //is called by prepareControlTokenDistribution()
     getLabelValuesController() {
         var labelVals1 = []
         $.each($("input[name^='label1-']"), function (obj) {
@@ -191,7 +200,7 @@ class MyCoreIdentity extends React.Component {
             }
         }
         console.log("controller_ID: " + JSON.stringify(this.state.control_id))
-		console.log("controller_token_quantity: " + JSON.stringify(this.state.control_token_quantity))
+        console.log("controller_token_quantity: " + JSON.stringify(this.state.control_token_quantity))
     }
 
     //called onClick of add controller button
@@ -224,7 +233,7 @@ class MyCoreIdentity extends React.Component {
         });
         return labelVals2;
     }
-
+    
     prepareOwnershipTokenDistrbution() {
         var labels = this.getLabelValuesOwner();
         for (var i = 0; i < labels.length; i += 2) {
@@ -262,26 +271,34 @@ class MyCoreIdentity extends React.Component {
 
     }
 
+    Create2DArray(rows) {
+        var arr = [];
+
+        for (var i = 0; i < rows; i++) {
+            arr[i] = [];
+        }
+
+        return arr;
+    }
+
+    prepareControllers(){
+        var output = []
+        create2DArray(output)
+        var controllers = this.state.testList
+        var tokens = this.state.testValues
+        for(var i=0; i<controllers.length; i++){
+            output.push(controllers[i],tokens[i])
+        }
+        console.log("output: " + output)
+        
+        
+    }
+    
+
     //************************************************************************
     //Invoke this code immediately after the component is mounted:
     //************************************************************************
     componentWillMount() {
-        
-
-        //generate their signature:
-        //(note: we have them sign the coid endpoint)
-
-        // var privKey = localStorage.getItem("privKey");
-        // var privKey1 = new Buffer(privKey,"hex");
-        // var msg = this.state.myCoidEndpoint;
-        // var msg_hash = keccak_256(msg);
-        // var msg_hash_buffer = new Buffer(msg_hash,"hex");
-        // var signature1 = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1))
-        // signature1 = JSON.parse(signature1).signature;
-        // signature1 = JSON.stringify(signature1);
-        // signature1 = JSON.parse(signature1).data;
-        // signature1 = new Buffer(signature1,"hex");
-        // signature1 = signature1.toString("hex");
 
         var msg = "abc"
         var signature1 = "abc"
@@ -294,28 +311,8 @@ class MyCoreIdentity extends React.Component {
                 "msg": msg,
                 "sig": signature1
             }
-        
-        
-        $.ajax({
-            type: "POST",
-            url: this.state.twinURL + this.state.controllerEndpoint,
-            data: requestData,
-            success: function (result) {
-                var res = result;
-                if($.type(result) != "object") {
-                    res = JSON.parseJSON(result)
-                }
-                console.log(JSON.stringify(res))
-                this.setState({ requestResult: data });
-                
-            }.bind(this),
-            complete: function () {
-                
-            }
-            
-        })
-        
-        //make a request for the 
+
+        //make a request for my token amount
         $.ajax({
             type: "POST",
             url: this.state.twinURL + this.state.myCoidEndpoint,
@@ -324,28 +321,76 @@ class MyCoreIdentity extends React.Component {
                 var data = result;
                 if ($.type(result) != "object") {
                     data = JSON.parseJSON(result)
-                    
+
                 }
 
                 //log it for testing
                 console.log(JSON.stringify(data))
 
-                this.setState({ requestResult: res });
+                this.setState({ myTokenAmount: data });
 
             }.bind(this),
             complete: function () {
                 // do something
             }
-            
+
         })
+        
+        
+        //GET CONTROLLERS TOKENS
+        $.ajax({
+            type: "POST",
+            url: this.state.twinURL + this.state.controllerTokenEndpoint,
+            data: requestData,
+            success: function (result) {
+                var res = result;
+                if ($.type(result) != "object") {
+                    res = JSON.parseJSON(result)
+                }
+                console.log("response from C.Token endpoint: " + JSON.stringify(res))
+                this.setState({ tokens: res.Result });
+
+            }.bind(this),
+            complete: function () {
+
+            }
+
+        })
+
+        //GET CONTROLLER LIST
+        $.ajax({
+            type: "POST",
+            url: this.state.twinURL + this.state.controllerListEndpoint,
+            data: requestData,
+            success: function (result) {
+                var res = result;
+                if ($.type(result) != "object") {
+                    res = JSON.parseJSON(result)
+                }
+                console.log("response from C.List endpoint: " + JSON.stringify(res))
+                this.setState({ controllers: res.Result });
+                console.log("controller_list state var: " + JSON.stringify(this.state.controller_list))
+
+            }.bind(this),
+            complete: function () {
+
+            }
+
+        })
+        
+        
     }
 
     render() {
+
+        //var controlLen = this.state.control_id.length
+        //var ownerLen = this.state.owner_id.length
+        //console.log(controlLen)
         
-        var controlLen = this.state.control_id.length
-        var ownerLen = this.state.owner_id.length
-        console.log(ownerLen)
-        
+        var rows = []
+
+
+
         var inputAttrs = {
             addKeys: [13, 188],	// Enter and comma
             inputProps: {
@@ -356,62 +401,76 @@ class MyCoreIdentity extends React.Component {
         var syle = {
             marginRight: '10px'
         }
+        var style = {
+            fontSize: '12.5px'
+        }
         return (
             <div id="MyCOIDContainer">
                 <h1>My Core Identity {this.state.twinUrl}</h1>
                 <form method="POST" id="MyCOID" role="form">
                     <div className="form-group">
-                        <label htmlFor="myControlAmount">Your current Ownership Token Amount is: {this.state.requestResult.Result}</label>
+                        <label htmlFor="myControlAmount">Your current Ownership Token Amount is: {this.state.myTokenAmount.Result}</label>
                     </div>
                 </form>
+                
+                <div className="modal-body">
+                    <table className="table table-striped table-hover" style={style}>
+                        <tbody>
+                            <tr>
+                            <td colSpan="3"><b>CONTROLLERS</b></td>
+                            </tr>
+                            
+                            {(() => {
+                                if (!$.isEmptyObject(localStorage.getItem("pubKey"))) {
+                                    console.log("*****")
+                                    return this.state.testList.map((ids, i) => {
+                                        return (
+                                            <tr key={i}>
+                                                <td>{ids}</td>
+                                                <td>{ids[0]}</td>
+                                                <td><button type="button" className="btn btn-danger pull-right btn-sm" style={syle}> REMOVE </button></td>
+                                            </tr>
+                                        )
+                                    });
+                                    
+                                } else { }
+
+                            })(this) }
+                            
+                            
+                            
+
+                        </tbody>
+                    </table>
+                </div>
+                
+                
                 <div className="form-group">
-                    <label htmlFor="owner_dist">Add Owner.</label>
+                    <label htmlFor="owner_dist">Add Owner:</label>
                     {this.state.inputs_ownership.map(input => <OwnerTokenDistributionForm handleShowModal={this.handleShowModal.bind(this) } min={this.state.subform_cont} max="10" key={input} labelref={input} />) }
                 </div>
                 <div className="form-group">
                     <div className="col-md-offset-6 col-md-6 ">
                         <p></p>
-                        <button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInputOwners.bind(this) }>
+                        <button type="button" className="btn btn-info pull-right btn-sm" style={syle} onClick={this.appendInputOwners.bind(this) }>
                             <span className="glyphicon glyphicon-plus"></span>Add More
                         </button>
                     </div>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
+                    <label htmlFor="control_dist">Add Controller:</label>
                     {this.state.inputs_control.map(input => <ControlTokenDistributionForm handleShowModal={this.handleShowModal.bind(this) } min={this.state.subform_cont} max="10" key={input} labelref={input} />) }
                 </div>
                 <div className="form-group">
                     <div className="col-md-offset-6 col-md-6 ">
                         <p></p>
-                        <button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInputControllers.bind(this) }>
+                        <button type="button" className="btn btn-info pull-right btn-sm" style={syle} onClick={this.appendInputControllers.bind(this) }>
                             <span className="glyphicon glyphicon-plus"></span>Add More
                         </button>
                     </div>
-                </div> 
-                <div className="form-group">
-                    <label htmlFor="remove_owner">Remove Owner(s) </label>
-                    <TagsInput {...inputAttrs} value={this.state.remove_owner} onChange={(e) => { this.onFieldChange("remove_owner", e) } } />
                 </div>
-                <div className="form-group">
-                    <div className="txt-right">
-                        <p></p>
-                        <button type="button" className="btn btn-secondary pull-right" style={syle} onClick={this.removeOwnersClick.bind(this) }>
-                            <span className="glyphicon glyphicon-minus"></span>Remove
-                        </button>
-                    </div>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="remove_controller">Remove controller(s) </label>
-                    <TagsInput {...inputAttrs} value={this.state.remove_controller} onChange={(e) => { this.onFieldChange("remove_controller", e) } } />
-                </div>
-                <div className="form-group">
-                    <div className="txt-right">
-                        <p></p>
-                        <button type="button" className="btn btn-secondary pull-right" style={syle} onClick={this.removeControllersClick.bind(this) }>
-                            <span className="glyphicon glyphicon-minus"></span>Remove
-                        </button>
-                    </div>
-                </div>
+
+
 
             </div>
 

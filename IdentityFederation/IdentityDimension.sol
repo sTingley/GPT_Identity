@@ -85,7 +85,7 @@ contract IdentityDimension
         (existsPub,temp) = this.existsInPublicRecord(descriptor);
         (existsPriv,temp) = this.existsInPrivateRecord(descriptor);
             
-        if(flag == 0 && existsPub == false)
+        if(flag == 0 && existsPub == false && existsPriv == false)
         {
                 indexer = PublicIndexer;
                 
@@ -124,7 +124,7 @@ contract IdentityDimension
         }
         else //flag = 1, add as private
         {
-            if(existsPriv == false)
+            if(existsPriv == false && existsPub == false)
             {
                 indexer = PrivateIndexer;
                 
@@ -176,7 +176,8 @@ contract IdentityDimension
         
         if(exists)
         {
-            PublicAttributes[index].descriptor = "";   
+            PublicAttributes[index].descriptor = "";
+            PublicAttributes[index].attribute = "";
             success = true;
         }
         else
@@ -186,6 +187,7 @@ contract IdentityDimension
             if(exists)
             {
                 PrivateAttributes[index].descriptor = "";
+                PrivateAttributes[index].attribute = "";
                 success = true;
             }
         }
@@ -193,14 +195,12 @@ contract IdentityDimension
     }
     
     //Gives you an attribute for a given descriptor.
-    //return SpendToken = 1, if it is private
-    //return SpendToken = 0, if it is public
     //return success = false if not found
     //value is the attribute for the descriptor
-    function readEntry(string descriptor) returns (string value, bool success, uint spendToken)
+    function readEntry(string descriptor) returns (string value, bool success, bool isPublic)
     {
         success = true;
-        spendToken = 0;
+        isPublic = true;
         
         //find the index of the entry:
         bool existsPub;
@@ -224,8 +224,8 @@ contract IdentityDimension
             }
             else
             {
-                //private, so change spendToken
-                spendToken = 1;
+                //private, so change isPublic to false
+                isPublic = false;
                 
                 value = PrivateAttributes[index].attribute;
             }
@@ -251,6 +251,10 @@ contract IdentityDimension
         
         (existsPub,pubIndex) = this.existsInPublicRecord(descriptor);
         (existsPriv,privIndex) = this.existsInPrivateRecord(descriptor);
+        
+        /***NOTE: While we initially decided to change this below (it was not needed),
+        //realized you do need to find the actual attribute because of the way line 289 needs the value to addEntry.
+        // (we need to find it when we re-add the entry)
         
         //they don't want to change the attribute.
         if(attribute == "")

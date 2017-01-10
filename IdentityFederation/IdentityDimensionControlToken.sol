@@ -5,11 +5,6 @@
 //README: This contract is intended to be used as a token contract in IdentityDimensionControl, which manages IdentityDimension contracts
 //for a CoreIdentity. (IdentityDimensionControl also manages access to IdentityDimension contracts)
 
-//TODO: Consider hashing/not hashing controller input management
-//MUTEX?
-//Change old contract
-//TODO: this return an error?
-//ISSUE FILED. ERIS
 
 contract IdentityControlToken
 {
@@ -271,6 +266,7 @@ contract IdentityControlToken
         if(success)//only remove them if they exist
         {
             
+            
             //find out the controller with least tokens, if they exist.
             bool leastControllerExists = false;
             uint leastControllerIndex = 0;
@@ -295,8 +291,11 @@ contract IdentityControlToken
             //now, give the least controller their tokens:
             if(leastControllerExists)
             {
-                
+                controllerAmounts[leastControllerIndex] = controllerAmounts[leastControllerIndex] + controllerAmounts[index];
             }
+            
+            controllers[index] = 0x0;
+            controllerAmounts[index] = 0;
         
             
 

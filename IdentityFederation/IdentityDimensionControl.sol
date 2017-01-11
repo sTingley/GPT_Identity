@@ -1,32 +1,27 @@
 
-
 import "CoreIdentity.sol";
 import "IdentityDimension.sol"
+import "IdentityDimensionControlToken.sol"
 
 contract IdentityDimensionControl
 {
     
     CoreIdentity myCOID;
+    IdentityDimensionControlToken tokenManagement;
     
     address[] dimensions; //addresses of the dimension contract at index i
     bytes32[] IDs; //IDs of the dimension contract at index i
     string[] dimensionType; //Descriptor of each dimension contract (example "financial history")
     
-    struct delegation
-    {
-        bytes32 accessGranter; //sha3 of COID owner/controller to grant access
-        bytes32 controller; //sha3 pubkey of delegate controller
-        uint quantity;
-        uint expiration;
-    }
     
-    mapping(bytes32 => delegation) delegations;
-    
-    
+    //IMPORTANT: At instantiation, controllers here are (owners,controllers) in COID
+    //This can diverge.
     //This works as a core identity control token contract
-    function IdentityDimensionControl(address CoidAddr)
+    function IdentityDimensionControl(address CoidAddr, bytes32[20] controllers, uint[20] amounts)
     {
         myCoid = CoreIdentity(CoidAddr);
+        
+        tokenManagement = new IdentityDimensionControlToken(controllers,amounts);
     }
     
     //TODO: add function isOwner to CoreIdentity
@@ -184,7 +179,8 @@ contract IdentityDimensionControl
     //This function allows you to change the descriptor and/or flag of an entry.
     //IMPORTANT: If you do not wish to change the descriptor, make it null.
     //If you do not wish to change the flag, make it 2.
-    function updateEntry(string pubKey, string type, bytes32 ID, string attribute, string descriptor, uint flag) returns (bool result)
+    //NOTE: If you wish to change the name of the attribute, you will have to delete it, then create it.
+    function updateEntry(string pubKey, string type, bytes32 ID, string attribute, string descriptor) returns (bool result)
     {
         
         result = false;    
@@ -208,21 +204,11 @@ contract IdentityDimensionControl
                 IdentityDimension current = IdentityDimension(addr);
                 
                 //add the entry to the identity contract:
-                result = current.update(attribute, descriptor, flag);
+                result = current.update(attribute, descriptor);
                 
             }
         }
     }
-
-    
-    //all through myCOID
-    
-    function delegate
-    
-    // -> -> -> -> -> ->
-    // HELPER FUNCTIONS:
-    // -> -> -> -> -> ->
-    
     
     //gives you the address of a dimension contract. It is okay if one of the two parameters are null.
     //This is itended to let the user access the contract either by knowing the type of the dimension
@@ -300,5 +286,51 @@ contract IdentityDimensionControl
     }
 
 
+    //delegate tokens to a delegatee
+    function delegate(bytes32 controller, bytes32 delegatee, uint amount, string dimension, uint timeFrame) returns (bool success)
+    {
+        success = tokenManagement.addDelegation(controller,delegatee,amount,dimension,timeFrame);
+    }
+    
+    function controllerExists(bytes32 controllerHash) returns (bool exists, uint index)
+    {
+        (exists,index) = tokenManagement.controllerEixsts(controllerHash);
+    }
+    
+    function addDelegation(bytes32 controller, bytes32 delegatee, uint amount, string dimension, uint timeFrame) returns (bool success)
+    {
+        success = tokenManagement.addDelegation(controller,delegatee,amount,dimension,timeFrame);
+    }
+    
+    function revokeDelegation(bytes32 controller, bytes32 delegatee, uint amount, string dimension, bool all) returns (bool success)
+    {
+        success = tokenManagement.revokeDelegation(controller,delegatee,amount,dimension,all);
+    }
+      
+    function revokeDelegation(bytes32 controller, bytes32 delegatee, uint amount, string dimension, bool all) returns (bool success)
+    {
+        success = tokenManagement.revokeDelegation(controller,delegatee,amount,dimension,all);
+    }
+        
+    function removeController(bytes32 controller) returns (bool success)
+    {
+        success = tokenManagement.removeController(controller);
+    }
+        
+    function spendTokens(bytes32 delegatee, uint amount, string identityDimension) returns (bool success)
+    {
+        success = tokenManagement.spendTokens(delegatee,amount,identityDimension);
+    }
+        
+    function delegateeAmount(bytes32 delegatee, string dimension) returns (uint amount)
+    {
+        amount = tokenManagement.delegateeAmount(delegatee,dimension);
+    }
+
+
+
+
 
 }
+
+

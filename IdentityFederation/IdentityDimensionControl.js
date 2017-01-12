@@ -259,7 +259,7 @@ for(let endpoint in IdentityConfig)
        // res.json({'Status':'hi','Result':'hello'})
 
         //formulate the string of code for the function call
-        var toExecute = "dimension." + MyCoidConfig[endpoint] + "(formdata,function(error,result)"
+        var toExecute = "dimension." + IdentityConfig[endpoint] + "(formdata,function(error,result)"
         toExecute = toExecute + "{"
         toExecute = toExecute + "res.json({'Status':error,'Result':(''+result)});"
         toExecute = toExecute + "console.log(result + '');"

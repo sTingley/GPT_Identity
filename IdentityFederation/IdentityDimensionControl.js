@@ -29,7 +29,7 @@ var IdentityDimensionControl = function(contractAddress)
     this.contractData = require('./epm.json')
     var contractAddr = contractAddress
     console.log("contract addr: " + contractAddr)
-    this.contractAbiAddress = this.contractData['CoreIdentity'];
+    this.contractAbiAddress = this.contractData['IdentityDimensionControl'];
     this.erisAbi = JSON.parse(fs.readFileSync("./abi/"+this.contractAbiAddress));
     this.accountData = require("./accounts.json");
     this.contractMgr = erisC.newContractManagerDev(this.erisdburl, chainConfig[this.chain]);

@@ -306,11 +306,6 @@ contract IdentityDimensionControl
     {
         success = tokenManagement.revokeDelegation(controller,delegatee,amount,dimension,all);
     }
-      
-    function revokeDelegation(bytes32 controller, bytes32 delegatee, uint amount, string dimension, bool all) returns (bool success)
-    {
-        success = tokenManagement.revokeDelegation(controller,delegatee,amount,dimension,all);
-    }
         
     function removeController(bytes32 controller) returns (bool success)
     {

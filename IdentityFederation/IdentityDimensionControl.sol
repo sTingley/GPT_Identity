@@ -311,6 +311,10 @@ contract IdentityDimensionControl
     {
         success = tokenManagement.removeController(controller);
     }
+    function addController(bytes32 controller) returns (bool success)
+    {
+        success = tokenManagement.addController(controller);
+    }
         
     function spendTokens(bytes32 delegatee, uint amount, string identityDimension) returns (bool success)
     {

@@ -1,0 +1,17 @@
+//key is endpoint name; value is corresponding function call
+{
+    "CreateDimension": "CreateDimension",
+    "RemoveDimension": "RemoveDimension",
+    "addEntry": "addEntry",
+    "removeEntry": "removeEntry",
+    "updateEntry": "updateEntry",
+    "getDimensionAddress": "getDimensionAddress",
+    "delegate": "delegate",
+    "controllerExists": "controllerExists",
+    "addDelegation": "addDelegation",
+    "revokeDelegation": "revokeDelegation",
+    "removeController": "removeController",
+    "spendTokens": "spendTokens",
+    "delegateeAmount": "delegateeAmount",
+    "addController": "addController",
+}

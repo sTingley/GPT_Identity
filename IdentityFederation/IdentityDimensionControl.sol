@@ -311,9 +311,9 @@ contract IdentityDimensionControl
     {
         success = tokenManagement.removeController(controller);
     }
-    function addController(bytes32 controller) returns (bool success)
+    function addController(bytes32 controller, uint amount) returns (bool success)
     {
-        success = tokenManagement.addController(controller);
+        success = tokenManagement.addController(controller,amount);
     }
         
     function spendTokens(bytes32 delegatee, uint amount, string identityDimension) returns (bool success)

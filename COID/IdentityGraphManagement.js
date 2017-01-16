@@ -29,8 +29,32 @@ function createContract(contractAddress, callback)
         callback(); // to allow synchronous calling of this function
 }
 
-
-
+//todo: remember list must be nonempty; check async!
+function getContract(contractAddr)
+{
+        var returnMe;
+        for(var i = 0; i < addrList.length;i++)
+        {
+                if(addr[i] == contractAddr)
+                {
+                        returnMe = contractList[i];
+                }
+        }
+        return returnMe;
+}
+//todo: remember list must be nonempty; check async!
+function getMutex(contractAddr)
+{
+        var returnMe;
+        for(var i = 0; i < addrList.length;i++)
+        {
+                if(addr[i] == contractAddr)
+                {
+                        returnMe = mutexList[i];
+                }
+        }
+        return returnMe;
+}
 
 
 
@@ -39,19 +63,8 @@ function createContract(contractAddress, callback)
 function implementTransactions(contractAddress)
 {
         //get the contract:
-        this.chain = 'primaryAccount'
-        this.erisdburl = chainConfig.chainURL
-        this.contractData = require('./epm.json')
-        var contractAddr = contractAddress
-        console.log("contract addr: " + contractAddr)
-        this.contractAbiAddress = this.contractData['CoreIdentity'];
-        this.erisAbi = JSON.parse(fs.readFileSync("./abi/"+this.contractAbiAddress));
-        this.accountData = require("./accounts.json");
-        this.contractMgr = erisC.newContractManagerDev(this.erisdburl, chainConfig[this.chain]);
-        this.contract = this.contractMgr.newContractFactory(this.erisAbi).at(contractAddress);
-
-        var reference = this;
-
+        var contract = 
+            
         //FIRST: see if list is empty
 
 }

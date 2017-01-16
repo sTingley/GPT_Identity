@@ -1,3 +1,16 @@
+'use strict'
+
+var bodyParser = require('body-parser')
+var fs = require('fs')
+var keccak_256 = require('js-sha3').keccak_256
+
+//configuration of the chain
+var chainConfig = require('/home/demoadmin/.eris/ErisChainConfig.json')
+
+//required library for accessing the contract
+var erisC = require('eris-contracts');
+
+
 //REMEMBER TO ADD PROOF OF CORRECT EXECUTION
 
 
@@ -5,6 +18,14 @@
 var addrList = [];
 var contractList = [];
 var mutexList = [];
+
+function registerContract(contractAddress)
+{
+        createContract(contractAddress, function()
+        {
+                //continuous event listening
+        })
+}
 
 function createContract(contractAddress, callback)
 {
@@ -59,12 +80,25 @@ function getMutex(contractAddr)
 
 
 
-
+//recursive function to be called each time an event is triggered.
+//todo: check async
+//todo: input contract instead of contractAddress?
 function implementTransactions(contractAddress)
 {
-        //get the contract:
-        var contract = 
-            
-        //FIRST: see if list is empty
-
+        //first get the mutex
+        var mutex = getMutex(contractAddress)
+        var contract = getContract(contractAddress)
+        
+        if(mutex)
+        {
+                mutex = false;
+                
+                //1. check if list is empty
+                //2. 
+                
+                
+                mutex = true;
+                implementTransactions(contractAddress);
+        }
+        
 }

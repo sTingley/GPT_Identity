@@ -21,14 +21,15 @@ class Header extends React.Component {
              <ul className="nav navbar-nav hidden-lg">
                 <li><Link to='/home' activeClassName="active">Home</Link></li>
 				<li><Link to='/upload' activeClassName="active">Upload Keys</Link></li>
-				{ prop.loggedin ?  <li><Link to='/tovote' activeClassName="active">Vote</Link></li> : ''}
-                { prop.loggedin ?  <li><Link to='/notifications' activeClassName="active">Notifications</Link></li> : ''}
+        { prop.loggedin ?  <li><Link to='/tovote' activeClassName="active">Vote</Link></li> : ''}
+        { prop.loggedin ?  <li><Link to='/notifications' activeClassName="active">Notifications</Link></li> : ''}
 				{ prop.loggedin ?  <li><Link to='/register' activeClassName="active">Name Register</Link></li> : ''}
 				{ prop.loggedin ?  <li><Link to='/identity' activeClassName="active">Core Identity</Link></li> : '' }
 				{ prop.loggedin ?  <li><Link to='/assets' activeClassName="active">Assets</Link></li> : '' }
 				{ prop.loggedin ?  <li><Link to='/docs' activeClassName="active">My Documents</Link></li> : '' }
-                { prop.loggedin ?  <li><Link to='/myGatekeeper' activeClassName="active">My Gatekeeper</Link></li> : '' }
-                { prop.loggedin ?  <li><Link to='/mycoreidentity' activeClassName="active">My Core Identity</Link></li> : '' }
+        { prop.loggedin ?  <li><Link to='/myGatekeeper' activeClassName="active">My Gatekeeper</Link></li> : '' }
+        { prop.loggedin ?  <li><Link to='/mycoreidentity' activeClassName="active">My Core Identity</Link></li> : '' }
+        { prop.loggedin ?  <li><Link to='/identitydimension' activeClassName='active'>Identity Dimensions</Link></li> : '' }
             </ul>
             <ul className="nav navbar-nav navbar-right">
                 <li><a href="http://www.tcs.com">Powered by TCS, Monax, BigChainDB and IPFS</a></li>

@@ -57,7 +57,7 @@ contract IdentityControlToken
         uint index = 0;
         (success,index) = this.controllerExists(controller);
         
-        sucess = success && (controllerAmounts[index] > 0);
+        success = success && (controllerAmounts[index] >= amount);
         
         if(success)
         {

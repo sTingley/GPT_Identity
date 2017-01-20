@@ -2,307 +2,314 @@ import React, { Component } from 'react';
 
 
 
-
-//Dimension Category will be chosen when user is creating a dimension,
-//then the categories will later be populated with a request
-class DimensionCategoryRow extends React.Component {
-
-    render() {
-        return <tr><th colSpan="4">{this.props.dimension}</th></tr>
-    }
-}
-
-/*
-    DIMENSION ROW is renders in DIMENSION TABLE
-    
-    TODO:
-    -- POPULATE DIMENSIONS WITH REQUEST RESULT
-    -- add OnCLICK logic for 'UPDATE'
-    
-*/
-class DimensionRow extends React.Component {
-    
-
-    deleteDimension(id){
-        alert("Are you sure?")
-        this.props.onDelete(id)
-    }
-
-    render() {
-        console.log("DIMENSION ROW PROPS: " + JSON.stringify(this.props))
-
-        var name = this.props.dimension.owned ? this.props.dimension.name :
-            <span style={{ color: 'red' }}>
-                {this.props.dimension.name}
-            </span>;
-        return (
-            <tr>
-                <td>{name}</td>
-                <td>{this.props.dimension.ID}</td>
-                <td>
-                <button className="btn btn-warning">Update</button>
-                </td>
-                <td>
-                <button className="btn btn-danger" onClick={this.deleteDimension.bind(this, this.props.dimension.ID)}>Delete</button>
-                </td>
-            </tr>
-            
-        );
-    }
-
-}
-
-
-/*
-    DIMENSION TABLE RENDERS BOTH DIMENSON ROW and DIMENSIONCATEGORY ROW
-*/
-class DimensionTable extends React.Component {
-
-
-    deleteDimension(id) {
-
-        this.props.onDelete(id)
-    }
-
-    render() {
-        var rows = []
-        //used to check last index in dimensions array
-        var lastType = null
-
-        this.props.dimensions.forEach((dimension) => {
-            if (dimension.name.indexOf(this.props.filterText) === -1 ||
-            (!dimension.owned && this.props.owned_Only)) {
-
-                return
-            }
-            if (dimension.dimensionType !== lastType) {
-                rows.push(
-                    <DimensionCategoryRow
-                        dimensionType={dimension.dimensionType}
-                        key={dimension.dimensionType}
-                        />
-                );
-            }
-            rows.push(
-                <DimensionRow
-                    dimension={dimension}
-                    key={dimension.name}
-                    onDelete={this.deleteDimension.bind(this) }/>
-            );
-
-            lastType = dimension.dimensionType;
-
-        });
-
-        return (
-            <table className="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th>NAME</th>
-                        <th>Reference</th>
-                    </tr>
-                </thead>
-                <tbody>{rows}</tbody>
-            </table>
-        )
-
-    }
-} //end DimensionTable
-
-
-class SearchBar extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.handleChange = this.handleChange.bind(this)
-    }
-
-    handleChange() {
-        this.props.onUserInput(
-            this.filterTextInput.value,
-            this.owned_onlyInput.checked
-        );
-    }
-
-    render() {
-        console.log("search bar props: " + JSON.stringify(this.props))
-        return (
-            <form>
-                <input
-                    type="text"
-                    placeholder="Search..."
-                    value={this.props.filterText}
-                    ref={(input) => this.filterTextInput = input}
-                    onChange={this.handleChange}
-                    />
-                <p>
-                    <input
-                        type="checkbox"
-                        checked={this.props.owned_Only}
-                        ref={(input) => this.owned_onlyInput = input}
-                        onChange={this.handleChange}
-                        />
-                    {' '}
-                    show OWNED dimensions
-                </p>
-                <h3></h3>
-            </form>
-        );
-    }
-}
-
-
-class FilterableDimensionTable extends React.Component {
-
-    constructor() {
-        super();
-        this.state = {
-            filterText: '',
-            owned_only: false
-        }
-
-        this.handleUserInput = this.handleUserInput.bind(this);
-    }
-    
-    handleAddDimension(dimension) {
-        let dimensions = this.props.dimensions;
-        dimensions.push(dimension);
-    }
-
-    handleUserInput(filterText, owned_only) {
-        this.setState({
-            filterText: filterText,
-            owned_only: owned_only
-        });
-    }
-
-    render() {
-        console.log("DIMENSION TABLE PROPS: " + JSON.stringify(this.props))
-        console.log("STATE OF TABLE" + this.state)
-        return (
-            <div>
-                
-                <SearchBar
-                    filterText={this.state.filterText}
-                    owned_only={this.state.owned_only}
-                    onUserInput={this.handleUserInput}
-                    />
-                <DimensionTable
-                    dimensions={this.props.dimensions}
-                    filterText={this.state.filterText}
-                    owned_Only={this.state.owned_only}
-                    onDelete={this.props.onDelete}
-                    key={this.props.dimensions.dimensionType}
-                    />
-            </div>
-        );
-    }
-}
-
-class AddDimension extends React.Component {
+class AddDimension extends Component {
 
     constructor() {
         super();
         this.state = {
             newDimension: {},
-            files: ['FinanceReport.xls', 'Contacts.json', 'My_DOC.pdf']
-
+            files: ['FinanceChart.xls', 'Patent.pdf', 'Journal3.docx']
         }
+        //propTypes = {}
     }
-    
-    handleSubmit(e){
-        if(this.refs.dimensionType.value === ''){
-            alert('descriptor is required')
+
+    handleSubmit(e) {
+        if (this.refs.dimensionType.value === '') {
+            alert('name is required')
         } else {
-            console.log("**************************")
-            this.setState({newDimension:{
-                ID: '23121',
-                dimensionType: this.refs.descriptor.value,
-                owned: true
-            }}, function(){
+            this.setState({
+                newDimension: {
+                    ID: Math.floor(Math.random() * 100),
+                    dimensionType: this.refs.dimensionType.value,
+                    category: this.refs.category.value
+                }
+            }, function () {
                 this.props.addDimension(this.state.newDimension)
             })
         }
     }
 
     render() {
-
-        let files = this.state.files.map(option => {
-            return <option key={option} value={option}>{option}</option>
+        let categoryOptions = this.state.files.map(category => {
+            return <option key={category} value={category}>{category}</option>
         });
         return (
             <div>
-                <h3> Add Dimension </h3>
+                <h3>Add Dimension</h3>
                 <form onSubmit={this.handleSubmit.bind(this) }>
-                    <div>
-                        <label>Descriptor:</label><br />
-                        <input type="text" ref="descriptor" />
 
+                    <div>
+                        <label>Dimension name: </label><br />
+                        <input type="text" ref="dimensionType" />
                     </div>
                     <div>
-                        <label>Select File: </label><br />
-                        <select ref="category"> {files} </select>
-
+                        <label>Category</label><br />
+                        <select ref="category">
+                            {categoryOptions}
+                        </select>
                     </div>
                     <br />
                     <input type="submit" value="Submit" />
                     <br />
                 </form>
+
             </div>
-        )
+        );
     }
+}
+
+class DimensionForm extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            dimension: this.props.dataHandler,
+            dimension_data: {}
+        };
+
+    }
+
+
+    //HANDLE THE CHOICE OF USER INPUT
+    submitHandler(e) {
+        e.preventDefault();
+        var ele = $(e.target);
+
+        var json = {
+            "publicKey": localStorage.getItem("pubKey")
+        }
+
+
+        //add request to add dimension
+
+        //add request to update dimension
+
+        //add request to remove dimension
+
+
+    }//end submitHandler
+
+
+    componentDidMount() {
+        var _this = this;
+        
+        var dim = {
+            ID: 123432, dimensionType: "financial"
+        }
+
+//UNCOMMENT WHEN INTEGRATING CONTRACTS AND THE JS
+
+    // $.ajax({
+    //     type: "POST",
+    //     url: twinUrl + 'getDimensionData',
+    //     data: {
+    //         "publicKey": localStorage.getItem("pubKey"),
+    //         "ID": "321312231212312"
+    //     },
+    //     success: function (result) {
+    //         //var isSecure = true;
+
+    //         if ($.type(result) == "string") {
+    //             result = JSON.parse(result);
+    //         }
+
+            _this.setState({
+                dimension_data: { dim
+                }
+            });
+            $("#dimensionDetails").modal('show');
+            $("#dimensionDetails").on('hidden.bs.modal', this.props.hideHandler);
+
+    //     }
+
+    // })
+
 
 }
 
 
-class Modal extends React.Component {
+
+render() {
+
+    //var prop = this.state.dimension;
+    console.log("state in DImensionForm" + JSON.stringify(this.state))
+    var type = this.state.dimension;
+    console.log("#" + JSON.stringify(type))
+    
+    
+    //type = JSON.parse(type).dimensionType
+
+    return (
+        <div className="modal fade" id="dimensionDetails" tabIndex="-1" role="dialog">
+            <div className="modal-dialog modal-lg" role="document">
+                <div className="modal-content">
+
+                    <div className="modal-header">
+                        <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times; </span></button>
+                        <h4 className="modal-title" id="dimension">Identity Dimension Details</h4>
+                    </div>
+
+                    <div className="modal-body">
+                        <table className="table table-striped table-hover">
+                            <tbody>
+                                <tr>
+                                    <td>Dimension Type</td>
+                                    <td>{type.dimensionType}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Reference Hash</td>
+                                    <td>{type.ID}</td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-danger" onClick={this.submitHandler.bind(this) }>THIS BUTTON DOES SOMETHING</button>
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+    )
+}
+}
+
+
+class Modal extends Component {
 
     constructor(props) {
-        super(props)
-
+        super(props);
         this.state = {
-            
-            dimensions: []
+            iDimensions: [],
+            showDetails: false,
+            activeDimension: {}
+        };
+        this.showHandler = this.showHandler.bind(this);
+    }
+
+    getDimensions() {
+        this.setState({
+            iDimensions: [
+                {
+                    ID: 123124, dimensionType: "financial"
+                },
+                {
+                    ID: 342342, dimensionType: "education"
+                },
+                {
+                    ID: 212144, dimensionType: "personal"
+                }
+            ]
+        })
+    }
+
+    // componentWillMount() {
+    //     this.getDimensions();
+    // }
+
+    componentDidMount() {
+        //ajax request to get identityDimensions from digital twin
+        var dimensions = {
+            identity_dimensions:
+            [
+                { dimensionType: "financial", ID: "123124" },
+                { dimensionType: "personal", ID: "123124" },
+                { dimensionType: "education", ID: "123124" }
+            ]
         }
+        
+        this.setState({iDimensions: dimensions.identity_dimensions})
     }
-    
-    getDimensions(){
-        this.setState({dimensions: [
-            { dimensionType: 'Sporting Goods', ID: '12234', owned: true, name: 'Football' },
-            { dimensionType: 'PERSONAL', ID: '34334', owned: true, name: 'iPod Touch' },
-            { dimensionType: 'Electronics', ID: '56676', owned: false, name: 'iPhone 5' }
-        ]})
+
+    hideHandler() {
+        this.setState({ showDetails: false });
     }
-    
-    handleAddDimension(dimension){
-        let dimensions = this.state.dimensions;
+
+    dataHandler(index) {
+        return this.state.iDimensions[index];
+    }
+
+    getActiveData() {
+        return this.state.activeDimension;
+    }
+
+    showHandler(e) {
+        e.preventDefault();
+        this.setState({
+            showDetails: true,
+            activeDimension: this.dataHandler($(e.target).attr('data-index'))
+        });
+    }
+
+    handleAddDimension(dimension) {
+        console.log("insidehandle add" + JSON.stringify(dimension))
+        let dimensions = this.state.iDimensions;
         dimensions.push(dimension);
-        this.setState({dimensions: dimensions})
+        this.setState({ iDimensions: dimensions })
     }
-    
-    handleDeleteDimension(id){
-        let dimensions = this.state.dimensions;
-        let index = dimensions.findIndex(x => x.ID === id);
+
+    handleDeleteDimension(id) {
+        let dimensions = this.state.iDimensions;
+        let index = dimensions.findIndex(x => x.id === id);
         dimensions.splice(index, 1);
-        this.setState({dimensions: dimensions})
-    }
-    
-    componentWillMount(){
-        this.getDimensions();
+        this.setState({ iDimensions: dimensions })
     }
 
     render() {
-        console.log("MODAL props" + JSON.stringify(this.props))
+        console.log(JSON.stringify(this.state))
+        let dimensions = this.state.iDimensions;
+        var _that = this
         return (
-            <div className="dimension-container">
-                <h3> Identity Dimensions </h3>
-                <FilterableDimensionTable dimensions={this.state.dimensions} onDelete={this.handleDeleteDimension.bind(this)} />
-                <AddDimension addDimension={this.handleAddDimension.bind(this)} />
+            <div id="dimensions_container">
+
+                <h1>IDENTITY DIMENSIONS</h1><hr />
+
+                <AddDimension addDimension={this.handleAddDimension.bind(this) } /><br /><br />
+
+                <table className="table table-striped">
+                    <tbody>
+                        {(() => {
+                            if ($.isArray(this.state.iDimensions) && this.state.iDimensions.length > 0) {
+                                return this.state.iDimensions.map(function (el, i) {
+                                    return (
+                                        <tr key={i}>
+                                            <td>
+                                                <div><b>{el.dimensionType}</b></div>
+                                            </td>
+                                            <td className="pull-right">
+                                                <button type="button" className="btn btn-primary" data-item={el} data-index={i} onClick={_that.showHandler} >VIEW DIMENSION</button>
+                                            </td>
+                                        </tr>
+                                    );
+                                });
+                            } else {
+                                return (
+                                    <tr>
+                                        <td>
+                                            <p>No identity dimensions</p>
+                                        </td>
+                                    </tr>);
+                            }
+                        })(this) }
+                    </tbody>
+                </table>
+
+                {this.state.showDetails ? <DimensionForm hideHandler={this.hideHandler.bind(this) } dataHandler={this.state.activeDimension} /> : null}
             </div>
-        )
+        );
     }
 
-}
+};
+
+//<IdentityDimensions dimensions={dimensions} onDelete={this.handleDeleteDimension.bind(this) } key={dimensions.ID} onClick={this.showHandler.bind(this)}/>
 
 
 export default Modal
+

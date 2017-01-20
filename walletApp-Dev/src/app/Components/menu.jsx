@@ -21,7 +21,8 @@ class Menu extends React.Component {
 				{ prop.loggedin ?  <li><Link to='/assets' activeClassName="active">Assets</Link></li> : '' }
 				{ prop.loggedin ?  <li><Link to='/docs' activeClassName="active">My Documents</Link></li> : '' }
 				{ prop.loggedin ?  <li><Link to='/myGatekeeper' activeClassName="active">My Gatekeeper</Link></li> : '' }
-                { prop.loggedin ?  <li><Link to='/mycoreidentity' activeClassName="active">My Core Identity</Link></li> : '' }
+				{ prop.loggedin ?  <li><Link to='/mycoreidentity' activeClassName="active">My Core Identity</Link></li> : '' }
+				{ prop.loggedin ?  <li><Link to='/identitydimension' activeClassName='active'>Identity Dimensions</Link></li> : '' }
 			  </ul>
 			</div>
 		);

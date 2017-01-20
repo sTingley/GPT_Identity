@@ -21,7 +21,7 @@ import ToVote from './Components/ToVote.jsx';
 import Notifications from './Components/Notifications.jsx';
 import Assets from './Components/Assets.jsx';
 import MyCoreIdentity from './Components/MyCoreIdentity.jsx';
-
+import IdentityDimension from './Components/IdentityDimension.jsx';
 import Documents from './Components/Documents.jsx';
 import MyGateKeeper from './Components/MyGateKeeper.jsx';
 
@@ -90,7 +90,8 @@ render((
 			<Route path="assets" component={Assets} onEnter={validateLogin} />
 			<Route path="docs" component={Documents} onEnter={validateLogin} />
 			<Route path="myGateKeeper" component={MyGateKeeper} onEnter={validateLogin} />
-            <Route path="mycoreidentity" component={MyCoreIdentity} onEnter={validateLogin} />
+			<Route path="mycoreidentity" component={MyCoreIdentity} onEnter={validateLogin} />
+			<Route path="identitydimension" component={IdentityDimension} onEnter={validateLogin} />
       	</Route>
     </Router>
 ), document.getElementById('app'));

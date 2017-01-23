@@ -1,72 +1,208 @@
 import React, { Component } from 'react';
 
 
+class UploadIpfsFile extends React.Component {
 
-class AddDimension extends Component {
+	constructor(props){
+		super(props);
+		this.state = {
+			docs: {},
+			pubKey: props.pubKey,
+			selected:'0',
+			files:''
+		};
+		this.inputChangeHandler = this.inputChangeHandler.bind(this);
+	}
 
-    constructor() {
-        super();
-        this.state = {
-            newDimension: {},
-            files: ['FinanceChart.xls', 'Patent.pdf', 'Journal3.docx']
-        }
-        //propTypes = {}
-    }
+	componentDidMount(){
+		$.ajax({
+			url: twinUrl + "ipfs/alldocs/"+this.state.pubKey,
+			dataType: 'json',
+			cache: false,
+			success: function(resp) {
+				this.setState({docs: resp.data.documents});
+			}.bind(this),
+			error: function(xhr, status, err) {
+				console.error(this.props.url, status, err.toString());
+			}.bind(this)
+		});
+		
+		$("#CoreIdentityContainer .modal").modal('show');
+        $("#CoreIdentityContainer .modal").on('hidden.bs.modal', this.props.handleHideModal);
+	}
+	
+	uploadHandler(data, additionalParams){
+		var params = {
+			url: twinUrl + "ipfs/upload",
+			type: 'POST',
+			data: data,
+			cache: false,
+			processData: false,
+			contentType: false,
+		};
+		$.extend(params, additionalParams);
+		$.ajax(params);
+	}
+	
+	fileHandler(e){
+		e.preventDefault();
+		if(this.state.selected != "0"){
+			var hash, fileHash;
+			this.props.dataHandler(this.state.selected);
+			$("button.close").trigger("click");
+		} else {
+			if(this.state.files.size > 0){
+				var fileInput = $("input[name=newdoc]");
+				var fData = new FormData();
+				fData.append("user_pubkey", this.state.pubKey);
+				 $.each(fileInput[0].files, function(key, value){
+					fData.append(key, value);
+				});
+				var _this = this;
+				var callbacks = {
+					beforeSend: (xhr) => {
+						$("button[name=uploadsubmit]").button('loading');
+						$("button.close").hide();
+					},
+					success: function(resp){
+						if(resp.uploded && resp.uploded.length > 0){
+							var filedata = resp.uploded[0].hash+"|"+resp.uploded[0].file_hash;
+							//data handler forms JSON object
+							this.props.dataHandler(filedata);
+							$("button.close").trigger("click");
+						}
+					}.bind(this),
+					complete: () => {
+						$("button[name=uploadsubmit]").button('reset');
+						$("button.close").show();
+					}
+				};
+				this.uploadHandler(fData,callbacks);
+			}
+		}
+	}
+	
+	inputChangeHandler(e){
+		if(e.target.tagName == "SELECT"){
+			this.setState({selected: e.target.value});
+		} else 
+			this.setState({files: e.target.files[0]});
+	}
 
-    handleSubmit(e) {
-        if (this.refs.dimensionType.value === '') {
-            alert('name is required')
-        } else {
-            this.setState({
-                newDimension: {
-                    ID: Math.floor(Math.random() * 100),
-                    dimensionType: this.refs.dimensionType.value,
-                    category: this.refs.category.value
-                }
-            }, function () {
-                this.props.addDimension(this.state.newDimension)
-            })
-        }
-    }
-
-    render() {
-        let categoryOptions = this.state.files.map(category => {
-            return <option key={category} value={category}>{category}</option>
-        });
-        return (
-            <div>
-                <h3>Add Dimension</h3>
-                <form onSubmit={this.handleSubmit.bind(this) }>
-
-                    <div>
-                        <label>Dimension name: </label><br />
-                        <input type="text" ref="dimensionType" />
-                    </div>
-                    <div>
-                        <label>Category</label><br />
-                        <select ref="category">
-                            {categoryOptions}
-                        </select>
-                    </div>
-                    <br />
-                    <input type="submit" value="Submit" />
-                    <br />
-                </form>
-
+	render(){
+		var center = {
+			textAlign: 'center'
+		};
+		return(
+			<div className="modal fade">
+            <div className="modal-dialog">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h4 className="modal-title">Upload Document</h4>
+                </div>
+                <div className="modal-body">
+                  <form>
+                  	<div className="form-group">
+                  		<label htmlFor="get-hash">Choose from documents</label>
+                  		<select className="form-control" onChange={this.inputChangeHandler}>
+							<option value="0">Select Document</option>
+						{(()=>{
+							if(this.state.docs && this.state.docs.length > 0){
+								var i=0;
+								return this.state.docs.map((obj) => {
+									i++;
+									var optsVal = obj.hash+"|"+obj.file_hash;
+									return <option value={optsVal} key={i}>{obj.filename}</option>
+								});
+							} else {
+								return <option value="0">-- Empty --</option>
+							}
+						})()}
+						</select>
+                  	</div>
+                  	<p style={center}>(or)</p>
+                  	<div className="form-group">
+                  		<label htmlFor="documents">Upload Document</label>
+                  		<input type="file" className="form-control" name="newdoc" onChange={this.inputChangeHandler}/>
+                  	</div>
+                  </form>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" data-loading-text="Processing..." name="uploadsubmit" className="btn btn-success" onClick={this.fileHandler.bind(this)}>Submit</button>
+                </div>
+              </div>
             </div>
-        );
+          </div>
+		)
+	}
+};
+
+
+//form where we can add addtional labels (uniqueIDAttrs)
+class UniqueIDAttributesForm extends React.Component {
+
+	constructor(props){
+		super(props);
+		this.state = {
+		file_attrs:[],
+		inputs: ['input-0'],
+		tmpFile:'',
+		showModal: false,
+		pubKey: localStorage.getItem("pubKey")
+		};
+	
+	}
+	
+	handleShowModal(e){
+		this.setState({showModal: true, tmpFile: $(e.target).attr('data-id')});
     }
-}
+	
+	handleHideModal(){
+		this.setState({showModal: false});
+	}
+	
+	render(){
+		
+		return(
+			<div className="form-group col-md-12">
+				<div className="col-md-10">
+				<label htmlFor="unique_id_attrs"> Official IDs e.g. SSN, Passport, Driver's License, Digital retinal scans and/or digital fingerprints </label>
+					<input name={'label-'+this.props.labelref} className="form-control col-md-4" type="text" placeholder="Label"  />
+				</div>
+				<div className="col-md-2">
+					<button type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn btn-warning pull-right"><span className="glyphicon glyphicon-upload"></span>Upload File</button>
+				</div>	
+			</div>	
+		);
+	}
+
+};
+
+
 
 class DimensionForm extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
+            inputs: ['input-0'],
             dimension: this.props.dataHandler,
-            dimension_data: {}
+            dimension_data: {},
+            showModal: false
         };
 
+    }
+    	handleShowModal(e){
+        this.setState({showModal: true, tmpFile: $(e.target).attr('data-id')});
+    }
+    
+    appendInput() {
+		var inputLen = this.state.inputs.length;
+		if(inputLen < this.maxUniqAttr){
+			var newInput = `input-${inputLen}`;
+        	this.setState({ inputs: this.state.inputs.concat([newInput]) });
+		}
     }
 
 
@@ -133,10 +269,12 @@ class DimensionForm extends Component {
     render() {
 
         //var prop = this.state.dimension;
-        console.log("state in DImensionForm" + JSON.stringify(this.state))
+        console.log("state in DimensionForm" + JSON.stringify(this.state))
         var type = this.state.dimension;
         console.log("#" + JSON.stringify(type))
-
+        var syle = {
+			marginRight:'15px'
+		}
 
         //type = JSON.parse(type).dimensionType
 
@@ -154,8 +292,8 @@ class DimensionForm extends Component {
                         </div>
 
                         <div className="modal-body">
-                        
                             <div className="tab-content">
+                            
                                 <div role="tabpanel" className="tab-pane active" id="dimension_Details">
 
                                     <table className="table table-striped table-hover">
@@ -174,18 +312,22 @@ class DimensionForm extends Component {
                                 </div>
 
                                 <div role="tabpanel" className="tab-pane center-block" id="edit" >
-                                    <table className="table table-striped table-hover" >
-                                        <tbody>
-                                            <tr>
-                                                <th><b>Public Key of Owner</b></th>
-                                                <th><b>Ownership Token Quantity</b></th>
-                                            </tr>
-                                            <tr>
-                                                <td><input name={'label2-' + this.props.labelref}  type="text" placeholder="Public Key of Owner"  /></td>
-                                                <td><input name={'label2-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Ownership Token Quantity"  /></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                    
+                                    
+                                    <div className="form-group">
+						                <label htmlFor="unique_id">Enter Unique ID Attributes. The first Attribute has to be name (first, last). Then add any official identification such as SSN or national ID number(s). Make sure to add the supporting file(s) through "Upload File".</label>
+						                {this.state.inputs.map(input => <UniqueIDAttributesForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+					                </div>
+                                    
+					                <div className="form-group"> 
+						                <div className="col-md-offset-6 col-md-6 "> 
+							                <p></p>
+							                <button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
+								            <span className="glyphicon glyphicon-plus"></span>Add More
+							                </button>
+						                </div>
+					                </div>
+                                    
                                 </div>
 
                             </div>

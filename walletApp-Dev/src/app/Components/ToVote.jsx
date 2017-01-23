@@ -141,6 +141,7 @@ class ModalWin extends React.Component {
                 }
                 result.ownerArray = ownerArray
                 //console.log(result.ownerArray)
+		console.log('result of getCoidData' + result)
 
 				_this.setState({
 					proposal_data: result

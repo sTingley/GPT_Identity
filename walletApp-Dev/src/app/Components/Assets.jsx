@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import TagsInput from 'react-tagsinput';
 import QRCode from 'qrcode.react';
 import AssetTags from './classAndSubClass.js';
+import TokenDistributionForm from './TokenDistributionForm.jsx'
 //import wallet from './wallet.js';
 
 var crypto = require('crypto');
@@ -19,12 +20,17 @@ class Modal extends Component {
 		this.privKey = localStorage.getItem("privKey");
 		this.tags = new AssetTags(this.pubKey, props.asset.asset_id);
 		this.state = {
+			
+			//added for identityDimension tab-pane
+			inputs: ['input-0'],
+			
 			asset: props.asset || {},
 			asset_class: this.tags.getAssetData("classes"),
 			asset_subclass: this.tags.getAssetData("subclasses"),
 			qrCode_signature: {}
 		};
 		this.handleClassChange = this.handleClassChange.bind(this);;
+		this.maxUniqAttr = 10;
 	}
 
 	componentDidMount() {
@@ -70,6 +76,39 @@ class Modal extends Component {
 		this.setState({ asset_subclass: tags });
 		this.tags.updateClasses(tags, this.props.asset.asset_id, "subclasses");
 	}
+	
+	appendInput() {
+		console.log("hit append Input")
+		var inputLen = this.state.inputs.length;
+		if(inputLen < this.maxUniqAttr){
+			var newInput = `input-${inputLen}`;
+        	this.setState({ inputs: this.state.inputs.concat([newInput]) });
+		}
+    }
+	
+	getLabelValues(){
+		console.log("hit getLabelValues")
+		var labelVals = []
+		var _this = this;
+		$.each($("input[name^='label-']"), function(obj){
+			var value = $.trim($(this).val());
+			if(value.length > 0){
+				labelVals.push({
+					//replace the 'label' with the entered unique attribute descriptor, for example 'Name' or 'US SSN'
+					[$(this).attr('name').replace("label-","")] : value
+				});
+			}
+		});
+		return labelVals;
+	}
+	
+	handleHideModal(){
+		this.setState({showModal: false});
+	}
+
+	handleShowModal(e){
+        this.setState({showModal: true, tmpFile: $(e.target).attr('data-id')});
+    }
 
 	render() {
 
@@ -110,6 +149,10 @@ class Modal extends Component {
 			maxWidth: "100%",
 			textAlign: "center"
 		};
+		
+		var syle = {
+			marginRight:'15px'
+		}
 
 		return (
 			<div className="modal fade" id="assetDetails" key={this.props.asset.asset_id} tabIndex="-1" role="dialog" aria-labelledby="asset">
@@ -120,6 +163,7 @@ class Modal extends Component {
 							<ul className="nav nav-pills" role="tablist">
 								<li role="presentation" className="active"><a href="#asset_details" role="tab" data-toggle="tab">Asset Details</a></li>
 								<li role="presentation"><a href="#qrcode" role="tab" data-toggle="tab">QR Code</a></li>
+								<li role="presentation"><a href="#dimension" role="tab" data-toggle="tab">Identity Dimensions</a></li>
 							</ul>
 						</div>
 						<div className="modal-body">
@@ -245,8 +289,25 @@ class Modal extends Component {
 										</tbody>
 									</table>
 								</div>
+								
 								<div role="tabpanel" className="tab-pane center-block" id="qrcode" style={qrStyle}>
 									<QRCode value={qrConfig} size={200} />
+								</div>
+								
+								<div role="tabpanel" className='tab-pane' id="dimension">
+								
+									<form method="POST" id="register" role="form">
+										<label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
+										{this.state.inputs.map(input => <TokenDistributionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+									
+										<button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
+											<span className="glyphicon glyphicon-plus"></span>Add More
+										</button>
+									</form>
+									
+									
+										
+										
 								</div>
 							</div>
 						</div>

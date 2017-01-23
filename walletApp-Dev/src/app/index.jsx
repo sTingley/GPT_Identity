@@ -10,7 +10,6 @@ import { Router, Route, IndexRedirect, hashHistory } from 'react-router';
 // TODO: Asset should be implemented with real data
 // TODO: Asset menu only applicable for logged in users, this will be taking care once the functionality get done
 
-
 import Menu from './Components/menu.jsx';
 import Header from './Components/header.jsx';
 import Home from './Components/Home.jsx';
@@ -24,7 +23,8 @@ import MyCoreIdentity from './Components/MyCoreIdentity.jsx';
 import IdentityDimension from './Components/IdentityDimension.jsx';
 import Documents from './Components/Documents.jsx';
 import MyGateKeeper from './Components/MyGateKeeper.jsx';
-
+import IdentityDimension from './Components/IdentityDimension.jsx';
+import IDimensions from './Components/IDimensions.jsx';
 
 
 class App extends React.Component {

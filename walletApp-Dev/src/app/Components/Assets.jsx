@@ -30,11 +30,11 @@ class Modal extends Component {
 	componentDidMount() {
         $("#assetDetails").modal('show');
         $("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
-		
+
 		var prop = this.props.asset.asset_name;
 
 		var theTime = (new Date()).toString()
-		
+
 		var qrCode_Object = JSON.stringify({
 			uniqueId: prop.uniqueId,
 			name: prop.uniqueIdAttributes[0],
@@ -44,21 +44,21 @@ class Modal extends Component {
 			endpoint: twinUrl + "validateQrCode"
 		})
 		console.log("**" + qrCode_Object)
-		
+
 		var qrCode_Object_hash = keccak_256(theTime);
-		
-		this.privKey = new Buffer(this.privKey,"hex");
-		
-		var qrCode_Object_hash_buffer = new Buffer(qrCode_Object_hash,"hex");
-		
-		 var signature = JSON.stringify(secp256k1.sign(qrCode_Object_hash_buffer, this.privKey));
-		 signature = JSON.parse(signature).signature;
-		 signature = JSON.stringify(signature);
-		 signature = JSON.parse(signature).data;
-		 signature = new Buffer(signature,"hex");
-		 signature = signature.toString("hex")
-		 
-		 this.setState({qrCode_signature: {"msgHash": qrCode_Object_hash, "signature":signature, "timestamp": theTime}})
+
+		this.privKey = new Buffer(this.privKey, "hex");
+
+		var qrCode_Object_hash_buffer = new Buffer(qrCode_Object_hash, "hex");
+
+		var signature = JSON.stringify(secp256k1.sign(qrCode_Object_hash_buffer, this.privKey));
+		signature = JSON.parse(signature).signature;
+		signature = JSON.stringify(signature);
+		signature = JSON.parse(signature).data;
+		signature = new Buffer(signature, "hex");
+		signature = signature.toString("hex")
+
+		this.setState({ qrCode_signature: { "msgHash": qrCode_Object_hash, "signature": signature, "timestamp": theTime } })
     }
 
 	handleClassChange(tags) {
@@ -72,7 +72,7 @@ class Modal extends Component {
 	}
 
 	render() {
-		
+
 		var prop = this.props.asset.asset_name;
 		var style = {
 			fontSize: '12.5px'
@@ -284,7 +284,7 @@ class Assets extends Component {
 	}
 
 	componentWillMount() {
-        
+
         //get all assets, OWNED, CONTROLLED, DELEGATAED:        
 
         // -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
@@ -295,181 +295,158 @@ class Assets extends Component {
 			data: { "pubKey": localStorage.getItem("pubKey") },
 			success: function (result) {
 				var data = result;
-				if ($.type(result) != "object") 
-                {
+				if ($.type(result) != "object") {
 					data = JSON.parseJSON(result)
 				}
-                
+
                 //get the array:
                 data = data.data;
-                
+
                 //DEBUGGING:
                 console.log("getOwnedAssets result: " + data);
-                
-                if(data.length > 0)
-                {
+
+                if (data.length > 0) {
                     //loop through OWNED assets
-                    for(let i = 0; i < data.length; i++)
-                    {
+                    for (let i = 0; i < data.length; i++) {
                         //AJAX each asset:
                         $.ajax({
                             type: "POST",
                             url: twinUrl + 'getAsset',
-                            data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": data[i]},
-                            success: function (result) 
-                            {
+                            data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": data[i] },
+                            success: function (result) {
                                 var dataResult = result;
-                                if ($.type(result) != "object") 
-                                {
+                                if ($.type(result) != "object") {
                                     dataResult = JSON.parseJSON(result)
                                 }
-                                
 
-                                
+
+
                                 //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
                                 var theArray = this.state.own_assets;
-                                
+
                                 console.log("length is: " + theArray.length)
                                 console.log(theArray)
                                 theArray[theArray.length] = { asset_id: dataResult.assetID, asset_name: dataResult }
                                 this.setState({ own_assets: theArray });
 
                             }.bind(this),
-                            complete: function () 
-                            {
-                                
+                            complete: function () {
+
                             },
                             //console.log(result)	
                         })
-                                  
+
                     }
                 }
 			}.bind(this),
-			complete: function () 
-            {
-			},	
+			complete: function () {
+			},
 		})
         // <- <- <- END get OWNED assets <- <- <-
         // <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
-        
-        
+
+
         // -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
         // -> -> -> START get CONTROLLED assets -> -> ->
         $.ajax({
 			type: "POST",
 			url: twinUrl + 'getControlledAssets',
 			data: { "pubKey": localStorage.getItem("pubKey") },
-			success: function (result) 
-            {
+			success: function (result) {
 				var data = result;
-				if ($.type(result) != "object") 
-                {
+				if ($.type(result) != "object") {
 					data = JSON.parseJSON(result)
 				}
-                
+
                 //get the array:
                 data = data.data;
-                
+
                 //debugging:
                 console.log("Get Controlled Assets result: " + data);
-                
-                if(data.length > 0)
-                {
+
+                if (data.length > 0) {
                     //loop through OWNED assets
-                    for(let i = 0; i < data.length; i++)
-                    {
+                    for (let i = 0; i < data.length; i++) {
                         //AJAX each asset:
                         $.ajax({
                             type: "POST",
                             url: twinUrl + 'getAsset',
-                            data: { "pubKey": localStorage.getItem("pubKey"), "flag": 1, "fileName": data[i]},
-                            success: function (result) 
-                            {
+                            data: { "pubKey": localStorage.getItem("pubKey"), "flag": 1, "fileName": data[i] },
+                            success: function (result) {
                                 var dataResult = result;
-                                if ($.type(result) != "object") 
-                                {
+                                if ($.type(result) != "object") {
                                     dataResult = JSON.parseJSON(result)
                                 }
-                                
+
                                 //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
                                 this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_name: dataResult }] });
 
                             }.bind(this),
-                            complete: function () 
-                            {
+                            complete: function () {
                                 // do something
                             },
                             //console.log(result)	
                         })
-                                  
+
                     }
                 }
 			}.bind(this),
-			complete: function () 
-            {
+			complete: function () {
 				// do something
 			},
 			//console.log(result)	
 		})
         // <- <- <- END get CONTROLLED assets <- <- <-
         // <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
-        
-        
-        
+
+
+
         // -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
         // -> -> -> START get DELEGATED assets -> -> ->
         $.ajax({
 			type: "POST",
 			url: twinUrl + 'getDelegatedAssets',
 			data: { "pubKey": localStorage.getItem("pubKey") },
-			success: function (result) 
-            {
+			success: function (result) {
 				var data = result;
-				if ($.type(result) != "object") 
-                {
+				if ($.type(result) != "object") {
 					data = JSON.parseJSON(result)
 				}
-                
+
                 //get the array:
                 data = data.data;
-                
+
                 //debugging:
                 console.log("Get Delegated Assets result: " + data)
-                
-                if(data.length > 0)
-                {
+
+                if (data.length > 0) {
                     //loop through OWNED assets
-                    for(let i = 0; i < data.length; i++)
-                    {
+                    for (let i = 0; i < data.length; i++) {
                         //AJAX each asset:
                         $.ajax({
                             type: "POST",
                             url: twinUrl + 'getAsset',
-                            data: { "pubKey": localStorage.getItem("pubKey"), "flag": 2, "fileName": data[i]},
-                            success: function (result) 
-                            {
+                            data: { "pubKey": localStorage.getItem("pubKey"), "flag": 2, "fileName": data[i] },
+                            success: function (result) {
                                 var dataResult = result;
-                                if ($.type(result) != "object") 
-                                {
+                                if ($.type(result) != "object") {
                                     dataResult = JSON.parseJSON(result)
                                 }
-                                
+
                                 //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
                                 this.setState({ delegated_assets: [{ asset_id: dataResult.assetID, asset_name: dataResult }] });
 
                             }.bind(this),
-                            complete: function () 
-                            {
+                            complete: function () {
                                 // do something
                             },
                             //console.log(result)	
                         })
-                                  
+
                     }
                 }
 			}.bind(this),
-			complete: function () 
-            {
+			complete: function () {
 				// do something
 			},
 			//console.log(result)	
@@ -514,6 +491,7 @@ class Assets extends Component {
 	}
 
 	render() {
+
 		return (
 			<div id="assets-container" className="assets">
 				<div className="row" id="search-bar">
@@ -531,6 +509,7 @@ class Assets extends Component {
 						</form>
 					</div>
 				</div>
+
 				<div id="my-accounts">
 					<h4>My Wallet</h4> <hr/>
 					<div className="all-accounts">
@@ -539,6 +518,7 @@ class Assets extends Component {
 						</div>
 					</div>
 				</div>
+
 				<div id="own-assets">
 					<h4>My Owned Assets</h4> <hr/>
 					<div className="own-assets">
@@ -560,6 +540,7 @@ class Assets extends Component {
 						</div>
 					</div>
 				</div>
+
 				<div id="controlled-assets">
 					<h4>My Controlled Assets</h4> <hr/>
 					<div className="row assets">
@@ -579,12 +560,7 @@ class Assets extends Component {
 						}) }
 					</div>
 				</div>
-				<div id="qr-code">
-					<h4>Qr Code</h4> <hr />
-					<div className="row assets">
-						<div id="render-qr-code"></div>
-					</div>
-				</div>
+
 				{this.state.showDetails ? <Modal hideHandler={this.hideHandler} asset={this.state.active_asset} /> : null}
 			</div>
 		);

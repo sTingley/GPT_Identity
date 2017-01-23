@@ -92,93 +92,119 @@ class DimensionForm extends Component {
 
     componentDidMount() {
         var _this = this;
-        
+
         var dim = {
             ID: 123432, dimensionType: "financial"
         }
 
-//UNCOMMENT WHEN INTEGRATING CONTRACTS AND THE JS
+        //UNCOMMENT WHEN INTEGRATING CONTRACTS AND THE JS
 
-    // $.ajax({
-    //     type: "POST",
-    //     url: twinUrl + 'getDimensionData',
-    //     data: {
-    //         "publicKey": localStorage.getItem("pubKey"),
-    //         "ID": "321312231212312"
-    //     },
-    //     success: function (result) {
-    //         //var isSecure = true;
+        // $.ajax({
+        //     type: "POST",
+        //     url: twinUrl + 'getDimensionData',
+        //     data: {
+        //         "publicKey": localStorage.getItem("pubKey"),
+        //         "ID": "321312231212312"
+        //     },
+        //     success: function (result) {
+        //         //var isSecure = true;
 
-    //         if ($.type(result) == "string") {
-    //             result = JSON.parse(result);
-    //         }
+        //         if ($.type(result) == "string") {
+        //             result = JSON.parse(result);
+        //         }
 
-            _this.setState({
-                dimension_data: { dim
-                }
-            });
-            $("#dimensionDetails").modal('show');
-            $("#dimensionDetails").on('hidden.bs.modal', this.props.hideHandler);
+        _this.setState({
+            dimension_data: {
+                dim
+            }
+        });
+        $("#dimensionDetails").modal('show');
+        $("#dimensionDetails").on('hidden.bs.modal', this.props.hideHandler);
 
-    //     }
+        //     }
 
-    // })
-
-
-}
+        // })
 
 
+    }
 
-render() {
 
-    //var prop = this.state.dimension;
-    console.log("state in DImensionForm" + JSON.stringify(this.state))
-    var type = this.state.dimension;
-    console.log("#" + JSON.stringify(type))
-    
-    
-    //type = JSON.parse(type).dimensionType
 
-    return (
-        <div className="modal fade" id="dimensionDetails" tabIndex="-1" role="dialog">
-            <div className="modal-dialog modal-lg" role="document">
-                <div className="modal-content">
+    render() {
 
-                    <div className="modal-header">
-                        <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times; </span></button>
-                        <h4 className="modal-title" id="dimension">Identity Dimension Details</h4>
+        //var prop = this.state.dimension;
+        console.log("state in DImensionForm" + JSON.stringify(this.state))
+        var type = this.state.dimension;
+        console.log("#" + JSON.stringify(type))
+
+
+        //type = JSON.parse(type).dimensionType
+
+        return (
+            <div className="modal fade" id="dimensionDetails" tabIndex="-1" role="dialog">
+                <div className="modal-dialog modal-lg" role="document">
+                    <div className="modal-content">
+
+                        <div className="modal-header">
+                            <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times; </span></button>
+                            <ul className="nav nav-pills" role="tablist">
+                                <li role="presentation" className="active"><a href="#dimension_Details" role="tab" data-toggle="tab">Dimension Details</a></li>
+                                <li role="presentation"><a href="#edit" role="tab" data-toggle="tab">Edit dimension</a></li>
+                            </ul>
+                        </div>
+
+                        <div className="modal-body">
+                        
+                            <div className="tab-content">
+                                <div role="tabpanel" className="tab-pane active" id="dimension_Details">
+
+                                    <table className="table table-striped table-hover">
+                                        <tbody>
+                                            <tr>
+                                                <td>Dimension Type</td>
+                                                <td>{type.dimensionType}</td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>Reference Hash</td>
+                                                <td>{type.ID}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div role="tabpanel" className="tab-pane center-block" id="edit" >
+                                    <table className="table table-striped table-hover" >
+                                        <tbody>
+                                            <tr>
+                                                <th><b>Public Key of Owner</b></th>
+                                                <th><b>Ownership Token Quantity</b></th>
+                                            </tr>
+                                            <tr>
+                                                <td><input name={'label2-' + this.props.labelref}  type="text" placeholder="Public Key of Owner"  /></td>
+                                                <td><input name={'label2-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Ownership Token Quantity"  /></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-danger btn-sm" onClick={this.submitHandler.bind(this) }>THIS BUTTON DOES SOMETHING</button>
+                        </div>
+
                     </div>
 
-                    <div className="modal-body">
-                        <table className="table table-striped table-hover">
-                            <tbody>
-                                <tr>
-                                    <td>Dimension Type</td>
-                                    <td>{type.dimensionType}</td>
-                                </tr>
-
-                                <tr>
-                                    <td>Reference Hash</td>
-                                    <td>{type.ID}</td>
-                                </tr>
-
-                            </tbody>
-                        </table>
-
-                    </div>
-
-                    <div className="modal-footer">
-                        <button type="button" className="btn btn-danger" onClick={this.submitHandler.bind(this) }>THIS BUTTON DOES SOMETHING</button>
-                    </div>
 
                 </div>
 
-
             </div>
-
-        </div>
-    )
-}
+        )
+    }
 }
 
 
@@ -224,8 +250,8 @@ class Modal extends Component {
                 { dimensionType: "education", ID: "123124" }
             ]
         }
-        
-        this.setState({iDimensions: dimensions.identity_dimensions})
+
+        this.setState({ iDimensions: dimensions.identity_dimensions })
     }
 
     hideHandler() {
@@ -266,12 +292,13 @@ class Modal extends Component {
         console.log(JSON.stringify(this.state))
         let dimensions = this.state.iDimensions;
         var _that = this
+        var style = {width: '180px'}
+        
+        
         return (
             <div id="dimensions_container">
 
                 <h1>IDENTITY DIMENSIONS</h1><hr />
-
-                <AddDimension addDimension={this.handleAddDimension.bind(this) } /><br /><br />
 
                 <table className="table table-striped">
                     <tbody>
@@ -280,11 +307,8 @@ class Modal extends Component {
                                 return this.state.iDimensions.map(function (el, i) {
                                     return (
                                         <tr key={i}>
-                                            <td>
-                                                <div><b>{el.dimensionType}</b></div>
-                                            </td>
                                             <td className="pull-right">
-                                                <button type="button" className="btn btn-primary" data-item={el} data-index={i} onClick={_that.showHandler} >VIEW DIMENSION</button>
+                                                <button type="button" className="btn btn-primary" style={style} data-item={el} data-index={i} onClick={_that.showHandler} >{el.dimensionType}</button>
                                             </td>
                                         </tr>
                                     );

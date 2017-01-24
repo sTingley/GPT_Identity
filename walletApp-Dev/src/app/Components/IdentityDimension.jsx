@@ -1,185 +1,6 @@
 import React, { Component } from 'react';
 
 
-class UploadIpfsFile extends React.Component {
-
-	constructor(props){
-		super(props);
-		this.state = {
-			docs: {},
-			pubKey: props.pubKey,
-			selected:'0',
-			files:''
-		};
-		this.inputChangeHandler = this.inputChangeHandler.bind(this);
-	}
-
-	componentDidMount(){
-		$.ajax({
-			url: twinUrl + "ipfs/alldocs/"+this.state.pubKey,
-			dataType: 'json',
-			cache: false,
-			success: function(resp) {
-				this.setState({docs: resp.data.documents});
-			}.bind(this),
-			error: function(xhr, status, err) {
-				console.error(this.props.url, status, err.toString());
-			}.bind(this)
-		});
-		
-		$("#CoreIdentityContainer .modal").modal('show');
-        $("#CoreIdentityContainer .modal").on('hidden.bs.modal', this.props.handleHideModal);
-	}
-	
-	uploadHandler(data, additionalParams){
-		var params = {
-			url: twinUrl + "ipfs/upload",
-			type: 'POST',
-			data: data,
-			cache: false,
-			processData: false,
-			contentType: false,
-		};
-		$.extend(params, additionalParams);
-		$.ajax(params);
-	}
-	
-	fileHandler(e){
-		e.preventDefault();
-		if(this.state.selected != "0"){
-			var hash, fileHash;
-			this.props.dataHandler(this.state.selected);
-			$("button.close").trigger("click");
-		} else {
-			if(this.state.files.size > 0){
-				var fileInput = $("input[name=newdoc]");
-				var fData = new FormData();
-				fData.append("user_pubkey", this.state.pubKey);
-				 $.each(fileInput[0].files, function(key, value){
-					fData.append(key, value);
-				});
-				var _this = this;
-				var callbacks = {
-					beforeSend: (xhr) => {
-						$("button[name=uploadsubmit]").button('loading');
-						$("button.close").hide();
-					},
-					success: function(resp){
-						if(resp.uploded && resp.uploded.length > 0){
-							var filedata = resp.uploded[0].hash+"|"+resp.uploded[0].file_hash;
-							//data handler forms JSON object
-							this.props.dataHandler(filedata);
-							$("button.close").trigger("click");
-						}
-					}.bind(this),
-					complete: () => {
-						$("button[name=uploadsubmit]").button('reset');
-						$("button.close").show();
-					}
-				};
-				this.uploadHandler(fData,callbacks);
-			}
-		}
-	}
-	
-	inputChangeHandler(e){
-		if(e.target.tagName == "SELECT"){
-			this.setState({selected: e.target.value});
-		} else 
-			this.setState({files: e.target.files[0]});
-	}
-
-	render(){
-		var center = {
-			textAlign: 'center'
-		};
-		return(
-			<div className="modal fade">
-            <div className="modal-dialog">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                  <h4 className="modal-title">Upload Document</h4>
-                </div>
-                <div className="modal-body">
-                  <form>
-                  	<div className="form-group">
-                  		<label htmlFor="get-hash">Choose from documents</label>
-                  		<select className="form-control" onChange={this.inputChangeHandler}>
-							<option value="0">Select Document</option>
-						{(()=>{
-							if(this.state.docs && this.state.docs.length > 0){
-								var i=0;
-								return this.state.docs.map((obj) => {
-									i++;
-									var optsVal = obj.hash+"|"+obj.file_hash;
-									return <option value={optsVal} key={i}>{obj.filename}</option>
-								});
-							} else {
-								return <option value="0">-- Empty --</option>
-							}
-						})()}
-						</select>
-                  	</div>
-                  	<p style={center}>(or)</p>
-                  	<div className="form-group">
-                  		<label htmlFor="documents">Upload Document</label>
-                  		<input type="file" className="form-control" name="newdoc" onChange={this.inputChangeHandler}/>
-                  	</div>
-                  </form>
-                </div>
-                <div className="modal-footer">
-                  <button type="button" data-loading-text="Processing..." name="uploadsubmit" className="btn btn-success" onClick={this.fileHandler.bind(this)}>Submit</button>
-                </div>
-              </div>
-            </div>
-          </div>
-		)
-	}
-};
-
-
-//form where we can add addtional labels (uniqueIDAttrs)
-class UniqueIDAttributesForm extends React.Component {
-
-	constructor(props){
-		super(props);
-		this.state = {
-		file_attrs:[],
-		inputs: ['input-0'],
-		tmpFile:'',
-		showModal: false,
-		pubKey: localStorage.getItem("pubKey")
-		};
-	
-	}
-	
-	handleShowModal(e){
-		this.setState({showModal: true, tmpFile: $(e.target).attr('data-id')});
-    }
-	
-	handleHideModal(){
-		this.setState({showModal: false});
-	}
-	
-	render(){
-		
-		return(
-			<div className="form-group col-md-12">
-				<div className="col-md-10">
-				<label htmlFor="unique_id_attrs"> Official IDs e.g. SSN, Passport, Driver's License, Digital retinal scans and/or digital fingerprints </label>
-					<input name={'label-'+this.props.labelref} className="form-control col-md-4" type="text" placeholder="Label"  />
-				</div>
-				<div className="col-md-2">
-					<button type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn btn-warning pull-right"><span className="glyphicon glyphicon-upload"></span>Upload File</button>
-				</div>	
-			</div>	
-		);
-	}
-
-};
-
-
 
 class DimensionForm extends Component {
 
@@ -197,13 +18,13 @@ class DimensionForm extends Component {
         this.setState({showModal: true, tmpFile: $(e.target).attr('data-id')});
     }
     
-    appendInput() {
-		var inputLen = this.state.inputs.length;
-		if(inputLen < this.maxUniqAttr){
-			var newInput = `input-${inputLen}`;
-        	this.setState({ inputs: this.state.inputs.concat([newInput]) });
-		}
-    }
+    // appendInput() {
+	// 	var inputLen = this.state.inputs.length;
+	// 	if(inputLen < this.maxUniqAttr){
+	// 		var newInput = `input-${inputLen}`;
+    //     	this.setState({ inputs: this.state.inputs.concat([newInput]) });
+	// 	}
+    // }
 
 
     //HANDLE THE CHOICE OF USER INPUT
@@ -295,7 +116,6 @@ class DimensionForm extends Component {
                             <div className="tab-content">
                             
                                 <div role="tabpanel" className="tab-pane active" id="dimension_Details">
-
                                     <table className="table table-striped table-hover">
                                         <tbody>
                                             <tr>
@@ -311,28 +131,13 @@ class DimensionForm extends Component {
                                     </table>
                                 </div>
 
-                                <div role="tabpanel" className="tab-pane center-block" id="edit" >
-                                    
-                                    
-                                    <div className="form-group">
-						                <label htmlFor="unique_id">Enter Unique ID Attributes. The first Attribute has to be name (first, last). Then add any official identification such as SSN or national ID number(s). Make sure to add the supporting file(s) through "Upload File".</label>
-						                {this.state.inputs.map(input => <UniqueIDAttributesForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
-					                </div>
-                                    
-					                <div className="form-group"> 
-						                <div className="col-md-offset-6 col-md-6 "> 
-							                <p></p>
-							                <button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
-								            <span className="glyphicon glyphicon-plus"></span>Add More
-							                </button>
-						                </div>
-					                </div>
+                                <div role="tabpanel" className="tab-pane center-block" id="edit" >  
                                     
                                 </div>
-
+                                
+                                
                             </div>
                         </div>
-
 
 
                         <div className="modal-footer">
@@ -362,39 +167,83 @@ class Modal extends Component {
         this.showHandler = this.showHandler.bind(this);
     }
 
-    getDimensions() {
-        this.setState({
-            iDimensions: [
-                {
-                    ID: 123124, dimensionType: "financial"
-                },
-                {
-                    ID: 342342, dimensionType: "education"
-                },
-                {
-                    ID: 212144, dimensionType: "personal"
-                }
-            ]
-        })
-    }
-
-    // componentWillMount() {
-    //     this.getDimensions();
+    // getDimensions() {
+    //     this.setState({
+    //         iDimensions: [
+    //             {
+    //                 ID: 123124, dimensionType: "financial"
+    //             },
+    //             {
+    //                 ID: 342342, dimensionType: "education"
+    //             },
+    //             {
+    //                 ID: 212144, dimensionType: "personal"
+    //             }
+    //         ]
+    //     })
     // }
 
-    componentDidMount() {
-        //ajax request to get identityDimensions from digital twin
-        var dimensions = {
-            identity_dimensions:
-            [
-                { dimensionType: "financial", ID: "123124" },
-                { dimensionType: "personal", ID: "123124" },
-                { dimensionType: "education", ID: "123124" }
-            ]
-        }
+    componentWillMount() {
+        console.log("TWIN URL: " + twinUrl)
+        $.ajax({
+            url: twinUrl + 'getMetaData',
+            type: 'POST',
+            data: {
+                //"pubKey": localStorage.getItem("pubKey")
+            },
+            success: function(result){
+                var data = result;
+                if ($.type(result) != "object"){
+                    data = JSON.parse(result)
+                }
+                
+                console.log("data: " + JSON.stringify(data))
+                data = JSON.stringify(data)
+                data = JSON.parse(data).data
+                console.log("data after parse: " + JSON.stringify(data))
+                data = JSON.stringify(data)
+                var dimensions = JSON.parse(data).Dimensions
+                console.log("dimensions: " + JSON.stringify(dimensions))
+                
+                this.setState({iDimensions: dimensions})
+                
+               // var totalDimensions = Object.keys(dimensions).length
+                //var totalDimensions = data.keys(Dimensions.ID).length;
+                //console.log(totalDimensions)
+                
+                // for (var i=0; i<totalDimensions; i++){
+                //     this.setState({iDimensions: {
+                //         "ID": dimensions.ID,
+                //         "attributes": dimensions.attributes,
+                //         "hashes": dimension.hashes
+                //     }})
+                // }
+                
+                
+            }.bind(this),
+            
+            complete: function(){
+                
+            }
+        })
+        
+    }//end componentWillMount
 
-        this.setState({ iDimensions: dimensions.identity_dimensions })
-    }
+
+
+    // componentDidMount() {
+    //     //ajax request to get identityDimensions from digital twin
+    //     var dimensions = {
+    //         identity_dimensions:
+    //         [
+    //             { dimensionType: "financial", ID: "123124" },
+    //             { dimensionType: "personal", ID: "123124" },
+    //             { dimensionType: "education", ID: "123124" }
+    //         ]
+    //     }
+
+    //     this.setState({ iDimensions: dimensions.identity_dimensions })
+    // }
 
     hideHandler() {
         this.setState({ showDetails: false });
@@ -445,12 +294,12 @@ class Modal extends Component {
                 <table className="table table-striped">
                     <tbody>
                         {(() => {
-                            if ($.isArray(this.state.iDimensions) && this.state.iDimensions.length > 0) {
+                            if (this.state.iDimensions.length > 0) {
                                 return this.state.iDimensions.map(function (el, i) {
                                     return (
                                         <tr key={i}>
                                             <td className="pull-right">
-                                                <button type="button" className="btn btn-primary" style={style} data-item={el} data-index={i} onClick={_that.showHandler} >{el.dimensionType}</button>
+                                                <button type="button" className="btn btn-primary" style={style} data-item={el} data-index={i} onClick={_that.showHandler} >{el.ID}</button>
                                             </td>
                                         </tr>
                                     );

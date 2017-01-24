@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import TagsInput from 'react-tagsinput';
 import QRCode from 'qrcode.react';
 import AssetTags from './classAndSubClass.js';
-import TokenDistributionForm from './TokenDistributionForm.jsx'
+import DimensionCreationForm from './DimensionCreationForm.jsx'
 //import wallet from './wallet.js';
 
 var crypto = require('crypto');
@@ -158,6 +158,7 @@ class Modal extends Component {
 			<div className="modal fade" id="assetDetails" key={this.props.asset.asset_id} tabIndex="-1" role="dialog" aria-labelledby="asset">
 				<div className="modal-dialog modal-lg" role="document">
 					<div className="modal-content">
+					
 						<div className="modal-header">
 							<button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times; </span></button>
 							<ul className="nav nav-pills" role="tablist">
@@ -166,8 +167,10 @@ class Modal extends Component {
 								<li role="presentation"><a href="#dimension" role="tab" data-toggle="tab">Identity Dimensions</a></li>
 							</ul>
 						</div>
+						
 						<div className="modal-body">
 							<div className="tab-content">
+								
 								<div role="tabpanel" className="tab-pane active" id="asset_details">
 									<table className="table table-striped table-hover" style={style}>
 										<tbody>
@@ -294,23 +297,13 @@ class Modal extends Component {
 									<QRCode value={qrConfig} size={200} />
 								</div>
 								
-								<div role="tabpanel" className='tab-pane' id="dimension">
-								
-									<form method="POST" id="register" role="form">
-										<label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
-										{this.state.inputs.map(input => <TokenDistributionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
-									
-										<button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
-											<span className="glyphicon glyphicon-plus"></span>Add More
-										</button>
-									</form>
-									
-									
-										
-										
+								<div role="tabpanel" className="tab-pane" id="dimension">
+									<DimensionCreationForm handleHideModal={this.handleHideModal} />			
 								</div>
+								
 							</div>
 						</div>
+						
 					</div>
 				</div>
 			</div>

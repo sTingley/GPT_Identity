@@ -253,7 +253,7 @@ class DimensionForm extends Component {
                                     <button type="button" className="btn btn-info" data-val="2" onClick={this.submitHandler.bind(this)}> ADD CONTROLLER</button>
                                 </div>
 
-                                <div role="tabpanel" className="tab-pane active" id="delegations">
+                                <div role="tabpanel" className="tab-pane" id="delegations">
                                     <table className="table table-striped table-hover" style={syle}>
                                         <tbody>
                                             <tr>
@@ -268,6 +268,12 @@ class DimensionForm extends Component {
                                             <tr>
                                                 <td><input className="form-control col-md-4" type="text" placeholder="Delegatee Address" /></td>
                                                 <td><input className="form-control col-md-4" type="text" placeholder="Token Quantity" /></td>
+                                            </tr>
+                                            <tr>
+                                                <option value="one">One</option>
+                                                <option value="two">Two</option>
+                                                <option value="three">Three</option>
+                                                <option value="four">Four</option>
                                             </tr>
 
                                         </tbody>

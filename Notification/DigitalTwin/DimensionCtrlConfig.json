@@ -1,0 +1,6 @@
+{
+    "PATH": "/home/demoadmin/DigitalTwin/dimensions",
+    "ControlDirectory": "controlled",
+    "OwnershipDirectory": "owned",
+    "DelegateDirectory": "delegated"
+}

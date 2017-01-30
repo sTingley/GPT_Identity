@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { keccak_256 } from 'js-sha3';
 
 class UploadIpfsFile extends React.Component {
 
@@ -168,11 +169,11 @@ class UniqueIDAttributesForm extends React.Component {
 		return (
 			<div className="form-group col-md-12">
 				<div className="col-md-10">
-					<label htmlFor="unique_id_attrs"> Official IDs e.g. SSN, Passport, Driver's License, Digital retinal scans and/or digital fingerprints </label>
+					<label htmlFor="unique_id_attrs"> Official IDs e.g. SSN, Passport, Driver's License </label>
 					<input name={'label-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Label" />
 				</div>
 				<div className="col-md-2">
-					<button type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn btn-warning pull-right">
+					<button type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn btn-warning pull-right btn-sm">
 						<span className="glyphicon glyphicon-upload"></span>Upload File
 					</button>
 				</div>
@@ -253,15 +254,15 @@ class Modal extends React.Component {
 
 			//ControllerDistributionForm inputs are mapped to this array
 			controllerForm_inputs: ['input-0'],
-			
+
 			//Every time a new controller is added,
 			control_id: [], /* AND */ control_token_quantity: [],
 			//are both updated accordingly.
 
 			//owner list
 			//KEEP THIS??????????
-			owner_id:[],
-			
+			owner_id: [],
+
 			pubKey: localStorage.getItem("pubKey"),
 			privKey: localStorage.getItem("privKey"),
 			signature: ''
@@ -272,8 +273,8 @@ class Modal extends React.Component {
 		this.onFieldChange = this.onFieldChange.bind(this);
 		this.handleHideModal = this.handleHideModal.bind(this);
 	}
-	
-	
+
+
 	onFieldChange(inputField, e) {
 		var multipleValues = {};
 		if (inputField == "name" || inputField == "signature" || inputField == "message") {
@@ -322,16 +323,6 @@ class Modal extends React.Component {
 		console.log("controllerForm_inputs: " + this.state.controllerForm_inputs)
 	}
 
-	prepareControlTokenDistribution() {
-		var labels = this.getControllerLabels();
-		for (var i = 0; i < labels.length; i += 2) {
-			for (var key in labels[i]) {
-				this.state.control_id.push(labels[i][key]);
-				this.state.control_token_quantity.push(labels[i + 1][key]);
-			}
-		}
-	}
-
 	//used in token form class for control token distribution list.. is called by appendController()
 	getControllerLabels() {
 		var labelVals1 = []
@@ -348,21 +339,31 @@ class Modal extends React.Component {
 		return labelVals1;
 	}
 	
+	prepareControlTokenDistribution() {
+		var labels = this.getControllerLabels();
+		for (var i = 0; i < labels.length; i += 2) {
+			for (var key in labels[i]) {
+				this.state.control_id.push(labels[i][key]);
+				this.state.control_token_quantity.push(labels[i + 1][key]);
+			}
+		}
+	}
+
 	//HELPER FUNCTION: HASHES INPUTS
-	getHash(input){
+	getHash(input) {
 		var input = $.trim(input);
-		if(input){
+		if (input) {
 			var hash = keccak_256(input)
 			return hash;
 		}
 		return input;
 	}
-	
+
 	//Hashes arrays (no delimiter)
-	valueIntoHash(values){
+	valueIntoHash(values) {
 		var newArr = [];
 		var _this = this;
-		if($.isArray(values)){
+		if ($.isArray(values)) {
 			values.map((value) => {
 				newArr.push(_this.getHash(value));
 			});
@@ -371,78 +372,37 @@ class Modal extends React.Component {
 	}
 
 	//create hash attribute
-	createHashAttribute(values){
-		if($.isArray(values) && values.length > 0){
-			if($.isPlainObject(values[0])){
+	createHashAttribute(values) {
+		if ($.isArray(values) && values.length > 0) {
+			if ($.isPlainObject(values[0])) {
 				var str = "";
-				for(var i=0; i<values.length; i++){
-					for(var key in values[i]){
+				for (var i = 0; i < values.length; i++) {
+					for (var key in values[i]) {
 						var hash, filehash;
-						[hash,filehash] = values[i][key].split("|");
-						if((values.length-1) == i)
+						[hash, filehash] = values[i][key].split("|");
+						if ((values.length - 1) == i)
 							str += hash;
-						else 
-							str += hash+"|";
+						else
+							str += hash + "|";
 					}
 				}
 				return this.getHash(str);
-				
+
 				//if only one value in 'values'
 			} else {
 				var valStr = values.join("|");
 				return this.getHash(valStr);
 			}
-			
+
 		}
 		return '';
 	}
-	
 
-	prepareJsonToSubmit(){
-		prepareControlTokenDistribution()
-		var inputObj = {
-				"pubKey": this.refs.pubKey.value,
-				//"sig": this.refs.signature.value,
-				
-				//"msg": this.refs.message.value,
-				//"name": this.refs.nameReg.value,		no longer standalone part of JSON object (it is part of unique attributes)
-
-				"uniqueId": this.createHashAttribute(this.state.file_attrs),
-				"uniqueIdAttributes": this.prepareUniqueIdAttrs(),
-				
-				"ownershipId": this.createHashAttribute(this.state.owner_id),	//calculated from ownerIDlist
-				"ownerIdList":this.valueIntoHash(this.state.owner_id),
-				"controlId": this.createHashAttribute(this.state.control_id),
-				"controlIdList": this.valueIntoHash(this.state.control_id),
-				
-				//calculated. should be one time hashing of ownershipTokenAttributes and ownership token quantity
-				"ownershipTokenId": this.getHash(this.joinValuesOwnership()),	
-				
-				"ownershipTokenAttributes": this.state.owner_token_desc,					
-				"ownershipTokenQuantity": this.state.owner_token_quantity,
-				
-				//calculated. should be one time hashing of controlTokenAttributes and control token quantity
-				"controlTokenId": this.getHash(this.joinValuesControl()),
-				
-				"controlTokenAttributes": this.state.control_token_desc,
-				"controlTokenQuantity": this.state.control_token_quantity,
-				
-				"isHuman": true,
-				"timestamp": "",
-				"assetID": "MyCOID",
-				"Type": "non_cash",
-				"bigchainHash":  "",
-				"bigchainID": "",
-				"coidAddr": "",
-				"gatekeeperAddr": ""
-
-		};
-		return inputObj;
-	}
 
 	submitDimension(e) {
-		prepareJsonToSubmit()
+
 		e.preventDefault();
+		prepareControlTokenDistribution();
 
 		//var json = {
 
@@ -454,6 +414,11 @@ class Modal extends React.Component {
 		//"vote": parseInt(ele.attr("data-val"))
 
 		//};
+
+		var json = {
+			"controlIdList": this.valueIntoHash(this.state.control_id)
+		}
+
 
 		var privKey1 = new Buffer(this.state.privKey, "hex");
 		var msg_hash = keccak_256(JSON.stringify(json));
@@ -523,27 +488,24 @@ class Modal extends React.Component {
 						<label htmlFor="unique_id">Enter Unique ID Attributes. Make sure to add the supporting file(s) through "Upload File".</label>
 						{this.state.uniqueAttr_inputs.map(input => <UniqueIDAttributesForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
 					</div>
+					<button type="button" className="btn btn-info pull-left btn-sm" style={syle} onClick={this.appendInput.bind(this)}>
+						<span className="glyphicon glyphicon-plus"></span>Add More
+						</button>
+
 					<div className="form-group">
-						<div className="col-md-offset-6 col-md-6 ">
-							<button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
-								<span className="glyphicon glyphicon-plus"></span>Add More
-                            </button>
-						</div>
-					</div>
-					<div className="form-group">
-						<label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
+						<br /><label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
 						{this.state.controllerForm_inputs.map(input => <ControllerDistributionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
-
 					</div>
 
-					<button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendController.bind(this)}>
+					<button type="button" className="btn btn-info pull-left btn-sm" style={syle} onClick={this.appendController.bind(this)}>
 						<span className="glyphicon glyphicon-plus"></span>Add More
                             </button>
-
-					<input className="form-control" ref="signature" type="hidden" value={10} />
-					<input type="hidden" name="pubkey" ref="pubKey" value={localStorage.getItem("pubKey")} />
-					<button className="btn btn-primary" data-loading-text="Submit Dimension" name="submit-form" type="button" onClick={this.submitDimension.bind(this)}>Submit Dimension</button>
-
+					<div>
+						<input className="form-control" ref="signature" type="hidden" value={10} />
+						<input type="hidden" name="pubkey" ref="pubKey" value={localStorage.getItem("pubKey")} />
+						<br /><br />
+						<button className="btn btn-primary pull-right" data-loading-text="Submit Dimension" name="submit-form" type="button" onClick={this.submitDimension.bind(this)}>Submit Dimension</button>
+					</div>
 
 				</form>
 				{this.state.showModal1 ? <UploadIpfsFile pubKey={this.state.pubKey} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}

@@ -65,7 +65,9 @@ class DimensionForm extends Component {
         super(props);
         this.state = {
             dimension: this.props.dataHandler,
-            dimension_data: {}
+            dimension_data: {},
+
+            dimension_dist: []
         };
 
         var owned = true
@@ -137,14 +139,16 @@ class DimensionForm extends Component {
 
     }//end submitHandler
 
+    // componentWillMount(){
+
+    // }
+
 
     componentDidMount() {
 
-
-
-        // _this.setState({
-        //     dimension_data: { this.props.dimensions }
-        // });
+        this.setState({
+            dimension_data: this.props.dimension
+        });
 
         $("#dimension_Details").modal('show');
         $("#dimension_Details").on('hidden.bs.modal', this.props.hideHandler);
@@ -156,10 +160,9 @@ class DimensionForm extends Component {
 
     render() {
 
-        //var prop = this.state.dimension;
-        console.log("state in DImensionForm" + JSON.stringify(this.state))
-        var type = this.state.dimension;
-        console.log("#" + JSON.stringify(type))
+        console.log("state in DimensionForm" + JSON.stringify(this.state))
+        var dims = this.state.dimension
+        console.log("dims: " + JSON.stringify(dims))
 
         var syle = {
             marginRight: '15px'
@@ -168,10 +171,9 @@ class DimensionForm extends Component {
         var controllers = ["pubkey2121", "pubkey4422", "pubkey0"]
 
 
-        //type = JSON.parse(type).dimensionType
 
         return (
-            <div className="modal fade" id="dimension_Details" key={type.ID} tabIndex="-1" role="dialog" aria-labelledby="dimension">
+            <div className="modal fade" id="dimension_Details" key={dims.ID} tabIndex="-1" role="dialog" aria-labelledby="dimension">
                 <div className="modal-dialog modal-lg" role="document">
                     <div className="modal-content">
 
@@ -192,13 +194,24 @@ class DimensionForm extends Component {
                                         <tbody>
                                             <tr>
                                                 <td>Dimension Type</td>
-                                                <td>{type.dimensionType}</td>
+                                                <td>{dims.dimensionType}</td>
                                             </tr>
 
                                             <tr>
-                                                <td>Reference Hash</td>
-                                                <td>{type.ID}</td>
+                                                <td colSpan="2"><b>Descriptors:</b></td>
                                             </tr>
+                                            {(() => {
+                                                if(dims.attr_list.length > 0) {
+                                                    return dims.attr_list.map((attrs, i) => {
+                                                        return (
+                                                            <tr key={i}>
+                                                                <td>{attrs[0]}</td>
+                                                                <td><p>{attrs[1]}</p></td>
+                                                            </tr>
+                                                        )
+                                                    });
+                                                } else { return <tr><td colSpan="2">No Ids found</td></tr> }
+                                            })(this)}
 
                                             <tr>
                                                 <th><b>Add Dimension Attribute</b></th>
@@ -438,6 +451,40 @@ class Modal extends Component {
     }
 
 };
+
+
+
+
+
+// //temp function
+// app.post('/getMetaData', function(req,res)
+// {
+//         console.log("endpoint getMetaData was hit");
+//         var obj1 = {"dimensionType": "financial history", "ID": "1234", "attr_list": ["jan1", "hash_jan1_ptr", "jan 2", "hash_jan2_ptr"], "flag": [0,1] }
+//         var obj2 = {"dimensionType": "personal", "ID": "6678", "attr_list": ["val 1", "hash_val_1_ptr", "val 2", "hash_val_2_ptr"], "flag": [1,1] }
+//         var obj3 = {"dimensionType": "photography",  "ID": "4538", "attr_list": ["document_1", "hash_ptr_doc1", "document_2", "hash_ptr_doc2"], "flag": [0,1,1] }
+//         var response = { "Dimensions": [obj1, obj2, obj3] }
+//         res.json({"data": response})
+
+// })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*
 

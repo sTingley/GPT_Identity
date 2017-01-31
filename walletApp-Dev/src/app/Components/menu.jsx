@@ -17,12 +17,11 @@ class Menu extends React.Component {
 				{ prop.loggedin ?  <li><Link to='/tovote' activeClassName="active">Vote</Link></li> : ''}
 				{ prop.loggedin ?  <li><Link to='/notifications' activeClassName="active">Notifications</Link></li> : ''}
 				{ prop.loggedin ?  <li><Link to='/register' activeClassName="active">Name Register</Link></li> : ''}
-				{ prop.loggedin ?  <li><Link to='/identity' activeClassName="active">Core Identity</Link></li> : '' }
+				{ prop.loggedin ?  <li><Link to='/identity' activeClassName="active">Create Core Identity</Link></li> : '' }
 				{ prop.loggedin ?  <li><Link to='/assets' activeClassName="active">Assets</Link></li> : '' }
 				{ prop.loggedin ?  <li><Link to='/docs' activeClassName="active">My Documents</Link></li> : '' }
 				{ prop.loggedin ?  <li><Link to='/myGatekeeper' activeClassName="active">My Gatekeeper</Link></li> : '' }
-				{ prop.loggedin ?  <li><Link to='/mycoreidentity' activeClassName="active">My Core Identity</Link></li> : '' }
-				{ prop.loggedin ?  <li><Link to='/identitydimension' activeClassName='active'>Identity Dimensions</Link></li> : '' }
+				{ prop.loggedin ?  <li><Link to='/mycoreidentity' activeClassName="active">COID Utility</Link></li> : '' }
 			  </ul>
 			</div>
 		);

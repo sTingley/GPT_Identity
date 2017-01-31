@@ -4,6 +4,8 @@ import TagsInput from 'react-tagsinput';
 import QRCode from 'qrcode.react';
 import AssetTags from './classAndSubClass.js';
 import DimensionCreationForm from './DimensionCreationForm.jsx'
+import { Router, Route, IndexRedirect, hashHistory } from 'react-router';
+
 //import wallet from './wallet.js';
 
 var crypto = require('crypto');
@@ -109,6 +111,10 @@ class Modal extends Component {
 	handleShowModal(e){
         this.setState({showModal: true, tmpFile: $(e.target).attr('data-id')});
     }
+
+	onNavigateToDimensions(){
+		hashHistory.replace("/identityDimension", student.id)
+	}
 
 	render() {
 
@@ -298,7 +304,8 @@ class Modal extends Component {
 								</div>
 								
 								<div role="tabpanel" className="tab-pane" id="dimension">
-									<DimensionCreationForm handleHideModal={this.handleHideModal} />			
+										
+									<button onClick={this.onNavigateToDimensions} className="btn btn-primary">Create dimension</button>	
 								</div>
 								
 							</div>
@@ -310,7 +317,7 @@ class Modal extends Component {
 		);
 	}
 }
-
+//<DimensionCreationForm handleHideModal={this.handleHideModal} />
 Modal.propTypes = {
 	hideHandler: React.PropTypes.func.isRequired	// hideHandler method must exists in parent component
 };
@@ -380,8 +387,10 @@ class Assets extends Component {
 
                                 console.log("length is: " + theArray.length)
                                 console.log(theArray)
+												//TODO: RENAME asset_name TO ASSET DETAILS
                                 theArray[theArray.length] = { asset_id: dataResult.assetID, asset_name: dataResult }
                                 this.setState({ own_assets: theArray });
+								console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets))
 
                             }.bind(this),
                             complete: function () {

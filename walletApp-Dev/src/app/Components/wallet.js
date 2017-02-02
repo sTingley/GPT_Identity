@@ -118,8 +118,6 @@ var wallet = function(){
 
   //******************************************************************************
   //******************************************************************************
-  //NEEDS TO BE FINISHED!!!!!!!!!
-
   //current design is to hash the pubkey and then check for the correct wallet
   //the wallet file will have to be read and then can be returned to the user
 };

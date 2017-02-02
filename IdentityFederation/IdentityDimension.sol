@@ -11,344 +11,446 @@
 
 contract IdentityDimension
 {
-    
-    address chairperson;
-    
-    bytes32 ID; //This is the Identity Dimension ID 
-    string dimensionType; //The use case of the identity dimension. For example, "Financial History".
-    
-    //Having a private and public struct makes lookups easier:
-    
-    //Attribute that is public
-    struct PublicAttribute
-    {
-        string attribute;
-        string descriptor;
-    }
-    
-    //Attribute that is private
-    struct PrivateAttribute
-    {
-        string attribute;
-        string descriptor;
-    }
-    
-    
-    //Arrays are preferred over mappings, since the use of a mapping
-    //invokes the need for an array in order to do searches.
-    PublicAttribute[] PublicAttributes;
-    PrivateAttribute[] PrivateAttributes;
-    
-    uint PublicIndexer; //tells you the current index of the array PublicAttributes
-    uint PrivateIndexer; //tells you the current index of the array PrivateAttributes
-    
+    bytes32 chairperson;
+
+
+    //A DIMENSION CAN BE REFERRED TO BE ANY OF THE TWO:
+    bytes32 ID; //This is the Identity Dimension ID
+    bytes32 dimensionType; //The use case of the identity dimension. For example, "Financial History".
+
+
+    //the following are hash tables: key is descriptor; value is attribute
+    mapping(bytes32 => bytes32) publicAttributes;
+    mapping(bytes32 => bytes32) privateAttributes;
+
+    //the following keeps track of the descriptors that are public and private
+    bytes32[] publicDescriptors;
+    bytes32[] privateDescriptors;
+
     uint nonce;//for random number generation
-    
-    
+
+    //NOTE:
+    //the way this is coded is if something exists in the public mapping,
+    //its descriptor must exist in the publicDescriptor array.
+    //the analagous holds for the private mapping and the privateDescriptor array.
+
     //constructor — input information at instantiation
     //INPUT: uniqueID (unhashed)
     //       dimensionType (ex. "My Music Playlist")
     //       flag (for making the first attribute, the Owner. flag = (0,1) = (public,private))
-    function IdentityDimension(bytes32 uniqueID, string theDimensionType, uint flag)
+    function IdentityDimension(bytes32 uniqueID, bytes32 theDimensionType, uint flag)
     {
         //make the chairperson the deployer of this contract, by this line in the constructor:
-        chairperson = msg.sender;
-        
+        chairperson = sha3(msg.sender);
+
         //instantiate vars:
         nonce = 0;
-        PublicIndexer = 0;
-        PrivateIndexer = 0;
-    
+
         //To Consider -- get rid of the random number?
-        ID = sha3(uniqueID,attributeInput,getRand(1,1000));
+        ID = sha3(uniqueID,theDimensionType,getRand(1,1000));
         dimensionType = theDimensionType;
-        
-        //create the first Attribute/descriptor pair — it is always “Owner":
-        this.addEntry("owner",sha3(uniqueID));
+
+        //this is the descriptor of the first entry
+        //it is the hex encoding of the string "Owner"
+        //using the hex encoder: http://www.convertstring.com/EncodeDecode/HexEncode
+        bytes32 theDescriptor = 0x4F776E6572;
+
+        this.addEntry(theDescriptor,sha3(uniqueID),flag);
     }
-    
-    
-    
+
+
+    modifier accessCheck(address caller)
+    {
+        if(sha3(caller) != chairperson)
+        {
+            throw;
+        }
+
+        _
+    }
+
+
     //creates an attribute/descriptor and puts it in the appropriate array,
     //determined by the flag (flag = 0 => public; flag = 1 => private)
-    function addEntry(string descriptor, string attribute, uint flag) returns (bool success)
+    //NOT for updates
+    function addEntry(bytes32 descriptor, bytes32 attribute, uint flag) accessCheck(msg.sender) returns (bool success)
     {
         success = false;
-        
-        uint indexer = 0;
-        
-        //make sure an entry with the descriptor doesn't already exist
-        uint temp = 0;
-        bool existsPub;
-        bool existsPriv;
-        
-        (existsPub,temp) = this.existsInPublicRecord(descriptor);
-        (existsPriv,temp) = this.existsInPrivateRecord(descriptor);
-            
-        if(flag == 0 && existsPub == false && existsPriv == false)
+
+        //public
+        if(flag == 0)
         {
-                indexer = PublicIndexer;
-                
-                PublicAttribute tempPub;
-                
-                tempPub.attribute = attribute;
-                tempPub.descriptor = descriptor;
-                
-                if(indexer == 0)//because looping will give an out of bounds error if indexer = 0
-                {
-                    PublicAttributes.push(tempPub);
-                    PublicIndexer++;
-                }
-                else
-                {
-                    bool foundPub = false;
-                    
-                    //see if there are empty entries, in which case you don't have to push (see *)
-                    for(uint i = 0; i < indexer; i++)
-                    {
-                        if(PublicAttributes[i].descriptor = "" && foundPub == false)
-                        {
-                            foundPub = true;
-                            
-                            PublicAttributes[i] = tempPub;
-                        }
-                    }
-                    
-                    if(foundPub == false)
-                    {
-                        PublicAttributes.push(tempPub);
-                        PublicIndexer++;
-                    }
-                }
-                
-        }
-        else //flag = 1, add as private
-        {
-            if(existsPriv == false && existsPub == false)
+            if(publicAttributes[descriptor] != 0x0)
             {
-                indexer = PrivateIndexer;
-                
-                PrivateAttribute tempPriv;
-                
-                tempPriv.attribute = attribute;
-                tempPriv.descriptor = descriptor;
-                
-                if(indexer == 0)//because looping will give an out of bounds error if indexer = 0
-                {
-                    PrivateAttributes.push(tempPriv);
-                    PrivateIndexer++;
-                }
-                else
-                {
-                    bool foundPriv = false;
-                    
-                    //see if there are empty entries, in which case you don't have to push (see *)
-                    for(uint i = 0; i < indexer; i++)
-                    {
-                        if(PrivateAttributes[i].descriptor = "" && foundPriv == false)
-                        {
-                            foundPriv = true;
-                            
-                            PrivateAttributes[i] = tempPriv;
-                        }
-                    }
-                    
-                    if(foundPriv == false)
-                    {
-                        PrivateAttributes.push(tempPriv);
-                        PrivateIndexer++;
-                    }
-                }
+                //add to the mapping
+                publicAttributes[descriptor] = attribute;
+                success = true;
+                //add to the array
+                addPublicDescriptor(descriptor);
+
             }
         }
-            
+        else //private
+        {
+            if(privateAttributes[descriptor] != 0x0)
+            {
+                //add to the mapping
+                privateAttributes[descriptor] = attribute;
+                success = true;
+                //add to the array
+                addPrivateDescriptor(descriptor);
+            }
+        }
     }
-    
+
     //removes an entry
-    function removeEntry(string descriptor) returns (bool success)
+    //entry must exist to be removed
+    function removeEntry(bytes32 descriptor) accessCheck(msg.sender) returns (bool success)
     {
         success = false;
-        
-        uint index = 0;
-        bool exists = false;
-        
-        (exists,index) = this.existsInPublicRecord(descriptor);
-        
-        if(exists)
+
+        if(publicAttributes[descriptor] != 0x0)
         {
-            PublicAttributes[index].descriptor = "";
-            PublicAttributes[index].attribute = "";
+            //remove from the mapping
+            publicAttributes[descriptor] = 0x0;
             success = true;
+            //remove from the array
+            removePublicDescriptor(descriptor);
+
         }
         else
         {
-            (exists,index) = this.existsInPrivateRecord(descriptor);
-            
-            if(exists)
+            if(privateAttributes[descriptor] != 0x0)
             {
-                PrivateAttributes[index].descriptor = "";
-                PrivateAttributes[index].attribute = "";
+                //remove from the mapping
+                privateAttributes[descriptor] = 0x0;
                 success = true;
+                //remove from the array
+                removePrivateDescriptor(descriptor);
             }
         }
-        
+
+
     }
-    
+
     //Gives you an attribute for a given descriptor.
     //return success = false if not found
     //value is the attribute for the descriptor
-    function readEntry(string descriptor) returns (string value, bool success, bool isPublic)
+    function readEntry(bytes32 descriptor) accessCheck(msg.sender) returns (bytes32 value, bool success, bool isPublic)
     {
-        success = true;
+
         isPublic = true;
-        
-        //find the index of the entry:
-        bool existsPub;
-        bool existsPriv;
-        uint pubIndex;
-        uint privIndex;
-        
-        (existsPub,pubIndex) = this.existsInPublicRecord(descriptor);
-        (existsPriv,privIndex) = this.existsInPrivateRecord(descriptor);
-        
-        if(existsPub == false && existsPriv == false)
+        success = true;
+        value = 0x0;
+        bytes32 pub = publicAttributes[descriptor];
+        bytes32 priv = privateAttributes[descriptor];
+
+        if(pub != 0x0)
         {
-            //doesn't exist, change success to false
-            success = false;
+            //it's public
+            value = pub;
+            //no need to change isPublic (since by default is true)
+            //no need to change success (since by default is true)
         }
         else
         {
-            if(existsPub)
+            if(priv != 0x0)
             {
-                value = PublicAttributes[index].attribute;
+                //it's private
+                value = priv;
+
+                isPublic = false;
+                //no need to change success (since by default is true)
+
             }
             else
             {
-                //private, so change isPublic to false
-                isPublic = false;
-                
-                value = PrivateAttributes[index].attribute;
+                //not found
+                success = false;
             }
         }
     }
-    
+
+
+    function changeDescriptor(bytes32 oldDescriptor, bytes32 newDescriptor) accessCheck(msg.sender) returns (bool success)
+    {
+        bytes32 pub = publicAttributes[oldDescriptor];
+        bytes32 priv = privateAttributes[oldDescriptor];
+
+        success = (pub != 0x0 || priv != 0x0);
+        if(success)
+        {
+            if(pub != 0x0)
+            {
+                //update mapping
+                publicAttributes[oldDescriptor] = 0x0;
+                publicAttributes[newDescriptor] = pub;
+                //update arrays
+                removePublicDescriptor(oldDescriptor);
+                addPublicDescriptor(newDescriptor);
+            }
+            else
+            {
+                //update mapping
+                privateAttributes[oldDescriptor] = 0x0;
+                privateAttributes[newDescriptor] = priv;
+                //update arrays
+                removePrivateDescriptor(oldDescriptor);
+                addPrivateDescriptor(newDescriptor);
+            }
+        }
+    }
+
+
     //This function is to update entries.
     //IMPORTANT:
+    //THIS FUNCTION IS NOT INTENDED TO BE CALLED AS A DELETE!
     //In calling this function, if someone doesn't want to change the flag,
     //put flag = 2.
-    //In calling this function, if someone doesn't want to change the attribute, 
-    //you can put the attribute as an empty string.
-    //You CANNOT change the descriptor. If you wish to do that,
-    //you must call the function changeDescriptor (or deleteEntry then addEntry)
-    function update(string descriptor, string attribute, uint flag) returns (bool success)
+    //In calling this function, if someone doesn't want to change the attribute,
+    //you can put the attribute as an empty bytes32.
+    function update(bytes32 descriptor, bytes32 attribute, uint flag) accessCheck(msg.sender) returns (bool success)
     {
-        success = false;
-        
-        bool existsPub;
-        bool existsPriv;
-        uint pubIndex;
-        uint privIndex;
-        
-        (existsPub,pubIndex) = this.existsInPublicRecord(descriptor);
-        (existsPriv,privIndex) = this.existsInPrivateRecord(descriptor);
-        
-        /***NOTE: While we initially decided to change this below (it was not needed),
-        //realized you do need to find the actual attribute because of the way line 289 needs the value to addEntry.
-        // (we need to find it when we re-add the entry)
-        
-        //they don't want to change the attribute.
-        if(attribute == "")
+        bytes32 value = 0x0;
+        bool entryExists;
+        bool isPublic;
+        (value, entryExists, isPublic) = readEntry(descriptor);
+
+        success = entryExists;
+
+        if(success)
         {
-            if(existsPub)
+            //find the correct flag for removing and then adding the entry
+            if(flag == 2)
             {
-                attribute = PublicAttributes[pubIndex].attribute;
-            }
-            if(existsPriv)
-            {
-                attribute = PrivateAttributes[privIndex].attribute;
-            }
-        }
-        
-        //they don't want to change the flag (or don't know what it is and want to keep it same)
-        if(flag == 2)
-        {
-            if(existsPub)
-            {
-                flag = 0;
-            }
-            if(existsPriv)
-            {
-                flag = 1;
-            }
-        }
-        
-        //only if it exists, do the update:
-        if(existsPub == true || existsPriv == true)
-        {
-            //order of operations, does removeEntry before addEntry
-            success = (removeEntry(descriptor) && addEntry(descriptor,attribute,flag));
-        }
-        
-        
-    }
-    
-    //helper function
-    //tells you if a descriptor exists in the public record
-    function existsInPublicRecord(string descriptor) returns (bool exists, uint index)
-    {
-        exists = false;
-        index = 0;
-        
-        if(PublicIndexer > 0)
-        {
-            for(uint i = 0; i < PublicIndexer; i++)
-            {
-                //checking if exists = false saves lookups
-                if(exists = false && PublicAttributes[i].descriptor = descriptor)
+                if(isPublic)
                 {
-                    exists = true;
-                    index = i;
+                    flag = 0;
+                }
+                else
+                {
+                    flag = 1;
                 }
             }
-        }
-    }
-    
-    //helper function
-    //tells you if a descriptor exists in the private record
-    function existsInPrivateRecord(string descriptor) returns (bool exists, uint index)
-    {
-        exists = false;
-        index = 0;
-        
-        if(PrivateIndexer > 0)
-        {
-            for(uint i = 0; i < PrivateIndexer; i++)
+
+            //find the correct attribute for removing and then adding the entry
+            if(attribute == 0x0)
             {
-                //checking if exists = false saves lookups
-                if(exists = false && PrivateAttributes[i].descriptor = descriptor)
+                attribute = value;//value is current value of the attribute for the descriptor
+            }//else keep it as it is
+
+            //remove the entry then add it
+            success = removeEntry(descriptor) && addEntry(descriptor,attribute,flag);
+        }
+
+    }
+
+    //tellls you if a descriptor is public
+    function isPublic(bytes32 descriptor) returns (bool result)
+    {
+        result = (publicAttributes[descriptor] != 0x0);
+    }
+
+    //tells you if a descriptor is private
+    function isPrivate(bytes32 descriptor) returns (bool result)
+    {
+        result = (privateAttributes[descriptor] != 0x0);
+    }
+
+    //delimiter is a comma
+    //to be precise, this returns the first 100 public descriptors
+    function getPublicDescriptors() returns (bytes32[100] list)
+    {
+        //NOTE: the function is formatted the way it is because publicDescriptors can have
+        //some holes (ex. 3rd entry null, 4th entry with value) ... because of the way the
+        //delete strategy works for this contract
+
+        uint arrayCounter = 0;
+
+        for(uint i = 0; i < list.length; i++)
+        {
+            if(arrayCounter < publicDescriptors.length)
+            {
+                bytes32 currentVal = publicDescriptors[arrayCounter];
+
+                if(currentVal == 0x0)
                 {
-                    exists = true;
-                    index = i;
+                    i = i - 1; //to leave no holes in list (decrease it because it will be increased)
                 }
+                else
+                {
+                    list[i] = currentVal;
+                }
+
+                arrayCounter++;
             }
         }
     }
-    
+
+
+    //delimiter is a comma
+    function getPrivateDescriptors() returns (bytes32[100] list)
+    {
+        //NOTE: the function is formatted the way it is because privateDescriptors can have
+        //some holes (ex. 3rd entry null, 4th entry with value) ... because of the way the
+        //delete strategy works for this contract
+
+        uint arrayCounter = 0;
+
+        for(uint i = 0; i < list.length; i++)
+        {
+            if(arrayCounter < privateDescriptors.length)
+            {
+                bytes32 currentVal = privateDescriptors[arrayCounter];
+
+                if(currentVal == 0x0)
+                {
+                    i = i - 1; //to leave no holes in list (decrease it because it will be increased)
+                }
+                else
+                {
+                    list[i] = currentVal;
+                }
+
+                arrayCounter++;
+            }
+        }
+    }
+
     //helper function, gives you a random integer in the closed interval [min,max]
-    function getRand(uint min, uint max) returns (uint val)
+    function getRand(uint min, uint max) internal returns (uint val)
     {
         nonce++;
         val = uint(sha3(nonce))%(min+max)-min;
     }
-    
+
     //gives you the ID
-    function getID() returns (bytes32 theID)
+    function getID() accessCheck(msg.sender) returns (bytes32 theID)
     {
         theID = ID;
     }
-    
+
+    //gives you the dimension name
+    function getName() accessCheck(msg.sender) returns (bytes32 theName)
+    {
+        theName = dimensionType;
+    }
+
+
+    //THE REST OF THIS SCRIPT ARE ARRAY HELPER FUNCTIONS
+    //THE DESCRIPTOR COUNTS ARE MANAGED BY ONLY THESE FUNCTIONS
+
+    //helper function. adds a descriptor to the public descriptor array
+    //assumes that the descriptor is new to the array
+    function addPublicDescriptor(bytes32 descriptor) internal
+    {
+        if(publicDescriptors.length == 0)
+        {
+            publicDescriptors.push(descriptor);
+        }
+        else
+        {
+            //find FIRST empty index of array
+            uint indexOfEmpty = 0;
+            bool emptyFound = false;
+
+            for(uint i = 0; i < publicDescriptors.length; i++)
+            {
+                if(emptyFound == false)
+                {
+                    if(publicDescriptors[i] == 0x0)
+                    {
+                        emptyFound = true;
+                        indexOfEmpty = i;
+                    }
+                }
+            }
+
+            if(emptyFound)
+            {
+                publicDescriptors[indexOfEmpty] = descriptor;
+            }
+            else
+            {
+                publicDescriptors.push(descriptor);
+            }
+        }
+
+    }
+
+
+
+    //helper function. adds a descriptor to the private descriptor array
+    //assumes that the descriptor is new to the array
+    function addPrivateDescriptor(bytes32 descriptor) internal
+    {
+        if(privateDescriptors.length == 0)
+        {
+            privateDescriptors.push(descriptor);
+        }
+        else
+        {
+            //find FIRST empty index of array
+            uint indexOfEmpty = 0;
+            bool emptyFound = false;
+
+            for(uint i = 0; i < privateDescriptors.length; i++)
+            {
+                if(emptyFound == false)
+                {
+                    if(privateDescriptors[i] == 0x0)
+                    {
+                        emptyFound = true;
+                        indexOfEmpty = i;
+                    }
+                }
+            }
+
+            if(emptyFound)
+            {
+                privateDescriptors[indexOfEmpty] = descriptor;
+            }
+            else
+            {
+                privateDescriptors.push(descriptor);
+            }
+        }
+
+    }
+
+    //helper function
+    //ASSUMES a given descriptor is in the publicArray, sets it empty
+    //given the way the functions are called, there will never be double entries
+    //in the publicDescriptor array
+    function removePublicDescriptor(bytes32 descriptor) internal
+    {
+        for(uint i = 0; i < publicDescriptors.length;i++)
+        {
+            if(publicDescriptors[i] == descriptor)
+            {
+                publicDescriptors[i] = 0x0;
+            }
+        }
+
+    }
+
+    //helper function
+    //ASSUMES a descriptor is in the privateArray, sets it empty
+    //given the way the functions are called, there will never be double entries
+    //in the privateDescriptor array
+    function removePrivateDescriptor(bytes32 descriptor) internal
+    {
+        for(uint i = 0; i < privateDescriptors.length;i++)
+        {
+            if(privateDescriptors[i] == descriptor)
+            {
+                privateDescriptors[i] = 0x0;
+            }
+        }
+    }
+
     //kills the contract
-    function kill()
+    function kill() accessCheck(msg.sender)
     {
         suicide(this);
     }

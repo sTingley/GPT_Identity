@@ -112,10 +112,6 @@ class Modal extends Component {
         this.setState({showModal: true, tmpFile: $(e.target).attr('data-id')});
     }
 
-	onNavigateToDimensions(){
-		hashHistory.replace("/identityDimension", student.id)
-	}
-
 	render() {
 
 		var prop = this.props.asset.asset_name;
@@ -305,7 +301,7 @@ class Modal extends Component {
 								
 								<div role="tabpanel" className="tab-pane" id="dimension">
 										
-									<button onClick={this.onNavigateToDimensions} className="btn btn-primary">Create dimension</button>	
+									<a href="#/identityDimension">Create dimension</a>	
 								</div>
 								
 							</div>
@@ -379,8 +375,6 @@ class Assets extends Component {
                                 if ($.type(result) != "object") {
                                     dataResult = JSON.parseJSON(result)
                                 }
-
-
 
                                 //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
                                 var theArray = this.state.own_assets;

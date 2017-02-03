@@ -16,11 +16,19 @@ contract IdentityDimensionControl
     bytes32 chairperson;
     bytes32[] accessContracts;
 
+    bytes bytesString;
+    bytes resultBytes;
+
+    bool mutex;//mutex for bytes32 to String
+
     //CAN ONLY BE CALLED ONCE. Does this by forcing chairperson to be null.
     function IdentityDimensionControlInstantiation(address CoidAddr) returns (bytes32[10] val)
     {
         if(chairperson == 0x0)
         {
+
+                mutex = true;
+
                 myCOID = CoreIdentity(CoidAddr);
 
                 tokenManagement = new IdentityDimensionControlToken(myCOID.getOwners());
@@ -95,23 +103,33 @@ contract IdentityDimensionControl
     //START STRING HELPER FUNCTIONS
     function testing(bytes32 x) constant returns (string)
     {
-        bytes memory bytesString = new bytes(32);
-        uint charCount = 0;
-        for(uint j = 0; j < 32; j++)
-        {
-                byte char = byte(bytes32(uint(x)*2**(8*j)));
-                if(char != 0)
+                uint charCount = 0;
+
+                //bytesString.length = 0;
+                //resultBytes.length = 0;
+
+                for(uint i = 0; i < bytesString.length; i++)
                 {
-                        bytesString[charCount] = char;
-                        charCount++;
+                        bytesString.push(0);
                 }
-        }
-        bytes memory resultBytes = new bytes(32);
-        for(j = 0; j < charCount; j++)
-        {
-                resultBytes[j] = bytesString[j];
-        }
-        return string(bytesString);
+
+                for(uint j = 0; j < 32; j++)
+                {
+                        byte char = byte(bytes32(uint(x)*2**(8*j)));
+                        if(char != 0)
+                        {
+                                bytesString[charCount] = char;
+                                charCount++;
+                        }
+                }
+
+                for(j = 0; j < charCount; j++)
+                {
+                        resultBytes.push(bytesString[j]);
+                }
+
+                return string(resultBytes);
+
 
     }
 
@@ -556,4 +574,3 @@ contract IdentityDimensionControl
         amount = tokenManagement.delegateeAmount(delegatee,dimension, descriptor);
     }
 }
-

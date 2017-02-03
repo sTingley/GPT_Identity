@@ -29,6 +29,8 @@ contract IdentityDimensionControl
 
                 mutex = true;
 
+                bytesString.length = 32;
+
                 myCOID = CoreIdentity(CoidAddr);
 
                 tokenManagement = new IdentityDimensionControlToken(myCOID.getOwners());
@@ -101,17 +103,17 @@ contract IdentityDimensionControl
     }
 
     //START STRING HELPER FUNCTIONS
-    function testing(bytes32 x) constant returns (string)
+    function testing(bytes32 x) constant returns (string val)
     {
+        val = "";
+        if(mutex == true)
+        {
+
+                mutex = false;
+
                 uint charCount = 0;
 
-                //bytesString.length = 0;
-                //resultBytes.length = 0;
-
-                for(uint i = 0; i < bytesString.length; i++)
-                {
-                        bytesString.push(0);
-                }
+                resultBytes.length = 0;
 
                 for(uint j = 0; j < 32; j++)
                 {
@@ -127,9 +129,10 @@ contract IdentityDimensionControl
                 {
                         resultBytes.push(bytesString[j]);
                 }
+                val = string(resultBytes);
 
-                return string(resultBytes);
-
+                mutex = true;
+        }
 
     }
 

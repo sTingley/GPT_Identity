@@ -163,6 +163,7 @@ contract ErisBigchainRequester
 
 
     //allows the javascript application to set values
+    //ErisBigchainService.js uses the response field to pass responses from bigChainDB to the contract
     function setCurrentInList(address addr, string response)
     {
         if(msg.sender == chairperson)

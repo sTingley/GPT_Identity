@@ -23,8 +23,6 @@ import MyCoreIdentity from './Components/MyCoreIdentity.jsx';
 import IdentityDimension from './Components/IdentityDimension.jsx';
 import Documents from './Components/Documents.jsx';
 import MyGateKeeper from './Components/MyGateKeeper.jsx';
-import IDimensions from './Components/IDimensions.jsx';
-
 
 class App extends React.Component {
 

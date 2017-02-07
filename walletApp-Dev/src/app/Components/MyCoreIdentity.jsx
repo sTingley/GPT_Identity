@@ -38,7 +38,7 @@ class Asset extends React.Component {
         //console.log("asset form props: " + JSON.stringify(this.props))
         return (
             <div className="container">
-            {this.props.asset.asset_id}
+                {this.props.asset.asset_id}
 
                 <div className="modal-header">
                     <ul className="nav nav-pills" role="tablist">
@@ -56,8 +56,6 @@ class Asset extends React.Component {
                                 <tbody>
                                     <tr>
                                         <td>Control ID List</td>
-                                    </tr>
-                                    <tr>
                                         <td>
                                             {(() => {
                                                 if (!$.isEmptyObject(prop)) {
@@ -69,10 +67,8 @@ class Asset extends React.Component {
                                         </td>
                                     </tr>
                                     <tr>
+                                        <td>Add a controller:</td>
                                         <td><input className="form-control col-md-4" type="text" style={style} placeholder="Public Key of Controller" /></td>
-                                    </tr>
-                                    <tr>
-                                        <td><input className="form-control col-md-4" type="text" style={style} placeholder="Control Token Quantity" /></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -98,12 +94,16 @@ class Asset extends React.Component {
                                     </tr>
                                     <tr>
                                         <td>Recovery Condition</td>
-                                        <td> <p> {prop.recoveryCondition}</p></td>
+                                        <td><p>{prop.recoveryCondition}</p></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Add a recovery ID:</td>
+                                        <td><input name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Public Key" /></td>
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>{/*recovery*/}
 
-                        </div>
 
                     </div>{/*tab-content*/}
 
@@ -111,8 +111,7 @@ class Asset extends React.Component {
 
 
                 <div className="modal-footer">
-                    <button type="button" className="btn btn-primary">Save changes</button>
-                    <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" className="btn btn-primary"><span className="glyphicon glyphicon-plus"></span>Update</button>
                 </div>
 
             </div>
@@ -354,12 +353,6 @@ class Identities extends React.Component {
 
                     <div className="modal-body">
 
-
-                        <div id="OWNED" className="tab-pane fade">
-                            <p>PUT COID ON HERE AS DEFAULT, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-                        </div>
-
-
                         {this.state.showDetails ? <Asset hideHandler={this.handleHideAsset} asset={this.state.active_asset} /> : null}
 
                     </div>{/*END MODAL-BODY*/}
@@ -369,60 +362,16 @@ class Identities extends React.Component {
 
 
 
-
             </div>
-
-
 
         );
     }
 
 }
+
 export default Identities;
 
 
-                                // {(() => {
-
-
-                                // })(this)}
-
-                // <div className="modal-body" id="modal-body">
-
-                //     <div role="tabpanel" className="tab-content">
-
-                //         <table className="table table-striped table-hover">
-                //             <tbody>
-                //                 <tr>
-                //                 <td>ASSET NAME</td>
-                //                 </tr>
-                //             </tbody>
-                //         </table>
-
-                //     </div>{/* END OF tabpanel */}
-
-
-                // </div>{/* END OF modal-body */}
-
-
-                // <div className="modal-footer"></div>
-
-                // {this.state.showDetails ? <Modal hideHandler={this.hideHandler} asset={this.state.active_asset} /> : null}
-
-
-
-                        // <li role="presentation" className="dropdown">
-                        //     <a className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Controlled
-                        //     <span className="caret"></span></a>
-
-                        //     <ul className="dropdown-menu">
-                        //         {(() => {
-                        //             {/* POPULATE the controlled assets, */}
-                        //             if (controlled.length > 0) {
-                        //                 return controlled.map((control, i) => {
-                        //                     return <li role="presentation" key={i}><a role="tab" data-toggle="tab" onClick={this.HandleControlledAsset(control)}>{control}</a></li>
-                        //                 })
-                        //             }
-                        //             else { return <li role="presentation">None</li> }
-                        //         })(this)}
-                        //     </ul>
-                        // </li>
+                        // <div id="OWNED" className="tab-pane fade">
+                        //     <p>PUT COID ON HERE AS DEFAULT, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                        // </div>

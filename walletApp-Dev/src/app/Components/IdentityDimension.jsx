@@ -108,7 +108,7 @@ class DimensionForm extends Component {
         if (button_val === 2) {
             console.log("hit controller rq")
             $.ajax({
-                url: twinUrl + 'addDelegation',
+                url: twinUrl + 'addController',
                 type: 'POST',
                 data: json,
                 success: function (res) {
@@ -198,7 +198,7 @@ class DimensionForm extends Component {
                                             </tr>
 
                                             <tr>
-                                                <td colSpan="2"><b>Descriptors:</b></td>
+                                                <td colSpan="3"><b>Descriptors:</b></td>
                                             </tr>
                                             {(() => {
                                                 if(dims.attr_list.length > 0) {
@@ -207,10 +207,11 @@ class DimensionForm extends Component {
                                                             <tr key={i}>
                                                                 <td>{attrs[0]}</td>
                                                                 <td><p>{attrs[1]}</p></td>
+                                                                <td><input type="checkbox" id={i}></input></td>
                                                             </tr>
                                                         )
                                                     });
-                                                } else { return <tr><td colSpan="2">No Ids found</td></tr> }
+                                                } else { return <tr><td colSpan="3">No Ids found</td></tr> }
                                             })(this)}
 
                                             <tr>

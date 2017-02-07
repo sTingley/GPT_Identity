@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import { Link } from 'react-router';
 import TagsInput from 'react-tagsinput';
 import QRCode from 'qrcode.react';
@@ -22,22 +22,26 @@ class Modal extends Component {
 		this.privKey = localStorage.getItem("privKey");
 		this.tags = new AssetTags(this.pubKey, props.asset.asset_id);
 		this.state = {
-			
+
 			//added for identityDimension tab-pane
 			inputs: ['input-0'],
-			
+
 			asset: props.asset || {},
 			asset_class: this.tags.getAssetData("classes"),
 			asset_subclass: this.tags.getAssetData("subclasses"),
-			qrCode_signature: {}
+			qrCode_signature: {},
+
+			//used for identitydimension file upload
+			docs: {}
+
 		};
 		this.handleClassChange = this.handleClassChange.bind(this);;
 		this.maxUniqAttr = 10;
 	}
 
 	componentDidMount() {
-        $("#assetDetails").modal('show');
-        $("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
+		$("#assetDetails").modal('show');
+		$("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
 
 		var prop = this.props.asset.asset_name;
 
@@ -67,7 +71,7 @@ class Modal extends Component {
 		signature = signature.toString("hex")
 
 		this.setState({ qrCode_signature: { "msgHash": qrCode_Object_hash, "signature": signature, "timestamp": theTime } })
-    }
+	}
 
 	handleClassChange(tags) {
 		this.setState({ asset_class: tags });
@@ -78,39 +82,75 @@ class Modal extends Component {
 		this.setState({ asset_subclass: tags });
 		this.tags.updateClasses(tags, this.props.asset.asset_id, "subclasses");
 	}
-	
+
 	appendInput() {
 		console.log("hit append Input")
 		var inputLen = this.state.inputs.length;
-		if(inputLen < this.maxUniqAttr){
+		if (inputLen < this.maxUniqAttr) {
 			var newInput = `input-${inputLen}`;
-        	this.setState({ inputs: this.state.inputs.concat([newInput]) });
+			this.setState({ inputs: this.state.inputs.concat([newInput]) });
 		}
-    }
-	
-	getLabelValues(){
+	}
+
+	getLabelValues() {
 		console.log("hit getLabelValues")
 		var labelVals = []
 		var _this = this;
-		$.each($("input[name^='label-']"), function(obj){
+		$.each($("input[name^='label-']"), function (obj) {
 			var value = $.trim($(this).val());
-			if(value.length > 0){
+			if (value.length > 0) {
 				labelVals.push({
 					//replace the 'label' with the entered unique attribute descriptor, for example 'Name' or 'US SSN'
-					[$(this).attr('name').replace("label-","")] : value
+					[$(this).attr('name').replace("label-", "")]: value
 				});
 			}
 		});
 		return labelVals;
 	}
-	
-	handleHideModal(){
-		this.setState({showModal: false});
+
+	handleHideModal() {
+		this.setState({ showModal: false });
 	}
 
-	handleShowModal(e){
-        this.setState({showModal: true, tmpFile: $(e.target).attr('data-id')});
-    }
+	handleShowModal(e) {
+		this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
+	}
+
+	handleDimensionSubmit(e) {
+		e.preventDefault();
+		//var json = my data
+
+		console.log("handleDimensionSubmit")
+
+		// $.ajax({
+		// 	url: twinUrl + 'requestIdentityDimension',
+		// 	type: 'POST',
+		// 	data: json,
+		// 	success: function(res){
+		//         console.log(JSON.stringify(json))
+		//         var sendMe = {};
+		//         sendMe.flag = 0; //owned core identity
+		//         sendMe.fileName = "MyCOID.json" //
+		//         sendMe.updateFlag = 0; //new identity
+		//         //sendMe.data = json;
+		//         sendMe.pubKey = localStorage.getItem("pubKey");
+
+		// 		$.ajax({
+		// 			url: twinUrl + 'setDimension',
+		// 			type: 'POST',
+		// 			data: sendMe,
+		//             success: function(res)
+		//             {
+		//                 console.log("response from setDimension: " + res)
+		//             }
+		// 		})
+		// 	},
+		// 	complete: function(){
+		// 		// do something
+		// 	}
+		// });
+
+	}
 
 	render() {
 
@@ -151,16 +191,16 @@ class Modal extends Component {
 			maxWidth: "100%",
 			textAlign: "center"
 		};
-		
+
 		var syle = {
-			marginRight:'15px'
+			marginRight: '15px'
 		}
 
 		return (
 			<div className="modal fade" id="assetDetails" key={this.props.asset.asset_id} tabIndex="-1" role="dialog" aria-labelledby="asset">
 				<div className="modal-dialog modal-lg" role="document">
 					<div className="modal-content">
-					
+
 						<div className="modal-header">
 							<button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times; </span></button>
 							<ul className="nav nav-pills" role="tablist">
@@ -169,10 +209,10 @@ class Modal extends Component {
 								<li role="presentation"><a href="#dimension" role="tab" data-toggle="tab">Identity Dimensions</a></li>
 							</ul>
 						</div>
-						
+
 						<div className="modal-body">
 							<div className="tab-content">
-								
+
 								<div role="tabpanel" className="tab-pane active" id="asset_details">
 									<table className="table table-striped table-hover" style={style}>
 										<tbody>
@@ -182,11 +222,11 @@ class Modal extends Component {
 											</tr>
 											<tr>
 												<td>Asset Class<p className="text-info">Use comma/enter to add class </p></td>
-												<td><TagsInput {...classInput}  /></td>
+												<td><TagsInput {...classInput} /></td>
 											</tr>
 											<tr>
 												<td>Asset SubClass<p className="text-info">Use comma/enter to add sub class </p></td>
-												<td><TagsInput {...subClassInput}  /></td>
+												<td><TagsInput {...subClassInput} /></td>
 											</tr>
 											<tr>
 												<td>COID Contract address</td>
@@ -213,7 +253,7 @@ class Modal extends Component {
 												} else {
 													return <tr><td colSpan="2">No Ids found</td></tr>
 												}
-											})(this) }
+											})(this)}
 											<tr>
 												<td>Ownership ID</td>
 												<td><p> {prop.ownershipId}</p></td>
@@ -226,7 +266,7 @@ class Modal extends Component {
 															return <p key={i}> {prop.ownerIdList[i]}</p>
 														})
 													}
-												})(this) }
+												})(this)}
 												</td>
 											</tr>
 											<tr>
@@ -253,7 +293,7 @@ class Modal extends Component {
 															return <p key={i}> {prop.controlIdList[i]}</p>
 														})
 													}
-												})(this) }
+												})(this)}
 												</td>
 											</tr>
 											<tr>
@@ -276,7 +316,7 @@ class Modal extends Component {
 															return <p key={i}> {prop.identityRecoveryIdList[i]}</p>
 														})
 													}
-												})(this) }
+												})(this)}
 												</td>
 											</tr>
 											<tr>
@@ -294,19 +334,52 @@ class Modal extends Component {
 										</tbody>
 									</table>
 								</div>
-								
+
 								<div role="tabpanel" className="tab-pane center-block" id="qrcode" style={qrStyle}>
 									<QRCode value={qrConfig} size={200} />
 								</div>
-								
+
 								<div role="tabpanel" className="tab-pane" id="dimension">
-										
-									<a href="#/identityDimension">Create dimension</a>	
+									<label className="custom-file">
+										<input type="file" id="file" className="custom-file-input"></input>
+										<span className="custom-file-control"></span>
+									</label>
+
+
+
+									<form className="form-horizontal">
+										<div className="form-group">
+											<label for="inputEmail" className="control-label col-xs-2">Email</label>
+											<div className="col-xs-10">
+												<input type="email" className="form-control" id="inputEmail" placeholder="Email" />
+											</div>
+										</div>
+										<div className="form-group">
+											<label for="inputPassword" className="control-label col-xs-2">Password</label>
+											<div className="col-xs-10">
+												<input type="password" className="form-control" id="inputPassword" placeholder="Password" />
+											</div>
+										</div>
+										<div className="form-group">
+											<div className="col-xs-offset-2 col-xs-10">
+												<div className="checkbox">
+													<label><input type="checkbox" /> Remember me</label>
+												</div>
+											</div>
+										</div>
+										<div className="form-group">
+											<div className="col-xs-offset-2 col-xs-10">
+												<button type="submit" className="btn btn-primary">Login</button>
+											</div>
+										</div>
+									</form>
+
+
 								</div>
-								
+
 							</div>
 						</div>
-						
+
 					</div>
 				</div>
 			</div>
@@ -329,7 +402,7 @@ class Assets extends Component {
 			wallet: { pubKey: localStorage.getItem("pubKey") },
 			own_assets: [],
 			controlled_assets: [{ asset_id: 161718, asset_name: 'Parents House' }, { asset_id: 192021, asset_name: 'My Car' }],
-            delegated_assets: [{}],
+			delegated_assets: [{}],
 			active_asset: {},
 			show_only: []
 		};
@@ -342,11 +415,11 @@ class Assets extends Component {
 
 	componentWillMount() {
 
-        //get all assets, OWNED, CONTROLLED, DELEGATAED:        
+		//get all assets, OWNED, CONTROLLED, DELEGATAED:        
 
-        // -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
-        // -> -> -> START get OWNED assets -> -> ->
-        $.ajax({
+		// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
+		// -> -> -> START get OWNED assets -> -> ->
+		$.ajax({
 			type: "POST",
 			url: twinUrl + 'getOwnedAssets',
 			data: { "pubKey": localStorage.getItem("pubKey") },
@@ -356,56 +429,56 @@ class Assets extends Component {
 					data = JSON.parseJSON(result)
 				}
 
-                //get the array:
-                data = data.data;
+				//get the array:
+				data = data.data;
 
-                //DEBUGGING:
-                console.log("getOwnedAssets result: " + data);
+				//DEBUGGING:
+				console.log("getOwnedAssets result: " + data);
 
-                if (data.length > 0) {
-                    //loop through OWNED assets
-                    for (let i = 0; i < data.length; i++) {
-                        //AJAX each asset:
-                        $.ajax({
-                            type: "POST",
-                            url: twinUrl + 'getAsset',
-                            data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": data[i] },
-                            success: function (result) {
-                                var dataResult = result;
-                                if ($.type(result) != "object") {
-                                    dataResult = JSON.parseJSON(result)
-                                }
+				if (data.length > 0) {
+					//loop through OWNED assets
+					for (let i = 0; i < data.length; i++) {
+						//AJAX each asset:
+						$.ajax({
+							type: "POST",
+							url: twinUrl + 'getAsset',
+							data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": data[i] },
+							success: function (result) {
+								var dataResult = result;
+								if ($.type(result) != "object") {
+									dataResult = JSON.parseJSON(result)
+								}
 
-                                //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-                                var theArray = this.state.own_assets;
+								//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
+								var theArray = this.state.own_assets;
 
-                                console.log("length is: " + theArray.length)
-                                console.log(theArray)
-												//TODO: RENAME asset_name TO ASSET DETAILS
-                                theArray[theArray.length] = { asset_id: dataResult.assetID, asset_name: dataResult }
-                                this.setState({ own_assets: theArray });
+								console.log("length is: " + theArray.length)
+								console.log(theArray)
+								//TODO: RENAME asset_name TO ASSET DETAILS
+								theArray[theArray.length] = { asset_id: dataResult.assetID, asset_name: dataResult }
+								this.setState({ own_assets: theArray });
 								console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets))
 
-                            }.bind(this),
-                            complete: function () {
+							}.bind(this),
+							complete: function () {
 
-                            },
-                            //console.log(result)	
-                        })
+							},
+							//console.log(result)	
+						})
 
-                    }
-                }
+					}
+				}
 			}.bind(this),
 			complete: function () {
 			},
 		})
-        // <- <- <- END get OWNED assets <- <- <-
-        // <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
+		// <- <- <- END get OWNED assets <- <- <-
+		// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
 
 
-        // -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
-        // -> -> -> START get CONTROLLED assets -> -> ->
-        $.ajax({
+		// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
+		// -> -> -> START get CONTROLLED assets -> -> ->
+		$.ajax({
 			type: "POST",
 			url: twinUrl + 'getControlledAssets',
 			data: { "pubKey": localStorage.getItem("pubKey") },
@@ -415,52 +488,52 @@ class Assets extends Component {
 					data = JSON.parseJSON(result)
 				}
 
-                //get the array:
-                data = data.data;
+				//get the array:
+				data = data.data;
 
-                //debugging:
-                console.log("Get Controlled Assets result: " + data);
+				//debugging:
+				console.log("Get Controlled Assets result: " + data);
 
-                if (data.length > 0) {
-                    //loop through OWNED assets
-                    for (let i = 0; i < data.length; i++) {
-                        //AJAX each asset:
-                        $.ajax({
-                            type: "POST",
-                            url: twinUrl + 'getAsset',
-                            data: { "pubKey": localStorage.getItem("pubKey"), "flag": 1, "fileName": data[i] },
-                            success: function (result) {
-                                var dataResult = result;
-                                if ($.type(result) != "object") {
-                                    dataResult = JSON.parseJSON(result)
-                                }
+				if (data.length > 0) {
+					//loop through OWNED assets
+					for (let i = 0; i < data.length; i++) {
+						//AJAX each asset:
+						$.ajax({
+							type: "POST",
+							url: twinUrl + 'getAsset',
+							data: { "pubKey": localStorage.getItem("pubKey"), "flag": 1, "fileName": data[i] },
+							success: function (result) {
+								var dataResult = result;
+								if ($.type(result) != "object") {
+									dataResult = JSON.parseJSON(result)
+								}
 
-                                //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-                                this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_name: dataResult }] });
+								//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
+								this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_name: dataResult }] });
 
-                            }.bind(this),
-                            complete: function () {
-                                // do something
-                            },
-                            //console.log(result)	
-                        })
+							}.bind(this),
+							complete: function () {
+								// do something
+							},
+							//console.log(result)	
+						})
 
-                    }
-                }
+					}
+				}
 			}.bind(this),
 			complete: function () {
 				// do something
 			},
-			//console.log(result)	
+			//console.log(result)
 		})
-        // <- <- <- END get CONTROLLED assets <- <- <-
-        // <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
+		// <- <- <- END get CONTROLLED assets <- <- <-
+		// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
 
 
 
-        // -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
-        // -> -> -> START get DELEGATED assets -> -> ->
-        $.ajax({
+		// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
+		// -> -> -> START get DELEGATED assets -> -> ->
+		$.ajax({
 			type: "POST",
 			url: twinUrl + 'getDelegatedAssets',
 			data: { "pubKey": localStorage.getItem("pubKey") },
@@ -470,46 +543,46 @@ class Assets extends Component {
 					data = JSON.parseJSON(result)
 				}
 
-                //get the array:
-                data = data.data;
+				//get the array:
+				data = data.data;
 
-                //debugging:
-                console.log("Get Delegated Assets result: " + data)
+				//debugging:
+				console.log("Get Delegated Assets result: " + data)
 
-                if (data.length > 0) {
-                    //loop through OWNED assets
-                    for (let i = 0; i < data.length; i++) {
-                        //AJAX each asset:
-                        $.ajax({
-                            type: "POST",
-                            url: twinUrl + 'getAsset',
-                            data: { "pubKey": localStorage.getItem("pubKey"), "flag": 2, "fileName": data[i] },
-                            success: function (result) {
-                                var dataResult = result;
-                                if ($.type(result) != "object") {
-                                    dataResult = JSON.parseJSON(result)
-                                }
+				if (data.length > 0) {
+					//loop through OWNED assets
+					for (let i = 0; i < data.length; i++) {
+						//AJAX each asset:
+						$.ajax({
+							type: "POST",
+							url: twinUrl + 'getAsset',
+							data: { "pubKey": localStorage.getItem("pubKey"), "flag": 2, "fileName": data[i] },
+							success: function (result) {
+								var dataResult = result;
+								if ($.type(result) != "object") {
+									dataResult = JSON.parseJSON(result)
+								}
 
-                                //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-                                this.setState({ delegated_assets: [{ asset_id: dataResult.assetID, asset_name: dataResult }] });
+								//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
+								this.setState({ delegated_assets: [{ asset_id: dataResult.assetID, asset_name: dataResult }] });
 
-                            }.bind(this),
-                            complete: function () {
-                                // do something
-                            },
-                            //console.log(result)	
-                        })
+							}.bind(this),
+							complete: function () {
+								// do something
+							},
+							//console.log(result)	
+						})
 
-                    }
-                }
+					}
+				}
 			}.bind(this),
 			complete: function () {
 				// do something
 			},
-			//console.log(result)	
+			//console.log(result)
 		})
-        // <- <- <- END get DELEGATED assets <- <- <-
-        // <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
+		// <- <- <- END get DELEGATED assets <- <- <-
+		// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
 
 
 	}
@@ -568,7 +641,7 @@ class Assets extends Component {
 				</div>
 
 				<div id="my-accounts">
-					<h4>My Wallet</h4> <hr/>
+					<h4>My Wallet</h4> <hr />
 					<div className="all-accounts">
 						<div className="row accounts">
 							<p><b>Public Key: </b>{this.state.wallet.pubKey}</p>
@@ -577,7 +650,7 @@ class Assets extends Component {
 				</div>
 
 				<div id="own-assets">
-					<h4>My Owned Assets</h4> <hr/>
+					<h4>My Owned Assets</h4> <hr />
 					<div className="own-assets">
 						<div className="row assets">
 							{this.state.own_assets.map((asset, i) => {
@@ -588,18 +661,18 @@ class Assets extends Component {
 									} else cssClass.replace("hidden", "");
 								}
 								return (
-									<button type="button" key={i} className={cssClass} onClick={() => this.assetHandler(asset) }>
+									<button type="button" key={i} className={cssClass} onClick={() => this.assetHandler(asset)}>
 										<span className="glyphicon glyphicon-ok-circle"></span>
 										{asset.asset_id}
 									</button>
 								);
-							}) }
+							})}
 						</div>
 					</div>
 				</div>
 
 				<div id="controlled-assets">
-					<h4>My Controlled Assets</h4> <hr/>
+					<h4>My Controlled Assets</h4> <hr />
 					<div className="row assets">
 						{this.state.controlled_assets.map((asset) => {
 							var cssClass = "btn btn-info";
@@ -609,12 +682,12 @@ class Assets extends Component {
 								} else cssClass += " hidden";
 							}
 							return (
-								<button type="button" key={asset.asset_id} className={cssClass} onClick={() => this.assetHandler(asset) }>
+								<button type="button" key={asset.asset_id} className={cssClass} onClick={() => this.assetHandler(asset)}>
 									<span className="glyphicon glyphicon-link"></span>
 									{asset.asset_name}
 								</button>
 							);
-						}) }
+						})}
 					</div>
 				</div>
 

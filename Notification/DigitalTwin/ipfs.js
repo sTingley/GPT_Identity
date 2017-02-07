@@ -43,6 +43,7 @@ var IPFS = {
 		var fileName = JSONPath + IPFS.pubKey + suffix + ".json";
 		
 		if (!fs.existsSync(fileName)) {
+			console.log("found filename: " + fileName)
 			var datastruct = {
 				id:IPFS.pubKey,
 				documents:[]
@@ -64,6 +65,7 @@ var IPFS = {
 	},
 	
 	objIntoArray: function(allFiles){
+		console.log("hit objIntoArray")
 		var newArr = new Array();
 		for(var key in allFiles){
 			newArr.push(allFiles[key]);
@@ -86,6 +88,7 @@ var IPFS = {
 	},
 	
 	writeData: function(data, res){
+		console.log("hit writeData")
 		var allDocs = [];
 		allDocs.push({'filename':data.filename, 'hash': data.hash, 'file_hash': data.file_hash});
 		var fileName = JSONPath + IPFS.pubKey + suffix + ".json";
@@ -106,6 +109,7 @@ var IPFS = {
 	},
 	
 	moveFileToIPFS: function(fileNode, res, callback){
+		console.log("hit moveFileToIPFS")
 		fileNode.mv(tmpPath + fileNode.name, (err) => {
 			if(!err){
 				const file = tmpPath + fileNode.name;
@@ -120,6 +124,7 @@ var IPFS = {
 				});
 				ipfs.on('close', (code) => {
 					if(code > 0){
+						console.log("filenode.name " + filenode.name)
 						IPFS.erros.push(fileNode.name);
 					} else {
 						var hash = buffer[buffer.length - 1].replace(/^\s+|\s+$/g, '');
@@ -145,8 +150,8 @@ var IPFS = {
 						}
 					}
 				});
-			}
-		});
+			} // end of if(!err)
+		}); // end of fileNode.mv
 	},
 
 	getHashFromIpfsFile(req, res) {

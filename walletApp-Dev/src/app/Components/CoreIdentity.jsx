@@ -95,6 +95,7 @@ class UploadIpfsFile extends React.Component {
 	}
 
 	render(){
+		console.log("UploadIpfsFile state: " + JSON.stringify(this.state))
 		var center = {
 			textAlign: 'center'
 		};
@@ -168,6 +169,8 @@ class UniqueIDAttributesForm extends React.Component {
 	}
 	
 	render(){
+		console.log("insdie unqiueIDATTRSform, state: " + (JSON.stringify(this.state)))
+		console.log("insdie unqiueIDATTRSform, props: " + (JSON.stringify(this.props)))
 		
 		return(
 			<div className="form-group col-md-12">
@@ -530,6 +533,7 @@ class CoreIdentity extends React.Component {
 			var newInput = `input-${inputLen}`;
         	this.setState({ inputs: this.state.inputs.concat([newInput]) });
 		}
+		console.log("inputs: " + this.state.inputs)
     }
 	
 	//used in tokendistrubtionform
@@ -552,6 +556,7 @@ class CoreIdentity extends React.Component {
 		var syle = {
 			marginRight:'15px'
 		}
+
 	    return (
 	    	<div id="CoreIdentityContainer">
 	    		<h1>Core Identity Submission Form</h1>

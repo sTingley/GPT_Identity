@@ -98,7 +98,7 @@ contract ErisBigchainRequester
     }	
 
 
-    //this function is intended for requesterApp.js
+    //this function is intended for ErisBigchainService.js
     //check if the list is empty    
     function listIsEmpty() returns (bool emptyList)
     {
@@ -122,7 +122,7 @@ contract ErisBigchainRequester
     }
 
 
-    //this function is intended for requesterApp.js
+    //this function is intended for ErisBigchainService.js
     //0 is the index of the current address in the stack
     function getCurrentInList() returns (address addr)
     {
@@ -151,7 +151,7 @@ contract ErisBigchainRequester
     }
 
 
-    //this function is intended for requesterApp.js
+    //this function is intended for ErisBigchainService.js
     //this passes the request by address    
     function getRequestByAddress(address addr) returns (string request)
     {
@@ -162,7 +162,7 @@ contract ErisBigchainRequester
     }
 
 
-    //allows the javascript application to set values
+    //allows the javascript application(ErisBigchainService.js) to set values
     //ErisBigchainService.js uses the response field to pass responses from bigChainDB to the contract
     function setCurrentInList(address addr, string response)
     {

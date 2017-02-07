@@ -5,8 +5,8 @@ contract Verification
     //this makes sure only the application can call functions,
     //which requesters should not be able to call:
     //this will be hardcoded in this contract
-    address chairperson = 0xE6A299E460649D658504E1D887AE738321EDBD5B;
-   
+    address chairperson;
+
     event requestMade(address addr);
     event CallbackReady(address addr);
 
@@ -31,13 +31,18 @@ contract Verification
     address[] indexer;
 
 
+    function Verification()
+    {
+        chairperson = msg.sender;
+    }
+
     //string msg, string sig, string pubKey
     function VerificationQuery(string message, string sig, string pubKey)
     {
 
-	address sender1 = msg.sender;
+        address sender1 = msg.sender;
 
-	requestMade(sender1);
+        requestMade(sender1);
 
         //check there is no previous request with msg.sender
         if(requests[sender1].txnInProgress != 0)
@@ -61,7 +66,7 @@ contract Verification
 
     function removeMyRequest()
     {
-	address sender = msg.sender;
+        address sender = msg.sender;
 
         //(1) FIND index of msg.sender (there can be only one):
         uint theIndex = 0;
@@ -106,7 +111,7 @@ contract Verification
 
     function myCallback() returns (string userCallback)
     {
-	//this.setSender();
+        //this.setSender();
         userCallback = callbacks[msg.sender];
     }
 
@@ -115,7 +120,7 @@ contract Verification
     //check if the list is empty
     function listIsEmpty() returns (bool emptyList)
     {
-	//this.setSender();
+        //this.setSender();
         if(msg.sender == chairperson)
         {
             emptyList = true;
@@ -140,7 +145,7 @@ contract Verification
     //0 is the index of the current address in the stack
     function getCurrentInList() returns (address addr)
     {
-	//this.setSender();
+        //this.setSender();
         if(msg.sender == chairperson)
         {
             bool checkIt = false;
@@ -170,18 +175,18 @@ contract Verification
     //this passes the request by address
     function getRequestByAddress(address addr) returns (string message, string sig, string pubKey)
     {
-	//this.setSender();
+        //this.setSender();
         if(msg.sender == chairperson)
         {
             return (requests[addr].message, requests[addr].sig, requests[addr].pubKey);
         }
     }
 
-	
+
     //allows the javascript application to set values
     function setCurrentInList(address addr, string response)
     {
-	//this.setSender();
+        //this.setSender();
         if(msg.sender == chairperson)
         {
             CallbackReady(addr);
@@ -191,5 +196,3 @@ contract Verification
         }
     }
 }
-
-

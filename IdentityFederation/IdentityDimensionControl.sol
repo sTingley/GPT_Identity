@@ -103,7 +103,7 @@ contract IdentityDimensionControl
     }
 
     //START STRING HELPER FUNCTIONS
-    function testing(bytes32 x) constant returns (string val)
+    function bytes32ToString(bytes32 x) constant returns (string val)
     {
         val = "";
         if(mutex == true)
@@ -136,9 +136,11 @@ contract IdentityDimensionControl
 
     }
 
-    function bytes32ToString(bytes32 x) returns (string val)
+
+    function testing(string pubKey1, string type1, bytes32 ID, string attribute, string descriptor, uint flag) returns (string val)
     {
-        val = "";
+        val = pubKey1;
+        //val = (myCOID.isOwner(sha3(x)) || myCOID.isController(sha3(x)));
     }
 
     function stringToBytes32(string memory source) internal returns (bytes32 result)
@@ -267,33 +269,51 @@ contract IdentityDimensionControl
     //NOTE: One of Type or ID can be null. To make it easier for the user to call this function.
     //This function adds a (attribute/descriptor) entry to a dimension.
     //They must be an Owner or Controller to call this function.
-    function addEntry(string pubKey, string type1, bytes32 ID, string attribute, string descriptor, uint flag) accessContract(msg.sender) returns (bool result)
+    function addEntry(string pubKey1, string type1, bytes32 ID, string attribute, string descriptor, uint flag) accessContract(msg.sender) returns (string pubKey1ret, string type1ret, bytes32 IDret, string attributeret, string descriptorret, uint flagReturn)
     {
-        result = false;
 
+        pubKey1ret = pubKey1;
+        type1ret = type1;
+        IDret = ID;
+        attributeret = attribute;
+        descriptorret = descriptor;
+        flagReturn = flag;
+
+
+//        result = false;
+//      uint val;
         //params for accessing the relevant IdentityDimension Contract
-        bool found = false;
-        address addr = 0x0;
+//        bool found = false;
+//        address addr = 0x0;
+
+//      keyHash = sha3(pubKey1);
+//      nullHash = sha3("");
 
 
-        if(myCOID.isOwner(sha3(pubKey)) || myCOID.isController(sha3(pubKey)))
-        {
+//        if(sha3(pubKey1) == sha3("a1"))
+//        {
+//          val = 1;
 
-            (found,addr) = getDimensionAddress(type1, ID);
+//            (found,addr) = getDimensionAddress(type1, ID);
 
 
-            //were able to find the identity contract:
-            if(found)
-            {
-
-                //get the identity contract:
-                IdentityDimension current = IdentityDimension(addr);
-
-                //add the entry to the identity contract:
-                result = current.addEntry(stringToBytes32(descriptor),stringToBytes32(attribute), flag);
-
-            }
-        }
+//            //were able to find the identity contract:
+//            if(found)
+//            {
+//              val = 2;
+//
+//                //get the identity contract:
+//                IdentityDimension current = IdentityDimension(addr);
+//
+//                //add the entry to the identity contract:
+//                result = current.addEntry(stringToBytes32(descriptor),stringToBytes32(attribute), flag);
+//
+//            }
+//        }
+//      else
+//      {
+//              val = 33;
+//      }
 
     }
 
@@ -523,7 +543,7 @@ contract IdentityDimensionControl
     }
 
     //Finds index of ID. The index can be used by dimensions (an array) to find the address of the contract on the blockchain.
-    function findIndexOfID(bytes32 ID) internal returns (bool found, uint index)
+    function findIndexOfID(bytes32 ID) returns (bool found, uint index)
     {
         found = false;
         index = 0;
@@ -577,3 +597,4 @@ contract IdentityDimensionControl
         amount = tokenManagement.delegateeAmount(delegatee,dimension, descriptor);
     }
 }
+

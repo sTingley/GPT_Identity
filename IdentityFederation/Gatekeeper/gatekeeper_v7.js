@@ -244,9 +244,9 @@ var gatekeeper = function () {
             this.setCoidRequester(requester, proposalId, sig, msg);
             this.setisHuman(proposalId, isHuman);
             this.setmyUniqueID(requester, proposalId, myUniqueId, myUniqueIdAttributes);
-	    var this1 = this;
-	    setTimeout(function()
-	    {
+            var this1 = this;
+            setTimeout(function()
+            {
             this1.setmyOwnershipID(requester, proposalId, myOwnershipId, myOwnerIdList);
             this1.setmyControlID(requester, proposalId, myControlId, myControlIdList);
             this1.setmyOwnershipTokenID(requester, proposalId, myOwnershipTokenId, myOwnershipTokenAttributes, myOwnershipTokenQuantity);
@@ -259,7 +259,7 @@ var gatekeeper = function () {
             theNotifier.createProposalPendingNotification(requester, proposalId);
 
             callback(false, res);
-	    },3000)
+            },3000)
         }
         catch (e) {
             callback(true, res);
@@ -945,7 +945,7 @@ app.post("/gatekeeper", function (req, res) {
     var formdata = req.body;
     console.log("Form data from gatekeeper ===> ", formdata);
 
-    /*var formdata =
+    var formdata =
         {
             "pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
             "sig": "7051442bbf18bb2c86cbc8951a07e27ec6ba05ac3fa427e4c6b948e3dcf91a94046b048edf52445fb22cc776a94b87c3f55426f993458ec744f61f09fb46eeaa",
@@ -965,7 +965,7 @@ app.post("/gatekeeper", function (req, res) {
             "identityRecoveryIdList": "4A56E33E9D718571CED220A7347B96FE43DF4E51,A7576C8A328EEE4BF69589DDB71099250316FF19",
             "recoveryCondition": 2,
             "yesVotesRequiredToPass": 2
-        }*/
+        }
 
 
     var gatekeeperApp = new gatekeeper();

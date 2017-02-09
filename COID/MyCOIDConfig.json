@@ -11,5 +11,7 @@
     "myTokenAmount": "myTokenAmount",
     "addOwner": "addOwner",
     "removeOwner": "removeOwner",
-    "giveTokens": "giveTokens"
+    "giveTokens": "giveTokens",
+    "getControllerList": "getControllerList",
+    "getControllerTokens": "getControllerTokens"
 }

@@ -23,6 +23,95 @@ class Asset extends React.Component {
 
     }
 
+    getControllerValues(){
+        let controller
+        let controller_tokens
+        var _this = this;
+        $.each($("input[name^='pubkey_controller']"), function(obj){
+            var value = $.trim($(this).val())
+            if (value.length > 0){
+                controller = value
+            }
+        })
+        console.log("controller: " + controller)
+        $.each($("input[name^='token_quantity']"), function(obj){
+            var value = $.trim($(this).val())
+            if (value.length > 0){
+                controller_tokens = value
+            }
+        })
+        console.log("tokens: " + controller_tokens)
+
+        var arr = []
+        arr.push(controller)
+        arr.push(controller_tokens)
+
+        return arr
+
+    }
+
+    updateController(e){
+        e.preventDefault()
+
+        //FORMAT of control_dist = [pubkey, quantity]
+        var control_dist = this.getControllerValues()
+        console.log("control_dist: " + control_dist)
+
+        var json = {}
+
+        json.pubKey = localStorage.getItem("pubKey")
+
+        json.address = localStorage.getItem("coidAddr")
+
+        json.controller = control_dist[0]
+
+        json.token_quantity = control_dist[1]
+
+        var privKey = localStorage.getItem("privKey")
+
+        var privKey1 = new Buffer(privKey,"hex");
+		var msg_hash = keccak_256(JSON.stringify(json));
+		var msg_hash_buffer = new Buffer(msg_hash,"hex");
+		var signature1 = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1))
+		
+		signature1 = JSON.parse(signature1).signature;
+		signature1 = JSON.stringify(signature1);
+		signature1 = JSON.parse(signature1).data;
+		signature1 = new Buffer(signature1,"hex");
+		signature1 = signature1.toString("hex");
+		
+		console.log("sig" + signature1)
+		console.log(typeof(signature1))
+		
+        //UNCOMMENT THESE LATER!!!!!!!!!!
+		// json.sig = signature1;
+		// json.msg = msg_hash_buffer.toString("hex");
+
+        json.sig = ""
+        json.msg = ""
+
+        console.log("JSON!! "+ JSON.stringify(json))
+
+        $.ajax({
+            type: "POST",
+            url: twinUrl + 'MyCOID/addController',
+            data: json,
+            success: function (result) {
+                var data = result;
+                if ($.type(result) != "object") {
+                    data = JSON.parseJSON(result)
+                }
+                //get the array:
+                data = data.Result;
+                //DEBUGGING:
+                console.log("addController result: " + JSON.stringify(data));
+                //data is: MYCOID.json
+
+            }.bind(this),
+        })
+
+    }
+
     render() {
 
         var syle = {
@@ -55,7 +144,7 @@ class Asset extends React.Component {
                             <table className="table table-striped table-hover" style={style}>
                                 <tbody>
                                     <tr>
-                                        <td>Control ID List</td>
+                                        <td><b>Control ID List</b></td>
                                         <td>
                                             {(() => {
                                                 if (!$.isEmptyObject(prop)) {
@@ -68,10 +157,17 @@ class Asset extends React.Component {
                                     </tr>
                                     <tr>
                                         <td>Add a controller:</td>
-                                        <td><input className="form-control col-md-4" type="text" style={style} placeholder="Public Key of Controller" /></td>
+                                        <td><input name="pubkey_controller" className="form-control col-md-4" type="text" placeholder="Public Key of Controller" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Control token to be given:</td>
+                                        <td><input name="token_quantity" className="form-control col-md-4" type="text" placeholder="Token Quantity" /></td>
                                     </tr>
                                 </tbody>
                             </table>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-primary" onClick={this.updateController.bind(this)}><span className="glyphicon glyphicon-plus"></span>Update Control</button>
+                        </div>
 
 
                         </div>{/*tab-pane controllers*/}
@@ -100,19 +196,23 @@ class Asset extends React.Component {
                                         <td>Add a recovery ID:</td>
                                         <td><input name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Public Key" /></td>
                                     </tr>
+                                    <tr>
+                                        <td>Change recovery condition:</td>
+                                        <td><input name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="# of signatures required" /></td>
+                                    </tr>
                                 </tbody>
                             </table>
-                        </div>{/*recovery*/}
+
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-primary"><span className="glyphicon glyphicon-plus"></span>Update Recovery Conditions</button>
+                        </div>
+
+                        </div>{/*tab-pane recovery*/}
 
 
                     </div>{/*tab-content*/}
 
                 </div>{/*modal-body*/}
-
-
-                <div className="modal-footer">
-                    <button type="button" className="btn btn-primary"><span className="glyphicon glyphicon-plus"></span>Update</button>
-                </div>
 
             </div>
 

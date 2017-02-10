@@ -111,10 +111,6 @@
 	
 	var _MyGateKeeper2 = _interopRequireDefault(_MyGateKeeper);
 	
-	var _IDimensions = __webpack_require__(/*! ./Components/IDimensions.jsx */ 349);
-	
-	var _IDimensions2 = _interopRequireDefault(_IDimensions);
-	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -200,6 +196,7 @@
 			window.location.reload();
 		}
 	}
+	
 	(0, _reactDom.render)(_react2.default.createElement(
 		_reactRouter.Router,
 		{ history: _reactRouter.hashHistory },
@@ -47504,7 +47501,6 @@
 			value: function render() {
 				var _this3 = this;
 	
-				console.log("UploadIpfsFile state: " + JSON.stringify(this.state));
 				var center = {
 					textAlign: 'center'
 				};
@@ -47650,8 +47646,6 @@
 		}, {
 			key: 'render',
 			value: function render() {
-				console.log("insdie unqiueIDATTRSform, state: " + JSON.stringify(this.state));
-				console.log("insdie unqiueIDATTRSform, props: " + JSON.stringify(this.props));
 	
 				return _react2.default.createElement(
 					'div',
@@ -48114,7 +48108,6 @@
 					var newInput = 'input-' + inputLen;
 					this.setState({ inputs: this.state.inputs.concat([newInput]) });
 				}
-				console.log("inputs: " + this.state.inputs);
 			}
 	
 			//used in tokendistrubtionform
@@ -48143,7 +48136,6 @@
 				var syle = {
 					marginRight: '15px'
 				};
-	
 				return _react2.default.createElement(
 					'div',
 					{ id: 'CoreIdentityContainer' },
@@ -50370,15 +50362,6 @@
 											'a',
 											{ href: '#qrcode', role: 'tab', 'data-toggle': 'tab' },
 											'QR Code'
-										)
-									),
-									_react2.default.createElement(
-										'li',
-										{ role: 'presentation' },
-										_react2.default.createElement(
-											'a',
-											{ href: '#dimension', role: 'tab', 'data-toggle': 'tab' },
-											'Identity Dimensions'
 										)
 									)
 								)
@@ -53554,11 +53537,13 @@
   \***********************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
@@ -53606,6 +53591,94 @@
 	            // $("#assetDetails").modal('show');
 	            // $("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
 	
+	        }
+	    }, {
+	        key: 'getControllerValues',
+	        value: function getControllerValues() {
+	            var controller = void 0;
+	            var controller_tokens = void 0;
+	            var _this = this;
+	            $.each($("input[name^='pubkey_controller']"), function (obj) {
+	                var value = $.trim($(this).val());
+	                if (value.length > 0) {
+	                    controller = value;
+	                }
+	            });
+	            console.log("controller: " + controller);
+	            $.each($("input[name^='token_quantity']"), function (obj) {
+	                var value = $.trim($(this).val());
+	                if (value.length > 0) {
+	                    controller_tokens = value;
+	                }
+	            });
+	            console.log("tokens: " + controller_tokens);
+	
+	            var arr = [];
+	            arr.push(controller);
+	            arr.push(controller_tokens);
+	
+	            return arr;
+	        }
+	    }, {
+	        key: 'updateController',
+	        value: function updateController(e) {
+	            e.preventDefault();
+	
+	            //FORMAT of control_dist = [pubkey, quantity]
+	            var control_dist = this.getControllerValues();
+	            console.log("control_dist: " + control_dist);
+	
+	            var json = {};
+	
+	            json.pubKey = localStorage.getItem("pubKey");
+	
+	            json.address = localStorage.getItem("coidAddr");
+	
+	            json.controller = control_dist[0];
+	
+	            json.token_quantity = control_dist[1];
+	
+	            var privKey = localStorage.getItem("privKey");
+	
+	            var privKey1 = new Buffer(privKey, "hex");
+	            var msg_hash = keccak_256(JSON.stringify(json));
+	            var msg_hash_buffer = new Buffer(msg_hash, "hex");
+	            var signature1 = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1));
+	
+	            signature1 = JSON.parse(signature1).signature;
+	            signature1 = JSON.stringify(signature1);
+	            signature1 = JSON.parse(signature1).data;
+	            signature1 = new Buffer(signature1, "hex");
+	            signature1 = signature1.toString("hex");
+	
+	            console.log("sig" + signature1);
+	            console.log(typeof signature1 === 'undefined' ? 'undefined' : _typeof(signature1));
+	
+	            //UNCOMMENT THESE LATER!!!!!!!!!!
+	            // json.sig = signature1;
+	            // json.msg = msg_hash_buffer.toString("hex");
+	
+	            json.sig = "";
+	            json.msg = "";
+	
+	            console.log("JSON!! " + JSON.stringify(json));
+	
+	            $.ajax({
+	                type: "POST",
+	                url: twinUrl + 'MyCOID/addController',
+	                data: json,
+	                success: function (result) {
+	                    var data = result;
+	                    if ($.type(result) != "object") {
+	                        data = JSON.parseJSON(result);
+	                    }
+	                    //get the array:
+	                    data = data.Result;
+	                    //DEBUGGING:
+	                    console.log("addController result: " + JSON.stringify(data));
+	                    //data is: MYCOID.json
+	                }.bind(this)
+	            });
 	        }
 	    }, {
 	        key: 'render',
@@ -53673,7 +53746,11 @@
 	                                        _react2.default.createElement(
 	                                            'td',
 	                                            null,
-	                                            'Control ID List'
+	                                            _react2.default.createElement(
+	                                                'b',
+	                                                null,
+	                                                'Control ID List'
+	                                            )
 	                                        ),
 	                                        _react2.default.createElement(
 	                                            'td',
@@ -53703,9 +53780,33 @@
 	                                        _react2.default.createElement(
 	                                            'td',
 	                                            null,
-	                                            _react2.default.createElement('input', { className: 'form-control col-md-4', type: 'text', style: style, placeholder: 'Public Key of Controller' })
+	                                            _react2.default.createElement('input', { name: 'pubkey_controller', className: 'form-control col-md-4', type: 'text', placeholder: 'Public Key of Controller' })
+	                                        )
+	                                    ),
+	                                    _react2.default.createElement(
+	                                        'tr',
+	                                        null,
+	                                        _react2.default.createElement(
+	                                            'td',
+	                                            null,
+	                                            'Control token to be given:'
+	                                        ),
+	                                        _react2.default.createElement(
+	                                            'td',
+	                                            null,
+	                                            _react2.default.createElement('input', { name: 'token_quantity', className: 'form-control col-md-4', type: 'text', placeholder: 'Token Quantity' })
 	                                        )
 	                                    )
+	                                )
+	                            ),
+	                            _react2.default.createElement(
+	                                'div',
+	                                { className: 'modal-footer' },
+	                                _react2.default.createElement(
+	                                    'button',
+	                                    { type: 'button', className: 'btn btn-primary', onClick: this.updateController.bind(this) },
+	                                    _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
+	                                    'Update Control'
 	                                )
 	                            )
 	                        ),
@@ -53774,20 +53875,34 @@
 	                                            null,
 	                                            _react2.default.createElement('input', { name: 'label1-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: 'Public Key' })
 	                                        )
+	                                    ),
+	                                    _react2.default.createElement(
+	                                        'tr',
+	                                        null,
+	                                        _react2.default.createElement(
+	                                            'td',
+	                                            null,
+	                                            'Change recovery condition:'
+	                                        ),
+	                                        _react2.default.createElement(
+	                                            'td',
+	                                            null,
+	                                            _react2.default.createElement('input', { name: 'label1-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: '# of signatures required' })
+	                                        )
 	                                    )
+	                                )
+	                            ),
+	                            _react2.default.createElement(
+	                                'div',
+	                                { className: 'modal-footer' },
+	                                _react2.default.createElement(
+	                                    'button',
+	                                    { type: 'button', className: 'btn btn-primary' },
+	                                    _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
+	                                    'Update Recovery Conditions'
 	                                )
 	                            )
 	                        )
-	                    )
-	                ),
-	                _react2.default.createElement(
-	                    'div',
-	                    { className: 'modal-footer' },
-	                    _react2.default.createElement(
-	                        'button',
-	                        { type: 'button', className: 'btn btn-primary' },
-	                        _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
-	                        'Update'
 	                    )
 	                )
 	            );
@@ -54106,6 +54221,7 @@
 	// <div id="OWNED" className="tab-pane fade">
 	//     <p>PUT COID ON HERE AS DEFAULT, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
 	// </div>
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/buffer/index.js */ 239).Buffer))
 
 /***/ },
 /* 346 */
@@ -54128,70 +54244,13 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	//TODO ------ ADD ROUTING!!!!!!!!!
-	//import { Router, Route, IndexRedirect, hashHistory } from 'react-router';
-	
-	// class AddDimension extends Component {
-	
-	//     constructor() {
-	//         super();
-	//         this.state = {
-	//             newDimension: {},
-	//             files: ['FinanceChart.xls', 'Patent.pdf', 'Journal3.docx']
-	//         }
-	//         //propTypes = {}
-	//     }
-	
-	//     handleSubmit(e) {
-	//         if (this.refs.dimensionType.value === '') {
-	//             alert('name is required')
-	//         } else {
-	//             this.setState({
-	//                 newDimension: {
-	//                     ID: Math.floor(Math.random() * 100),
-	//                     dimensionType: this.refs.dimensionType.value,
-	//                     category: this.refs.category.value
-	//                 }
-	//             }, function () {
-	//                 this.props.addDimension(this.state.newDimension)
-	//             })
-	//         }
-	//     }
-	
-	//     render() {
-	//         let categoryOptions = this.state.files.map(category => {
-	//             return <option key={category} value={category}>{category}</option>
-	//         });
-	//         return (
-	//             <div>
-	//                 <h3>Add Dimension</h3>
-	//                 <form onSubmit={this.handleSubmit.bind(this) }>
-	
-	//                     <div>
-	//                         <label>Dimension name: </label><br />
-	//                         <input type="text" ref="dimensionType" />
-	//                     </div>
-	//                     <div>
-	//                         <label>Category</label><br />
-	//                         <select ref="category">
-	//                             {categoryOptions}
-	//                         </select>
-	//                     </div>
-	//                     <br />
-	//                     <input type="submit" value="Submit" />
-	//                     <br />
-	//                 </form>
-	
-	//             </div>
-	//         );
-	//     }
-	// }
 	
 	var DimensionForm = function (_Component) {
 	    _inherits(DimensionForm, _Component);
@@ -54199,10 +54258,10 @@
 	    function DimensionForm(props) {
 	        _classCallCheck(this, DimensionForm);
 	
-	        var _this = _possibleConstructorReturn(this, (DimensionForm.__proto__ || Object.getPrototypeOf(DimensionForm)).call(this, props));
+	        var _this2 = _possibleConstructorReturn(this, (DimensionForm.__proto__ || Object.getPrototypeOf(DimensionForm)).call(this, props));
 	
-	        _this.state = {
-	            dimension: _this.props.dataHandler,
+	        _this2.state = {
+	            dimension: _this2.props.dataHandler,
 	            dimension_data: {},
 	
 	            dimension_dist: []
@@ -54210,7 +54269,7 @@
 	
 	        var owned = true;
 	
-	        return _this;
+	        return _this2;
 	    }
 	
 	    //HANDLE THE CHOICE OF USER INPUT
@@ -54223,8 +54282,6 @@
 	            var ele = $(e.target);
 	
 	            var button_val = parseInt(ele.attr("data-val"));
-	
-	            // console.log("ele: " + $(e.target))
 	
 	            var json = {
 	                "publicKey": localStorage.getItem("pubKey")
@@ -54280,7 +54337,6 @@
 	        } //end submitHandler
 	
 	        // componentWillMount(){
-	
 	        // }
 	
 	
@@ -54291,7 +54347,6 @@
 	            this.setState({
 	                dimension_data: this.props.dimension
 	            });
-	
 	            $("#dimension_Details").modal('show');
 	            $("#dimension_Details").on('hidden.bs.modal', this.props.hideHandler);
 	        }
@@ -54383,6 +54438,20 @@
 	                                                _react2.default.createElement(
 	                                                    "td",
 	                                                    null,
+	                                                    "Asset"
+	                                                ),
+	                                                _react2.default.createElement(
+	                                                    "td",
+	                                                    null,
+	                                                    "MyCOID"
+	                                                )
+	                                            ),
+	                                            _react2.default.createElement(
+	                                                "tr",
+	                                                null,
+	                                                _react2.default.createElement(
+	                                                    "td",
+	                                                    null,
 	                                                    "Dimension Type"
 	                                                ),
 	                                                _react2.default.createElement(
@@ -54396,7 +54465,7 @@
 	                                                null,
 	                                                _react2.default.createElement(
 	                                                    "td",
-	                                                    { colSpan: "3" },
+	                                                    { colSpan: "2" },
 	                                                    _react2.default.createElement(
 	                                                        "b",
 	                                                        null,
@@ -54405,9 +54474,33 @@
 	                                                )
 	                                            ),
 	                                            function () {
+	                                                var ipfs_url = "http://10.101.114.231:8080/ipfs/";
 	                                                if (dims.attr_list.length > 0) {
 	                                                    return dims.attr_list.map(function (attrs, i) {
-	                                                        return _react2.default.createElement(
+	                                                        if (attrs[1].charAt(0) == "Q") {
+	                                                            return _react2.default.createElement(
+	                                                                "tr",
+	                                                                { key: i },
+	                                                                _react2.default.createElement(
+	                                                                    "td",
+	                                                                    null,
+	                                                                    attrs[0]
+	                                                                ),
+	                                                                _react2.default.createElement(
+	                                                                    "td",
+	                                                                    null,
+	                                                                    _react2.default.createElement(
+	                                                                        "p",
+	                                                                        null,
+	                                                                        _react2.default.createElement(
+	                                                                            "a",
+	                                                                            { target: "_blank", href: ipfs_url + "/" + attrs[1] },
+	                                                                            attrs[1]
+	                                                                        )
+	                                                                    )
+	                                                                )
+	                                                            );
+	                                                        } else return _react2.default.createElement(
 	                                                            "tr",
 	                                                            { key: i },
 	                                                            _react2.default.createElement(
@@ -54419,15 +54512,11 @@
 	                                                                "td",
 	                                                                null,
 	                                                                _react2.default.createElement(
-	                                                                    "p",
+	                                                                    "a",
 	                                                                    null,
-	                                                                    attrs[1]
+	                                                                    attrs[1],
+	                                                                    ">"
 	                                                                )
-	                                                            ),
-	                                                            _react2.default.createElement(
-	                                                                "td",
-	                                                                null,
-	                                                                _react2.default.createElement("input", { type: "checkbox", id: i })
 	                                                            )
 	                                                        );
 	                                                    });
@@ -54437,8 +54526,8 @@
 	                                                        null,
 	                                                        _react2.default.createElement(
 	                                                            "td",
-	                                                            { colSpan: "3" },
-	                                                            "No Ids found"
+	                                                            { colSpan: "2" },
+	                                                            "No descriptors found."
 	                                                        )
 	                                                    );
 	                                                }
@@ -54662,36 +54751,326 @@
 	//                                <button type="button" className="btn btn-danger" onClick={this.submitHandler.bind(this)}>THIS BUTTON DOES SOMETHING</button>
 	//                           </div>
 	
-	var Modal = function (_Component2) {
-	    _inherits(Modal, _Component2);
+	var UploadIpfsFile = function (_React$Component) {
+	    _inherits(UploadIpfsFile, _React$Component);
 	
-	    function Modal(props) {
-	        _classCallCheck(this, Modal);
+	    function UploadIpfsFile(props) {
+	        _classCallCheck(this, UploadIpfsFile);
 	
-	        var _this2 = _possibleConstructorReturn(this, (Modal.__proto__ || Object.getPrototypeOf(Modal)).call(this, props));
+	        var _this3 = _possibleConstructorReturn(this, (UploadIpfsFile.__proto__ || Object.getPrototypeOf(UploadIpfsFile)).call(this, props));
 	
-	        _this2.state = {
+	        _this3.state = {
+	            docs: {},
+	            pubKey: props.pubKey,
+	            selected: '0',
+	            files: ''
+	        };
+	        _this3.inputChangeHandler = _this3.inputChangeHandler.bind(_this3);
+	        return _this3;
+	    }
+	
+	    _createClass(UploadIpfsFile, [{
+	        key: "componentDidMount",
+	        value: function componentDidMount() {
+	            $.ajax({
+	                url: twinUrl + "ipfs/alldocs/" + this.state.pubKey,
+	                dataType: 'json',
+	                cache: false,
+	                success: function (resp) {
+	                    this.setState({ docs: resp.data.documents });
+	                }.bind(this),
+	                error: function (xhr, status, err) {
+	                    console.error(this.props.url, status, err.toString());
+	                }.bind(this)
+	            });
+	
+	            $("#AttributesContainer .modal").modal('show');
+	            $("#AttributesContainer .modal").on('hidden.bs.modal', this.props.handleHideModal);
+	        }
+	    }, {
+	        key: "uploadHandler",
+	        value: function uploadHandler(data, additionalParams) {
+	            var params = {
+	                url: twinUrl + "ipfs/upload",
+	                type: 'POST',
+	                data: data,
+	                cache: false,
+	                processData: false,
+	                contentType: false
+	            };
+	            $.extend(params, additionalParams);
+	            $.ajax(params);
+	        }
+	    }, {
+	        key: "fileHandler",
+	        value: function fileHandler(e) {
+	            e.preventDefault();
+	            if (this.state.selected != "0") {
+	                var hash, fileHash;
+	                this.props.dataHandler(this.state.selected);
+	                $("button.close").trigger("click");
+	            } else {
+	                if (this.state.files.size > 0) {
+	                    var fileInput = $("input[name=newdoc]");
+	                    var fData = new FormData();
+	                    fData.append("user_pubkey", this.state.pubKey);
+	                    $.each(fileInput[0].files, function (key, value) {
+	                        fData.append(key, value);
+	                    });
+	                    var _this = this;
+	                    var callbacks = {
+	                        beforeSend: function beforeSend(xhr) {
+	                            $("button[name=uploadsubmit]").button('loading');
+	                            $("button.close").hide();
+	                        },
+	                        success: function (resp) {
+	                            if (resp.uploded && resp.uploded.length > 0) {
+	                                var filedata = resp.uploded[0].hash + "|" + resp.uploded[0].file_hash;
+	                                //data handler forms JSON object
+	                                this.props.dataHandler(filedata);
+	                                $("button.close").trigger("click");
+	                            }
+	                        }.bind(this),
+	                        complete: function complete() {
+	                            $("button[name=uploadsubmit]").button('reset');
+	                            $("button.close").show();
+	                        }
+	                    };
+	                    this.uploadHandler(fData, callbacks);
+	                }
+	            }
+	        }
+	    }, {
+	        key: "inputChangeHandler",
+	        value: function inputChangeHandler(e) {
+	            if (e.target.tagName == "SELECT") {
+	                this.setState({ selected: e.target.value });
+	            } else this.setState({ files: e.target.files[0] });
+	        }
+	    }, {
+	        key: "render",
+	        value: function render() {
+	            var _this4 = this;
+	
+	            console.log("UploadIpfsFile state: " + JSON.stringify(this.state));
+	            var center = {
+	                textAlign: 'center'
+	            };
+	            return _react2.default.createElement(
+	                "div",
+	                { className: "modal fade" },
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "modal-dialog" },
+	                    _react2.default.createElement(
+	                        "div",
+	                        { className: "modal-content" },
+	                        _react2.default.createElement(
+	                            "div",
+	                            { className: "modal-header" },
+	                            _react2.default.createElement(
+	                                "button",
+	                                { type: "button", className: "close", "data-dismiss": "modal", "aria-label": "Close" },
+	                                _react2.default.createElement(
+	                                    "span",
+	                                    { "aria-hidden": "true" },
+	                                    "×"
+	                                )
+	                            ),
+	                            _react2.default.createElement(
+	                                "h4",
+	                                { className: "modal-title" },
+	                                "Upload Document"
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            "div",
+	                            { className: "modal-body" },
+	                            _react2.default.createElement(
+	                                "form",
+	                                null,
+	                                _react2.default.createElement(
+	                                    "div",
+	                                    { className: "form-group" },
+	                                    _react2.default.createElement(
+	                                        "label",
+	                                        { htmlFor: "get-hash" },
+	                                        "Choose from documents"
+	                                    ),
+	                                    _react2.default.createElement(
+	                                        "select",
+	                                        { className: "form-control", onChange: this.inputChangeHandler },
+	                                        _react2.default.createElement(
+	                                            "option",
+	                                            { value: "0" },
+	                                            "Select Document"
+	                                        ),
+	                                        function () {
+	                                            if (_this4.state.docs && _this4.state.docs.length > 0) {
+	                                                var i = 0;
+	                                                return _this4.state.docs.map(function (obj) {
+	                                                    i++;
+	                                                    var optsVal = obj.hash + "|" + obj.file_hash;
+	                                                    return _react2.default.createElement(
+	                                                        "option",
+	                                                        { value: optsVal, key: i },
+	                                                        obj.filename
+	                                                    );
+	                                                });
+	                                            } else {
+	                                                return _react2.default.createElement(
+	                                                    "option",
+	                                                    { value: "0" },
+	                                                    "-- Empty --"
+	                                                );
+	                                            }
+	                                        }()
+	                                    )
+	                                ),
+	                                _react2.default.createElement(
+	                                    "p",
+	                                    { style: center },
+	                                    "(or)"
+	                                ),
+	                                _react2.default.createElement(
+	                                    "div",
+	                                    { className: "form-group" },
+	                                    _react2.default.createElement(
+	                                        "label",
+	                                        { htmlFor: "documents" },
+	                                        "Upload Document"
+	                                    ),
+	                                    _react2.default.createElement("input", { type: "file", className: "form-control", name: "newdoc", onChange: this.inputChangeHandler })
+	                                )
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            "div",
+	                            { className: "modal-footer" },
+	                            _react2.default.createElement(
+	                                "button",
+	                                { type: "button", "data-loading-text": "Processing...", name: "uploadsubmit", className: "btn btn-success", onClick: this.fileHandler.bind(this) },
+	                                "Submit"
+	                            )
+	                        )
+	                    )
+	                )
+	            );
+	        }
+	    }]);
+	
+	    return UploadIpfsFile;
+	}(_react2.default.Component);
+	
+	;
+	
+	var DimensionAttributeForm = function (_React$Component2) {
+	    _inherits(DimensionAttributeForm, _React$Component2);
+	
+	    function DimensionAttributeForm(props) {
+	        _classCallCheck(this, DimensionAttributeForm);
+	
+	        var _this5 = _possibleConstructorReturn(this, (DimensionAttributeForm.__proto__ || Object.getPrototypeOf(DimensionAttributeForm)).call(this, props));
+	
+	        _this5.state = {
+	
+	            file_attrs: [],
+	            inputs: ['input-0'],
+	            tmpFile: '',
+	            showModal: false,
+	            pubKey: localStorage.getItem("pubKey")
+	        };
+	        return _this5;
+	    }
+	
+	    _createClass(DimensionAttributeForm, [{
+	        key: "handleShowModal",
+	        value: function handleShowModal(e) {
+	            this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
+	        }
+	    }, {
+	        key: "handleHideModal",
+	        value: function handleHideModal() {
+	            this.setState({ showModal: false });
+	        }
+	    }, {
+	        key: "render",
+	        value: function render() {
+	            return _react2.default.createElement(
+	                "div",
+	                { className: "form-group col-md-12" },
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "col-md-10" },
+	                    _react2.default.createElement(
+	                        "label",
+	                        { htmlFor: "unique_id_attrs" },
+	                        " Dimension Attributes e.g. \"My college transcript\", \"Chase Bank KYC\", or \"My blockchain research\". "
+	                    ),
+	                    _react2.default.createElement("input", { name: 'label-' + this.props.labelref, className: "form-control col-md-4", type: "text", placeholder: "Label" })
+	                ),
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "col-md-2" },
+	                    _react2.default.createElement(
+	                        "button",
+	                        { type: "button", "data-id": this.props.labelref, onClick: this.props.handleShowModal, className: "btn btn-warning pull-right" },
+	                        _react2.default.createElement("span", { className: "glyphicon glyphicon-upload" }),
+	                        "Upload File"
+	                    )
+	                )
+	            );
+	        }
+	    }]);
+	
+	    return DimensionAttributeForm;
+	}(_react2.default.Component);
+	
+	;
+	
+	var IdentityDimensions = function (_Component2) {
+	    _inherits(IdentityDimensions, _Component2);
+	
+	    function IdentityDimensions(props) {
+	        _classCallCheck(this, IdentityDimensions);
+	
+	        var _this6 = _possibleConstructorReturn(this, (IdentityDimensions.__proto__ || Object.getPrototypeOf(IdentityDimensions)).call(this, props));
+	
+	        _this6.state = {
+	
+	            pubKey: localStorage.getItem("pubKey"),
+	
+	            //********************
+	            //UniqueIDAttributesForm
+	            inputs: ['input-0'],
+	            showModal: false,
+	            tmpFile: '',
+	
+	            //TODO: BELIEVE WE CAN TAKE THIS OUT (for use it to genrte new unqiueID)
+	            file_attrs: [],
+	
+	            //used to populate the select options for add dimension
+	            owned_assets: [], //endpoint: getOwnedAssets
+	            controlled_assets: [], //endpoint: getControlledAssets
+	
+	            //********************
+	            //DimensionForm
 	            iDimensions: [],
 	            delegations: [],
 	            showDetails: false,
 	            activeDimension: {}
+	
 	        };
-	        _this2.showHandler = _this2.showHandler.bind(_this2);
-	        return _this2;
+	        _this6.showDimensionHandler = _this6.showDimensionHandler.bind(_this6);
+	        _this6.handleHideModal = _this6.handleHideModal.bind(_this6);
+	
+	        return _this6;
 	    }
 	
-	    //USED IF DIGITAL TWIN NOT AVAILABLE
-	    // getDimensions() {
-	    //     this.setState({
-	    //         iDimensions: [
-	    //             { dimensionType: 'FINANCIAL HISTORY', ID: '12234', owned: true, name: 'Football', descriptors: ["monday", "tuesday", "wednesday"], attributes: ["h1", "h2", "h3"] },
-	    //             { dimensionType: 'EDUCATION', ID: '34334', owned: true, name: 'iPod Touch', descriptors: ["monday", "tuesday", "wednesday"], attributes: ["h1", "h2", "h3"] },
-	    //             { dimensionType: 'DIGITAL ASSETS', ID: '56676', owned: false, name: 'iPhone 5', descriptors: ["monday", "tuesday", "wednesday"], attributes: ["h1", "h2", "h3"] }
-	    //         ]
-	    //     })
-	    // }
-	
-	    _createClass(Modal, [{
+	    _createClass(IdentityDimensions, [{
+	        key: "handleSelection",
+	        value: function handleSelection() {}
+	    }, {
 	        key: "componentWillMount",
 	        value: function componentWillMount() {
 	            //this.getDimensions();
@@ -54706,18 +55085,75 @@
 	                    if ($.type(result) != "object") {
 	                        data = JSON.parse(result);
 	                    }
-	
-	                    console.log("data: " + JSON.stringify(data));
+	                    //console.log("data: " + JSON.stringify(data))
 	                    data = JSON.stringify(data);
 	                    data = JSON.parse(data).data;
-	                    console.log("data after parse: " + JSON.stringify(data));
+	                    //console.log("data after parse: " + JSON.stringify(data))
 	                    data = JSON.stringify(data);
 	                    var dimensions = JSON.parse(data).Dimensions;
-	                    console.log("dimensions: " + JSON.stringify(dimensions));
+	                    //console.log("dimensions: " + JSON.stringify(dimensions))
 	
 	                    this.setState({ iDimensions: dimensions });
 	                }.bind(this),
 	                complete: function complete() {}
+	            });
+	
+	            $.ajax({
+	                type: "POST",
+	                url: twinUrl + 'getOwnedAssets',
+	                data: { "pubKey": localStorage.getItem("pubKey") },
+	                success: function (result) {
+	                    var data = result;
+	                    if ($.type(result) != "object") {
+	                        data = JSON.parseJSON(result);
+	                    }
+	                    //get the array:
+	                    data = data.data;
+	
+	                    var owned_array = [];
+	
+	                    if (data.length > 0) {
+	                        for (var i = 0; i < data.length; i++) {
+	                            owned_array.push(data[i]);
+	                        }
+	                        console.log(owned_array);
+	                        this.setState({ owned_assets: owned_array });
+	                    }
+	
+	                    //DEBUGGING:
+	                    console.log("getOwnedAssets result: " + data);
+	                }.bind(this),
+	                complete: function complete() {}
+	            });
+	
+	            $.ajax({
+	                type: "POST",
+	                url: twinUrl + 'getControlledAssets',
+	                data: { "pubKey": localStorage.getItem("pubKey") },
+	                success: function (result) {
+	                    var data = result;
+	                    if ($.type(result) != "object") {
+	                        data = JSON.parseJSON(result);
+	                    }
+	
+	                    //get the array:
+	                    data = data.data;
+	
+	                    var ctrl_array = [];
+	                    if (data.length > 0) {
+	                        for (var i = 0; i < data.length; i++) {
+	                            ctrl_array.push(data[i]);
+	                        }
+	                        console.log(ctrl_array);
+	                        this.setState({ controlled_assets: ctrl_array });
+	                    }
+	
+	                    //debugging:
+	                    console.log("Get Controlled Assets result: " + data);
+	                }.bind(this),
+	                complete: function complete() {
+	                    // do something
+	                }
 	            });
 	        }
 	    }, {
@@ -54735,9 +55171,12 @@
 	        value: function getActiveData() {
 	            return this.state.activeDimension;
 	        }
+	
+	        //used to show activeDimension
+	
 	    }, {
-	        key: "showHandler",
-	        value: function showHandler(e) {
+	        key: "showDimensionHandler",
+	        value: function showDimensionHandler(e) {
 	            e.preventDefault();
 	            this.setState({
 	                showDetails: true,
@@ -54745,31 +55184,90 @@
 	            });
 	        }
 	    }, {
-	        key: "handleAddDimension",
-	        value: function handleAddDimension(dimension) {
-	            console.log("insidehandle add" + JSON.stringify(dimension));
-	            var dimensions = this.state.iDimensions;
-	            dimensions.push(dimension);
-	            this.setState({ iDimensions: dimensions });
+	        key: "getFileDetails",
+	        value: function getFileDetails(filedata) {
+	            var obj = _defineProperty({}, this.state.tmpFile, filedata);
+	            this.setState({ file_attrs: this.state.file_attrs.concat([obj]) });
 	        }
 	    }, {
-	        key: "handleDeleteDimension",
-	        value: function handleDeleteDimension(id) {
-	            var dimensions = this.state.iDimensions;
-	            var index = dimensions.findIndex(function (x) {
-	                return x.id === id;
+	        key: "handleHideModal",
+	        value: function handleHideModal() {
+	            this.setState({ showModal: false });
+	        }
+	    }, {
+	        key: "handleShowModal",
+	        value: function handleShowModal(e) {
+	            this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
+	        }
+	    }, {
+	        key: "appendInput",
+	        value: function appendInput() {
+	            var inputLen = this.state.inputs.length;
+	            if (inputLen < 10) {
+	                var newInput = "input-" + inputLen;
+	                this.setState({ inputs: this.state.inputs.concat([newInput]) });
+	            }
+	            console.log("inputs: " + this.state.inputs);
+	        }
+	
+	        // prepareJSON(){
+	
+	        //     var inputObj = {
+	        //         pubKey: this.state.pubKey,
+	        //         uniqueID: "needs to be coid unique ID",
+	        //         controlContractAddr: "434344423423423234",
+	        //         type: "identityDimension",
+	        //         bigchainHash: "",
+	        //         bigchainID: ""
+	        //     };
+	        //     return inputObj
+	        // }
+	
+	    }, {
+	        key: "createDimension",
+	        value: function createDimension(e) {
+	
+	            // e.preventDefault();
+	            // console.log("hit createDimension")
+	            // var json = this.prepareJSON()
+	            // console.log("creating dimension with this data... " + JSON.stringify(json))
+	
+	            $.ajax({
+	                type: "POST",
+	                url: twinUrl + 'createDimension',
+	                data: { pubkey: localStorage.getItem("pubKey") },
+	                success: function (result) {
+	                    var data = result;
+	                    if ($.type(result) != "object") {
+	                        data = JSON.parseJSON(result);
+	                    }
+	
+	                    //get the array:
+	                    data = data.data;
+	
+	                    //debugging:
+	                    console.log("createDimensionforDEMO result: " + data);
+	                }.bind(this),
+	                complete: function complete() {
+	                    // do something
+	                }
 	            });
-	            dimensions.splice(index, 1);
-	            this.setState({ iDimensions: dimensions });
 	        }
 	    }, {
 	        key: "render",
 	        value: function render() {
-	            var _this3 = this;
+	            var _this7 = this,
+	                _React$createElement,
+	                _React$createElement2;
 	
 	            console.log(JSON.stringify(this.state));
 	            var dimensions = this.state.iDimensions;
+	
 	            var _that = this;
+	
+	            var syle = {
+	                marginRight: '15px'
+	            };
 	
 	            var table = {
 	                margin: '0 auto'
@@ -54777,7 +55275,7 @@
 	
 	            return _react2.default.createElement(
 	                "div",
-	                { id: "dimensions_container" },
+	                { id: "IDENTITYDIMENSIONS_MODAL" },
 	                _react2.default.createElement(
 	                    "h1",
 	                    null,
@@ -54785,56 +55283,182 @@
 	                ),
 	                _react2.default.createElement("hr", null),
 	                _react2.default.createElement(
-	                    "table",
-	                    { style: table, className: "table table-striped center" },
+	                    "div",
+	                    { className: "modal-header" },
 	                    _react2.default.createElement(
-	                        "tbody",
-	                        null,
-	                        function () {
-	                            if ($.isArray(_this3.state.iDimensions) && _this3.state.iDimensions.length > 0) {
-	                                return _this3.state.iDimensions.map(function (el, i) {
-	                                    return _react2.default.createElement(
-	                                        "tr",
-	                                        { key: i },
-	                                        _react2.default.createElement(
-	                                            "td",
-	                                            null,
-	                                            _react2.default.createElement(
-	                                                "a",
-	                                                { "data-item": el, "data-index": i, onClick: _that.showHandler },
-	                                                el.dimensionType
-	                                            )
-	                                        ),
-	                                        _react2.default.createElement("td", { className: "pull-left" })
-	                                    );
-	                                });
-	                            } else {
-	                                return _react2.default.createElement(
-	                                    "tr",
-	                                    null,
-	                                    _react2.default.createElement(
-	                                        "td",
-	                                        null,
-	                                        _react2.default.createElement(
-	                                            "p",
-	                                            null,
-	                                            "No identity dimensions"
-	                                        )
-	                                    )
-	                                );
-	                            }
-	                        }(this)
+	                        "ul",
+	                        { className: "nav nav-tabs", role: "tablist" },
+	                        _react2.default.createElement(
+	                            "li",
+	                            { role: "presentation", className: "active" },
+	                            _react2.default.createElement(
+	                                "a",
+	                                { href: "#dimensions", role: "tab", "data-toggle": "tab" },
+	                                "Identity Dimensions"
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            "li",
+	                            { role: "presentation" },
+	                            _react2.default.createElement(
+	                                "a",
+	                                { href: "#addDimension", role: "tab", "data-toggle": "tab" },
+	                                "Create new dimension"
+	                            )
+	                        )
 	                    )
 	                ),
-	                this.state.showDetails ? _react2.default.createElement(DimensionForm, { hideHandler: this.hideHandler.bind(this), dataHandler: this.state.activeDimension }) : null
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "modal-body" },
+	                    _react2.default.createElement(
+	                        "div",
+	                        { className: "tab-content" },
+	                        _react2.default.createElement(
+	                            "div",
+	                            (_React$createElement = { className: "tabpanel", role: "tabpanel" }, _defineProperty(_React$createElement, "className", "tab-pane active"), _defineProperty(_React$createElement, "id", "dimensions"), _React$createElement),
+	                            _react2.default.createElement("br", null),
+	                            _react2.default.createElement(
+	                                "table",
+	                                { style: table, className: "table table-striped center" },
+	                                _react2.default.createElement(
+	                                    "tbody",
+	                                    null,
+	                                    function () {
+	                                        if ($.isArray(_this7.state.iDimensions) && _this7.state.iDimensions.length > 0) {
+	                                            return _this7.state.iDimensions.map(function (el, i) {
+	                                                return _react2.default.createElement(
+	                                                    "tr",
+	                                                    { key: i },
+	                                                    _react2.default.createElement(
+	                                                        "td",
+	                                                        null,
+	                                                        _react2.default.createElement(
+	                                                            "a",
+	                                                            { "data-item": el, "data-index": i, onClick: _that.showDimensionHandler },
+	                                                            el.dimensionType
+	                                                        )
+	                                                    )
+	                                                );
+	                                            });
+	                                        } else {
+	                                            return _react2.default.createElement(
+	                                                "tr",
+	                                                null,
+	                                                _react2.default.createElement(
+	                                                    "td",
+	                                                    null,
+	                                                    _react2.default.createElement(
+	                                                        "p",
+	                                                        null,
+	                                                        "No identity dimensions"
+	                                                    )
+	                                                )
+	                                            );
+	                                        }
+	                                    }(this)
+	                                )
+	                            ),
+	                            this.state.showDetails ? _react2.default.createElement(DimensionForm, { hideHandler: this.hideHandler.bind(this), dataHandler: this.state.activeDimension }) : null
+	                        ),
+	                        _react2.default.createElement(
+	                            "div",
+	                            (_React$createElement2 = { className: "tabpanel", role: "tabpanel" }, _defineProperty(_React$createElement2, "className", "tab-pane"), _defineProperty(_React$createElement2, "id", "addDimension"), _React$createElement2),
+	                            _react2.default.createElement("br", null),
+	                            _react2.default.createElement(
+	                                "div",
+	                                null,
+	                                _react2.default.createElement(
+	                                    "select",
+	                                    { className: "selectpicker show-tick", value: this.state.selectedAsset, onChange: this.handleSelection },
+	                                    _react2.default.createElement(
+	                                        "optgroup",
+	                                        { label: "Owned" },
+	                                        _react2.default.createElement(
+	                                            "option",
+	                                            null,
+	                                            "MyCOID"
+	                                        ),
+	                                        _react2.default.createElement(
+	                                            "option",
+	                                            null,
+	                                            "My Car"
+	                                        )
+	                                    ),
+	                                    _react2.default.createElement(
+	                                        "optgroup",
+	                                        { label: "Controlled" },
+	                                        _react2.default.createElement(
+	                                            "option",
+	                                            null,
+	                                            "Parents house"
+	                                        )
+	                                    )
+	                                )
+	                            ),
+	                            _react2.default.createElement("br", null),
+	                            _react2.default.createElement(
+	                                "div",
+	                                { id: "AttributesContainer" },
+	                                _react2.default.createElement(
+	                                    "form",
+	                                    { method: "POST", id: "register", role: "form" },
+	                                    _react2.default.createElement(
+	                                        "div",
+	                                        { className: "form-group" },
+	                                        _react2.default.createElement(
+	                                            "label",
+	                                            { htmlFor: "unique_id" },
+	                                            "Enter Identity Dimension Details:"
+	                                        ),
+	                                        this.state.inputs.map(function (input) {
+	                                            return _react2.default.createElement(DimensionAttributeForm, { handleShowModal: _this7.handleShowModal.bind(_this7), min: _this7.state.subform_cont, max: "10", key: input, labelref: input });
+	                                        })
+	                                    ),
+	                                    _react2.default.createElement(
+	                                        "div",
+	                                        { className: "form-group" },
+	                                        _react2.default.createElement(
+	                                            "div",
+	                                            { className: "col-md-offset-6 col-md-6 " },
+	                                            _react2.default.createElement(
+	                                                "button",
+	                                                { type: "button", className: "btn btn-info pull-right", style: syle, onClick: this.appendInput.bind(this) },
+	                                                _react2.default.createElement("span", { className: "glyphicon glyphicon-plus" }),
+	                                                "Add More"
+	                                            )
+	                                        )
+	                                    ),
+	                                    _react2.default.createElement(
+	                                        "div",
+	                                        { className: "form-group" },
+	                                        _react2.default.createElement(
+	                                            "div",
+	                                            { className: "col-sm-6" },
+	                                            _react2.default.createElement("hr", null),
+	                                            _react2.default.createElement(
+	                                                "button",
+	                                                { className: "btn btn-primary", "data-loading-text": "Submit", name: "submit-form", type: "button", onClick: this.createDimension.bind(this) },
+	                                                "Create Dimension"
+	                                            )
+	                                        )
+	                                    )
+	                                ),
+	                                this.state.showModal ? _react2.default.createElement(UploadIpfsFile, { pubKey: this.state.pubKey, dataHandler: this.getFileDetails.bind(this), handleHideModal: this.handleHideModal }) : null
+	                            )
+	                        )
+	                    )
+	                )
 	            );
 	        }
 	    }]);
 	
-	    return Modal;
+	    return IdentityDimensions;
 	}(_react.Component);
 	
 	;
+	
+	exports.default = IdentityDimensions;
 	
 	// //temp function
 	// app.post('/getMetaData', function(req,res)
@@ -54849,33 +55473,21 @@
 	// })
 	
 	
-	/*
+	//USED IF DIGITAL TWIN NOT AVAILABLE
+	// getDimensions() {
+	//     this.setState({
+	//         iDimensions: [
+	//             { dimensionType: 'FINANCIAL HISTORY', ID: '12234', owned: true, name: 'Football', descriptors: ["monday", "tuesday", "wednesday"], attributes: ["h1", "h2", "h3"] },
+	//             { dimensionType: 'EDUCATION', ID: '34334', owned: true, name: 'iPod Touch', descriptors: ["monday", "tuesday", "wednesday"], attributes: ["h1", "h2", "h3"] },
+	//             { dimensionType: 'DIGITAL ASSETS', ID: '56676', owned: false, name: 'iPhone 5', descriptors: ["monday", "tuesday", "wednesday"], attributes: ["h1", "h2", "h3"] }
+	//         ]
+	//     })
+	// }
 	
-	                        {(() => {
-	                            if ($.isArray(this.state.delegations) && this.state.delegations.length > 0) {
-	                                return (
-	                                    <tr key={i}>
-	                                        <td>
-	                                            <a data-item={el} data-index={i}  >{el.dimensionType}</a>
-	                                        </td>
-	                                        <td className="pull-left">
-	
-	                                        </td>
-	                                    </tr>
-	                                );
-	                            }
-	
-	                        })(this)}
-	
-	
-	 */
 	
 	//<AddDimension addDimension={this.handleAddDimension.bind(this) } /><br /><br />
 	
 	//<IdentityDimensions dimensions={dimensions} onDelete={this.handleDeleteDimension.bind(this) } key={dimensions.ID} onClick={this.showHandler.bind(this)}/>
-	
-	
-	exports.default = Modal;
 
 /***/ },
 /* 347 */
@@ -54949,6 +55561,8 @@
 		}, {
 			key: 'uploadHandler',
 			value: function uploadHandler(data, additionalParams) {
+				console.log("hit uploadHandler, data: " + JSON.stringify(data));
+				console.log("hit uploadHandler, additionalParams: " + JSON.stringify(additionalParams));
 				var params = {
 					url: twinUrl + "ipfs/upload",
 					type: 'POST',
@@ -54977,6 +55591,7 @@
 						$.each(fileInput[0].files, function (key, value) {
 							fData.append(key, value);
 						});
+						console.log("FormData before callbacks: " + JSON.stringify(fData));
 						var _this = this;
 						var callbacks = {
 							beforeSend: function beforeSend(xhr) {
@@ -54987,6 +55602,7 @@
 								if (resp.uploded && resp.uploded.length > 0) {
 									var filedata = resp.uploded[0].hash + "|" + resp.uploded[0].file_hash;
 									//data handler forms JSON object
+									console.log(this.props.dataHandler(filedata));
 									this.props.dataHandler(filedata);
 									$("button.close").trigger("click");
 								}
@@ -54996,6 +55612,8 @@
 								$("button.close").show();
 							}
 						};
+						console.log("right before uploadHandler, callbacks: " + JSON.stringify(callbacks));
+						console.log("right before uploadHandler, FormData: " + JSON.stringify(fData));
 						this.uploadHandler(fData, callbacks);
 					}
 				}
@@ -55140,7 +55758,7 @@
 				file_attrs: [],
 				tmpFile: '',
 	
-				//list of documents populated from digital twin /notifications ($pubkey_files.json)
+				//list of documents populated from digital twin /notifications ($_files.json)
 				docs: {},
 				pubKey: localStorage.getItem("pubKey")
 			};
@@ -55279,8 +55897,6 @@
 	}(_react.Component);
 	
 	exports.default = Documents;
-	
-	//{/*dataHandler={this.getFileDetails.bind(this)} */}
 
 /***/ },
 /* 348 */
@@ -55855,6 +56471,7 @@
 							data = JSON.parseJSON(result);
 						}
 						localStorage.setItem("gatekeeperAddr", result.gatekeeperAddr);
+						localStorage.setItem("coidAddr", result.coidAddr);
 					}.bind(this),
 					complete: function complete() {}
 				});
@@ -56415,684 +57032,6 @@
 	
 	exports.default = MyGatekeeper;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/buffer/index.js */ 239).Buffer))
-
-/***/ },
-/* 349 */
-/*!********************************************!*\
-  !*** ./src/app/Components/IDimensions.jsx ***!
-  \********************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var SearchBar = function (_React$Component) {
-	    _inherits(SearchBar, _React$Component);
-	
-	    function SearchBar(props) {
-	        _classCallCheck(this, SearchBar);
-	
-	        var _this = _possibleConstructorReturn(this, (SearchBar.__proto__ || Object.getPrototypeOf(SearchBar)).call(this, props));
-	
-	        _this.handleChange = _this.handleChange.bind(_this);
-	        return _this;
-	    }
-	
-	    _createClass(SearchBar, [{
-	        key: "handleChange",
-	        value: function handleChange() {
-	            this.props.onUserInput(this.filterTextInput.value, this.owned_onlyInput.checked);
-	        }
-	    }, {
-	        key: "render",
-	        value: function render() {
-	            var _this2 = this;
-	
-	            console.log("search bar props: " + JSON.stringify(this.props));
-	            return _react2.default.createElement(
-	                "form",
-	                null,
-	                _react2.default.createElement("input", {
-	                    type: "text",
-	                    placeholder: "Search...",
-	                    value: this.props.filterText,
-	                    ref: function ref(input) {
-	                        return _this2.filterTextInput = input;
-	                    },
-	                    onChange: this.handleChange
-	                }),
-	                _react2.default.createElement(
-	                    "p",
-	                    null,
-	                    _react2.default.createElement("input", {
-	                        type: "checkbox",
-	                        checked: this.props.owned_Only,
-	                        ref: function ref(input) {
-	                            return _this2.owned_onlyInput = input;
-	                        },
-	                        onChange: this.handleChange
-	                    }),
-	                    ' ',
-	                    "show OWNED dimensions"
-	                ),
-	                _react2.default.createElement("br", null)
-	            );
-	        }
-	    }]);
-	
-	    return SearchBar;
-	}(_react2.default.Component);
-	
-	//TODO:
-	//INTEGREATE ADD FUNCTIONALITY LATER---- DIMENSIONS SHOULD BE ADDED FROM MYCOID
-	
-	
-	var AddDimension = function (_React$Component2) {
-	    _inherits(AddDimension, _React$Component2);
-	
-	    function AddDimension() {
-	        _classCallCheck(this, AddDimension);
-	
-	        var _this3 = _possibleConstructorReturn(this, (AddDimension.__proto__ || Object.getPrototypeOf(AddDimension)).call(this));
-	
-	        _this3.state = {
-	            newDimension: {},
-	            files: ['FinanceReport.xls', 'Contacts.json', 'My_DOC.pdf']
-	
-	        };
-	        return _this3;
-	    }
-	
-	    _createClass(AddDimension, [{
-	        key: "handleSubmit",
-	        value: function handleSubmit(e) {
-	            if (this.refs.dimensionType.value === '') {
-	                alert('descriptor is required');
-	            } else {
-	                console.log("**************************");
-	                this.setState({
-	                    //TODO: UPDATE THIS for correct schema!!!!!!!!!!!!!!!!!!!!!!
-	                    newDimension: {
-	                        ID: '23121',
-	                        dimensionType: this.refs.dimensionType.value,
-	                        owned: true
-	                    }
-	                }, function () {
-	                    //addDimsion prop is passed down from parent
-	                    this.props.addDimension(this.state.newDimension);
-	                });
-	            }
-	        }
-	    }, {
-	        key: "render",
-	        value: function render() {
-	
-	            var fileList = this.state.files.map(function (option) {
-	                return _react2.default.createElement(
-	                    "option",
-	                    { key: option, value: option },
-	                    option
-	                );
-	            });
-	            return _react2.default.createElement(
-	                "div",
-	                null,
-	                _react2.default.createElement(
-	                    "h3",
-	                    null,
-	                    " Add Dimension "
-	                ),
-	                _react2.default.createElement(
-	                    "form",
-	                    { onSubmit: this.handleSubmit.bind(this) },
-	                    _react2.default.createElement(
-	                        "div",
-	                        null,
-	                        _react2.default.createElement(
-	                            "label",
-	                            null,
-	                            "Descriptor:"
-	                        ),
-	                        _react2.default.createElement("br", null),
-	                        _react2.default.createElement("input", { type: "text", ref: "dimensionType" })
-	                    ),
-	                    _react2.default.createElement(
-	                        "div",
-	                        null,
-	                        _react2.default.createElement(
-	                            "label",
-	                            null,
-	                            "Select File: "
-	                        ),
-	                        _react2.default.createElement("br", null),
-	                        _react2.default.createElement(
-	                            "select",
-	                            { ref: "category" },
-	                            " ",
-	                            fileList,
-	                            " "
-	                        )
-	                    ),
-	                    _react2.default.createElement("br", null),
-	                    _react2.default.createElement("input", { type: "submit", value: "Submit" }),
-	                    _react2.default.createElement("br", null)
-	                )
-	            );
-	        }
-	    }]);
-	
-	    return AddDimension;
-	}(_react2.default.Component);
-	
-	//********************************************************************************************** */
-	//********************************************************************************************** */
-	
-	//RENDERS A DIMENSION TABLE WITH A SEARCH BAR COMPONENT
-	
-	
-	var FilterableDimensionTable = function (_React$Component3) {
-	    _inherits(FilterableDimensionTable, _React$Component3);
-	
-	    function FilterableDimensionTable() {
-	        _classCallCheck(this, FilterableDimensionTable);
-	
-	        var _this4 = _possibleConstructorReturn(this, (FilterableDimensionTable.__proto__ || Object.getPrototypeOf(FilterableDimensionTable)).call(this));
-	
-	        _this4.state = {
-	            dimension_rows: [],
-	            filterText: '',
-	            owned_only: false
-	        };
-	
-	        _this4.handleUserInput = _this4.handleUserInput.bind(_this4);
-	        _this4.deleteDimension = _this4.deleteDimension.bind(_this4);
-	        //this.showHandler = this.showHandler.bind(this)
-	        return _this4;
-	    }
-	
-	    _createClass(FilterableDimensionTable, [{
-	        key: "handleAddDimension",
-	        value: function handleAddDimension(dimension) {
-	            var dimensions = this.props.dimensions;
-	            dimensions.push(dimension);
-	        }
-	
-	        //DIMENSION HANDLER---
-	
-	    }, {
-	        key: "showHandler",
-	        value: function showHandler(dimension) {
-	
-	            //this.props.dimensionHandler(dimension)
-	        }
-	    }, {
-	        key: "deleteDimension",
-	        value: function deleteDimension(id) {
-	
-	            this.props.onDelete(id);
-	        }
-	
-	        //handle the filtering of dimensions based on the filterText and 
-	
-	    }, {
-	        key: "handleUserInput",
-	        value: function handleUserInput(filterText, owned_only) {
-	            this.setState({
-	                filterText: filterText,
-	                owned_only: owned_only
-	            });
-	        }
-	    }, {
-	        key: "componentWillMount",
-	        value: function componentWillMount() {
-	
-	            var theTypes = [];
-	
-	            for (var i = 0; i < this.props.dimensions.length; i++) {
-	                var type = this.props.dimensions[i].dimensionType;
-	                var ID = this.props.dimensions[i].ID;
-	                theTypes.push(type);
-	                theTypes.push(ID);
-	            }
-	            this.setState({ dimension_rows: theTypes });
-	        }
-	    }, {
-	        key: "render",
-	        value: function render() {
-	
-	            //if this.props.owned is false dimension name will appear red
-	            // var name = this.props.dimension.owned ? this.props.dimension.name :
-	            //     <span style={{ color: 'red' }}>
-	            //         {this.props.dimension.name}
-	            //     </span>;
-	
-	            console.log("DIMENSION TABLE PROPS: " + JSON.stringify(this.props));
-	            console.log("DIMENSION TABLE STATE: " + JSON.stringify(this.state));
-	
-	            var dims = this.state.dimension_rows;
-	            var rows = [];
-	
-	            for (var i = 0; i < dims.length; i += 2) {
-	                console.log("i: " + dims[i] + " i+1: " + dims[i + 1]);
-	                rows.push(_react2.default.createElement(
-	                    "tr",
-	                    { key: i },
-	                    _react2.default.createElement(
-	                        "td",
-	                        null,
-	                        dims[i]
-	                    ),
-	                    _react2.default.createElement(
-	                        "td",
-	                        null,
-	                        _react2.default.createElement(
-	                            "button",
-	                            { className: "btn btn-warning", "data-index": i, onClick: this.dimensionHandler.bind(this) },
-	                            "Update"
-	                        )
-	                    ),
-	                    _react2.default.createElement(
-	                        "td",
-	                        null,
-	                        _react2.default.createElement(
-	                            "button",
-	                            { className: "btn btn-danger", onClick: this.deleteDimension.bind(this, dims[i + 1]) },
-	                            "Delete"
-	                        )
-	                    )
-	                ));
-	            }
-	
-	            return _react2.default.createElement(
-	                "div",
-	                null,
-	                _react2.default.createElement(SearchBar, {
-	                    filterText: this.state.filterText,
-	                    owned_only: this.state.owned_only,
-	                    onUserInput: this.handleUserInput
-	                }),
-	                _react2.default.createElement(
-	                    "table",
-	                    { className: "table table-striped table-hover" },
-	                    _react2.default.createElement(
-	                        "thead",
-	                        null,
-	                        _react2.default.createElement(
-	                            "tr",
-	                            null,
-	                            _react2.default.createElement(
-	                                "th",
-	                                null,
-	                                "Name"
-	                            )
-	                        )
-	                    ),
-	                    _react2.default.createElement(
-	                        "tbody",
-	                        null,
-	                        rows
-	                    )
-	                )
-	            );
-	        }
-	    }]);
-	
-	    return FilterableDimensionTable;
-	}(_react2.default.Component);
-	
-	// <DimensionTable
-	//     dimensions={this.props.dimensions}
-	//     filterText={this.state.filterText}
-	//     owned_Only={this.state.owned_only}
-	//     onDelete={this.props.onDelete}
-	//     key={this.props.dimensions.dimensionType}
-	//     />
-	
-	
-	// {this.props.dimensions.map(() => {
-	
-	// }) }
-	
-	
-	var Modal = function (_React$Component4) {
-	    _inherits(Modal, _React$Component4);
-	
-	    function Modal() {
-	        _classCallCheck(this, Modal);
-	
-	        return _possibleConstructorReturn(this, (Modal.__proto__ || Object.getPrototypeOf(Modal)).apply(this, arguments));
-	    }
-	
-	    _createClass(Modal, [{
-	        key: "render",
-	        value: function render() {
-	
-	            var style = {
-	                marginRight: '15px'
-	            };
-	
-	            //var prop = this.props.dimension
-	
-	            return _react2.default.createElement(
-	                "div",
-	                { className: "modal fade", id: "assetDetails", key: this.props.asset.asset_id, tabIndex: "-1", role: "dialog", "aria-labelledby": "asset" },
-	                _react2.default.createElement(
-	                    "div",
-	                    { className: "modal-content" },
-	                    _react2.default.createElement(
-	                        "div",
-	                        { className: "modal-header" },
-	                        _react2.default.createElement(
-	                            "button",
-	                            { type: "button", className: "close", "data-dismiss": "modal", "aria-label": "Close" },
-	                            _react2.default.createElement(
-	                                "span",
-	                                { "aria-hidden": "true" },
-	                                "× "
-	                            )
-	                        ),
-	                        _react2.default.createElement(
-	                            "ul",
-	                            { className: "nav nav-pills", role: "tablist" },
-	                            _react2.default.createElement(
-	                                "li",
-	                                { role: "presentation", className: "active" },
-	                                _react2.default.createElement(
-	                                    "a",
-	                                    { href: "#dimension_details", role: "tab", "data-toggle": "tab" },
-	                                    "Dimension Details"
-	                                )
-	                            ),
-	                            _react2.default.createElement(
-	                                "li",
-	                                { role: "presentation" },
-	                                _react2.default.createElement(
-	                                    "a",
-	                                    { href: "#controllers", role: "tab", "data-toggle": "tab" },
-	                                    "Edit controllers"
-	                                )
-	                            ),
-	                            _react2.default.createElement(
-	                                "li",
-	                                { role: "presentation" },
-	                                _react2.default.createElement(
-	                                    "a",
-	                                    { href: "#delegations", role: "tab", "data-toggle": "tab" },
-	                                    "Token delegations"
-	                                )
-	                            )
-	                        )
-	                    ),
-	                    _react2.default.createElement(
-	                        "div",
-	                        { className: "modal-body" },
-	                        _react2.default.createElement(
-	                            "div",
-	                            { className: "tab-pane active", role: "tabpanel", id: "dimension_details" },
-	                            _react2.default.createElement(
-	                                "table",
-	                                { className: "table table-striped table-hover", style: style },
-	                                _react2.default.createElement(
-	                                    "thead",
-	                                    null,
-	                                    _react2.default.createElement(
-	                                        "tr",
-	                                        null,
-	                                        _react2.default.createElement(
-	                                            "th",
-	                                            null,
-	                                            "NAME"
-	                                        )
-	                                    )
-	                                ),
-	                                _react2.default.createElement(
-	                                    "tbody",
-	                                    null,
-	                                    _react2.default.createElement(
-	                                        "tr",
-	                                        null,
-	                                        _react2.default.createElement(
-	                                            "td",
-	                                            null,
-	                                            "DISPLAY the DESCRIPTORS and ATTRIBUTES"
-	                                        )
-	                                    ),
-	                                    _react2.default.createElement(
-	                                        "tr",
-	                                        null,
-	                                        _react2.default.createElement(
-	                                            "td",
-	                                            null,
-	                                            "ADD AN ATTRIBUTE HERE!!!!!!!!!!"
-	                                        )
-	                                    )
-	                                )
-	                            )
-	                        ),
-	                        _react2.default.createElement(
-	                            "div",
-	                            { className: "tab-pane", role: "tabpanel", id: "controllers" },
-	                            _react2.default.createElement(
-	                                "table",
-	                                { className: "table table-striped table-hover", style: style },
-	                                _react2.default.createElement(
-	                                    "thead",
-	                                    null,
-	                                    _react2.default.createElement(
-	                                        "tr",
-	                                        null,
-	                                        _react2.default.createElement(
-	                                            "th",
-	                                            null,
-	                                            "Controllers and Control Tokens"
-	                                        )
-	                                    )
-	                                ),
-	                                _react2.default.createElement(
-	                                    "tbody",
-	                                    null,
-	                                    _react2.default.createElement(
-	                                        "tr",
-	                                        null,
-	                                        _react2.default.createElement(
-	                                            "td",
-	                                            null,
-	                                            "DISPLAY the CONTROLLERS"
-	                                        )
-	                                    ),
-	                                    _react2.default.createElement(
-	                                        "tr",
-	                                        null,
-	                                        _react2.default.createElement(
-	                                            "td",
-	                                            null,
-	                                            "ADD A CONTROLLER HERE!!!!!!!!!!"
-	                                        )
-	                                    )
-	                                )
-	                            )
-	                        ),
-	                        _react2.default.createElement(
-	                            "div",
-	                            { className: "tab-pane active", role: "tabpanel", id: "delegations" },
-	                            _react2.default.createElement(
-	                                "table",
-	                                { className: "table table-striped table-hover", style: style },
-	                                _react2.default.createElement(
-	                                    "thead",
-	                                    null,
-	                                    _react2.default.createElement(
-	                                        "tr",
-	                                        null,
-	                                        _react2.default.createElement(
-	                                            "th",
-	                                            null,
-	                                            "Delegations"
-	                                        )
-	                                    )
-	                                ),
-	                                _react2.default.createElement(
-	                                    "tbody",
-	                                    null,
-	                                    _react2.default.createElement(
-	                                        "tr",
-	                                        null,
-	                                        _react2.default.createElement(
-	                                            "td",
-	                                            null,
-	                                            "DISPLAY the DELEGATIONS"
-	                                        )
-	                                    ),
-	                                    _react2.default.createElement(
-	                                        "tr",
-	                                        null,
-	                                        _react2.default.createElement(
-	                                            "td",
-	                                            null,
-	                                            "ADD AN ATTRIBUTE HERE!!!!!!!!!!"
-	                                        )
-	                                    )
-	                                )
-	                            )
-	                        )
-	                    )
-	                )
-	            );
-	        }
-	    }]);
-	
-	    return Modal;
-	}(_react2.default.Component);
-	
-	var Dimension_Container = function (_React$Component5) {
-	    _inherits(Dimension_Container, _React$Component5);
-	
-	    function Dimension_Container(props) {
-	        _classCallCheck(this, Dimension_Container);
-	
-	        var _this6 = _possibleConstructorReturn(this, (Dimension_Container.__proto__ || Object.getPrototypeOf(Dimension_Container)).call(this, props));
-	
-	        _this6.state = {
-	
-	            dimensions: [],
-	
-	            //added for Modal
-	            active_dimension: {},
-	            showDetails: false
-	        };
-	
-	        _this6.showHandler = _this6.showHandler.bind(_this6);
-	        _this6.hideHandler = _this6.hideHandler.bind(_this6);
-	        //add search handler?????
-	        return _this6;
-	    }
-	
-	    //CLOSE MODAL (Dimension details)
-	
-	
-	    _createClass(Dimension_Container, [{
-	        key: "hideHandler",
-	        value: function hideHandler() {
-	            this.setState({ showDetails: false, active_dimension: {} });
-	        }
-	
-	        //SHOW DIMENSION MODAL VIEW
-	
-	    }, {
-	        key: "showHandler",
-	        value: function showHandler(dimension) {
-	            this.setState({
-	                showDetails: false,
-	                active_dimension: this.dataHandler($(e.target).attr('data-index'))
-	            });
-	        }
-	
-	        /*As per the specificiation, identity dimensions have the following form in solidity:
-	            
-	            INPUT:
-	            
-	            uniqueID (unhashed)
-	            dimensionType (ex. "My Music Playlist")
-	            flag (for making the first attribute, the Owner. flag
-	            
-	                    flag = 0 =>         public flag=1 => private
-	                    
-	            IdentityDimension(bytes32 uniqueID, string theDimensionType, uint flag)
-	          */
-	
-	    }, {
-	        key: "getDimensions",
-	        value: function getDimensions() {
-	            this.setState({
-	                dimensions: [{ dimensionType: 'FINANCIAL HISTORY', ID: '12234', owned: true, name: 'Football', descriptors: ["monday", "tuesday", "wednesday"], attributes: ["h1", "h2", "h3"] }, { dimensionType: 'EDUCATION', ID: '34334', owned: true, name: 'iPod Touch', descriptors: ["monday", "tuesday", "wednesday"], attributes: ["h1", "h2", "h3"] }, { dimensionType: 'DIGITAL ASSETS', ID: '56676', owned: false, name: 'iPhone 5', descriptors: ["monday", "tuesday", "wednesday"], attributes: ["h1", "h2", "h3"] }]
-	            });
-	        }
-	    }, {
-	        key: "handleAddDimension",
-	        value: function handleAddDimension(dimension) {
-	            var dimensions = this.state.dimensions;
-	            dimensions.push(dimension);
-	            this.setState({ dimensions: dimensions });
-	        }
-	    }, {
-	        key: "handleDeleteDimension",
-	        value: function handleDeleteDimension(id) {
-	            var dimensions = this.state.dimensions;
-	            var index = dimensions.findIndex(function (x) {
-	                return x.ID === id;
-	            });
-	            dimensions.splice(index, 1);
-	            this.setState({ dimensions: dimensions });
-	        }
-	
-	        //CHANGE TO PULL FROM DIGITAL TWIN
-	
-	    }, {
-	        key: "componentWillMount",
-	        value: function componentWillMount() {
-	            this.getDimensions();
-	        }
-	    }, {
-	        key: "render",
-	        value: function render() {
-	            console.log("MODAL props" + JSON.stringify(this.props));
-	
-	            return _react2.default.createElement(
-	                "div",
-	                { className: "dimension-container" },
-	                _react2.default.createElement(
-	                    "h3",
-	                    null,
-	                    " Identity Dimensions "
-	                ),
-	                _react2.default.createElement(FilterableDimensionTable, { dimensions: this.state.dimensions, onDelete: this.handleDeleteDimension.bind(this), showDetails: this.showHandler }),
-	                _react2.default.createElement(AddDimension, { addDimension: this.handleAddDimension.bind(this) }),
-	                this.state.showDetails ? _react2.default.createElement(Modal, { hideHandler: this.hideHandler, dimension: this.state.active_dimension }) : null
-	            );
-	        }
-	    }]);
-	
-	    return Dimension_Container;
-	}(_react2.default.Component);
-	
-	exports.default = Dimension_Container;
 
 /***/ }
 /******/ ]);

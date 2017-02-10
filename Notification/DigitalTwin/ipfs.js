@@ -43,7 +43,6 @@ var IPFS = {
 		var fileName = JSONPath + IPFS.pubKey + suffix + ".json";
 		
 		if (!fs.existsSync(fileName)) {
-			console.log("found filename: " + fileName)
 			var datastruct = {
 				id:IPFS.pubKey,
 				documents:[]
@@ -55,17 +54,19 @@ var IPFS = {
 
 		var allFiles = req.files;
 		var fileArr = IPFS.objIntoArray(allFiles);
+		console.log("fileArr: " + fileArr)
 		IPFS.filesLength = fileArr.length;
+		console.log("IPFS.filesLength: " + IPFS.filesLength)
 		for(var i=0; i<IPFS.filesLength; i++){
 			if(fileArr[i]){
 				var fileNode = fileArr[i];
+				console.log("right before moveFileToIPFS, filenode: " + JSON.stringify(fileNode))
 				IPFS.moveFileToIPFS(fileNode, res, IPFS.writeData);
 			}
 		}
 	},
 	
 	objIntoArray: function(allFiles){
-		console.log("hit objIntoArray")
 		var newArr = new Array();
 		for(var key in allFiles){
 			newArr.push(allFiles[key]);
@@ -88,7 +89,6 @@ var IPFS = {
 	},
 	
 	writeData: function(data, res){
-		console.log("hit writeData")
 		var allDocs = [];
 		allDocs.push({'filename':data.filename, 'hash': data.hash, 'file_hash': data.file_hash});
 		var fileName = JSONPath + IPFS.pubKey + suffix + ".json";
@@ -110,6 +110,8 @@ var IPFS = {
 	
 	moveFileToIPFS: function(fileNode, res, callback){
 		console.log("hit moveFileToIPFS")
+		console.log("fileNode " + JSON.stringify(fileNode))
+		console.log("res " + res)
 		fileNode.mv(tmpPath + fileNode.name, (err) => {
 			if(!err){
 				const file = tmpPath + fileNode.name;
@@ -124,8 +126,7 @@ var IPFS = {
 				});
 				ipfs.on('close', (code) => {
 					if(code > 0){
-						console.log("filenode.name " + filenode.name)
-						IPFS.erros.push(fileNode.name);
+						IPFS.errors.push(fileNode.name);
 					} else {
 						var hash = buffer[buffer.length - 1].replace(/^\s+|\s+$/g, '');
 						if(hash.length > 0){
@@ -146,12 +147,12 @@ var IPFS = {
 								});
 							});
 						} else {
-							IPFS.erros.push(fileNode.name);
+							IPFS.errors.push(fileNode.name);
 						}
 					}
 				});
-			} // end of if(!err)
-		}); // end of fileNode.mv
+			}
+		});
 	},
 
 	getHashFromIpfsFile(req, res) {

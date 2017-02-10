@@ -325,6 +325,7 @@ class MyGatekeeper extends React.Component {
 					data = JSON.parseJSON(result)
 				}
 				localStorage.setItem("gatekeeperAddr", result.gatekeeperAddr) 
+				localStorage.setItem("coidAddr", result.coidAddr)
 
 			}.bind(this),
 			complete: function () {

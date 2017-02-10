@@ -206,7 +206,7 @@ class Modal extends Component {
 							<ul className="nav nav-pills" role="tablist">
 								<li role="presentation" className="active"><a href="#asset_details" role="tab" data-toggle="tab">Asset Details</a></li>
 								<li role="presentation"><a href="#qrcode" role="tab" data-toggle="tab">QR Code</a></li>
-								<li role="presentation"><a href="#dimension" role="tab" data-toggle="tab">Identity Dimensions</a></li>
+								{/*<li role="presentation"><a href="#dimension" role="tab" data-toggle="tab">Identity Dimensions</a></li>*/}
 							</ul>
 						</div>
 

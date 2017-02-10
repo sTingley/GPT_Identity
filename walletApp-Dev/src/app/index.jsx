@@ -74,6 +74,7 @@ function validateLogin(nextState, replace){
 		window.location.reload();
 	}
 }
+
 render((
 	<Router history={hashHistory}>
     	<Route path="/" component={App}>

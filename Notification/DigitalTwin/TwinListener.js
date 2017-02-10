@@ -89,13 +89,36 @@ app.post('/deleteAsset',AssetCtrl.deleteAsset);
 
 // -> -> -> START IPFS FUNCTIONS -> -> ->
 app.post('/ipfs/upload', IPFS.uploadFile);
+
+//componentDidMount method of UploadIpfsFile and Documents classes hit this route
 app.get('/ipfs/alldocs/:pubKey', IPFS.getAllFiles);
+
 app.get('/ipfs/getfile/:hash', IPFS.getUrl);
 app.post('/ipfs/validateFiles', IPFS.getHashFromIpfsFile);
 // <- <- <- END IPFS FUNCTIONS <- <- <-
 
 
+//temp function
+app.post('/getMetaData', function(req,res)
+{
+        console.log("endpoint getMetaData was hit");
+        var obj1 = {"dimensionType": "financial history", "ID": "1234", "attr_list": [["jan1 deposit slip", "QmdpXUXTa3WrZMuQr3tK3dsPXkAxY3BdLyBqu4YspS5Kuz"], ["jan 2 deposit slip", "QmV9tSDx9UiPeWExXEeH6aoDvmihvx6jD5eLb4jbTaKGps"]], "flag": [0,1] }
+        var obj2 = {"dimensionType": "personal", "ID": "6678", "attr_list": [["val 1", "1914a856d46130819450f48a3cbf060cf01ce323021494a82fb8fec4eba7149d"], ["val 2", "a560b6d35e21c780b0f1d153849fc811aa4d7b35af9955329cb29f8237cf473f"]], "flag": [1,1] }
+        var obj3 = {"dimensionType": "photography",  "ID": "4538", "attr_list": [["senior photos", "QmdpXUXTa3WrZMuQr3tK3dsPXkAxY3BdLyBqu4YspS5Kuz"], ["my wedding", "QmStt2BEa2Z994ppJrqW3aZjW43Qco3fatRcE3HUjjUheT"]], "flag": [0,1,1] }
+        var response = { "Dimensions": [obj1, obj2, obj3] }
+        res.json({"data": response})
 
+})
+
+
+//INPUT:
+// "name" : name of dimension
+// "flag" : either 0 or 1 (0 means public, 1 means private)
+app.post('/createDimension', function(req,res)
+{
+        var data = req.data;
+        res.json(data);
+})
 
 // -> -> -> START GATEKEEPER FUNCTIONS -> -> ->
 //This is to request a Core Identity (isHuman = true) from the gatekeeper:
@@ -112,12 +135,48 @@ app.use('/getCoidData',proxy(proxyBallot))
 
 
 // -> -> -> START MYCOID FUNCTIONS -> -> ->
-var proxyMyCOID = getConfiguration(TwinConfig.MY_COID_CONFIG.TARGET,"/MyCOID/myTokenAmount",TwinConfig.MY_COID_CONFIG.ENDPOINT.TOKENAMOUNT,"MyCOID/myTokenAmount" )
-app.use('/MyCOID/myTokenAmount', proxy(proxyBallot))
+var COID_TWIN_ENDPOINTS = TwinConfig.MY_COID_CONFIG.TWIN_ENDPOINTS;
+var COID_NEW_ENDPOINTS = TwinConfig.MY_COID_CONFIG.NEW_ENDPOINTS;
 
-var proxyMyControllers = getConfiguration(TwinConfig.MY_COID_CONFIG.TARGET,"/MyCOID/getControllers",TwinConfig.MY_COID_CONFIG.ENDPOINT.CONTROLLERS,"MyCOID/getControllers" )
-app.use('/MyCOID/getControllers', proxy(proxyMyControllers))
+var COID_TARGET = TwinConfig.MY_COID_CONFIG.TARGET;
+
+for(let jsonKey in COID_TWIN_ENDPOINTS)
+{
+    var oldEndpoint = COID_TWIN_ENDPOINTS[jsonKey];
+    var newEndpoint = COID_NEW_ENDPOINTS[jsonKey];
+
+    console.log("MY COID OLD ENDPOINT: " + oldEndpoint);
+    console.log("MY COID NEW ENDPOINT: " + newEndpoint);
+
+    var txnID = newEndpoint;
+    var proxyObj = getConfiguration(COID_TARGET,oldEndpoint,newEndpoint,txnID);
+    app.use(oldEndpoint,proxy(proxyObj))
+}
 // <- <- <- END MYCOID FUNCTIONS <- <- <-
+
+
+// -> -> -> START IDENTITY DIMENSION FUNCTIONS -> -> ->
+var DIMENSION_TWIN_ENDPOINTS = TwinConfig.IDENTITY_DIMENSION_CONFIG.TWIN_ENDPOINTS;
+var DIMENSION_NEW_ENDPOINTS = TwinConfig.IDENTITY_DIMENSION_CONFIG.NEW_ENDPOINTS;
+
+var DIMENSION_TARGET = TwinConfig.IDENTITY_DIMENSION_CONFIG.TARGET;
+
+for(let jsonKey in DIMENSION_TWIN_ENDPOINTS)
+{
+    var oldEndpoint = DIMENSION_TWIN_ENDPOINTS[jsonKey];
+    var newEndpoint = DIMENSION_NEW_ENDPOINTS[jsonKey];
+
+    console.log("DIMENSION OLD ENDPOINT: " + oldEndpoint);
+    console.log("DIMENSION NEW ENDPOINT: " + newEndpoint);
+
+
+    var txnID = newEndpoint;
+    var proxyObj = getConfiguration(DIMENSION_TARGET,oldEndpoint,newEndpoint,txnID);
+    app.use(oldEndpoint,proxy(proxyObj))
+}
+// <- <- <- END IDENTITY DIMENSION FUNCTIONS <- <- <-
+
+
 
 // -> -> -> START MYGATEKEEPER FUNCTIONS -> -> ->
 var proxyMyGK = getConfiguration(TwinConfig.MY_GK_CONFIG.TARGET,'/request_new_COID',TwinConfig.MY_GK_CONFIG.ENDPOINT,'request_new_COID');
@@ -132,3 +191,4 @@ for(var i=0; i<TwinConfig.ports.length; i++)
         http.createServer(app).listen(port);
         console.log("Digital Twin running at "+port);
 }
+

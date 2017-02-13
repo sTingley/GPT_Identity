@@ -45,6 +45,7 @@ contract IdentityGraph
         values.push(value);
     }
     
+    //removes first operations from PM trie
     function removeFirst() returns (bool success)
     {
         success = false;
@@ -64,6 +65,8 @@ contract IdentityGraph
                     keys[i] = keys[i+1];
                     values[i] = values[i+1];
                 }
+                
+                operations.length--;
             }
             
             success = true;

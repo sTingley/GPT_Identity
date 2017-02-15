@@ -11,6 +11,99 @@ var chainConfig = require('/home/demoadmin/.eris/ErisChainConfig.json')
 var superAgent = require("superagent");
 //required library for accessing the contract
 var erisC = require('eris-contracts');
+
+//this function is intended to send a notification
+var TwinConnector = function() 
+{
+    //location of digital twin
+    this.twinUrl = "http://10.100.98.218:5050";
+
+    //for grabbing the appropriate scope
+    var _this = this;
+    
+    //flag = 0 ==> owned
+    //flag = 1 ==> controlled
+    //flag = 2 ==> delegated
+    
+    //Get Asset data from the twin folder (owned, delegated, controlled)
+    this.GetAsset = function(pubKey, fileName, flag)
+    {
+        superAgent.post(this.twinUrl + "/setAsset")
+            .send({
+                "pubKey": pubKey,
+                "fileName": fileName,
+                "flag": flag,
+            })
+            .set('Accept', 'application/json')
+            .end((err, res) => {
+                if(res.status == 200){
+                    return res.body;
+                }
+            });
+    }
+    
+    
+    //Create an Asset in the twin folder (owned, delegated, controlled)
+    this.CreateAsset = function(pubKey, fileName, flag, data)
+    {
+         superAgent.post(this.twinUrl + "/setAsset")
+            .send({
+                "pubKey": pubKey,
+                "fileName": fileName,
+                "flag": flag,
+                "data": data,
+                "updateFlag": 0
+            })
+            .set('Accept', 'application/json')
+            .end((err, res) => {
+                // if(res.status == 200){
+                // do something
+                // }
+            });
+    }
+    
+    //Update an Asset in the twin folder (owned, delegated, controlled)
+    this.UpdateAsset = function(pubKey, fileName, flag, data, keys, values)
+    {
+         superAgent.post(this.twinUrl + "/setAsset")
+            .send({
+                "pubKey": pubKey,
+                "fileName": fileName,
+                "flag": flag,
+                "keys": keys,
+                "values": values,
+                "updateFlag": 1
+            })
+            .set('Accept', 'application/json')
+            .end((err, res) => {
+                // if(res.status == 200){
+                // do something
+                // }
+            });
+    }
+
+    //Remove an Asset in the twin folder (owned, delegated, controlled)
+    this.RemoveAsset = function(pubKey, fileName, flag)
+    {
+          superAgent.post(this.twinUrl + "/deleteAsset")
+            .send({
+                "pubKey": pubKey,
+                "fileName": fileName,
+                "flag": flag,
+            })
+            .set('Accept', 'application/json')
+            .end((err, res) => {
+                // if(res.status == 200){
+                // do something
+                // }
+            });
+    }
+
+} //end var notifier
+
+var connector = new TwinConnector();
+
+
 var IdentityDimensionControl = function(contractAddress)
 {
     //get the contract:
@@ -188,6 +281,10 @@ var IdentityDimensionControl = function(contractAddress)
         var amount = formdata.amount;
         var dimension = formdata.dimension;
         var all = formdata.all;//boolean - true or false
+        
+        //put info inside for how to remove asset
+        //connector.RemoveAsset();
+        
         self.contract.revokeDelegation(controller,delegatee,amount,dimension,all,function(error,result)
         {
             callback(error,result);
@@ -236,3 +333,51 @@ app.post('readEntry', function(req,res)
         }        
     })
 })
+
+
+//This does all the endpoint listening:
+//The variable endpoint references all keys in the json object.
+for(let endpoint in MyCoidConfig)
+{
+    //this is the function to call
+    var functionCall = MyCoidConfig[endpoint];
+    console.log(functionCall)
+    console.log(endpoint)
+    app.post('/'+endpoint,function(req,res)
+    {
+
+	console.log("POSTED ENDPOINT: " + endpoint);
+
+        //their contract address
+        var contractAddress = req.body.address;
+        console.log(contractAddress)
+        console.log("endpoint is: " + endpoint)
+        //instantiate their Coid
+        var myCoid = new MyCOID(contractAddress)
+
+        //function input
+        var formdata = req.body;
+
+        console.log("function call is: " + functionCall)
+
+       // res.json({'Status':'hi','Result':'hello'})
+
+        //formulate the string of code for the function call
+        var toExecute = "myCoid." + IdentityConfig[endpoint] + "(formdata,function(error,result)"
+        toExecute = toExecute + "{"
+        toExecute = toExecute + "res.json({'Status':error,'Result':(''+result)});"
+        toExecute = toExecute + "console.log(result + '');"
+        toExecute = toExecute + "console.log('result is: ' + result);"
+        toExecute = toExecute + "})"
+
+        //for debugging
+        console.log(toExecute);
+
+        //evaulate the given function
+        eval(toExecute);
+    })
+}
+
+
+app.listen(3012)
+console.log("running at port 3012")

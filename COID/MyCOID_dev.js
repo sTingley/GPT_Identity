@@ -34,9 +34,9 @@ var TwinConnector = function()
     //flag = 2 ==> delegated
     
     //Get Asset data from the twin folder (owned, delegated, controlled)
-    this.GetAsset = function(pubKey, fileName, flag)
+    this.GetAsset = function(pubKey, fileName, flag, callback)
     {
-        superAgent.post(this.twinUrl + "/setAsset")
+        superAgent.post(this.twinUrl + "/getAsset")
             .send({
                 "pubKey": pubKey,
                 "fileName": fileName,
@@ -45,7 +45,9 @@ var TwinConnector = function()
             .set('Accept', 'application/json')
             .end((err, res) => {
                 if(res.status == 200){
-                    return res.body;
+		    console.log("GET ASSET RETURNED: " + JSON.stringify(res.body))
+		    var result = res.body;
+                    callback(result);
                 }
             });
     }
@@ -109,7 +111,7 @@ var TwinConnector = function()
 
 } //end var notifier
 
-
+var theNotifier = new TwinConnector();
 
 
 //myCoid object
@@ -311,12 +313,40 @@ var MyCOID = function(contractAddress)
         var controller = formdata.controller;
 
         //TODO:
-        var controllerHash = keccak_256(controller).toUpperCase()
+        //var controllerHash = keccak_256(controller).toUpperCase()
+	var controllerHash = keccak_256(controller)
 
-        self.contract.addController(controllerHash,function(error,result)
-        {
-            callback(error,result)
-        })
+	//TODO
+	var fileName = "MyCOID.json";
+	var flag = 0;
+
+	//1. Get Current Controllers
+	theNotifier.GetAsset(pubKey,fileName,flag,function(result)
+	{
+
+		var obj = result;
+
+		console.log("INSIDE ADD CONTROLLER: " + JSON.stringify(obj))
+		var controllers = obj.controlIdList;	
+
+		console.log("CONTROLLERS: " + controllers);
+
+		//2. Modify Array
+		controllers.push(controllerHash)
+		console.log("WITH ADDED CONTROLLER HASH: " + controllers);
+		var keys = ["controlIdList"]
+		var values = []
+		values.push(controllers);
+		console.log("Array of arrays: " + values)
+	
+		//3. Update
+		theNotifier.UpdateAsset(pubKey,fileName,flag,"",keys,values)
+	})
+
+        //self.contract.addController(controllerHash,function(error,result)
+        //{
+        //    callback(error,result)
+        //})
     }
 
 

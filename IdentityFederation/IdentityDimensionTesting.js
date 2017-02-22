@@ -97,6 +97,7 @@ var IdentityDimensionControl = function(contractAddress)
         var oldDescriptor = formdata.oldDescriptor;
         var newDescriptor = formdata.newDescriptor;
 
+        //SHOULD BE UPDATE ENTRY????????
         self.contract.changeDescriptor(pubKey, type, ID, oldDescriptor, newDescriptor, function (error,result)
         {
             callback(error,result);

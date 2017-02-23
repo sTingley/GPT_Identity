@@ -98,15 +98,20 @@ app.post('/ipfs/validateFiles', IPFS.getHashFromIpfsFile);
 // <- <- <- END IPFS FUNCTIONS <- <- <-
 
 
+
+
+
+var obj2 = {"dimensionType": "personal", "ID": "6678", "attr_list": [["val 1", "1914a856d46130819450f48a3cbf060cf01ce323021494a82fb8fec4eba7149d"], ["val 2", "a560b6d35e21c780b0f1d153849fc811aa4d7b35af9955329cb29f8237cf473f"]], "flag": [1,1] }
+//var obj3 = {"dimensionType": "photography",  "ID": "4538", "attr_list": [["senior photos", "QmdpXUXTa3WrZMuQr3tK3dsPXkAxY3BdLyBqu4YspS5Kuz"], ["my wedding", "QmStt2BEa2Z994ppJrqW3aZjW43Qco3fatRcE3HUjjUheT"]], "flag": [0,1,1] }
+var DimensionReturn = {"Dimensions": [obj2]}
+
+
+
 //temp function
 app.post('/getMetaData', function(req,res)
 {
         console.log("endpoint getMetaData was hit");
-        var obj1 = {"dimensionType": "financial history", "ID": "1234", "attr_list": [["jan1 deposit slip", "QmdpXUXTa3WrZMuQr3tK3dsPXkAxY3BdLyBqu4YspS5Kuz"], ["jan 2 deposit slip", "QmV9tSDx9UiPeWExXEeH6aoDvmihvx6jD5eLb4jbTaKGps"]], "flag": [0,1] }
-        var obj2 = {"dimensionType": "personal", "ID": "6678", "attr_list": [["val 1", "1914a856d46130819450f48a3cbf060cf01ce323021494a82fb8fec4eba7149d"], ["val 2", "a560b6d35e21c780b0f1d153849fc811aa4d7b35af9955329cb29f8237cf473f"]], "flag": [1,1] }
-        var obj3 = {"dimensionType": "photography",  "ID": "4538", "attr_list": [["senior photos", "QmdpXUXTa3WrZMuQr3tK3dsPXkAxY3BdLyBqu4YspS5Kuz"], ["my wedding", "QmStt2BEa2Z994ppJrqW3aZjW43Qco3fatRcE3HUjjUheT"]], "flag": [0,1,1] }
-        var response = { "Dimensions": [obj1, obj2, obj3] }
-        res.json({"data": response})
+        res.json({"data": DimensionReturn})
 
 })
 
@@ -116,8 +121,10 @@ app.post('/getMetaData', function(req,res)
 // "flag" : either 0 or 1 (0 means public, 1 means private)
 app.post('/createDimension', function(req,res)
 {
-        var data = req.data;
-        res.json(data);
+        var obj1 = {"dimensionType": "financial history", "ID": "1234", "attr_list": [["Banking history - JAN 2017", "QmTLY8y6isHoMvSz25p287c6BWD7op23BsgdhMzv2nsbMy"]], "flag": [] }
+        var jsonArray = DimensionReturn.Dimensions;
+	jsonArray.push(obj1);
+	DimensionReturn.Dimensions = jsonArray;
 })
 
 // -> -> -> START GATEKEEPER FUNCTIONS -> -> ->

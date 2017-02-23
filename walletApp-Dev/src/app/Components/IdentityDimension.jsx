@@ -525,45 +525,45 @@ class IdentityDimensions extends Component {
     }
 
     //USED IF DIGITAL TWIN NOT AVAILABLE
-    getDimensions() {
-        this.setState({
-            iDimensions: [
-                { "dimensionType": "financial history", "ID": "1234", "attr_list": ["jan1", "hash_jan1_ptr", "jan 2", "hash_jan2_ptr"], "flag": [0, 1] },
-                { "dimensionType": "personal", "ID": "6678", "attr_list": ["val 1", "hash_val_1_ptr", "val 2", "hash_val_2_ptr"], "flag": [1, 1] },
-                { "dimensionType": "photography", "ID": "4538", "attr_list": ["document_1", "hash_ptr_doc1", "document_2", "hash_ptr_doc2"], "flag": [0, 1, 1] }
-            ]
-        })
-    }
+    // getDimensions() {
+    //     this.setState({
+    //         iDimensions: [
+    //             { "dimensionType": "financial history", "ID": "1234", "attr_list": ["jan1", "hash_jan1_ptr", "jan 2", "hash_jan2_ptr"], "flag": [0, 1] },
+    //             { "dimensionType": "personal", "ID": "6678", "attr_list": ["val 1", "hash_val_1_ptr", "val 2", "hash_val_2_ptr"], "flag": [1, 1] },
+    //             { "dimensionType": "photography", "ID": "4538", "attr_list": ["document_1", "hash_ptr_doc1", "document_2", "hash_ptr_doc2"], "flag": [0, 1, 1] }
+    //         ]
+    //     })
+    // }
 
 
     componentWillMount() {
-        this.getDimensions();
-        // $.ajax({
-        //     url: twinUrl + 'getMetaData',
-        //     type: 'POST',
-        //     data: {
-        //         //"pubKey": localStorage.getItem("pubKey")
-        //     },
-        //     success: function (result) {
-        //         var data = result;
-        //         if ($.type(result) != "object") {
-        //             data = JSON.parse(result)
-        //         }
-        //         //console.log("data: " + JSON.stringify(data))
-        //         data = JSON.stringify(data)
-        //         data = JSON.parse(data).data
-        //         //console.log("data after parse: " + JSON.stringify(data))
-        //         data = JSON.stringify(data)
-        //         var dimensions = JSON.parse(data).Dimensions
-        //         //console.log("dimensions: " + JSON.stringify(dimensions))
+        //this.getDimensions();
+        $.ajax({
+            url: twinUrl + 'getMetaData',
+            type: 'POST',
+            data: {
+                //"pubKey": localStorage.getItem("pubKey")
+            },
+            success: function (result) {
+                var data = result;
+                if ($.type(result) != "object") {
+                    data = JSON.parse(result)
+                }
+                //console.log("data: " + JSON.stringify(data))
+                data = JSON.stringify(data)
+                data = JSON.parse(data).data
+                //console.log("data after parse: " + JSON.stringify(data))
+                data = JSON.stringify(data)
+                var dimensions = JSON.parse(data).Dimensions
+                //console.log("dimensions: " + JSON.stringify(dimensions))
 
-        //         this.setState({ iDimensions: dimensions })
+                this.setState({ iDimensions: dimensions })
 
-        //     }.bind(this),
-        //     complete: function () {
+            }.bind(this),
+            complete: function () {
 
-        //     }
-        // })
+            }
+        })
 
 
         // $.ajax({

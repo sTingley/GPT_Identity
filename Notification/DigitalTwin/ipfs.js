@@ -59,19 +59,22 @@ var IPFS = {
 		}
 
 		var allFiles = req.files;
+		console.log(" 0a. req.files "+ JSON.stringify(req.files))
 		var fileArr = IPFS.objIntoArray(allFiles);
-		console.log("fileArr: " + fileArr)
+		console.log(" 1. fileArr: " + IPFS.objIntoArray(allFiles))
 		IPFS.filesLength = fileArr.length;
-		console.log("IPFS.filesLength: " + IPFS.filesLength)
+		console.log(" 1a. IPFS.filesLength: " + IPFS.filesLength)
 		for (var i = 0; i < IPFS.filesLength; i++) {
 			if (fileArr[i]) {
 				var fileNode = fileArr[i];
+				//console.log(" 1b. fileNode moved to ipfs: " + JSON.stringify(fileNode))
 				IPFS.moveFileToIPFS(fileNode, res, IPFS.writeData);
 			}
 		}
 	},
 
 	objIntoArray: function (allFiles) {
+		console.log(" 0b. putting obj into array: " + JSON.stringify(allFiles))
 		var newArr = new Array();
 		for (var key in allFiles) {
 			newArr.push(allFiles[key]);
@@ -117,8 +120,10 @@ var IPFS = {
 		console.log("hit moveFileToIPFS")
 		//console.log("fileNode " + JSON.stringify(fileNode))
 		fileNode.mv(tmpPath + fileNode.name, (err) => {
+			console.log("inside mv arrow function")
 			if (!err) {
 				const file = tmpPath + fileNode.name;
+				console.log("-- file about to be added: " + file)
 				//changed from ('eris',['files','put'file])
 				const ipfs = spawn('ipfs', ['add', file]);
 				var buffer = [];

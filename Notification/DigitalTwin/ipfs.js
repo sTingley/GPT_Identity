@@ -1,19 +1,20 @@
 'use strict';
 var spawn = require('child_process').spawn,
 	config = require('./config.json'),
-	//has 2 methods, encrypt and decrypt
-	crypt = require('./cryptoCtr.js'),
-
+	cryptoCtr = require('./cryptoCtr.js'),
 	crypto = require('crypto'),
 	fs = require('fs'),
 	http = require('http');
 
 //DigitalTwin/tmp
 var tmpPath = config.env.ipfs_file_tmp_path;
-//DigitalTwin/notifications
+
+//"/home/demoadmin/DigitalTwin/notifications/"
 var JSONPath = config.env.notification_folder_path;
 
-//need to make sure this is proper, for eris service it was http://192.168.99.101:8080/ipfs/
+//for eris service it was "ipfs_file_read_url": "http://192.168.99.101:8080/ipfs/",
+// ...
+//now it is "ipfs_file_read_url": "http://10.100.98.218:8080/"
 var IPFS_baseUrl = config.env.ipfs_file_read_url;
 
 var suffix = config.suffix.ipfs_file;
@@ -30,51 +31,83 @@ var IPFS = {
 
 	pubKey: '',
 
+	/*******************************************************************************************
+	UPLOAD FILE:
+		0) method is called with formdata including pubkey and files
+		1) if the 'tmpPath' directoy doesn't exist, create it
+		2) create fileName var, = JSONpath + pubkey + _files + .json
+		3) if the $pubkey_files.json file doesnt exist, create it
+		4) encrypt the data, then write the file (fs.writeFileSync)
+		5) moveFileToIPFS method is called with callback (cb = IPFS.writeData)
+		6) Inside moveFileToIPFS,
+			- call fileNode.mv to move file from /tmp
+			- spawn child process 1, ipfs = spawn('ipfs', ['add', file]);
+				- ipfs.onClose, spawn child process 2, ipfs_cache = spawn('ipfs', ['pin', 'add', hash])
+					- ipfs_cache.onClose will call getFileHash method (opens the file as a readable stream),
+					- if successful then callback.apply,
+					- if successful then fs.unlinkSync(file)
+		6) when moveFileToIPFS method finishes, its callback IPFS.writeData is called
+
+		Finally this method will return res -> Digital Twin -> Browser wallet
+	******************************************************************************************/
 	uploadFile: function (req, res) {
+
+		console.log("uploadFile rq.body: " + JSON.stringify(req.body))
+
 		if (!req.files) {
 			res.send('No files were uploaded.');
 			return;
 		}
-
 		if (!req.body.user_pubkey) {
 			res.send('Public key required to upload files.');
 			return;
 		}
-
+		//checks that that tmpPath exists
 		if (!fs.existsSync(tmpPath)) {
+			//if it doesnt exist make the directory
 			fs.mkdirSync(tmpPath);
 		}
 
 		IPFS.pubKey = req.body.user_pubkey;
-		var fileName = JSONPath + IPFS.pubKey + suffix + ".json";
 
+		var fileName = JSONPath + IPFS.pubKey + suffix + ".json";
+		//check to see that $HOME/demoadmin/DigitalTwin/notifications/$pubkey_files.json exists
 		if (!fs.existsSync(fileName)) {
 			var datastruct = {
 				id: IPFS.pubKey,
 				documents: []
 			};
-			var cryptoEncr = new crypt({ pubKey: IPFS.pubKey });
+
+			//ST: added this to check the writeFileSync method
+			// var check_file_data = fs.writeFileSync(fileName, JSON.stringify(datastruct), 'utf8', function(err) {
+			// 	if(err) {
+			// 		console.log("failed. file_data: " + check_file_data)
+			// 	}
+			// 	else console.log("all good. file_data: " + check_file_data)
+			// })
+			// console.log("check_file_data: " + check_file_data)
+
+			//declaring a new reference, cryptoCtr, to use encryption methods in required file
+			var cryptoEncr = new cryptoCtr({ pubKey: IPFS.pubKey });
 			var cryptoData = cryptoEncr.encrypt(JSON.stringify(datastruct));
+			//fs.writeFileSync(file, data[, options])
 			fs.writeFileSync(fileName, cryptoData, 'utf8');
 		}
 
 		var allFiles = req.files;
-		console.log(" 0a. req.files "+ JSON.stringify(req.files))
 		var fileArr = IPFS.objIntoArray(allFiles);
-		console.log(" 1. fileArr: " + IPFS.objIntoArray(allFiles))
 		IPFS.filesLength = fileArr.length;
 		console.log(" 1a. IPFS.filesLength: " + IPFS.filesLength)
 		for (var i = 0; i < IPFS.filesLength; i++) {
 			if (fileArr[i]) {
 				var fileNode = fileArr[i];
-				//console.log(" 1b. fileNode moved to ipfs: " + JSON.stringify(fileNode))
+				//fileNode = req.files
 				IPFS.moveFileToIPFS(fileNode, res, IPFS.writeData);
 			}
 		}
 	},
 
 	objIntoArray: function (allFiles) {
-		console.log(" 0b. putting obj into array: " + JSON.stringify(allFiles))
 		var newArr = new Array();
 		for (var key in allFiles) {
 			newArr.push(allFiles[key]);
@@ -82,8 +115,12 @@ var IPFS = {
 		return newArr;
 	},
 
+	//this method is called inside writeData to inspect the _files.json file in the DT
+	//Confirmed is returning correctly
+	//allData is the parsed filecontent and data comes from the IPFS.writeData cb in IPFS.moveFileToIPFS, so it is passed as input
 	checkIsExists: function (allData, data) {
 		const docs = allData.documents;
+		//console.log("docs: " + JSON.stringify(docs))
 		if (docs.length > 0) {
 			for (var i = 0; i < docs.length; i++) {
 				let doc = docs[i];
@@ -96,55 +133,93 @@ var IPFS = {
 		return -1;
 	},
 
+	/******************************************************************************************
+	WRITEDATA:
+		0) push data object into an array
+		1) get the fileName, $pubkey_files.json
+		2) decrypt the file with the pubkey
+		3) check the .json file docs.hash matches data.hash (input)
+		4) when we find the proper index in _files.json, write the file
+		5) METHOD WILL RETURN RES -> moveFileToIPFS (the caller)
+	******************************************************************************************/
 	writeData: function (data, res) {
 		var allDocs = [];
 		allDocs.push({ 'filename': data.filename, 'hash': data.hash, 'file_hash': data.file_hash });
 		var fileName = JSONPath + IPFS.pubKey + suffix + ".json";
-		var cryptDec = new crypt({ pubKey: IPFS.pubKey });
+		var cryptDec = new cryptoCtr({ pubKey: IPFS.pubKey });
 		var fileContent = cryptDec.decrypt(fs.readFileSync(fileName, 'utf8'));
-		var struct = JSON.parse(fileContent),
-			index = IPFS.checkIsExists(struct, data);
+		var struct = JSON.parse(fileContent)
+		//STRUCT WILL HAVE THE CONTENT in _files.json
+		console.log("struct (filecontent inside _files.json): " + JSON.stringify(struct))
+		index = IPFS.checkIsExists(struct, data);
 		if (index > -1) {
+			console.log("index > -1")
 			struct.documents[index] = data;
 		} else {
+			console.log("unshift: " + struct.documents)
+			//unshift add one or more elements to the beginning of an array and returns the new length
 			struct.documents.unshift(data);
 		}
+
+		//write the encrypted data to /home/demoadmin/DigitalTwin/notifications/$pubkey_files.json 
 		fs.writeFileSync(fileName, cryptDec.encrypt(JSON.stringify(struct)));
 		if (allDocs.length > 0) {
+			console.log("we are writing the file")
+			//this response can be seen in the browser network console
 			res.status(200).json({ "uploded": allDocs, "failed": IPFS.errors });
 			return;
 		}
 	},
 
+	/******************************************************************************************
+	MoveFileToIPFS:
+		In this method we are working with instances of the NodeJS ChildProcess class.
+		Instances of the class are EventEmitters that represent spawned child processes.
+			-In our method we have 2 child processes: ipfs and ipfs_cache
+			-ipfsCache instance (process 2) is started by the close event of ipfs (process 1)
+
+		Method will return RES -> uploadFile -> Browser/Wallet
+	******************************************************************************************/
 	moveFileToIPFS: function (fileNode, res, callback) {
 		console.log("hit moveFileToIPFS")
-		//console.log("fileNode " + JSON.stringify(fileNode))
 		fileNode.mv(tmpPath + fileNode.name, (err) => {
 			console.log("inside mv arrow function")
 			if (!err) {
 				const file = tmpPath + fileNode.name;
-				console.log("-- file about to be added: " + file)
+				console.log("Our file, (tmpPath+fileNode.name): " + file)
 				//changed from ('eris',['files','put'file])
+
+				//child_process.spawn(command[, args][, options]) returns ChildProcess
 				const ipfs = spawn('ipfs', ['add', file]);
+				//we are going to write to a buffer
 				var buffer = [];
+				//A Readable Stream that represents the child process's stdout (child.stdout)
 				ipfs.stdout.on('data', (data) => {
 					buffer.push(data.toString());
+					console.log("pushed stdout to buffer. buffer= " + buffer)
 				});
+				//A Readable Stream that represents the child process's stderr. (child.strerr)
 				ipfs.stderr.on('data', (data) => {
 					console.log(`stderr: ${data}`);
-					// 2/23 Commented this out for debugging... do we still need? (ST)
-					//fs.unlinkSync(file); // Delete the file from temp path
+					//fs.unlinkSync(file);
 				});
 				ipfs.on('close', (code) => {
+					console.log("close event childprocess1 (ipfs)")
+					//event:'close' - code is the exit code if the child is exited on its own
 					if (code > 0) {
 						IPFS.errors.push(fileNode.name);
 					} else {
+						/* REGEX: this expression is removing whitespace on either end
+							^: beginning of string, \s: whitespace	*/
 						var hash = buffer[buffer.length - 1].replace(/^\s+|\s+$/g, '');
 						if (hash.length > 0) {
 							//var ipfsCache = spawn('ipfs', ['files', 'cache', hash]);
 							var ipfsCache = spawn('ipfs', ['pin', 'add', hash])
 							ipfsCache.on('close', (code) => {
+								console.log("close event childprocess 2 (ipfs_cache)")
+
 								IPFS.getFileHash(tmpPath + fileNode.name).then((fileHash) => {
+									console.log("**filehash: " + fileHash)
 									var fileData = {
 										'filename': fileNode.name,
 										'hash': hash,
@@ -153,22 +228,31 @@ var IPFS = {
 										'timestamp': Number(new Date()),
 										'fileformat': fileNode.mimetype
 									};
+									console.log("fileData obj built from getFileHash return: " + JSON.strinigfy(fileData))
 									IPFS.incr++;
+									//apply() method calls a function with a given this value and arguments provided as an array
 									callback.apply(this, [fileData, res]);
+									console.log("callback.apply executed")
 									fs.unlinkSync(file); // Delete the file from temp path
 								});
-							});
+
+							}); //end close event of ipfsCache childProcess
 						} else {
 							IPFS.errors.push(fileNode.name);
 						}
 					}
-				}); //end of stream.close
-			}
+				}); //end of close event of ipfs childProcess
+
+			}//end !err
 		}); //end of fileNode.mv
 	},
 
+	//*****************************************************************************************
+	//*****************************************************************************************
+	//called from DT endpoint /ipfs/validateFiles
 	getHashFromIpfsFile(req, res) {
 		var param = req.body;
+		console.log("getHashFromIPFSFile req.body: " + req.body)
 		var file_hash = param.file_hash.split(",");
 		var ipfs_hash = param.ipfs_hash.split(",");
 		var final_result = [];
@@ -190,26 +274,42 @@ var IPFS = {
 		} else res.send("false");
 	},
 
+	/*****************************************************************************************
+	Called inside of moveFileToIPFS and getHashFromIpfsFile
+	/****************************************************************************************/
 	getFileHash: function (filePath) {
 		var promise = new Promise((resolve, reject) => {
+			//this line opens the file as a readable stream
 			var input = fs.createReadStream(filePath);
 			var hash = crypto.createHash('sha256');
-			console.log("sha256 hash (getFileHash method): " + JSON.stringify(hash))
+			console.log("sha256 hash: " + JSON.stringify(hash))
+			console.log("getFileHash, filePath: " + filePath)
 			hash.setEncoding('hex');
 			input.on('end', () => {
-				hash.end();
+				console.log("readStream on end")
+				hash.end(function(err) {
+					if (err) {
+						console.log("hash.end error: " + err)
+					}
+				});
 				resolve(hash.read());
+				//hash.end()
 			});
+			//This pipes the ReadStream to the response object (which goes to the client or caller)
 			input.pipe(hash);
 		});
 		return promise;
 	},
 
+	/******************************************************************************************
+	 * The componentDidMount() method in the uploadIpfsFile class (wallet) will fire this AJAX rq
+	 * DT route: /ipfs/alldocs/:pubkey
+	/*****************************************************************************************/
 	getAllFiles: function (req, res) {
-		console.log("hit getAllFiles, params: " + params)
+		console.log("hit getAllFiles, params: " + req.params)
 		var param = req.params;
 		var fileName = JSONPath + param.pubKey + suffix + ".json";
-		var cryptoDecr = new crypt({ pubKey: param.pubKey });
+		var cryptoDecr = new cryptoCtr({ pubKey: param.pubKey });
 		if (param.pubKey && fs.existsSync(fileName)) {
 			fs.readFile(fileName, 'utf8', function (err, data) {
 				if (err) res.status(400).json({ "Error": "Unable to read IPFS files" });
@@ -220,9 +320,14 @@ var IPFS = {
 		}
 	},
 
+	/*****************************************************************************************
+	 * DT route: /ipfs/getfile/:hash'
+	/****************************************************************************************/
 	getUrl: function (hash) {
 		return IPFS_baseUrl + hash;
 	}
-}
+
+
+}//end IPFS object
 
 module.exports = IPFS;

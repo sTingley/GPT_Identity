@@ -120,13 +120,14 @@ var IPFS = {
 	//allData is the parsed filecontent and data comes from the IPFS.writeData cb in IPFS.moveFileToIPFS, so it is passed as input
 	checkIsExists: function (allData, data) {
 		const docs = allData.documents;
-		//console.log("docs: " + JSON.stringify(docs))
+		console.log("docs: " + JSON.stringify(docs) + ", length: " + docs.length)
 		if (docs.length > 0) {
 			for (var i = 0; i < docs.length; i++) {
 				let doc = docs[i];
 				if (doc.hash == data.hash) {
+					console.log("found match at " + i)
 					return i;
-					break;
+					//break;
 				}
 			}
 		}
@@ -143,6 +144,7 @@ var IPFS = {
 		5) METHOD WILL RETURN RES -> moveFileToIPFS (the caller)
 	******************************************************************************************/
 	writeData: function (data, res) {
+		console.log("writeData")
 		var allDocs = [];
 		allDocs.push({ 'filename': data.filename, 'hash': data.hash, 'file_hash': data.file_hash });
 		var fileName = JSONPath + IPFS.pubKey + suffix + ".json";
@@ -151,7 +153,8 @@ var IPFS = {
 		var struct = JSON.parse(fileContent)
 		//STRUCT WILL HAVE THE CONTENT in _files.json
 		console.log("struct (filecontent inside _files.json): " + JSON.stringify(struct))
-		index = IPFS.checkIsExists(struct, data);
+		var index = IPFS.checkIsExists(struct, data);
+
 		if (index > -1) {
 			console.log("index > -1")
 			struct.documents[index] = data;
@@ -162,9 +165,11 @@ var IPFS = {
 		}
 
 		//write the encrypted data to /home/demoadmin/DigitalTwin/notifications/$pubkey_files.json 
+		console.log("we should be writing~!!!!!")
 		fs.writeFileSync(fileName, cryptDec.encrypt(JSON.stringify(struct)));
+		console.log()
 		if (allDocs.length > 0) {
-			console.log("we are writing the file")
+			console.log("we are building response")
 			//this response can be seen in the browser network console
 			res.status(200).json({ "uploded": allDocs, "failed": IPFS.errors });
 			return;
@@ -228,7 +233,7 @@ var IPFS = {
 										'timestamp': Number(new Date()),
 										'fileformat': fileNode.mimetype
 									};
-									console.log("fileData obj built from getFileHash return: " + JSON.strinigfy(fileData))
+									console.log("fileData obj built from getFileHash return: " + JSON.stringify(fileData))
 									IPFS.incr++;
 									//apply() method calls a function with a given this value and arguments provided as an array
 									callback.apply(this, [fileData, res]);
@@ -280,11 +285,12 @@ var IPFS = {
 	getFileHash: function (filePath) {
 		var promise = new Promise((resolve, reject) => {
 			//this line opens the file as a readable stream
-			var input = fs.createReadStream(filePath);
+			var input = fs.createReadStream(filePath,[]);
 			var hash = crypto.createHash('sha256');
 			console.log("sha256 hash: " + JSON.stringify(hash))
 			console.log("getFileHash, filePath: " + filePath)
 			hash.setEncoding('hex');
+			//changed from end
 			input.on('end', () => {
 				console.log("readStream on end")
 				hash.end(function(err) {
@@ -292,12 +298,16 @@ var IPFS = {
 						console.log("hash.end error: " + err)
 					}
 				});
-				resolve(hash.read());
+				resolve(hash.read(function(err){
+					if(err){console.log("err: " + err)}
+				}));
 				//hash.end()
 			});
 			//This pipes the ReadStream to the response object (which goes to the client or caller)
 			input.pipe(hash);
+			console.log("right after pipe")
 		});
+		console.log("will return promise")
 		return promise;
 	},
 

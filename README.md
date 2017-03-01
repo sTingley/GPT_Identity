@@ -6,6 +6,8 @@ TODO* - remove old files
 NOTE* - As we are using the Monax software, we are deploying contracts with the eris package manager (EPM).
 To check which contracts are being deployed withih a given folder in this repo, look at the epm.yaml file for deploy jobs
 
+COID: All CoreIdentity and CoreIdentityToken contracts
+
 In /Notification you will see folders: Ballot, Digital twin
     -Digital Twin is our routing application connected to the client wallet (walletApp-Dev)
         Significant files: TwinListener.js, TwinConfig.json
@@ -22,8 +24,6 @@ In /IdentityFederation you will see DAO, IdentityDimensions, and gatekeeper (als
         Significant files: Dao.sol and Dao.js
     -Identity Dimension module: as per digital identity spec, dimensions extend from Core Identityies
         Significant files: IdentityDimension.sol, IdentityDimensionControl.sol, IdentityDimensionControlToken.sol, IdentityDimensionControl.js
-        
-    COID Contracts:
         
     MISC:
     -BigchainRouter.js is called by an Android app and is used to verify certains params against a bigchainDB payload

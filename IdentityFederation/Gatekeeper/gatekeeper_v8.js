@@ -1,3 +1,8 @@
+//THIS FILE IS OLD AND WILL BE REMOVED SOON!!!!!!!!!
+
+//CURRENT javascript app for IDF_Gatekeeper is IDFGatekeeper.js
+
+
 'use strict'
 
 var erisContracts = require('eris-contracts')

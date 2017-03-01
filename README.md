@@ -17,7 +17,7 @@ In /IdentityFederation you will see DAO, IdentityDimensions, and gatekeeper (als
     -DAO smart contract module: Is used to populate the DAO list that the gatekeeper will use to notify validators
         Significant files: Dao.sol and Dao.js
     -Identity Dimension module: as per digital identity spec, dimensions extend from Core Identityies
-        Significant files: IdentityDimension.sol, IdentityDimensionControl.sol, IdentityDimensionControlToken.sol,                                                    IdentityDimensionControl.js
+        Significant files: IdentityDimension.sol, IdentityDimensionControl.sol, IdentityDimensionControlToken.sol,        IdentityDimensionControl.js
         
     MISC:
     -BigchainRouter.js is called by an Android app and is used to verify certains params against a bigchainDB payload

@@ -1057,7 +1057,56 @@ var eventListener = function () {
             });
         }
         )
-}
+
+
+    //added from gatekeeper_v8
+
+    //this is the event listening. the event is just for debugging purposes.
+    _this.ballotContract.proposalExpired(
+        function (error, result) {
+
+        },
+        function (error, result) {
+            console.log(JSON.stringify(result.args) + "... is the result from event ballotContract.proposalExpired");
+        })
+
+
+    //for checking expiry of proposals
+    //contract function will delete proposal for you
+    function isExpired() {
+        _this.ballotContract.IsProposalExpired(function (error, result) {
+            console.log(JSON.stringify(result) + "...is from isproposalexpired function in ballot")
+            setTimeout(function () {
+                //recursively check every 9 seconds. in the future make this a day.
+                isExpired()
+            }, 9000)
+        })
+    }
+
+    //start the recursive checking
+
+    //            setTimeout(function()
+    //              {isExpired()
+    //            },5000);
+
+
+    //this is to delete the proposal in the ballot and gatekeeper, upon consensus (rejection and acceptance)
+    function deleteProposal(proposalId) {
+        _this.ballotContract.deleteProposal(proposalId, function (error, result) {
+            console.log(proposalId + " is the proposalId. Error in delete proposal from ballot? " + error)
+        })
+
+        _this.gateKeeperContract.deleteProposal(proposalId, function (error, result) {
+            console.log(proposalId + " is the proposalId. Error in delete proposal from gatekeepr? " + error)
+        });
+    }
+
+    //end of addition gatekeeper_v8
+    //******************************************************** */
+
+
+}//end of eventListener
+
 
 
 

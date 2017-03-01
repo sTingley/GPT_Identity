@@ -851,6 +851,7 @@ var eventListener = function () {
 
                             console.log("RESULT: " + result);
                             var bigchainID = JSON.parse(result).response;
+                            console.log("Result.response: " + bigchainID)
                             bigchainID = JSON.parse(bigchainID).id;
                             var bigchainHash = keccak_256(JSON.parse(result).response);
                             console.log("************: " + JSON.parse(result).response);

@@ -58,11 +58,11 @@ var notifier = function () {
         superAgent.post(this.twinUrl + "/setAsset")
             .send({
                 "pubKey": pubKey,
-		"flag": 0,
-		"fileName": "MyCOID.json",
-		"updateFlag": 1,
-		"keys":["bigchainID","bigchainHash","gatekeeperAddr","coidAddr"],
-		"values":[txnID,txnHash,gkAddr,coidAddr]
+                "flag": 0,
+                "fileName": "MyCOID.json",
+                "updateFlag": 1,
+                "keys": ["bigchainID", "bigchainHash", "gatekeeperAddr", "coidAddr"],
+                "values": [txnID, txnHash, gkAddr, coidAddr]
             })
             .set('Accept', 'application/json')
             .end((err, res) => {
@@ -106,9 +106,8 @@ var theNotifier = new notifier();
 
 
 //makes a coid
-function CoidMaker(coidAddr,formdata)
-{
-    
+function CoidMaker(coidAddr, formdata) {
+
     //get params for their COID contract
     console.log("hi")
     var chain = 'primaryAccount';
@@ -119,11 +118,10 @@ function CoidMaker(coidAddr,formdata)
     var accounts = require('./accounts.json')
     var manager = erisContracts.newContractManagerDev(chainUrl, chainConfig[chain])
     var contract = manager.newContractFactory(abi_COID).at(coidAddr)
-           
- 	contract.getIt(function(error,result)
-	{
-		console.log(result + " is the result")
-	})           
+
+    contract.getIt(function (error, result) {
+        console.log(result + " is the result")
+    })
     //parse the form data
     var sig = formdata.sig;
     var msg = formdata.msg;
@@ -147,89 +145,79 @@ function CoidMaker(coidAddr,formdata)
     var myIdentityRecoveryIdList = [];
     myIdentityRecoveryIdList = formdata.identityRecoveryIdList.split(",");
     var myRecoveryCondition = formdata.recoveryCondition; // number of recoveryList needed
-    
+
     //should isHumanValue be true?
     var isHumanValue = true;
     var theUniqueIDAttributes = myUniqueIdAttributes;
-    
-    for(var i = 0; i < theUniqueIDAttributes.length; i = i + 3)
-    {
+
+    for (var i = 0; i < theUniqueIDAttributes.length; i = i + 3) {
         theUniqueIDAttributes[i] = myUniqueIdAttributes[i];
     }
 
 
-    
-    setTimeout(function(){
 
-	theUniqueIDAttributes = theUniqueIDAttributes.concat(Array(10 - theUniqueIDAttributes.length).fill("0"));
-	myOwnerIdList = myOwnerIdList.concat(Array(10 - myOwnerIdList.length).fill("0"));
-	myControlIdList = myControlIdList.concat(Array(10 - myControlIdList.length).fill("0"));
-	myOwnershipTokenQuantity = myOwnershipTokenQuantity.concat(Array(10 - myOwnershipTokenQuantity.length).fill("0"));
-	myControlTokenQuantity = myControlTokenQuantity.concat(Array(10 - myControlTokenQuantity.length).fill("0"));
-	myIdentityRecoveryIdList = myIdentityRecoveryIdList.concat(Array(10 - myIdentityRecoveryIdList.length).fill("0"));
+    setTimeout(function () {
 
-    
-    //instantiate coid   
-    var _this = this;
-    contract.setUniqueID(myUniqueId,theUniqueIDAttributes,isHumanValue, function(error)
-    {
-        //debugging function (getIt)
-        contract.getIt(function(error,result)
-        {
-            console.log("setUniqueID: "+result);
-            
-            contract.setOwnership(myOwnerIdList, myOwnershipTokenQuantity, function(error)
-            {
-                //debugging function (getIt)
-                contract.getIt(function(error,result)
-                {
-                    console.log("setOwnership: "+result);
-                    
-                    contract.setControl(myControlTokenQuantity,myControlIdList, function(error){
-                        
-                        //debugging function (getIt)
-                        contract.getIt(function(error,result)
-                        {
-                            console.log("setControl"+result);
-                            
-                            contract.setRecovery(myIdentityRecoveryIdList,myRecoveryCondition,function(error,result)
-                            {
-                                
-                                //debugging function (getIt)
-                                contract.getIt(function(error,result)
-                                {
-                                    console.log("setRecovery: "+result);
+        theUniqueIDAttributes = theUniqueIDAttributes.concat(Array(10 - theUniqueIDAttributes.length).fill("0"));
+        myOwnerIdList = myOwnerIdList.concat(Array(10 - myOwnerIdList.length).fill("0"));
+        myControlIdList = myControlIdList.concat(Array(10 - myControlIdList.length).fill("0"));
+        myOwnershipTokenQuantity = myOwnershipTokenQuantity.concat(Array(10 - myOwnershipTokenQuantity.length).fill("0"));
+        myControlTokenQuantity = myControlTokenQuantity.concat(Array(10 - myControlTokenQuantity.length).fill("0"));
+        myIdentityRecoveryIdList = myIdentityRecoveryIdList.concat(Array(10 - myIdentityRecoveryIdList.length).fill("0"));
 
-                                    contract.StartCoid(function(error,result)
-                                    {
-                                        console.log("startCoid1: " + result);
-                                        
-                                        //debugging function (getIt)
-                                        contract.getIt(function(Error,result)
-                                        {
-                                            console.log("startCoid: " + result);
 
-                                        })//end getIT
+        //instantiate coid   
+        var _this = this;
+        contract.setUniqueID(myUniqueId, theUniqueIDAttributes, isHumanValue, function (error) {
+            //debugging function (getIt)
+            contract.getIt(function (error, result) {
+                console.log("setUniqueID: " + result);
 
-                                    })//end StartCoid
+                contract.setOwnership(myOwnerIdList, myOwnershipTokenQuantity, function (error) {
+                    //debugging function (getIt)
+                    contract.getIt(function (error, result) {
+                        console.log("setOwnership: " + result);
 
-                                })//end getIT
+                        contract.setControl(myControlTokenQuantity, myControlIdList, function (error) {
 
-                            })//end setRecovery
+                            //debugging function (getIt)
+                            contract.getIt(function (error, result) {
+                                console.log("setControl" + result);
 
-                        })//end getIT
+                                contract.setRecovery(myIdentityRecoveryIdList, myRecoveryCondition, function (error, result) {
 
-                    })//end setControl
+                                    //debugging function (getIt)
+                                    contract.getIt(function (error, result) {
+                                        console.log("setRecovery: " + result);
 
-                })//end getIT
+                                        contract.StartCoid(function (error, result) {
+                                            console.log("startCoid1: " + result);
 
-            })//end setOwnership
+                                            //debugging function (getIt)
+                                            contract.getIt(function (Error, result) {
+                                                console.log("startCoid: " + result);
 
-        })//end getIT
+                                            })//end getIT
 
-    })//end setUniqueID
-	},3000)
-    
+                                        })//end StartCoid
+
+                                    })//end getIT
+
+                                })//end setRecovery
+
+                            })//end getIT
+
+                        })//end setControl
+
+                    })//end getIT
+
+                })//end setOwnership
+
+            })//end getIT
+
+        })//end setUniqueID
+    }, 3000)
+
 }//end CoidMaker
 
 
@@ -374,21 +362,20 @@ var gatekeeper = function () {
             this.setisHuman(proposalId, isHuman);
             this.setmyUniqueID(requester, proposalId, myUniqueId, myUniqueIdAttributes);
             var this1 = this;
-            setTimeout(function()
-            {
-            this1.setmyOwnershipID(requester, proposalId, myOwnershipId, myOwnerIdList);
-            this1.setmyControlID(requester, proposalId, myControlId, myControlIdList);
-            this1.setmyOwnershipTokenID(requester, proposalId, myOwnershipTokenId, myOwnershipTokenAttributes, myOwnershipTokenQuantity);
-            this1.setmyControlTokenID(requester, proposalId, myControlTokenId, myControlTokenAttributes, myControlTokenQuantity);
-            this1.setmyIdentityRecoveryIdList(requester, proposalId, myIdentityRecoveryIdList, myRecoveryCondition);
-            this1.selectValidators(proposalId, DaoContractAddr, ballotContractAddr);
+            setTimeout(function () {
+                this1.setmyOwnershipID(requester, proposalId, myOwnershipId, myOwnerIdList);
+                this1.setmyControlID(requester, proposalId, myControlId, myControlIdList);
+                this1.setmyOwnershipTokenID(requester, proposalId, myOwnershipTokenId, myOwnershipTokenAttributes, myOwnershipTokenQuantity);
+                this1.setmyControlTokenID(requester, proposalId, myControlTokenId, myControlTokenAttributes, myControlTokenQuantity);
+                this1.setmyIdentityRecoveryIdList(requester, proposalId, myIdentityRecoveryIdList, myRecoveryCondition);
+                this1.selectValidators(proposalId, DaoContractAddr, ballotContractAddr);
 
-            this1.initiateCoidProposalSubmission(ballotContractAddr, proposalId, yesVotesRequiredToPass, isHuman);
-            //this.selectValidators(proposalId, DaoContractAddr, ballotContractAddr);
-            theNotifier.createProposalPendingNotification(requester, proposalId);
+                this1.initiateCoidProposalSubmission(ballotContractAddr, proposalId, yesVotesRequiredToPass, isHuman);
+                //this.selectValidators(proposalId, DaoContractAddr, ballotContractAddr);
+                theNotifier.createProposalPendingNotification(requester, proposalId);
 
-            callback(false, res);
-            },3000)
+                callback(false, res);
+            }, 3000)
         }
         catch (e) {
             callback(true, res);

@@ -53,6 +53,8 @@ var IPFS = {
 	uploadFile: function (req, res) {
 
 		console.log("uploadFile rq.body: " + JSON.stringify(req.body))
+		//console.log("rq.files: " + JSON.stringify(req.files))
+		//for (var key in req) {console.log("*" + key)}
 
 		if (!req.files) {
 			res.send('No files were uploaded.');
@@ -70,9 +72,11 @@ var IPFS = {
 
 		IPFS.pubKey = req.body.user_pubkey;
 
+		//This file will be an object of the form {"id": "","documents": []}
 		var fileName = JSONPath + IPFS.pubKey + suffix + ".json";
 		//check to see that $HOME/demoadmin/DigitalTwin/notifications/$pubkey_files.json exists
 		if (!fs.existsSync(fileName)) {
+			console.log("we are creating the file: " + fileName)
 			var datastruct = {
 				id: IPFS.pubKey,
 				documents: []
@@ -120,12 +124,12 @@ var IPFS = {
 	//allData is the parsed filecontent and data comes from the IPFS.writeData cb in IPFS.moveFileToIPFS, so it is passed as input
 	checkIsExists: function (allData, data) {
 		const docs = allData.documents;
-		console.log("docs: " + JSON.stringify(docs) + ", length: " + docs.length)
+		console.log("docs: " + JSON.stringify(docs) + "\n length: " + docs.length)
 		if (docs.length > 0) {
 			for (var i = 0; i < docs.length; i++) {
 				let doc = docs[i];
 				if (doc.hash == data.hash) {
-					console.log("found match at " + i)
+					console.log("checkIsExists f'n: found match in docs at index " + i)
 					return i;
 					//break;
 				}
@@ -144,7 +148,7 @@ var IPFS = {
 		5) METHOD WILL RETURN RES -> moveFileToIPFS (the caller)
 	******************************************************************************************/
 	writeData: function (data, res) {
-		console.log("writeData")
+		console.log("inside writeData")
 		var allDocs = [];
 		allDocs.push({ 'filename': data.filename, 'hash': data.hash, 'file_hash': data.file_hash });
 		var fileName = JSONPath + IPFS.pubKey + suffix + ".json";
@@ -152,11 +156,10 @@ var IPFS = {
 		var fileContent = cryptDec.decrypt(fs.readFileSync(fileName, 'utf8'));
 		var struct = JSON.parse(fileContent)
 		//STRUCT WILL HAVE THE CONTENT in _files.json
-		console.log("struct (filecontent inside _files.json): " + JSON.stringify(struct))
+		console.log("filecontent inside " + fileName + ": " + JSON.stringify(struct))
 		var index = IPFS.checkIsExists(struct, data);
 
 		if (index > -1) {
-			console.log("index > -1")
 			struct.documents[index] = data;
 		} else {
 			console.log("unshift: " + struct.documents)
@@ -165,11 +168,11 @@ var IPFS = {
 		}
 
 		//write the encrypted data to /home/demoadmin/DigitalTwin/notifications/$pubkey_files.json 
-		console.log("we should be writing~!!!!!")
+		console.log("we will be writing to " + fileName)
 		fs.writeFileSync(fileName, cryptDec.encrypt(JSON.stringify(struct)));
 		console.log()
 		if (allDocs.length > 0) {
-			console.log("we are building response")
+			console.log("sent response back to wallet")
 			//this response can be seen in the browser network console
 			res.status(200).json({ "uploded": allDocs, "failed": IPFS.errors });
 			return;
@@ -200,7 +203,8 @@ var IPFS = {
 				var buffer = [];
 				//A Readable Stream that represents the child process's stdout (child.stdout)
 				ipfs.stdout.on('data', (data) => {
-					buffer.push(data.toString());
+					var splice = data.toString().split(" ")
+					buffer.push(splice[1]);
 					console.log("pushed stdout to buffer. buffer= " + buffer)
 				});
 				//A Readable Stream that represents the child process's stderr. (child.strerr)
@@ -224,7 +228,7 @@ var IPFS = {
 								console.log("close event childprocess 2 (ipfs_cache)")
 
 								IPFS.getFileHash(tmpPath + fileNode.name).then((fileHash) => {
-									console.log("**filehash: " + fileHash)
+									console.log("\n**filehash: " + fileHash)
 									var fileData = {
 										'filename': fileNode.name,
 										'hash': hash,
@@ -233,11 +237,12 @@ var IPFS = {
 										'timestamp': Number(new Date()),
 										'fileformat': fileNode.mimetype
 									};
-									console.log("fileData obj built from getFileHash return: " + JSON.stringify(fileData))
+									console.log("getFileHash return: " + JSON.stringify(fileData))
 									IPFS.incr++;
 									//apply() method calls a function with a given this value and arguments provided as an array
-									callback.apply(this, [fileData, res]);
-									console.log("callback.apply executed")
+									callback.apply(this, [fileData, res], function(err){
+										if(err){console.log("callback.apply error: " + err)}
+									});
 									fs.unlinkSync(file); // Delete the file from temp path
 								});
 
@@ -256,27 +261,27 @@ var IPFS = {
 	//*****************************************************************************************
 	//called from DT endpoint /ipfs/validateFiles
 	getHashFromIpfsFile(req, res) {
-		var param = req.body;
-		console.log("getHashFromIPFSFile req.body: " + req.body)
-		var file_hash = param.file_hash.split(",");
-		var ipfs_hash = param.ipfs_hash.split(",");
-		var final_result = [];
-		if (file_hash > 0 && ipfs_hash > 0) {
-			for (var i = 0; i < ipfs_hash.length; i++) {
-				var hash = ipfs_hash[i];
-				//const ipfs = spawn('eris', ['files', 'get', hash, tmpPath + "ipfs_hash"]);
-				const ipfs = spawn('ipfs', ['get', hash, tmpPath + "ipfs_hash"])
-				ipfs.on('close', (code) => {
-					IPFS.getFileHash(tmpPath + "ipfs_hash").then((data) => {
-						fs.unlinkSync(tmpPath + "ipfs_hash");
-						if (data != file_hash[i]) {
-							final_result.push(false);
-						} else final_result.push(true);
-					});
-				});
-			}
-			if (final_result.indexOf(false)) { res.send("false"); } else { res.send("true"); }
-		} else res.send("false");
+		// var param = req.body;
+		// console.log("getHashFromIPFSFile req.body: " + req.body)
+		// var file_hash = param.file_hash.split(",");
+		// var ipfs_hash = param.ipfs_hash.split(",");
+		// var final_result = [];
+		// if (file_hash > 0 && ipfs_hash > 0) {
+		// 	for (var i = 0; i < ipfs_hash.length; i++) {
+		// 		var hash = ipfs_hash[i];
+		// 		//const ipfs = spawn('eris', ['files', 'get', hash, tmpPath + "ipfs_hash"]);
+		// 		const ipfs = spawn('ipfs', ['get', hash, tmpPath + "ipfs_hash"])
+		// 		ipfs.on('close', (code) => {
+		// 			IPFS.getFileHash(tmpPath + "ipfs_hash").then((data) => {
+		// 				fs.unlinkSync(tmpPath + "ipfs_hash");
+		// 				if (data != file_hash[i]) {
+		// 					final_result.push(false);
+		// 				} else final_result.push(true);
+		// 			});
+		// 		});
+		// 	}
+		// 	if (final_result.indexOf(false)) { res.send("false"); } else { res.send("true"); }
+		// } else res.send("false");
 	},
 
 	/*****************************************************************************************
@@ -294,20 +299,17 @@ var IPFS = {
 			input.on('end', () => {
 				console.log("readStream on end")
 				hash.end(function(err) {
-					if (err) {
+					if (err) { //ST: Added callback for debugging
 						console.log("hash.end error: " + err)
 					}
 				});
 				resolve(hash.read(function(err){
 					if(err){console.log("err: " + err)}
 				}));
-				//hash.end()
 			});
 			//This pipes the ReadStream to the response object (which goes to the client or caller)
 			input.pipe(hash);
-			console.log("right after pipe")
 		});
-		console.log("will return promise")
 		return promise;
 	},
 

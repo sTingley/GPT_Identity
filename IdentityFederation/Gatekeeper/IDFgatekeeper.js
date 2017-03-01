@@ -104,6 +104,135 @@ var theNotifier = new notifier();
 //Below for testing
 //theNotifier.createProposalPendingNotification("Requester","ImaproposalId")
 
+
+//makes a coid
+function CoidMaker(coidAddr,formdata)
+{
+    
+    //get params for their COID contract
+    console.log("hi")
+    var chain = 'primaryAccount';
+    var chainUrl = chainConfig.URL;
+    var contrData = require("./epm.json");
+    var abiAddr = contrData['CoreIdentity'];
+    var abi_COID = JSON.parse(fs.readFileSync('./abi/' + abiAddr, 'utf8'))
+    var accounts = require('./accounts.json')
+    var manager = erisContracts.newContractManagerDev(chainUrl, chainConfig[chain])
+    var contract = manager.newContractFactory(abi_COID).at(coidAddr)
+           
+ 	contract.getIt(function(error,result)
+	{
+		console.log(result + " is the result")
+	})           
+    //parse the form data
+    var sig = formdata.sig;
+    var msg = formdata.msg;
+    var requester = formdata.pubKey; // the pubkey of coid requester
+    var myUniqueId = formdata.uniqueId;
+    var myUniqueIdAttributes = formdata.uniqueIdAttributes.split(",");
+    var myOwnershipId = formdata.ownershipId;
+    var myOwnerIdList = [];
+    myOwnerIdList = formdata.ownerIdList.split(",");
+    var myControlId = formdata.controlId;
+    var myControlIdList = [];
+    myControlIdList = formdata.controlIdList.split(",");
+    var myOwnershipTokenId = formdata.ownershipTokenId;
+    var myOwnershipTokenAttributes = [];
+    myOwnershipTokenAttributes = formdata.ownershipTokenAttributes.split(",");
+    var myOwnershipTokenQuantity = formdata.ownershipTokenQuantity.split(",");
+    var myControlTokenId = formdata.controlTokenId;
+    var myControlTokenAttributes = [];
+    myControlTokenAttributes = formdata.controlTokenAttributes.split(",");
+    var myControlTokenQuantity = formdata.controlTokenQuantity.split(",");
+    var myIdentityRecoveryIdList = [];
+    myIdentityRecoveryIdList = formdata.identityRecoveryIdList.split(",");
+    var myRecoveryCondition = formdata.recoveryCondition; // number of recoveryList needed
+    
+    //should isHumanValue be true?
+    var isHumanValue = true;
+    var theUniqueIDAttributes = myUniqueIdAttributes;
+    
+    for(var i = 0; i < theUniqueIDAttributes.length; i = i + 3)
+    {
+        theUniqueIDAttributes[i] = myUniqueIdAttributes[i];
+    }
+
+
+    
+    setTimeout(function(){
+
+	theUniqueIDAttributes = theUniqueIDAttributes.concat(Array(10 - theUniqueIDAttributes.length).fill("0"));
+	myOwnerIdList = myOwnerIdList.concat(Array(10 - myOwnerIdList.length).fill("0"));
+	myControlIdList = myControlIdList.concat(Array(10 - myControlIdList.length).fill("0"));
+	myOwnershipTokenQuantity = myOwnershipTokenQuantity.concat(Array(10 - myOwnershipTokenQuantity.length).fill("0"));
+	myControlTokenQuantity = myControlTokenQuantity.concat(Array(10 - myControlTokenQuantity.length).fill("0"));
+	myIdentityRecoveryIdList = myIdentityRecoveryIdList.concat(Array(10 - myIdentityRecoveryIdList.length).fill("0"));
+
+    
+    //instantiate coid   
+    var _this = this;
+    contract.setUniqueID(myUniqueId,theUniqueIDAttributes,isHumanValue, function(error)
+    {
+        //debugging function (getIt)
+        contract.getIt(function(error,result)
+        {
+            console.log("setUniqueID: "+result);
+            
+            contract.setOwnership(myOwnerIdList, myOwnershipTokenQuantity, function(error)
+            {
+                //debugging function (getIt)
+                contract.getIt(function(error,result)
+                {
+                    console.log("setOwnership: "+result);
+                    
+                    contract.setControl(myControlTokenQuantity,myControlIdList, function(error){
+                        
+                        //debugging function (getIt)
+                        contract.getIt(function(error,result)
+                        {
+                            console.log("setControl"+result);
+                            
+                            contract.setRecovery(myIdentityRecoveryIdList,myRecoveryCondition,function(error,result)
+                            {
+                                
+                                //debugging function (getIt)
+                                contract.getIt(function(error,result)
+                                {
+                                    console.log("setRecovery: "+result);
+
+                                    contract.StartCoid(function(error,result)
+                                    {
+                                        console.log("startCoid1: " + result);
+                                        
+                                        //debugging function (getIt)
+                                        contract.getIt(function(Error,result)
+                                        {
+                                            console.log("startCoid: " + result);
+
+                                        })//end getIT
+
+                                    })//end StartCoid
+
+                                })//end getIT
+
+                            })//end setRecovery
+
+                        })//end getIT
+
+                    })//end setControl
+
+                })//end getIT
+
+            })//end setOwnership
+
+        })//end getIT
+
+    })//end setUniqueID
+	},3000)
+    
+}//end CoidMaker
+
+
 //Instantiate one of these
 var gatekeeper = function () {
 
@@ -874,6 +1003,13 @@ var eventListener = function () {
                                 console.log("GK ADDR: " + coidGKAddr)
                                 console.log("COID ADDR: " + coidAddr)
                                 theNotifier.notifyCoidCreation(formdataArray[index].pubKey, theId, theHash, coidGKAddr, coidAddr)
+
+                                //makes the core identity
+                                CoidMaker(coidAddr, formdataArray[index])
+
+                                //delete the proposal
+                                //TODO- add this function back
+                                //deleteProposal(proposalId);
                             })
                         })
                     },

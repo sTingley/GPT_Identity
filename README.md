@@ -6,9 +6,10 @@ TODO* - remove old files and update this readme
 In /Notification you will see folders: Ballot, Digital twin
     -Digital Twin is our routing application connected to the client wallet (walletApp-Dev)
         Significant files: TwinListener.js, TwinConfig.json
+            NOTE: all requests coming from the wallet are routed thru Digital Twin to appropriate blockchain service
         
     -Ballot is our 'voting' smart contract module
-        Significant files: ballot.js, ballot.js
+        Significant files: ballot.sol, ballot.js
         
 In /IdentityFederation you will see DAO, IdentityDimensions, and gatekeeper (also BigchainRouter.js and identityGraph)
     -Gatekeeper: Includes IDF_GATEKEEPER AND MY_GATEKEEPER (IDF is central contract used to create inital COID and MyGateekeper is used to      create subsequent COIDs afterwards. MyGatekeeper contract address returned to user after process in IDF_gatekeeper.js finishes.

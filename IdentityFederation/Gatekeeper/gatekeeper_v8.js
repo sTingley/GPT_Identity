@@ -6,7 +6,7 @@ var http = require('http')
 var express = require('express')
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
-
+var chainConfig = require('/home/demoadmin/.eris/ErisChainConfig.json')
 
 //for sending a notification
 var superAgent = require("superagent");
@@ -118,12 +118,13 @@ function CoidMaker(coidAddr,formdata)
     
     //get params for their COID contract
     console.log("hi")
+    var chain = 'primaryAccount';
+    var chainUrl = chainConfig.URL;
     var contrData = require("./epm.json");
     var abiAddr = contrData['CoreIdentity'];
     var abi_COID = JSON.parse(fs.readFileSync('./abi/' + abiAddr, 'utf8'))
     var accounts = require('./accounts.json')
-    var chainUrl = 'http://localhost:1337/rpc'
-    var manager = erisContracts.newContractManagerDev(chainUrl, accounts.newchain4_full_000)
+    var manager = erisContracts.newContractManagerDev(chainUrl, chainConfig[chain])
     var contract = manager.newContractFactory(abi_COID).at(coidAddr)
            
  	contract.getIt(function(error,result)
@@ -248,15 +249,14 @@ var gatekeeper = function () {
     console.log("A gatekeeper object has just been instantiated")
 
 
-    this.chain = 'newchain4_full_000';
-    this.erisdburl = "http://10.100.98.218:1337/rpc";
+    this.chain = 'primaryAccount';
+    this.erisdburl = chainConfig.chainURL;
     this.contractData = require("./epm.json");
     this.contractAddress = this.contractData['GateKeeper'];
     this.erisAbi = JSON.parse(fs.readFileSync("./abi/" + this.contractAddress));
     this.accountData = require("./accounts.json");
-    this.contractMgr = erisContracts.newContractManagerDev(this.erisdburl, this.accountData[this.chain]);
+    this.contractMgr = erisContracts.newContractManagerDev(this.erisdburl, chainConfig[this.chain]);
     this.gateKeeperContract = this.contractMgr.newContractFactory(this.erisAbi).at(this.contractAddress);
-
 
     //ballot contract
     this.ballotAddress = this.contractData['ballot'];
@@ -265,21 +265,22 @@ var gatekeeper = function () {
     this.ballotContract = this.contractMgr.newContractFactory(this.ballotAbi).at(this.ballotAddress);
 
     //dao contract
-    this.DaoData = require("/home/demoadmin/Migration_from_Eris/Dao/epm.json");
+    this.DaoData = require("/home/demoadmin/.eris/apps/Dao/epm.json");
     this.DaoAddress = this.DaoData['Dao'];
-    this.DaoAbi = JSON.parse(fs.readFileSync("/home/demoadmin/Migration_from_Eris/Dao/abi/" + this.DaoAddress));
+    this.DaoAbi = JSON.parse(fs.readFileSync("/home/demoadmin/.eris/apps/Dao/abi/" + this.DaoAddress));
     this.DaoContract = this.contractMgr.newContractFactory(this.DaoAbi).at(this.DaoAddress);
 
     //verification contract (oraclizer)
-    this.VerificationAddress = require('/home/demoadmin/Migration_from_Eris/VerifyOraclizerEthereum/wallet2/epm.json').deployStorageK;
-    this.VerificationAbi = JSON.parse(fs.readFileSync('/home/demoadmin/Migration_from_Eris/VerifyOraclizerEthereum/wallet2/abi/' + this.VerificationAddress, 'utf8'))
+    this.VerificationAddress = require('/home/demoadmin/.eris/apps/VerifyOraclizerEthereum/wallet2/epm.json').deployStorageK;
+    this.VerificationAbi = JSON.parse(fs.readFileSync('/home/demoadmin/.eris/apps/VerifyOraclizerEthereum/wallet2/abi/' + this.VerificationAddress, 'utf8'))
     this.VerificationContract = this.contractMgr.newContractFactory(this.VerificationAbi).at(this.VerificationAddress)
-    this.ErisAddress = this.accountData[this.chain].address;
+    this.ErisAddress = chainConfig[this.chain].address;
 
     //bigchain contract (oraclizer)
-    this.bigchain_query_addr = require('/home/demoadmin/Migration_from_Eris/BigchainOraclizer/epm.json').deployStorageK
-    this.bigchain_abi = JSON.parse(fs.readFileSync('/home/demoadmin/Migration_from_Eris/BigchainOraclizer/abi/' + this.bigchain_query_addr, 'utf8'))
+    this.bigchain_query_addr = require('/home/demoadmin/.eris/apps/BigchainOraclizer/epm.json').deployStorageK
+    this.bigchain_abi = JSON.parse(fs.readFileSync('/home/demoadmin/.eris/apps/BigchainOraclizer/abi/' + this.bigchain_query_addr, 'utf8'))
     this.bigchain_contract = this.contractMgr.newContractFactory(this.bigchain_abi).at(this.bigchain_query_addr)
+
 
 
 
@@ -789,16 +790,18 @@ app.get("/", function (req, res) {
 var eventListener = function()
 {
 
+    //Debugging Comment:
+    console.log("A gatekeeper object has just been instantiated")
 
-    this.chain = 'newchain4_full_000';
-    this.erisdburl = "http://10.100.98.218:1337/rpc";
+
+    this.chain = 'primaryAccount';
+    this.erisdburl = chainConfig.chainURL;
     this.contractData = require("./epm.json");
     this.contractAddress = this.contractData['GateKeeper'];
     this.erisAbi = JSON.parse(fs.readFileSync("./abi/" + this.contractAddress));
     this.accountData = require("./accounts.json");
-    this.contractMgr = erisContracts.newContractManagerDev(this.erisdburl, this.accountData[this.chain]);
+    this.contractMgr = erisContracts.newContractManagerDev(this.erisdburl, chainConfig[this.chain]);
     this.gateKeeperContract = this.contractMgr.newContractFactory(this.erisAbi).at(this.contractAddress);
-
 
     //ballot contract
     this.ballotAddress = this.contractData['ballot'];
@@ -807,21 +810,22 @@ var eventListener = function()
     this.ballotContract = this.contractMgr.newContractFactory(this.ballotAbi).at(this.ballotAddress);
 
     //dao contract
-    this.DaoData = require("/home/demoadmin/Migration_from_Eris/Dao/epm.json");
+    this.DaoData = require("/home/demoadmin/.eris/apps/Dao/epm.json");
     this.DaoAddress = this.DaoData['Dao'];
-    this.DaoAbi = JSON.parse(fs.readFileSync("/home/demoadmin/Migration_from_Eris/Dao/abi/" + this.DaoAddress));
+    this.DaoAbi = JSON.parse(fs.readFileSync("/home/demoadmin/.eris/apps/Dao/abi/" + this.DaoAddress));
     this.DaoContract = this.contractMgr.newContractFactory(this.DaoAbi).at(this.DaoAddress);
 
     //verification contract (oraclizer)
-    this.VerificationAddress = require('/home/demoadmin/Migration_from_Eris/VerifyOraclizerEthereum/wallet2/epm.json').deployStorageK;
-    this.VerificationAbi = JSON.parse(fs.readFileSync('/home/demoadmin/Migration_from_Eris/VerifyOraclizerEthereum/wallet2/abi/' + this.VerificationAddress, 'utf8'))
+    this.VerificationAddress = require('/home/demoadmin/.eris/apps/VerifyOraclizerEthereum/wallet2/epm.json').deployStorageK;
+    this.VerificationAbi = JSON.parse(fs.readFileSync('/home/demoadmin/.eris/apps/VerifyOraclizerEthereum/wallet2/abi/' + this.VerificationAddress, 'utf8'))
     this.VerificationContract = this.contractMgr.newContractFactory(this.VerificationAbi).at(this.VerificationAddress)
-    this.ErisAddress = this.accountData[this.chain].address;
+    this.ErisAddress = chainConfig[this.chain].address;
 
     //bigchain contract (oraclizer)
-    this.bigchain_query_addr = require('/home/demoadmin/Migration_from_Eris/BigchainOraclizer/epm.json').deployStorageK
-    this.bigchain_abi = JSON.parse(fs.readFileSync('/home/demoadmin/Migration_from_Eris/BigchainOraclizer/abi/' + this.bigchain_query_addr, 'utf8'))
+    this.bigchain_query_addr = require('/home/demoadmin/.eris/apps/BigchainOraclizer/epm.json').deployStorageK
+    this.bigchain_abi = JSON.parse(fs.readFileSync('/home/demoadmin/.eris/apps/BigchainOraclizer/abi/' + this.bigchain_query_addr, 'utf8'))
     this.bigchain_contract = this.contractMgr.newContractFactory(this.bigchain_abi).at(this.bigchain_query_addr)
+
 
 
 
@@ -1256,7 +1260,7 @@ app.post("/gatekeeper", function (req, res) {
 
 
 
-app.listen(3001, function () {
+app.listen(3000, function () {
     console.log("Connected to contract http://10.101.114.231:1337/rpc");
     console.log("Listening on port 3000");
 });

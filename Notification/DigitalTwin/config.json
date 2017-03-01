@@ -3,7 +3,7 @@
                 "allowed_orgins": "*",
                 "ipfs_file_tmp_path": "/home/demoadmin/DigitalTwin/tmp/",
                 "notification_folder_path": "/home/demoadmin/DigitalTwin/notifications/",
-                "ipfs_file_read_url": "http://192.168.99.101:8080/ipfs/",
+                "ipfs_file_read_url": "http://10.100.98.218:8000",
                 "gatekeeper_url": "http://10.100.99.207:3000/",
                 "my_gatekeeper_url": "http://10.100.99.207:3002/",
                 "ballot_url": "http://10.100.99.207:8082/",

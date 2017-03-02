@@ -1,6 +1,0 @@
-How to run the wallet in dev mode:
-
-1. go to file on local
-2. git pull
-3. cd to /walletApp-Dev
-	run, 'npm run dev'

@@ -130,6 +130,9 @@ class DimensionForm extends Component {
         var syle = {
             marginRight: '15px'
         }
+        var center = {
+            textAlign: 'center'
+        };
 
         var controllers = ["dcfdsdf34423342121", "fsdsddfn344534y4422", "jhjghjfgfdrterg565340"]
 
@@ -736,7 +739,6 @@ class IdentityDimensions extends Component {
 
                 <h1>IDENTITY DIMENSIONS</h1><hr />
 
-
                 <div className="modal-header">
                     <ul className="nav nav-tabs" role="tablist">
                         <li role="presentation" className="active"><a href="#dimensions" role="tab" data-toggle="tab">Identity Dimensions</a></li>
@@ -790,7 +792,6 @@ class IdentityDimensions extends Component {
                                     </optgroup>
                                 </select>
                             </div><br />
-
 
 
                             <div id="AttributesContainer">

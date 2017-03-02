@@ -43,7 +43,7 @@ var TwinConnector = function () {
             .set('Accept', 'application/json')
             .end((err, res) => {
                 if (res.status == 200) {
-                    console.log("GET ASSET RETURNED: " + JSON.stringify(res.body))
+                    console.log("GET ASSET RETURNED: " + JSON.stringify(res.body) + "\n")
                     var result = res.body;
                     callback(result);
                 }
@@ -69,7 +69,10 @@ var TwinConnector = function () {
             });
     }
 
-    //Update an Asset in the twin folder (owned, delegated, controlled)
+    /*
+    Update an Asset in the twin folder (owned, delegated, controlled).
+    This function will be called everytime we change COID parameters
+    */
     this.UpdateAsset = function (pubKey, fileName, flag, data, keys, values) {
         superAgent.post(this.twinUrl + "/setAsset")
             .send({
@@ -105,6 +108,8 @@ var TwinConnector = function () {
     }
 
 } //end TwinConnector
+
+
 
 var theNotifier = new TwinConnector();
 
@@ -145,8 +150,19 @@ var MyCOID = function (contractAddress) {
 
 
     // -> -> -> START CONTROL FUNCTIONS -> -> ->
-    //
-    //
+
+    /*
+        -getControllerTokens
+        -getControllerList
+        -revokeControlDelegation
+        -spendMyTokens (as a delegatee)
+        -myAmount (get delegatee tokens)
+        -delegate
+        -changeTokenController (must call addController first)
+        -amountDelegated
+        -addController
+        -removeController
+    */
 
     //GET CONTROLLER VALUES (from list)
     this.getControllerTokens = function (formdata, callback) {
@@ -340,6 +356,8 @@ var MyCOID = function (contractAddress) {
 
 
 
+
+
     // -> -> -> START OWNERSHIP FUNCTIONS -> -> ->
     //
     //
@@ -413,9 +431,63 @@ var MyCOID = function (contractAddress) {
 
     }
 
-    //
-    //
     // <- <- <- END OWNERSHIP FUNCTIONS <- <- <-
+
+    // -> -> -> START RECOVERY FUNCTIONS -> -> ->
+
+    this.addRecoveryID = function (formdata, callback) {
+
+        var sig = formdata.sig;
+        var pubKey = formdata.pubKey;
+        var recoveryID = formdata.recoveryID
+        var recoveryCondition = formdata.recoveryCondition
+
+        //TODO:
+        //var recoveryIDHash = keccak_256(recoveryID).toUpperCase()
+        var recoveryIDHash = keccak_256(recoveryID)
+
+        //TODO
+        var fileName = "MyCOID.json";
+        var flag = 0;
+
+        //1. Get Current Recovery keys
+        theNotifier.GetAsset(pubKey, fileName, flag, function (result) {
+
+            var obj = result;
+
+            // var condition = obj.recoveryCondition
+            // if (condition != null) { }
+
+            console.log("INSIDE ADD RECOVERY ID: " + JSON.stringify(obj))
+            var recovery_list = obj.identityRecoveryIdList;
+
+            console.log("RECOVERY KEYS: " + recovery_list);
+
+            //2. Modify Array
+            recovery_list.push(recoveryIDHash)
+            console.log("WITH ADDED RECOVERY ID HASH: " + recovery_list);
+            var keys = ["identityRecoveryIdList"]
+            var values = []
+            values.push(recovery_list);
+            console.log("Array of arrays: " + values)
+
+            //3. Update
+            theNotifier.UpdateAsset(pubKey, fileName, flag, "", keys, values)
+        })
+
+        //self.contract.addController(controllerHash,function(error,result)
+        //{
+        //    callback(error,result)
+        //})
+    }
+
+
+
+    // this.changeRecoveryCondition(function (formdata, callback) {
+
+    // })
+
+    // <- <- <- END RECOVERY FUNCTIONS <- <- <-
 
 
 }
@@ -434,7 +506,7 @@ for (let endpoint in MyCoidConfig) {
     console.log(endpoint)
     app.post('/' + endpoint, function (req, res) {
 
-        console.log("POSTED ENDPOINT: " + endpoint);
+        console.log("\n POSTED ENDPOINT: " + endpoint);
 
         //their contract address
         var contractAddress = req.body.address;
@@ -459,7 +531,7 @@ for (let endpoint in MyCoidConfig) {
         toExecute = toExecute + "})"
 
         //for debugging
-        console.log(toExecute);
+        console.log("\n" + toExecute);
 
         //evaulate the given function
         eval(toExecute);

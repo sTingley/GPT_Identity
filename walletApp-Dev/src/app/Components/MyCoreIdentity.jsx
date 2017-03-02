@@ -5,38 +5,47 @@ var crypto = require('crypto');
 var secp256k1 = require('secp256k1');
 var keccak_256 = require('js-sha3').keccak_256;
 
-
-
 class Asset extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-
             asset: props.asset || {}
         }
 
     }
 
-    componentDidMount() {
-        // $("#assetDetails").modal('show');
-        // $("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
-
+    //takes in a msg and returns a signature (needed for requests)
+    getSignature(msg) {
+        var privKey = localStorage.getItem("privKey")
+        var privKey1 = new Buffer(privKey, "hex");
+        var msg_hash = keccak_256(JSON.stringify(msg));
+        var msg_hash_buffer = new Buffer(msg_hash, "hex")
+        let signature = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1))
+        signature = JSON.parse(signature).signature;
+        signature = JSON.stringify(signature);
+        signature = JSON.parse(signature).data;
+        signature = new Buffer(signature, "hex");
+        signature = signature.toString("hex");
+        return signature
     }
 
-    getControllerValues(){
+    //**********************************************************************
+    // START CONTROLLER FUNCTIONS:
+
+    getControllerValues() {
         let controller
         let controller_tokens
         var _this = this;
-        $.each($("input[name^='pubkey_controller']"), function(obj){
+        $.each($("input[name^='pubkey_controller']"), function (obj) {
             var value = $.trim($(this).val())
-            if (value.length > 0){
+            if (value.length > 0) {
                 controller = value
             }
         })
         console.log("controller: " + controller)
-        $.each($("input[name^='token_quantity']"), function(obj){
+        $.each($("input[name^='token_quantity']"), function (obj) {
             var value = $.trim($(this).val())
-            if (value.length > 0){
+            if (value.length > 0) {
                 controller_tokens = value
             }
         })
@@ -47,12 +56,10 @@ class Asset extends React.Component {
         arr.push(controller_tokens)
 
         return arr
-
     }
 
-    updateController(e){
+    requestUpdateController(e) {
         e.preventDefault()
-
         //FORMAT of control_dist = [pubkey, quantity]
         var control_dist = this.getControllerValues()
         console.log("control_dist: " + control_dist)
@@ -60,37 +67,23 @@ class Asset extends React.Component {
         var json = {}
 
         json.pubKey = localStorage.getItem("pubKey")
-
         json.address = localStorage.getItem("coidAddr")
-
         json.controller = control_dist[0]
-
         json.token_quantity = control_dist[1]
 
-        var privKey = localStorage.getItem("privKey")
+        var signature = this.getSignature(json)
 
-        var privKey1 = new Buffer(privKey,"hex");
-		var msg_hash = keccak_256(JSON.stringify(json));
-		var msg_hash_buffer = new Buffer(msg_hash,"hex");
-		var signature1 = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1))
-		
-		signature1 = JSON.parse(signature1).signature;
-		signature1 = JSON.stringify(signature1);
-		signature1 = JSON.parse(signature1).data;
-		signature1 = new Buffer(signature1,"hex");
-		signature1 = signature1.toString("hex");
-		
-		console.log("sig" + signature1)
-		console.log(typeof(signature1))
-		
+        console.log("sig: " + signature)
+        console.log(typeof (signature))
+
         //UNCOMMENT THESE LATER!!!!!!!!!!
-		// json.sig = signature1;
-		// json.msg = msg_hash_buffer.toString("hex");
+        // json.sig = signature;
+        // json.msg = msg_hash_buffer.toString("hex");
 
         json.sig = ""
         json.msg = ""
 
-        console.log("JSON!! "+ JSON.stringify(json))
+        console.log("JSON!! " + JSON.stringify(json))
 
         $.ajax({
             type: "POST",
@@ -109,7 +102,96 @@ class Asset extends React.Component {
 
             }.bind(this),
         })
+    }
+    // END CONTROLLER UPDATE FUNCTIONS:
+    //**********************************************************************
 
+
+
+    //**********************************************************************
+    // START RECOVERY UPDATE FUNCTIONS:
+
+    getRecoveryParams() {
+        let recoveryID
+        let recoveryCondition
+        var _this = this;
+
+        $.each($("input[name^='recoveryID']"), function (obj) {
+            var value = $.trim($(this).val())
+            if (value.length > 0) {
+                recoveryID = value
+            }
+            console.log("got recoveryID: " + recoveryID)
+        })
+        $.each($("input[name^='recoveryCondition']"), function (obj) {
+            var value = $.trim($(this).val())
+            if (value.length > 0) {
+                recoveryCondition = value
+            }
+            console.log("got recoveryCondition: " + recoveryCondition)
+        })
+
+        var arr = []
+        arr.push(recoveryID)
+        if (recoveryCondition) { arr.push(recoveryCondition) }
+        return arr
+    }
+
+    requestUpdateRecovery(e) {
+        e.preventDefault()
+
+        var json = {}
+        json.pubKey = localStorage.getItem("pubKey")
+        json.address = localStorage.getItem("coidAddr")
+
+        var recoveryParams = this.getRecoveryParams()
+        console.log("recovery arr: " + recoveryParams)
+
+        if (recoveryParams.length > 1){
+            json.recoveryCondition = recoveryParams[1]
+        }
+
+        json.recoveryID = recoveryParams[0]
+
+        var signature = this.getSignature(json)
+
+        $.ajax({
+            type: "POST",
+            url: twinUrl + 'MyCOID/addRecoveryID',
+            data: json,
+            success: function (result) {
+                var data = result;
+                if ($.type(result) != "object") {
+                    data = JSON.parseJSON(result)
+                }
+                //get the array:
+                data = data.Result;
+                //DEBUGGING:
+                console.log("addRecovery result: " + JSON.stringify(data));
+                //data is: MYCOID.json
+
+            }.bind(this),
+        })
+
+    }
+
+    // END RECOVERY UPDATE FUNCTIONS:
+    //**********************************************************************
+
+
+    //**********************************************************************
+    // START OFFICAL ID FUNCTIONS:
+
+    //TODO: ADD THESE FUNCTIONS!!!!!!!!!!!! Grab entered values
+    //WE ALSO NEED TO IMPORT THE IPFS CLASS
+
+    // END OFFICIAL ID FUNCTIONS:
+    //**********************************************************************
+
+
+    componentDidMount() {
+        // $("#assetDetails").modal('show');
+        // $("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
     }
 
     render() {
@@ -133,8 +215,9 @@ class Asset extends React.Component {
                     <ul className="nav nav-pills" role="tablist">
                         <li role="presentation" className="active"><a href="#controllers" role="tab" data-toggle="tab">Control</a></li>
                         <li role="presentation"><a href="#recovery" role="tab" data-toggle="tab">Recovery</a></li>
+                        <li role="presentation"><a href="#officalID" role="tab" data-toggle="tab">Official IDs</a></li>
                     </ul>
-                </div>
+                </div>{/*END MODAL-HEADER*/}
 
                 <div className="modal-body">
 
@@ -165,9 +248,9 @@ class Asset extends React.Component {
                                     </tr>
                                 </tbody>
                             </table>
-                        <div className="modal-footer">
-                            <button type="button" className="btn btn-primary" onClick={this.updateController.bind(this)}><span className="glyphicon glyphicon-plus"></span>Update Control</button>
-                        </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-primary" onClick={this.requestUpdateController.bind(this)}><span className="glyphicon glyphicon-plus"></span>Update Control</button>
+                            </div>
 
 
                         </div>{/*tab-pane controllers*/}
@@ -194,20 +277,47 @@ class Asset extends React.Component {
                                     </tr>
                                     <tr>
                                         <td>Add a recovery ID:</td>
-                                        <td><input name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Public Key" /></td>
+                                        <td><input name="recoveryID" className="form-control col-md-4" type="text" placeholder="Public Key of Recoverer" /></td>
                                     </tr>
                                     <tr>
                                         <td>Change recovery condition:</td>
-                                        <td><input name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="# of signatures required" /></td>
+                                        <td><input name="recoveryCondition" className="form-control col-md-4" type="text" placeholder="# of signatures required." /></td>
                                     </tr>
                                 </tbody>
                             </table>
 
-                        <div className="modal-footer">
-                            <button type="button" className="btn btn-primary"><span className="glyphicon glyphicon-plus"></span>Update Recovery Conditions</button>
-                        </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-primary" onClick={this.requestUpdateRecovery.bind(this)}><span className="glyphicon glyphicon-plus"></span>Update Recovery Conditions</button>
+                            </div>
 
                         </div>{/*tab-pane recovery*/}
+
+
+                        <div role="tabpanel" className="tab-pane" id="officalID">
+                            <table className="table table-striped table-hover" style={style}>
+                                <tbody>
+                                    <tr>
+                                        <td colSpan="2"><b>Official IDs</b></td>
+                                    </tr>
+                                    {(() => {
+                                        var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+                                        if (!$.isEmptyObject(prop)) {
+                                            return prop.uniqueIdAttributes.map((ids, i) => {
+                                                return (
+                                                    <tr key={i}>
+                                                        <td>{ids[0]}</td>
+                                                        <td><p>File hash: {ids[1]}</p><p>IPFS hash: <a target="_blank" href={ipfs_url + "/" + ids[2]}>{ids[2]}</a></p></td>
+                                                    </tr>
+                                                )
+                                            });
+                                        } else {
+                                            return <tr><td colSpan="2">No Ids found</td></tr>
+                                        }
+                                    })(this)}
+                                </tbody>
+                            </table>
+                            <p>Need either 1) documents from digital twin or to import ipfs class</p>
+                        </div>{/*tab-pane officialIDs*/}
 
 
                     </div>{/*tab-content*/}
@@ -225,29 +335,42 @@ Asset.propTypes = {
     hideHandler: React.PropTypes.func.isRequired	// hideHandler method must exists
 };
 
+
+/**************************************************************************
+ * This class is the PARENT Component
+ * componentWillMount method will populated nav bar tabs with DT assets
+/*************************************************************************/
 class Identities extends React.Component {
 
     constructor(props) {
         super(props);
-
         this.state =
             {
                 pubKey: localStorage.getItem("pubKey"),
-                showDetails: false,
+                own_assets: [], //populated from DT
+                controlled_assets: [], //[populated from DT
 
-                own_assets: [],
-                controlled_assets: [],
-
-                active_asset: {},
-
-                testList: ["first_person", "second_person", "third_person"],
-                testValues: ["val1", "val2", "val3"]
+                showDetails: false, //will be set true when user selects asset
+                active_asset: {}, //passes active asset as prop to Asset class
             };
 
-        //event handlers
-        this.handleAsset = this.handleAsset.bind(this);
+        //handleSelectAsset will be called anytime we select from the nav bar
+        this.handleSelectAsset = this.handleSelectAsset.bind(this);
+        //if this.state.showDetials is true, handleHideAsset is passed as a prop (hideHandler) to Asset class
         this.handleHideAsset = this.handleHideAsset.bind(this);
+    }
 
+    handleHideAsset() {
+        this.setState({ showDetails: false, active_asset: {} });
+    }
+
+    //handle choice from asset navigation bar
+    handleSelectAsset(asset) {
+        var _this = this
+        let assetID = asset.asset_id
+        if (assetID) {
+            _this.setState({ showDetails: true, active_asset: asset })
+        }
     }
 
     //************************************************************************
@@ -287,7 +410,7 @@ class Identities extends React.Component {
                                 var theArray = this.state.own_assets;
 
                                 console.log("length is: " + theArray.length) //get total number of owned assets
-                                console.log(theArray)
+                                console.log(JSON.stringify(theArray))
                                 theArray[theArray.length] = { asset_id: dataResult.assetID, asset_name: dataResult }
                                 if (dataResult.assetID = "MyCOID")
                                     this.setState({ own_assets: theArray });
@@ -313,7 +436,6 @@ class Identities extends React.Component {
                 if ($.type(result) != "object") {
                     data = JSON.parseJSON(result)
                 }
-
                 //get the array:
                 data = data.data;
                 //debugging:
@@ -353,37 +475,10 @@ class Identities extends React.Component {
     //************************************************************************
     componentDidMount() {
         //TODO:
-        //ADD THE CODE SO THAT MYCOID displays on the page
+        //ADD THE CODE SO THAT MYCOID displays on the page by default?
     }
-
-    handleHideAsset() {
-        this.setState({ showDetails: false, active_asset: {} });
-    }
-
-    //handle choice from nav bar
-    handleAsset(asset) {
-        var _this = this
-        let assetID = asset.asset_id
-        if (assetID) {
-            console.log("should be inside here")
-            _this.setState({ showDetails: true, active_asset: asset })
-        }
-    }
-
-
-    ShowOwned(input) {
-
-        if (input == "MyCOID") {
-            //this.setState({active_asset: })
-            //$('.CONTROLLED').hide()
-            console.log("got myCOID")
-        }
-    }
-
-
 
     render() {
-
         var inputAttrs = {
             addKeys: [13, 188],	// Enter and comma
             inputProps: {
@@ -397,13 +492,10 @@ class Identities extends React.Component {
         var style = {
             fontSize: '12.5px'
         }
-
         //replace with owned assets
         var controlled = ["iPad", "BMW"]
 
         return (
-
-
             <div id="MyCOIDContainer">
 
                 <h1>Identity Utility</h1><hr />
@@ -422,7 +514,7 @@ class Identities extends React.Component {
                                         {/* POPULATE the owned assets, */ }
                                         if (this.state.own_assets.length > 0) {
                                             return this.state.own_assets.map((own, i) => {
-                                                return <li role="presentation" key={i}><a role="tab" data-toggle="tab" onClick={() => this.handleAsset(own)}>{own.asset_id}</a></li>
+                                                return <li role="presentation" key={i}><a role="tab" data-toggle="tab" onClick={() => this.handleSelectAsset(own)}>{own.asset_id}</a></li>
                                             })
                                         }
                                         else { return <li>None</li> }
@@ -437,7 +529,7 @@ class Identities extends React.Component {
                                         {/* POPULATE the controlled assets, */ }
                                         if (controlled.length > 0) {
                                             return controlled.map((ctrl, i) => {
-                                                return <li role="presentation" key={i}><a role="tab" data-toggle="tab" onClick={() => this.handleAsset(ctrl)}>{ctrl}</a></li>
+                                                return <li role="presentation" key={i}><a role="tab" data-toggle="tab" onClick={() => this.handleSelectAsset(ctrl)}>{ctrl}</a></li>
                                             })
                                         }
                                         else { return <li>None</li> }
@@ -452,26 +544,18 @@ class Identities extends React.Component {
 
 
                     <div className="modal-body">
-
                         {this.state.showDetails ? <Asset hideHandler={this.handleHideAsset} asset={this.state.active_asset} /> : null}
-
                     </div>{/*END MODAL-BODY*/}
 
 
                 </div>{/*END MODAL-CONTENT*/}
 
-
-
             </div>
-
         );
-    }
 
-}
+    }//render
+
+}//class Identities
+
 
 export default Identities;
-
-
-                        // <div id="OWNED" className="tab-pane fade">
-                        //     <p>PUT COID ON HERE AS DEFAULT, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-                        // </div>

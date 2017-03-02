@@ -646,7 +646,7 @@ var gatekeeper = function (MyGKaddr) {
         var sync = true;
 
         _this.gateKeeperContract.setValidators(proposalId, validators, ballotAddress, function (err, res) {
-            console.log(res);
+            //console.log(res); //has no return
             console.log("proposalId: " + proposalId);
             console.log("ballotAddress: " + ballotAddress);
             console.log("validators: " + validators);

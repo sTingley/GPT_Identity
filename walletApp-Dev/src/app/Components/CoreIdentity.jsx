@@ -63,6 +63,8 @@ class UploadIpfsFile extends React.Component {
 				 $.each(fileInput[0].files, function(key, value){
 					fData.append(key, value);
 				});
+				//for (var key in fData) {console.log(key)}
+				//for(var pair of fData.entries()){console.log(pair[0] + ',' + pair[1])}
 				var _this = this;
 				var callbacks = {
 					beforeSend: (xhr) => {

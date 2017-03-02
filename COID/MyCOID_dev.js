@@ -21,21 +21,19 @@ var MyCoidConfig = require('./MyCOIDConfig.json');
 
 
 //this function is intended to send a notification
-var TwinConnector = function() 
-{
+var TwinConnector = function () {
     //location of digital twin
     this.twinUrl = "http://10.100.98.218:5050";
 
     //for grabbing the appropriate scope
     var _this = this;
-    
+
     //flag = 0 ==> owned
     //flag = 1 ==> controlled
     //flag = 2 ==> delegated
-    
+
     //Get Asset data from the twin folder (owned, delegated, controlled)
-    this.GetAsset = function(pubKey, fileName, flag, callback)
-    {
+    this.GetAsset = function (pubKey, fileName, flag, callback) {
         superAgent.post(this.twinUrl + "/getAsset")
             .send({
                 "pubKey": pubKey,
@@ -44,19 +42,18 @@ var TwinConnector = function()
             })
             .set('Accept', 'application/json')
             .end((err, res) => {
-                if(res.status == 200){
-		    console.log("GET ASSET RETURNED: " + JSON.stringify(res.body))
-		    var result = res.body;
+                if (res.status == 200) {
+                    console.log("GET ASSET RETURNED: " + JSON.stringify(res.body))
+                    var result = res.body;
                     callback(result);
                 }
             });
     }
-    
-    
+
+
     //Create an Asset in the twin folder (owned, delegated, controlled)
-    this.CreateAsset = function(pubKey, fileName, flag, data)
-    {
-         superAgent.post(this.twinUrl + "/setAsset")
+    this.CreateAsset = function (pubKey, fileName, flag, data) {
+        superAgent.post(this.twinUrl + "/setAsset")
             .send({
                 "pubKey": pubKey,
                 "fileName": fileName,
@@ -71,11 +68,10 @@ var TwinConnector = function()
                 // }
             });
     }
-    
+
     //Update an Asset in the twin folder (owned, delegated, controlled)
-    this.UpdateAsset = function(pubKey, fileName, flag, data, keys, values)
-    {
-         superAgent.post(this.twinUrl + "/setAsset")
+    this.UpdateAsset = function (pubKey, fileName, flag, data, keys, values) {
+        superAgent.post(this.twinUrl + "/setAsset")
             .send({
                 "pubKey": pubKey,
                 "fileName": fileName,
@@ -93,9 +89,8 @@ var TwinConnector = function()
     }
 
     //Remove an Asset in the twin folder (owned, delegated, controlled)
-    this.RemoveAsset = function(pubKey, fileName, flag)
-    {
-          superAgent.post(this.twinUrl + "/deleteAsset")
+    this.RemoveAsset = function (pubKey, fileName, flag) {
+        superAgent.post(this.twinUrl + "/deleteAsset")
             .send({
                 "pubKey": pubKey,
                 "fileName": fileName,
@@ -109,7 +104,7 @@ var TwinConnector = function()
             });
     }
 
-} //end var notifier
+} //end TwinConnector
 
 var theNotifier = new TwinConnector();
 
@@ -118,8 +113,7 @@ var theNotifier = new TwinConnector();
 //To be used in post requests
 //NOTE: The ABI can be obtained from the contractAddress because the location of the abi is known
 //The location will always be where gatekeeper deployed it.
-var MyCOID = function(contractAddress)
-{
+var MyCOID = function (contractAddress) {
 
     //debugging:
     console.log("You made a MyCOID object");
@@ -131,21 +125,20 @@ var MyCOID = function(contractAddress)
     var contractAddr = contractAddress
     console.log("contract addr: " + contractAddr)
     this.contractAbiAddress = this.contractData['CoreIdentity'];
-    this.erisAbi = JSON.parse(fs.readFileSync("./abi/"+this.contractAbiAddress));
+    this.erisAbi = JSON.parse(fs.readFileSync("./abi/" + this.contractAbiAddress));
     this.accountData = require("./accounts.json");
     this.contractMgr = erisC.newContractManagerDev(this.erisdburl, chainConfig[this.chain]);
     this.contract = this.contractMgr.newContractFactory(this.erisAbi).at(contractAddress);
 
     //coid functions:
     var self = this;
-    
-    
+
+
     //ONE TIME INSTANTIATION
     //THIS FUNCTION IS INTENDED TO BE CALLED AT THE VERY BEGINNING
     //WHEN THEY MAKE THEIR TWIN
     //IT POPULATES THE ASSET SCREENS OF OTHER OWNERS, CONTROLLERS, DELEGATES
-    this.updateTwin = function(creatorPubkey,callback)
-    {
+    this.updateTwin = function (creatorPubkey, callback) {
         //1. see if there are any other owners, if so,
     }
 
@@ -156,40 +149,33 @@ var MyCOID = function(contractAddress)
     //
 
     //GET CONTROLLER VALUES (from list)
-    this.getControllerTokens = function(formdata,callback)
-    {
+    this.getControllerTokens = function (formdata, callback) {
         var pubKey = formdata.pubKey;
         var msg = formdata.msg;
         var sig = formdata.sig;
 
-        self.contract.getList(function(error,result)
-        {
-	    console.log("got controller tokens (inside function)")
-            callback(error,result)
+        self.contract.getList(function (error, result) {
+            console.log("got controller tokens (inside function)")
+            callback(error, result)
         })
     }
 
 
     //GET CONTROLLER LIST
-    this.getControllerList = function(formdata,callback)
-    {
+    this.getControllerList = function (formdata, callback) {
         var pubKey = formdata.pubKey;
         var msg = formdata.msg;
         var sig = formdata.sig;
 
-        self.contract.getControllerList(function(error,result)
-        {
-	    console.log("get controller list...")
-            callback(error,result)
+        self.contract.getControllerList(function (error, result) {
+            console.log("get controller list...")
+            callback(error, result)
         })
     }
 
 
-
-
     //REVOKE DELEGATION TO A DELEGATEE AS A CONTROLLER
-    this.revokeControlDelegation = function(formdata,callback)
-    {
+    this.revokeControlDelegation = function (formdata, callback) {
         var controller = formdata.controller;
         var delegatee = formdata.delegatee;
         var amount = formdata.amount;
@@ -200,17 +186,14 @@ var MyCOID = function(contractAddress)
         var controllerHash = keccak_256(controller).toUpperCase()
         var delegateeHash = keccak_256(delegatee).toUpperCase()
 
-        self.contract.revokeDelegation(controllerHash,delegateeHash,amount,function(error,result)
-        {
-            callback(error,result)
+        self.contract.revokeDelegation(controllerHash, delegateeHash, amount, function (error, result) {
+            callback(error, result)
         })
     }
 
 
-
     //SPEND MY TOKENS AS A DELEGATEE
-    this.spendMyTokens = function(formdata,callback)
-    {
+    this.spendMyTokens = function (formdata, callback) {
         var msg = formdata.msg;
         var sig = formdata.sig;
         var delegatee = formdata.delegatee;
@@ -219,17 +202,14 @@ var MyCOID = function(contractAddress)
         //TODO:
         var delegateeHash = keccak_256(delegatee).toUpperCase()
 
-        self.contract.spendMyTokens(delegateeHash,amount,function(error,result)
-        {
-            callback(error,result)
+        self.contract.spendMyTokens(delegateeHash, amount, function (error, result) {
+            callback(error, result)
         })
     }
 
 
-
     //GET YOUR AMOUNT AS A DELEGATEE
-    this.myAmount = function(formdata,callback)
-    {
+    this.myAmount = function (formdata, callback) {
         var delegatee = formdata.delegatee;
         var msg = formdata.msg;
         var sig = formdata.sig;
@@ -237,16 +217,14 @@ var MyCOID = function(contractAddress)
         //TODO:
         var delegateeHash = keccak_256(delegatee).toUpperCase()
 
-        self.contract.myAmount(delegateeHash,function(error,result)
-        {
-            callback(error,result)
+        self.contract.myAmount(delegateeHash, function (error, result) {
+            callback(error, result)
         })
     }
 
 
     //DELEGATE TOKENS AS A CONTROLLER TO A DELEGATEE
-    this.delegate = function(formdata,callback)
-    {
+    this.delegate = function (formdata, callback) {
         var delegatee = formdata.delegatee;
         var controller = formdata.controller;
         var amount = formdata.amount;
@@ -255,19 +233,16 @@ var MyCOID = function(contractAddress)
         var controllerHash = keccak_256(controller).toUpperCase()
         var delegateeHash = keccak_256(delegatee).toUpperCase()
 
-        self.contract.delegate(controllerHash,delegateeHash,amount,function(error,result)
-        {
-            callback(error,result)
+        self.contract.delegate(controllerHash, delegateeHash, amount, function (error, result) {
+            callback(error, result)
         })
     }
-
 
 
     //CHANGE TOKEN CONTROLLER
     //ALLOWS A CONTROLLER TO GIVE TOKENS TO ANOTHER CONTROLLER
     //YOU MUST ADD A CONTROLLER BEFORE CALLING THIS FUNCTION
-    this.changeTokenController = function(formdata,callback)
-    {
+    this.changeTokenController = function (formdata, callback) {
         var msg = formdata.msg;
         var sig = formdata.sig;
         var originalController = formdata.originalController;
@@ -278,17 +253,14 @@ var MyCOID = function(contractAddress)
         var originalControllerHash = keccak_256(originalController).toUpperCase()
         var newControllerHash = keccak_256(newController).toUpperCase()
 
-        self.contract.changeTokenController(originalControllerHash,newControllerHash,amount,function(error,result)
-        {
-            callback(error,result)
+        self.contract.changeTokenController(originalControllerHash, newControllerHash, amount, function (error, result) {
+            callback(error, result)
         })
     }
 
 
-
     //GIVES A CONTROLLER HOW MANY TOKENS THEY HAVE DELEGATED
-    this.amountDelegated = function(formdata,callback)
-    {
+    this.amountDelegated = function (formdata, callback) {
         var msg = formdata.msg;
         var sig = formdata.sig;
         var controller = formdata.controller;
@@ -296,17 +268,15 @@ var MyCOID = function(contractAddress)
         //TODO:
         var controllerHash = keccak_256(controller).toUpperCase()
 
-        self.contract.amountDelegated(controllerHash,function(error,result)
-        {
-            callback(error,result)
+        self.contract.amountDelegated(controllerHash, function (error, result) {
+            callback(error, result)
         })
     }
 
 
 
     //ADD A CONTROLLER
-    this.addController = function(formdata,callback)
-    {
+    this.addController = function (formdata, callback) {
         var msg = formdata.msg;
         var sig = formdata.sig;
         var pubKey = formdata.pubKey;
@@ -314,34 +284,33 @@ var MyCOID = function(contractAddress)
 
         //TODO:
         //var controllerHash = keccak_256(controller).toUpperCase()
-	var controllerHash = keccak_256(controller)
+        var controllerHash = keccak_256(controller)
 
-	//TODO
-	var fileName = "MyCOID.json";
-	var flag = 0;
+        //TODO
+        var fileName = "MyCOID.json";
+        var flag = 0;
 
-	//1. Get Current Controllers
-	theNotifier.GetAsset(pubKey,fileName,flag,function(result)
-	{
+        //1. Get Current Controllers
+        theNotifier.GetAsset(pubKey, fileName, flag, function (result) {
 
-		var obj = result;
+            var obj = result;
 
-		console.log("INSIDE ADD CONTROLLER: " + JSON.stringify(obj))
-		var controllers = obj.controlIdList;	
+            console.log("INSIDE ADD CONTROLLER: " + JSON.stringify(obj))
+            var controllers = obj.controlIdList;
 
-		console.log("CONTROLLERS: " + controllers);
+            console.log("CONTROLLERS: " + controllers);
 
-		//2. Modify Array
-		controllers.push(controllerHash)
-		console.log("WITH ADDED CONTROLLER HASH: " + controllers);
-		var keys = ["controlIdList"]
-		var values = []
-		values.push(controllers);
-		console.log("Array of arrays: " + values)
-	
-		//3. Update
-		theNotifier.UpdateAsset(pubKey,fileName,flag,"",keys,values)
-	})
+            //2. Modify Array
+            controllers.push(controllerHash)
+            console.log("WITH ADDED CONTROLLER HASH: " + controllers);
+            var keys = ["controlIdList"]
+            var values = []
+            values.push(controllers);
+            console.log("Array of arrays: " + values)
+
+            //3. Update
+            theNotifier.UpdateAsset(pubKey, fileName, flag, "", keys, values)
+        })
 
         //self.contract.addController(controllerHash,function(error,result)
         //{
@@ -352,8 +321,7 @@ var MyCOID = function(contractAddress)
 
 
     //REMOVE A CONTROLLER
-    this.removeController = function(formdata,callback)
-    {
+    this.removeController = function (formdata, callback) {
         var msg = formdata.msg;
         var sig = formdata.sig;
         var pubKey = formdata.pubKey
@@ -362,9 +330,8 @@ var MyCOID = function(contractAddress)
         //TODO:
         var controllerHash = keccak_256(controller).toUpperCase()
 
-        self.contract.removeController(controllerHash,function(error,result)
-        {
-            callback(error,result)
+        self.contract.removeController(controllerHash, function (error, result) {
+            callback(error, result)
         })
     }
     //
@@ -378,27 +345,24 @@ var MyCOID = function(contractAddress)
     //
 
     //Tells an owner how many tokens they have.
-    this.myTokenAmount = function(formdata,callback)
-    {
-	console.log("DEBUGGING: YOU HIT MYTOKENAMOUNT");
+    this.myTokenAmount = function (formdata, callback) {
+        console.log("DEBUGGING: YOU HIT MYTOKENAMOUNT");
 
         var msg = formdata.msg;
         var sig = formdata.sig;
         var owner = formdata.owner;
-	console.log("owner: " + owner);
+        console.log("owner: " + owner);
         //TODO:
         var ownershipHash = keccak_256(owner).toUpperCase()
 
-        self.contract.myTokenAmount(ownershipHash,function(error,result)
-        {
-	    console.log("DEBUGGING...RESULT,ERROR: " + ("" + result) + "..." + error)
-            callback(error,"" + result)
+        self.contract.myTokenAmount(ownershipHash, function (error, result) {
+            console.log("DEBUGGING...RESULT,ERROR: " + ("" + result) + "..." + error)
+            callback(error, "" + result)
         })
     }
 
     //Adds an owner
-    this.addOwner = function(formdata,callback)
-    {
+    this.addOwner = function (formdata, callback) {
         var msg = formdata.msg;
         var sig = formdata.sig;
         var pubKey = formdata.pubKey;
@@ -409,15 +373,13 @@ var MyCOID = function(contractAddress)
         //TODO:
         newOwner = keccak_256(newOwner).toUpperCase()
 
-        self.contract.addOwner(newOwner,amount,function(error,result)
-        {
-            callback(error,result)
+        self.contract.addOwner(newOwner, amount, function (error, result) {
+            callback(error, result)
         })
     }
 
     //Removes an owner
-    this.removeOwner = function(formdata,callback)
-    {
+    this.removeOwner = function (formdata, callback) {
         var msg = formdata.msg;
         var sig = formdata.sig;
         var pubKey = formdata.pubKey;
@@ -426,17 +388,15 @@ var MyCOID = function(contractAddress)
         //TODO:
         owner = keccak_256(owner).toUpperCase()
 
-        self.contract.removeOwner(owner,function(error,result)
-        {
-            callback(error,result)
+        self.contract.removeOwner(owner, function (error, result) {
+            callback(error, result)
         })
 
     }
 
 
     //Allows an owner to give tokens to another owner (they must already be an owner!)
-    this.giveTokens = function(formdata,callback)
-    {
+    this.giveTokens = function (formdata, callback) {
         var msg = formdata.msg;
         var sig = formdata.sig;
         var originalOwner = formdata.originalOwner;
@@ -447,9 +407,8 @@ var MyCOID = function(contractAddress)
         originalOwner = keccak_256(originalOwner).toUpperCase()
         newOwner = keccak_256(newOwner).toUpperCase()
 
-        self.contract.giveTokens(originalOwner,newOwner,amount,function(error,result)
-        {
-            callback(error,result)
+        self.contract.giveTokens(originalOwner, newOwner, amount, function (error, result) {
+            callback(error, result)
         })
 
     }
@@ -462,25 +421,20 @@ var MyCOID = function(contractAddress)
 }
 
 
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
-
-
 //This does all the endpoint listening:
 //The variable endpoint references all keys in the json object.
-for(let endpoint in MyCoidConfig)
-{
+for (let endpoint in MyCoidConfig) {
     //this is the function to call
     var functionCall = MyCoidConfig[endpoint];
     console.log(functionCall)
     console.log(endpoint)
-    app.post('/'+endpoint,function(req,res)
-    {
+    app.post('/' + endpoint, function (req, res) {
 
-	console.log("POSTED ENDPOINT: " + endpoint);
+        console.log("POSTED ENDPOINT: " + endpoint);
 
         //their contract address
         var contractAddress = req.body.address;
@@ -494,7 +448,7 @@ for(let endpoint in MyCoidConfig)
 
         console.log("function call is: " + functionCall)
 
-       // res.json({'Status':'hi','Result':'hello'})
+        // res.json({'Status':'hi','Result':'hello'})
 
         //formulate the string of code for the function call
         var toExecute = "myCoid." + MyCoidConfig[endpoint] + "(formdata,function(error,result)"

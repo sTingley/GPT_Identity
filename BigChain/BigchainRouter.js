@@ -1,3 +1,7 @@
+//THIS FILE IS CALLED BY THE ANDROID APP (scans digital identity QR Code)
+//Bigchain is called directly
+
+
 'use strict'
 
 //for allowing a post request

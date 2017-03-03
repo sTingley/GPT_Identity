@@ -32,12 +32,16 @@ contract IdentityDimensionControl
                 bytesString.length = 32;
 
                 myCOID = CoreIdentity(CoidAddr);
+                //bytes32[10] memory test;
+                //test[0]= 0x6131;
+                //test[1]= 0x6331;
 
                 tokenManagement = new IdentityDimensionControlToken(myCOID.getOwners());
 
                 chairperson = sha3(msg.sender);
 
                 val = myCOID.getOwners();
+                //val=test;
         }
     }
 
@@ -155,7 +159,7 @@ contract IdentityDimensionControl
 
 
     //TODO: add function isOwner to CoreIdentity
-    function CreateDimension(string pubKey, bytes32 uniqueID, string typeInput, uint flag) accessContract(msg.sender) returns (bool success, bytes32 callerHash)
+    function CreateDimension(string pubKey, bytes32 uniqueID, string typeInput, uint flag) accessContract(msg.sender) returns (bool success, bytes32 callerHash, address test)
     {
         success = false;
         callerHash = sha3(pubKey);
@@ -163,6 +167,7 @@ contract IdentityDimensionControl
         {
             //Create a new identity dimension contract:
             IdentityDimension creation = new IdentityDimension(uniqueID,stringToBytes32(typeInput),flag);
+            test = address(creation);
 
             //if there is an empty index, add it there:
             bool found = false;
@@ -187,6 +192,7 @@ contract IdentityDimensionControl
             else
             {
                 dimensions[emptyIndex] = address(creation);
+
                 IDs[emptyIndex] = creation.getID();
                 dimensionTypes[emptyIndex] = typeInput;
             }
@@ -218,6 +224,7 @@ contract IdentityDimensionControl
                     IdentityDimension current1 = IdentityDimension(dimensions[index]);
 
                     current1.kill();
+                    deleteDimensionIndex(index);
                     result = true;
                 }
             }
@@ -233,6 +240,7 @@ contract IdentityDimensionControl
 
                         current2.kill();
                         result = true;
+                        deleteDimensionIndex(index);
                     }
                     else
                     {
@@ -248,20 +256,19 @@ contract IdentityDimensionControl
     }
 
     //changes the descriptor
-    function changeDescriptor(string pubKey, string type1, bytes32 ID, string oldDescriptor, string newDescriptor) accessContract(msg.sender) returns (bool success)
+    function changeDescriptor(bytes32 pubKey, bytes32 type1, bytes32 ID, bytes32 oldDescriptor, bytes32 newDescriptor) accessContract(msg.sender) returns (bool success)
     {
         success = false;
-
         //params for accessing the relevant IdentityDimension Contract
         bool found = false;
         address addr = 0x0;
 
-       (found,addr) = getDimensionAddress(type1, ID);
+       (found,addr) = getDimensionAddress(bytes32ToString(type1), ID);
 
         if(found)
         {
             IdentityDimension current = IdentityDimension(addr);
-            success = current.changeDescriptor(stringToBytes32(oldDescriptor),stringToBytes32(newDescriptor));
+            success = current.changeDescriptor(oldDescriptor,newDescriptor);
         }
     }
 
@@ -269,51 +276,54 @@ contract IdentityDimensionControl
     //NOTE: One of Type or ID can be null. To make it easier for the user to call this function.
     //This function adds a (attribute/descriptor) entry to a dimension.
     //They must be an Owner or Controller to call this function.
-    function addEntry(string pubKey1, string type1, bytes32 ID, string attribute, string descriptor, uint flag) accessContract(msg.sender) returns (string pubKey1ret, string type1ret, bytes32 IDret, string attributeret, string descriptorret, uint flagReturn)
+    function addEntry(bytes32 pubKey1,bytes32 type1,bytes32 ID,bytes32 descriptor,bytes32 attribute,uint flag) accessContract(msg.sender) returns (bool result)
     {
 
-        pubKey1ret = pubKey1;
-        type1ret = type1;
-        IDret = ID;
-        attributeret = attribute;
-        descriptorret = descriptor;
-        flagReturn = flag;
+        //pubKey1ret = pubKey1;
+        //type1ret = type1;
+        //IDret = ID;
 
+        //attributeret = attribute;
+        //descriptorret = descriptor;
 
-//        result = false;
-//      uint val;
+        //flagReturn = flag;
+
+        //string memory  pubKey=bytes32ToString(pubKey1);
+        result = false;
+        uint val;
         //params for accessing the relevant IdentityDimension Contract
-//        bool found = false;
-//        address addr = 0x0;
+        bool found = false;
+        address addr = 0x0;
 
-//      keyHash = sha3(pubKey1);
-//      nullHash = sha3("");
-
-
-//        if(sha3(pubKey1) == sha3("a1"))
-//        {
-//          val = 1;
-
-//            (found,addr) = getDimensionAddress(type1, ID);
+        //keyHash = sha3(pubKey1);
+        //nullHash = sha3("");
 
 
-//            //were able to find the identity contract:
-//            if(found)
-//            {
-//              val = 2;
-//
-//                //get the identity contract:
-//                IdentityDimension current = IdentityDimension(addr);
-//
-//                //add the entry to the identity contract:
-//                result = current.addEntry(stringToBytes32(descriptor),stringToBytes32(attribute), flag);
-//
-//            }
-//        }
-//      else
-//      {
-//              val = 33;
-//      }
+        if(myCOID.isController(sha3(pubKey1)) || myCOID.isOwner(sha3(pubKey1)))
+        {
+            val = 1;
+
+            (found,addr) = getDimensionAddress(bytes32ToString(type1), ID);
+
+
+            //were able to find the identity contract:
+            if(found)
+            {
+                val = 2;
+
+                //get the identity contract:
+                IdentityDimension current = IdentityDimension(addr);
+
+                //add the entry to the identity contract:
+                result = current.addEntry(descriptor,attribute, flag);
+
+            }
+
+        }
+        else
+        {
+                val = 33;
+        }
 
     }
 
@@ -321,7 +331,7 @@ contract IdentityDimensionControl
     //NOTE: One of Type or ID can be null. To make it easier for the user to call this function.
     //This function removes an (attribute/descriptor) entry from a dimension.
     //They must be an Owner or Controller to call this function.
-    function removeEntry(string pubKey, string type1, bytes32 ID, string descriptor) accessContract(msg.sender) returns (bool result)
+    function removeEntry(bytes32 pubKey, bytes32 type1, bytes32 ID, bytes32 descriptor) accessContract(msg.sender) returns (bool result)
     {
         result = false;
 
@@ -330,10 +340,10 @@ contract IdentityDimensionControl
         address addr = 0x0;
 
 
-        if(myCOID.isOwner(sha3(pubKey)) || myCOID.isController(sha3(pubKey)))
+        if(myCOID.isOwner(sha3(bytes32ToString(pubKey))) || myCOID.isController(sha3(bytes32ToString(pubKey))))
         {
 
-            (found,addr) = getDimensionAddress(type1, ID);
+            (found,addr) = getDimensionAddress(bytes32ToString(type1), ID);
 
             //were able to find the identity contract:
             if(found)
@@ -343,7 +353,7 @@ contract IdentityDimensionControl
                 IdentityDimension current = IdentityDimension(addr);
 
                 //add the entry to the identity contract:
-                result = current.removeEntry(stringToBytes32(descriptor));
+                result = current.removeEntry(descriptor);
 
             }
         }
@@ -352,11 +362,11 @@ contract IdentityDimensionControl
 
 
     //NOTE: One of Type or ID can be null. To make it easier for the user to call this function.
-    //This function allows you to change the descriptor and/or flag of an entry.
-    //IMPORTANT: If you do not wish to change the descriptor, make it null.
+    //This function allows you to change the attribute and/or flag of an entry.
+    //IMPORTANT: If you do not wish to change the descriptor, make it null.(ignore)
     //If you do not wish to change the flag, make it 2.
     //NOTE: If you wish to change the name of the attribute, you will have to delete it, then create it.
-    function updateEntry(string pubKey, string type1, bytes32 ID, string descriptor, string attribute, uint flag) accessContract(msg.sender) returns (bool result)
+    function updateEntry(bytes32 pubKey, bytes32 type1, bytes32 ID, bytes32 descriptor, bytes32 attribute, uint flag) accessContract(msg.sender) returns (bool result)
     {
 
         result = false;
@@ -366,10 +376,10 @@ contract IdentityDimensionControl
         address addr = 0x0;
 
 
-        if(myCOID.isOwner(sha3(pubKey)) || myCOID.isController(sha3(pubKey)))
+        if(myCOID.isOwner(sha3(bytes32ToString(pubKey))) || myCOID.isController(sha3(bytes32ToString(pubKey))))
         {
 
-            (found,addr) = getDimensionAddress(type1, ID);
+            (found,addr) = getDimensionAddress(bytes32ToString(type1), ID);
 
 
             //were able to find the identity contract:
@@ -380,7 +390,8 @@ contract IdentityDimensionControl
                 IdentityDimension current = IdentityDimension(addr);
 
                 //add the entry to the identity contract:
-                result = current.update(stringToBytes32(descriptor),stringToBytes32(attribute),flag);
+                result = current.update(descriptor,attribute,flag);
+
 
             }
         }
@@ -391,7 +402,7 @@ contract IdentityDimensionControl
     //Type is the dimension name
     //ID is the dimension ID
     //can be referred by either...one of them can be null
-    function readEntry(string pubKey, string type1, bytes32 ID, string descriptor) accessContract(msg.sender) returns (string result)
+    function readEntry(bytes32 pubKey, bytes32 type1, bytes32 ID, bytes32 descriptor) accessContract(msg.sender) returns (string result)
     {
         result = "";
 
@@ -400,7 +411,7 @@ contract IdentityDimensionControl
         address addr = 0x0;
 
 
-        (found,addr) = getDimensionAddress(type1, ID);
+        (found,addr) = getDimensionAddress(bytes32ToString(type1), ID);
 
 
         //were able to find the identity contract:
@@ -415,27 +426,28 @@ contract IdentityDimensionControl
             bool isPub = false;
 
             //read the entry from the identity contract:
-            (toConvert,success,isPub) = current.readEntry(stringToBytes32(descriptor));
+            (toConvert,success,isPub) = current.readEntry(descriptor);
 
-            string memory attribute = bytes32ToString(toConvert);
+            //string memory attribute = bytes32ToString(toConvert);
 
             //if it is public, just return the descriptor:
             if(isPub)
             {
-                result = attribute;
+               if(success){ result = bytes32ToString(toConvert); }//was attribute
+               else{ result="Data not found"; }
             }
             else
             {
                 //return descriptor if they are an owner or controller
-                if(myCOID.isOwner(sha3(pubKey)) || myCOID.isController(sha3(pubKey)))
+                if(myCOID.isOwner(sha3(bytes32ToString(pubKey))) || myCOID.isController(sha3(bytes32ToString(pubKey))))
                 {
-                    result = attribute;
+                    result = bytes32ToString(toConvert);
                 }
                 else
                 {
-                    if(tokenManagement.spendTokens(sha3(pubKey),1,bytes32ToString(current.getName()),descriptor))
+                    if(tokenManagement.spendTokens(pubKey,1,bytes32ToString(current.getName()), bytes32ToString(descriptor)))
                     {
-                        result = descriptor;
+                        result =  bytes32ToString(descriptor);
                     }
                     else
                     {
@@ -447,19 +459,19 @@ contract IdentityDimensionControl
         }
         else
         {
-            result = "Data not found.";
+            result = "Contract not found.";
         }
     }
 
 
-    function getPublicDescriptors(string type1, bytes32 ID) accessContract(msg.sender) returns (bytes32[100] result)
+    function getPublicDescriptors(bytes32 type1, bytes32 ID) accessContract(msg.sender) returns (bytes32[100] result)
     {
         //params for accessing the relevant IdentityDimension Contract
         bool found = false;
         address addr = 0x0;
+        //type1ret=bytes32ToString(type1);
 
-
-        (found,addr) = getDimensionAddress(type1, ID);
+        (found,addr) = getDimensionAddress(bytes32ToString(type1), ID);
 
 
         //was able to find the identity contract:
@@ -469,18 +481,19 @@ contract IdentityDimensionControl
             IdentityDimension current = IdentityDimension(addr);
 
             result = current.getPublicDescriptors();
+
         }
 
     }
 
-    function getPrivateDescriptors(string type1, bytes32 ID) accessContract(msg.sender) returns (bytes32[100] result)
+    function getPrivateDescriptors(bytes32 type1, bytes32 ID) accessContract(msg.sender) returns (bytes32[100] result)
     {
         //params for accessing the relevant IdentityDimension Contract
         bool found = false;
         address addr = 0x0;
 
 
-        (found,addr) = getDimensionAddress(type1, ID);
+        (found,addr) = getDimensionAddress(bytes32ToString(type1), ID);
 
 
         //was able to find the identity contract:
@@ -597,4 +610,3 @@ contract IdentityDimensionControl
         amount = tokenManagement.delegateeAmount(delegatee,dimension, descriptor);
     }
 }
-

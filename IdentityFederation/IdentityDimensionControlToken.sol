@@ -1,4 +1,3 @@
-
 //The same strategy used in IdentityDimension is used here for arrays:
 //When you delete something, don't restructure the size; set the value(s) null.
 //When you add something, find the first null index.
@@ -192,12 +191,21 @@ contract IdentityDimensionControlToken
 
                 bool keepGoing = true;
 
+                uint index=0;
                 while(keepGoing)
                 {
                     //first find index in delegations with closest expiration.
-                    uint index = 0;
+                    //uint index = 0;
+                    //This correctly sets var index as the 1st available owner
+                    for(uint n=0;n<delegations.length;n++){
+                        if(delegations[n].owner == owner){
+                                index=n;
+                                break;
+                        }
+                    }
 
                     //size of delegations must be greater than zero because actualAmount != 0
+                    //could probably initialize k=index to save cycles later
                     for(uint k = 0; k < delegations.length; k++)
                     {
                         if(delegations[k].owner == owner)
@@ -259,18 +267,26 @@ contract IdentityDimensionControlToken
         if(actualAmount >= amount && amount > 0)
         {
             success = true;
-
             bool keepGoing = true;
+            uint index=0;
 
             while(keepGoing)
             {
+
+                for(uint n=0;n<delegations.length;n++){
+                        if(sha3(delegations[n].dimension) == sha3(identityDimension)){
+                                index=n;
+                                break;
+                        }
+                    }
+
                 //first find index in delegations with closest expiration.
-                uint index = 0;
+               // uint index = 0;
 
                 //size of delegations must be greater than zero because actualAmount != 0
                 for(uint k = 0; k < delegations.length; k++)
                 {
-                    if(delegations[k].expiration <= delegations[index].expiration && sha3(delegations[index].dimension) == sha3(identityDimension) && allowsDescriptor(k,descriptor))
+                    if(delegations[k].expiration <= delegations[index].expiration && sha3(delegations[k].dimension) == sha3(identityDimension)&& allowsDescriptor(k,descriptor) )
                     {
                         index = k;
                     }
@@ -433,4 +449,3 @@ contract IdentityDimensionControlToken
         }
     }
 }
-

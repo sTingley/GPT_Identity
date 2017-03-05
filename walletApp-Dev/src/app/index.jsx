@@ -14,12 +14,12 @@ import Menu from './Components/menu.jsx';
 import Header from './Components/header.jsx';
 import Home from './Components/Home.jsx';
 import NameRegister from './Components/NameRegister.jsx';
-import CoreIdentity from './Components/CoreIdentity.jsx';
+import CoreIdentity from './Components/CoreIdentityForm.jsx';
 import UploadKeyStore from './Components/Upload.jsx';
 import ToVote from './Components/ToVote.jsx';
 import Notifications from './Components/Notifications.jsx';
 import Assets from './Components/Assets.jsx';
-import MyCoreIdentity from './Components/MyCoreIdentity.jsx';
+import MyCOID from './Components/MyCOID.jsx';
 import IdentityDimension from './Components/IdentityDimension.jsx';
 import Documents from './Components/Documents.jsx';
 import MyGateKeeper from './Components/MyGateKeeper.jsx';
@@ -88,7 +88,7 @@ render((
 			<Route path="assets" component={Assets} onEnter={validateLogin} />
 			<Route path="docs" component={Documents} onEnter={validateLogin} />
 			<Route path="myGateKeeper" component={MyGateKeeper} onEnter={validateLogin} />
-			<Route path="mycoreidentity" component={MyCoreIdentity} onEnter={validateLogin} />
+			<Route path="mycoreidentity" component={MyCOID} onEnter={validateLogin} />
 			<Route path="identitydimension" component={IdentityDimension} onEnter={validateLogin} />
       	</Route>
     </Router>

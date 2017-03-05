@@ -1,5 +1,8 @@
 import React from 'react';
 
+//TODO: IMPLEMENT ONCE WE HAVE NAME REGISTRY
+//RIGHT NOW THIS COMPONENT IS COMMENTED OUT ON menu.jsx
+
 class NameRegister extends React.Component {
 	render () {
 	    return (

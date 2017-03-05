@@ -16,8 +16,8 @@ class Menu extends React.Component {
 					<li><Link to='/upload' activeClassName="active">Upload Keys</Link></li>
 					{prop.loggedin ? <li><Link to='/tovote' activeClassName="active">Vote</Link></li> : ''}
 					{prop.loggedin ? <li><Link to='/notifications' activeClassName="active">Notifications</Link></li> : ''}
-					{prop.loggedin ? <li><Link to='/register' activeClassName="active">Name Register</Link></li> : ''}
-					{prop.loggedin ? <li><Link to='/identity' activeClassName="active">Create Core Identity</Link></li> : ''}
+					{/*prop.loggedin ? <li><Link to='/register' activeClassName="active">Name Register</Link></li> : ''*/}
+					{prop.loggedin ? <li><Link to='/identity' activeClassName="active"><b>Create Core Identity</b></Link></li> : ''}
 					{prop.loggedin ? <li><Link to='/myGatekeeper' activeClassName="active">My Gatekeeper</Link></li> : ''}
 					{prop.loggedin ? <li><Link to='/assets' activeClassName="active">Assets</Link></li> : ''}
 					{prop.loggedin ? <li><Link to='/docs' activeClassName="active">My Documents</Link></li> : ''}

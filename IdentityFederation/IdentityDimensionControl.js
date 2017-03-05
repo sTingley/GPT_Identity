@@ -111,13 +111,16 @@ var IdentityDimensionControl = function(contractAddress)
     this.erisdburl = chainConfig.chainURL
     this.contractData = require('./epm.json')
     var contractAddr = contractAddress
-    console.log("contract addr: " + contractAddr)
+    console.log("contract address: " + contractAddr)
     this.contractAbiAddress = this.contractData['IdentityDimensionControl'];
     this.erisAbi = JSON.parse(fs.readFileSync("./abi/"+this.contractAbiAddress));
     this.accountData = require("./accounts.json");
     this.contractMgr = erisC.newContractManagerDev(this.erisdburl, chainConfig[this.chain]);
     this.contract = this.contractMgr.newContractFactory(this.erisAbi).at(contractAddress);
     var self = this;
+
+    //NOTE: contract is identityDimensionControl contract that is passed as input
+
     this.testing = function(valA,valB,valC,valD,valE,valF,callback)
     {
         self.contract.testing(valA,valB,valC,valD,valE,valF,function(error,result)
@@ -301,7 +304,9 @@ var IdentityDimensionControl = function(contractAddress)
             callback(error,result);
         })
     }
-}
+}//end IdentityDimensionControl
+
+
 app.listen(3015, function () {
     console.log("Connected to contract http://10.101.114.231:1337/rpc");
     console.log("Listening on port 3000");

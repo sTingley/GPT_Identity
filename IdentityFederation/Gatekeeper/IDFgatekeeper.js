@@ -416,8 +416,7 @@ var gatekeeper = function () {
         while (sync) { require('deasync').sleep(100); }
 
         this.setcoidData(proposalId, formdata, res, callback);
-        console.log("right after set coid data....");
-        console.log("formdata: " + formdata);
+        console.log("419: called set coid data....");
     }; //end of function
 
 
@@ -939,6 +938,7 @@ var eventListener = function () {
             var timestamp = (result.args).timestamp;
 
             //debugging
+            console.log("\nCaught gatekeeper contract event ResultReady....")
             console.log("Voting result is: " + votingResult);
             console.log("proposalID is: " + proposalId);
             console.log("resultMessage is: " + resultMessage);
@@ -948,7 +948,7 @@ var eventListener = function () {
             console.log("blockHashVal is: " + blockHashVal);
             console.log("blockchainID is: " + blockchainID);
             console.log("timestamp is: " + timestamp);
-            console.log(JSON.stringify(result.args));
+            console.log("result.args: " + JSON.stringify(result.args));
 
             //implement logic if and only if votingResult is true:
             if (votingResult) {

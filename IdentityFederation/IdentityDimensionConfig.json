@@ -1,5 +1,5 @@
-//key is endpoint name; value is corresponding function call
 {
+    "Instantiation": "Instantiation",
     "CreateDimension": "CreateDimension",
     "RemoveDimension": "RemoveDimension",
     "addEntry": "addEntry",
@@ -13,5 +13,5 @@
     "removeController": "removeController",
     "spendTokens": "spendTokens",
     "delegateeAmount": "delegateeAmount",
-    "addController": "addController",
+    "addController": "addController"
 }

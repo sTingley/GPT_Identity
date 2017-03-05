@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import TagsInput from 'react-tagsinput';
 import QRCode from 'qrcode.react';
 import AssetTags from './classAndSubClass.js';
-import DimensionCreationForm from './DimensionCreationForm.jsx'
+//import DimensionCreationForm from './DimensionCreationForm.jsx'
 import { Router, Route, IndexRedirect, hashHistory } from 'react-router';
 
 //import wallet from './wallet.js';
@@ -386,7 +386,7 @@ class Modal extends Component {
 		);
 	}
 }
-//<DimensionCreationForm handleHideModal={this.handleHideModal} />
+
 Modal.propTypes = {
 	hideHandler: React.PropTypes.func.isRequired	// hideHandler method must exists in parent component
 };

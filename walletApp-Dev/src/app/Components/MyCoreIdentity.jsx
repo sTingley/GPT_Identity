@@ -147,7 +147,7 @@ class Asset extends React.Component {
         var recoveryParams = this.getRecoveryParams()
         console.log("recovery arr: " + recoveryParams)
 
-        if (recoveryParams.length > 1){
+        if (recoveryParams.length > 1) {
             json.recoveryCondition = recoveryParams[1]
         }
 

@@ -52693,8 +52693,11 @@
 	            file_attrs: [],
 	
 	            //used to populate the select options for add dimension
-	            owned_assets: [], //endpoint: getOwnedAssets
+	            owned_assets_label: [], //endpoint: getOwnedAssets
 	            controlled_assets: [], //endpoint: getControlledAssets
+	
+	            //contains actual asset data from DT
+	            own_assets: [],
 	
 	            //********************
 	            //DimensionForm
@@ -52729,6 +52732,8 @@
 	    }, {
 	        key: "componentWillMount",
 	        value: function componentWillMount() {
+	
+	            var _this = this;
 	            //this.getDimensions();
 	            $.ajax({
 	                url: twinUrl + 'getMetaData',
@@ -52749,73 +52754,101 @@
 	                    var dimensions = JSON.parse(data).Dimensions;
 	                    //console.log("dimensions: " + JSON.stringify(dimensions))
 	
-	                    this.setState({ iDimensions: dimensions });
-	                }.bind(this),
+	                    _this.setState({ iDimensions: dimensions });
+	                }.bind(_this),
 	                complete: function complete() {}
 	            });
 	
-	            // $.ajax({
-	            // 	type: "POST",
-	            // 	url: twinUrl + 'getOwnedAssets',
-	            // 	data: { "pubKey": localStorage.getItem("pubKey") },
-	            // 	success: function (result) {
-	            // 		var data = result;
-	            // 		if ($.type(result) != "object") {
-	            // 			data = JSON.parseJSON(result)
-	            // 		}
-	            // 		//get the array:
-	            // 		data = data.data;
+	            $.ajax({
+	                type: "POST",
+	                url: twinUrl + 'getOwnedAssets',
+	                data: { "pubKey": localStorage.getItem("pubKey") },
+	                success: function success(result) {
+	                    var data = result;
+	                    if ($.type(result) != "object") {
+	                        data = JSON.parseJSON(result);
+	                    }
+	                    //get the array:
+	                    data = data.data;
+	                    //DEBUGGING:
+	                    console.log("getOwnedAssets result: " + data);
 	
-	            //         let owned_array = []
+	                    var owned_array = [];
 	
-	            //         if(data.length > 0){
-	            //             for(let i=0; i< data.length; i++){
-	            //                 owned_array.push(data[i])
-	            //             }
-	            //             console.log(owned_array)
-	            //             this.setState({owned_assets: owned_array})
-	            //         }
+	                    if (data.length > 0) {
+	                        for (var i = 0; i < data.length; i++) {
+	                            owned_array.push(data[i]);
+	                        }
+	                        console.log(owned_array);
+	                        _this.setState({ owned_assets_label: owned_array });
+	                        //****************************************************
 	
-	            // 		//DEBUGGING:
-	            // 		console.log("getOwnedAssets result: " + data);
+	                        //loop through OWNED assets
+	                        for (var _i = 0; _i < data.length; _i++) {
+	                            //AJAX each asset:
+	                            $.ajax({
+	                                type: "POST",
+	                                url: twinUrl + 'getAsset',
+	                                data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": data[_i] },
+	                                success: function (result) {
+	                                    var dataResult = result;
+	                                    if ($.type(result) != "object") {
+	                                        dataResult = JSON.parseJSON(result);
+	                                    }
+	                                    //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
+	                                    var theArray = _this.state.own_assets;
 	
-	            // 	}.bind(this),
-	            // 	complete: function () {
-	            // 	},
-	            // })
+	                                    console.log("length is: " + theArray.length); //get total number of owned assets
+	                                    console.log(JSON.stringify(theArray));
+	                                    theArray[theArray.length] = { asset_id: dataResult.assetID, asset_name: dataResult };
+	                                    if (dataResult.assetID = "MyCOID") _this.setState({ own_assets: theArray });
+	                                }.bind(_this),
+	                                complete: function complete() {
+	                                    // for(let i in this.state.owned_assets){
+	                                    //     localStorage.setItem("uniqueID" + i, i.)
+	                                    // }
+	                                }
+	                            });
+	                        } //end for
+	                    } //end if data>0
+	                } //end success
 	
-	            // $.ajax({
-	            // 	type: "POST",
-	            // 	url: twinUrl + 'getControlledAssets',
-	            // 	data: { "pubKey": localStorage.getItem("pubKey") },
-	            // 	success: function (result) {
-	            // 		var data = result;
-	            // 		if ($.type(result) != "object") {
-	            // 			data = JSON.parseJSON(result)
-	            // 		}
+	            });
+	        } //componentWillMount
 	
-	            // 		//get the array:
-	            // 		data = data.data;
+	        // $.ajax({
+	        // 	type: "POST",
+	        // 	url: twinUrl + 'getControlledAssets',
+	        // 	data: { "pubKey": localStorage.getItem("pubKey") },
+	        // 	success: function (result) {
+	        // 		var data = result;
+	        // 		if ($.type(result) != "object") {
+	        // 			data = JSON.parseJSON(result)
+	        // 		}
 	
-	            //         let ctrl_array = []
-	            //         if(data.length > 0){
-	            //             for(let i=0; i< data.length; i++){
-	            //                 ctrl_array.push(data[i])
-	            //             }
-	            //             console.log(ctrl_array)
-	            //             this.setState({controlled_assets: ctrl_array})
-	            //         }
+	        // 		//get the array:
+	        // 		data = data.data;
 	
-	            // 		//debugging:
-	            // 		console.log("Get Controlled Assets result: " + data);
+	        //         let ctrl_array = []
+	        //         if(data.length > 0){
+	        //             for(let i=0; i< data.length; i++){
+	        //                 ctrl_array.push(data[i])
+	        //             }
+	        //             console.log(ctrl_array)
+	        //             this.setState({controlled_assets: ctrl_array})
+	        //         }
 	
-	            // 	}.bind(this),
-	            // 	complete: function () {
-	            // 		// do something
-	            // 	},
-	            // 	//console.log(result)
-	            // })
-	        }
+	        // 		//debugging:
+	        // 		console.log("Get Controlled Assets result: " + data);
+	
+	        // 	}.bind(this),
+	        // 	complete: function () {
+	        // 		// do something
+	        // 	},
+	        // 	//console.log(result)
+	        // })
+	
+	
 	    }, {
 	        key: "hideHandler",
 	        value: function hideHandler() {
@@ -52895,7 +52928,11 @@
 	            $.ajax({
 	                type: "POST",
 	                url: twinUrl + 'createDimension',
-	                data: { pubkey: localStorage.getItem("pubKey") },
+	                data: {
+	                    pubkey: localStorage.getItem("pubKey"),
+	                    flag: '1',
+	                    type: 'public'
+	                },
 	                success: function (result) {
 	                    var data = result;
 	                    if ($.type(result) != "object") {

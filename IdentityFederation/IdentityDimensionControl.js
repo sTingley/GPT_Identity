@@ -4,9 +4,10 @@ var app = require("express")();
 var bodyParser = require('body-parser')
 var fs = require('fs')
 var keccak_256 = require('js-sha3').keccak_256
-var DataFetcher = require('/.DataFetcher.js')
+var DataFetcher = require('./DataFetcher.js')
 //configuration of the chain
 var chainConfig = require('/home/demoadmin/.eris/ErisChainConfig.json')
+var IdentityConfig = require('./IdentityDimensionConfig.json')
 //this is for sending a notification for superagent
 var superAgent = require("superagent");
 //required library for accessing the contract
@@ -104,19 +105,19 @@ var TwinConnector = function()
 var connector = new TwinConnector();
 
 
-var IdentityDimensionControl = function(contractAddress)
+var IdentityDimensionControl = function(iDimensionCtrlContractAddress)
 {
     //get the contract:
     this.chain = 'primaryAccount'
     this.erisdburl = chainConfig.chainURL
     this.contractData = require('./epm.json')
-    var contractAddr = contractAddress
-    console.log("contract address: " + contractAddr)
+    var iDimensionCtrlContractAddres = iDimensionCtrlContractAddres
+    console.log("iDimCtrl contract addr: " + iDimensionCtrlContractAddres)
     this.contractAbiAddress = this.contractData['IdentityDimensionControl'];
     this.erisAbi = JSON.parse(fs.readFileSync("./abi/"+this.contractAbiAddress));
     this.accountData = require("./accounts.json");
     this.contractMgr = erisC.newContractManagerDev(this.erisdburl, chainConfig[this.chain]);
-    this.contract = this.contractMgr.newContractFactory(this.erisAbi).at(contractAddress);
+    this.contract = this.contractMgr.newContractFactory(this.erisAbi).at(iDimensionCtrlContractAddres);
     var self = this;
 
     //NOTE: contract is identityDimensionControl contract that is passed as input
@@ -147,6 +148,18 @@ var IdentityDimensionControl = function(contractAddress)
         var typeInput = formdata.typeInput;
         var flag = formdata.flag;
         self.contract.CreateDimension(pubKey,uniqueID,typeInput,flag,function(error,result)
+        {
+            callback(error,result);
+        })
+    }
+    //QUESTION******** SHOULD THIS BE PUBLIC
+    //result is the bool found from the contract, as well as address of the dimension
+    this.getDimensionAddress = function(formdata,callback)
+    {
+        var type = formdata.type;
+        var ID = formdata.ID;
+        
+        self.contract.getDimensionAddress(type,ID,function(error,result)
         {
             callback(error,result);
         })
@@ -262,20 +275,22 @@ var IdentityDimensionControl = function(contractAddress)
             callback(error,result);
         })
     }
-    //the result is the bool success
-    this.addDelegation = function(formdata,callback)
-    {
-        var owner = formdata.owner;
-        var delegatee = formdata.delegatee;
-        var amount = formdata.amount;
-        var dimension = formdata.dimension;
-        var timeFrame = formdata.timeFrame;
-        var accessCategories = formdata.accessCategories;
-        self.contract.addDelegation(owner,delegatee,amount,dimension,timeFrame,accessCategories,function(error,result)
-        {
-            callback(error,result);
-        })
-    }
+    //  ST: COMMENTED THIS OUT BECAUSE idimCtrlToken has this method. it is called internally by delegate (see above)
+
+    // //the result is the bool success
+    // this.addDelegation = function(formdata,callback)
+    // {
+    //     var owner = formdata.owner;
+    //     var delegatee = formdata.delegatee;
+    //     var amount = formdata.amount;
+    //     var dimension = formdata.dimension;
+    //     var timeFrame = formdata.timeFrame;
+    //     var accessCategories = formdata.accessCategories;
+    //     self.contract.addDelegation(owner,delegatee,amount,dimension,timeFrame,accessCategories,function(error,result)
+    //     {
+    //         callback(error,result);
+    //     })
+    // }
     //the result is the bool success
     this.revokeDelegation = function(fromdata,callback)
     {
@@ -304,13 +319,65 @@ var IdentityDimensionControl = function(contractAddress)
             callback(error,result);
         })
     }
+
+//************************************************************************************ */
+
+    this.removeController = function(formdata,callback)
+    {
+        var controller = formdata.controller;
+        
+        self.contract.removeController(controller,function(error,result)
+        {
+            callback(error,result);
+        })
+    }
+    //SHOULD THIS FUNCTION EVEN BE HERE:?
+    //result is the bool exists, and uint index -- shouldn't we make that private
+    this.controllerExists = function(formdata,callback)
+    {
+        var controllerHash = formdata.controllerHash;
+        
+        self.contract.controllerExists(controllerHash,function(error,result)
+        {
+            callback(error,result);
+        })
+    }
+    //TODO: addController
+     this.addController = function(formdata,callback)
+     {
+         var controller = formdata.controller;
+         var amount = formdata.amount;
+         
+         self.contract.addController(controller,amount,function(error,result)
+         {
+             callback(error,result);
+         })
+     }
+//*********************************************************************************** */
+
 }//end IdentityDimensionControl
 
 
 app.listen(3015, function () {
     console.log("Connected to contract http://10.101.114.231:1337/rpc");
-    console.log("Listening on port 3000");
+    console.log("Listening on port 3015");
 });
+
+    /*SPEND TOKENS IS A TOKEN CONTROL FUNCTION THAT is called internally inside identityDimensionControl.sol
+    //  !!!!!!!!!!! (Called inside readEntry)
+
+    this.spendTokens = function(formdata,callback)
+    {
+        var delegatee = formdata.delegatee;
+        var amount = formdata.amount;
+        var identityDimension = formdata.identityDimension;
+        
+        self.contract.spendTokens(delegatee,amount,identityDimension,function(error,result)
+        {
+            callback(error,result);
+        })
+    }*/
+
 //TODO: what will instantiate their contract???
 app.post('readEntry', function(req,res)
 {
@@ -329,7 +396,7 @@ app.post('readEntry', function(req,res)
             {
                 //TODO: see if the result sends directly to the wallet
                 //If it does not, we will be forced to have to talk to the digital twin
-                res.json("Data": JSON.parse(result))
+                res.json({"Data": JSON.parse(result)})
             })
         }
         else
@@ -342,12 +409,12 @@ app.post('readEntry', function(req,res)
 
 //This does all the endpoint listening:
 //The variable endpoint references all keys in the json object.
-for(let endpoint in MyCoidConfig)
+for(let endpoint in IdentityConfig)
 {
     //this is the function to call
-    var functionCall = MyCoidConfig[endpoint];
-    console.log(functionCall)
-    console.log(endpoint)
+    var functionCall = IdentityConfig[endpoint];
+    console.log("functionCall: " + functionCall)
+    console.log("endpoint: " + endpoint)
     app.post('/'+endpoint,function(req,res)
     {
 
@@ -355,10 +422,10 @@ for(let endpoint in MyCoidConfig)
 
         //their contract address
         var contractAddress = req.body.address;
-        console.log(contractAddress)
+        console.log("contract address: " + contractAddress)
         console.log("endpoint is: " + endpoint)
         //instantiate their Coid
-        var myCoid = new MyCOID(contractAddress)
+        var dimension = new IdentityDimensionControl(contractAddress)
 
         //function input
         var formdata = req.body;
@@ -368,7 +435,7 @@ for(let endpoint in MyCoidConfig)
        // res.json({'Status':'hi','Result':'hello'})
 
         //formulate the string of code for the function call
-        var toExecute = "myCoid." + IdentityConfig[endpoint] + "(formdata,function(error,result)"
+        var toExecute = "dimension." + IdentityConfig[endpoint] + "(formdata,function(error,result)"
         toExecute = toExecute + "{"
         toExecute = toExecute + "res.json({'Status':error,'Result':(''+result)});"
         toExecute = toExecute + "console.log(result + '');"
@@ -384,5 +451,5 @@ for(let endpoint in MyCoidConfig)
 }
 
 
-app.listen(3012)
-console.log("running at port 3012")
+// app.listen(3012)
+// console.log("running at port 3012")

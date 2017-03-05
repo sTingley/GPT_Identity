@@ -506,9 +506,13 @@ class IdentityDimensions extends Component {
             //TODO: BELIEVE WE CAN TAKE THIS OUT (for use it to genrte new unqiueID)
             file_attrs: [],
 
+
             //used to populate the select options for add dimension
-            owned_assets: [],           //endpoint: getOwnedAssets
+            owned_assets_label: [],           //endpoint: getOwnedAssets
             controlled_assets: [],      //endpoint: getControlledAssets
+
+            //contains actual asset data from DT
+            own_assets: [],
 
             //********************
             //DimensionForm
@@ -540,6 +544,8 @@ class IdentityDimensions extends Component {
 
 
     componentWillMount() {
+
+        let _this = this
         //this.getDimensions();
         $.ajax({
             url: twinUrl + 'getMetaData',
@@ -560,44 +566,77 @@ class IdentityDimensions extends Component {
                 var dimensions = JSON.parse(data).Dimensions
                 //console.log("dimensions: " + JSON.stringify(dimensions))
 
-                this.setState({ iDimensions: dimensions })
+                _this.setState({ iDimensions: dimensions })
 
-            }.bind(this),
+            }.bind(_this),
             complete: function () {
 
             }
         })
 
 
-        // $.ajax({
-        // 	type: "POST",
-        // 	url: twinUrl + 'getOwnedAssets',
-        // 	data: { "pubKey": localStorage.getItem("pubKey") },
-        // 	success: function (result) {
-        // 		var data = result;
-        // 		if ($.type(result) != "object") {
-        // 			data = JSON.parseJSON(result)
-        // 		}
-        // 		//get the array:
-        // 		data = data.data;
+        $.ajax({
+            type: "POST",
+            url: twinUrl + 'getOwnedAssets',
+            data: { "pubKey": localStorage.getItem("pubKey") },
+            success: function (result) {
+                var data = result;
+                if ($.type(result) != "object") {
+                    data = JSON.parseJSON(result)
+                }
+                //get the array:
+                data = data.data;
+                //DEBUGGING:
+                console.log("getOwnedAssets result: " + data);
 
-        //         let owned_array = []
+                let owned_array = []
 
-        //         if(data.length > 0){
-        //             for(let i=0; i< data.length; i++){
-        //                 owned_array.push(data[i])
-        //             }
-        //             console.log(owned_array)
-        //             this.setState({owned_assets: owned_array})
-        //         }
+                if (data.length > 0) {
+                    for (let i = 0; i < data.length; i++) {
+                        owned_array.push(data[i])
+                    }
+                    console.log(owned_array)
+                    _this.setState({ owned_assets_label: owned_array })
+                    //****************************************************
 
-        // 		//DEBUGGING:
-        // 		console.log("getOwnedAssets result: " + data);
+                    //loop through OWNED assets
+                    for (let i = 0; i < data.length; i++) {
+                        //AJAX each asset:
+                        $.ajax({
+                            type: "POST",
+                            url: twinUrl + 'getAsset',
+                            data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": data[i] },
+                            success: function (result) {
+                                var dataResult = result;
+                                if ($.type(result) != "object") {
+                                    dataResult = JSON.parseJSON(result)
+                                }
+                                //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
+                                var theArray = _this.state.own_assets;
 
-        // 	}.bind(this),
-        // 	complete: function () {
-        // 	},
-        // })
+                                console.log("length is: " + theArray.length) //get total number of owned assets
+                                console.log(JSON.stringify(theArray))
+                                theArray[theArray.length] = { asset_id: dataResult.assetID, asset_name: dataResult }
+                                if (dataResult.assetID = "MyCOID")
+                                    _this.setState({ own_assets: theArray });
+
+                            }.bind(_this),
+                            complete: function () {
+                                // for(let i in this.state.owned_assets){
+                                //     localStorage.setItem("uniqueID" + i, i.)
+                                // }
+                            },
+                        })
+
+                    }//end for
+
+                }//end if data>0
+
+            }//end success
+
+        })
+
+    }//componentWillMount
 
         // $.ajax({
         // 	type: "POST",
@@ -631,212 +670,216 @@ class IdentityDimensions extends Component {
         // 	//console.log(result)
         // })
 
-    }
-
-    hideHandler() {
-        this.setState({ showDetails: false });
-    }
-
-    dataHandler(index) {
-        return this.state.iDimensions[index];
-    }
-
-    getActiveData() {
-        return this.state.activeDimension;
-    }
-
-    //used to show activeDimension
-    showDimensionHandler(e) {
-        e.preventDefault();
-        this.setState({
-            showDetails: true,
-            activeDimension: this.dataHandler($(e.target).attr('data-index'))
-        });
-    }
-
-    getFileDetails(filedata) {
-        var obj = { [this.state.tmpFile]: filedata };
-        this.setState({ file_attrs: this.state.file_attrs.concat([obj]) });
-    }
-
-    handleHideModal() {
-        this.setState({ showModal: false });
-    }
-
-    handleShowModal(e) {
-        this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-    }
-
-    appendInput() {
-        var inputLen = this.state.inputs.length;
-        if (inputLen < 10) {
-            var newInput = `input-${inputLen}`;
-            this.setState({ inputs: this.state.inputs.concat([newInput]) });
-        }
-        console.log("inputs: " + this.state.inputs)
-    }
-
-    // prepareJSON(){
-
-    //     var inputObj = {
-    //         pubKey: this.state.pubKey,
-    //         uniqueID: "needs to be coid unique ID",
-    //         controlContractAddr: "434344423423423234",
-    //         type: "identityDimension",
-    //         bigchainHash: "",
-    //         bigchainID: ""
-    //     };
-    //     return inputObj
-    // }
-
-    createDimension(e) {
-
-        // e.preventDefault();
-        // console.log("hit createDimension")
-        // var json = this.prepareJSON()
-        // console.log("creating dimension with this data... " + JSON.stringify(json))
-
-        $.ajax({
-            type: "POST",
-            url: twinUrl + 'createDimension',
-            data: { pubkey: localStorage.getItem("pubKey") },
-            success: function (result) {
-                var data = result;
-                if ($.type(result) != "object") {
-                    data = JSON.parseJSON(result)
-                }
-
-                //get the array:
-                data = data.data;
-
-                //debugging:
-                console.log("createDimensionforDEMO result: " + data);
-
-            }.bind(this),
-            complete: function () {
-                // do something
-            },
-        })
-    }
 
 
-    render() {
-        console.log(JSON.stringify(this.state))
-        let dimensions = this.state.iDimensions;
-
-        var _that = this
-
-        var syle = {
-            marginRight: '15px'
+        hideHandler() {
+            this.setState({ showDetails: false });
         }
 
-        var table = {
-            margin: '0 auto'
+        dataHandler(index) {
+            return this.state.iDimensions[index];
         }
 
-        return (
-            <div id="IDENTITYDIMENSIONS_MODAL">
+        getActiveData() {
+            return this.state.activeDimension;
+        }
 
-                <h1>IDENTITY DIMENSIONS</h1><hr />
+        //used to show activeDimension
+        showDimensionHandler(e) {
+            e.preventDefault();
+            this.setState({
+                showDetails: true,
+                activeDimension: this.dataHandler($(e.target).attr('data-index'))
+            });
+        }
 
-                <div className="modal-header">
-                    <ul className="nav nav-tabs" role="tablist">
-                        <li role="presentation" className="active"><a href="#dimensions" role="tab" data-toggle="tab">Identity Dimensions</a></li>
-                        <li role="presentation"><a href="#addDimension" role="tab" data-toggle="tab">Create new dimension</a></li>
-                    </ul>
-                </div>
+        getFileDetails(filedata) {
+            var obj = { [this.state.tmpFile]: filedata };
+            this.setState({ file_attrs: this.state.file_attrs.concat([obj]) });
+        }
 
-                <div className="modal-body">
+        handleHideModal() {
+            this.setState({ showModal: false });
+        }
 
-                    <div className="tab-content">
+        handleShowModal(e) {
+            this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
+        }
 
-                        <div className="tabpanel" role="tabpanel" className="tab-pane active" id="dimensions"><br />
-                            <table style={table} className="table table-striped center">
-                                <tbody>
-                                    {(() => {
-                                        if ($.isArray(this.state.iDimensions) && this.state.iDimensions.length > 0) {
-                                            return this.state.iDimensions.map(function (el, i) {
+        appendInput() {
+            var inputLen = this.state.inputs.length;
+            if (inputLen < 10) {
+                var newInput = `input-${inputLen}`;
+                this.setState({ inputs: this.state.inputs.concat([newInput]) });
+            }
+            console.log("inputs: " + this.state.inputs)
+        }
+
+        // prepareJSON(){
+
+        //     var inputObj = {
+        //         pubKey: this.state.pubKey,
+        //         uniqueID: "needs to be coid unique ID",
+        //         controlContractAddr: "434344423423423234",
+        //         type: "identityDimension",
+        //         bigchainHash: "",
+        //         bigchainID: ""
+        //     };
+        //     return inputObj
+        // }
+
+        createDimension(e) {
+
+            // e.preventDefault();
+            // console.log("hit createDimension")
+            // var json = this.prepareJSON()
+            // console.log("creating dimension with this data... " + JSON.stringify(json))
+
+            $.ajax({
+                type: "POST",
+                url: twinUrl + 'createDimension',
+                data: {
+                    pubkey: localStorage.getItem("pubKey"),
+                    flag: '1',
+                    type: 'public'
+                },
+                success: function (result) {
+                    var data = result;
+                    if ($.type(result) != "object") {
+                        data = JSON.parseJSON(result)
+                    }
+
+                    //get the array:
+                    data = data.data;
+
+                    //debugging:
+                    console.log("createDimensionforDEMO result: " + data);
+
+                }.bind(this),
+                complete: function () {
+                    // do something
+                },
+            })
+        }
+
+
+        render() {
+            console.log(JSON.stringify(this.state))
+            let dimensions = this.state.iDimensions;
+
+            var _that = this
+
+            var syle = {
+                marginRight: '15px'
+            }
+
+            var table = {
+                margin: '0 auto'
+            }
+
+            return (
+                <div id="IDENTITYDIMENSIONS_MODAL">
+
+                    <h1>IDENTITY DIMENSIONS</h1><hr />
+
+                    <div className="modal-header">
+                        <ul className="nav nav-tabs" role="tablist">
+                            <li role="presentation" className="active"><a href="#dimensions" role="tab" data-toggle="tab">Identity Dimensions</a></li>
+                            <li role="presentation"><a href="#addDimension" role="tab" data-toggle="tab">Create new dimension</a></li>
+                        </ul>
+                    </div>
+
+                    <div className="modal-body">
+
+                        <div className="tab-content">
+
+                            <div className="tabpanel" role="tabpanel" className="tab-pane active" id="dimensions"><br />
+                                <table style={table} className="table table-striped center">
+                                    <tbody>
+                                        {(() => {
+                                            if ($.isArray(this.state.iDimensions) && this.state.iDimensions.length > 0) {
+                                                return this.state.iDimensions.map(function (el, i) {
+                                                    return (
+                                                        <tr key={i}>
+                                                            <td>
+                                                                <a data-item={el} data-index={i} onClick={_that.showDimensionHandler} >{el.dimensionType}</a>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                });
+                                            } else {
                                                 return (
-                                                    <tr key={i}>
+                                                    <tr>
                                                         <td>
-                                                            <a data-item={el} data-index={i} onClick={_that.showDimensionHandler} >{el.dimensionType}</a>
+                                                            <p>No identity dimensions</p>
                                                         </td>
-                                                    </tr>
-                                                );
-                                            });
-                                        } else {
-                                            return (
-                                                <tr>
-                                                    <td>
-                                                        <p>No identity dimensions</p>
-                                                    </td>
-                                                </tr>);
-                                        }
-                                    })(this)}
-                                </tbody>
-                            </table>
-                            {this.state.showDetails ? <DimensionForm hideHandler={this.hideHandler.bind(this)} dataHandler={this.state.activeDimension} /> : null}
+                                                    </tr>);
+                                            }
+                                        })(this)}
+                                    </tbody>
+                                </table>
+                                {this.state.showDetails ? <DimensionForm hideHandler={this.hideHandler.bind(this)} dataHandler={this.state.activeDimension} /> : null}
 
-                        </div>{/*tabpanel dimensions*/}
+                            </div>{/*tabpanel dimensions*/}
 
-                        <div className="tabpanel" role="tabpanel" className="tab-pane" id="addDimension"><br />
+                            <div className="tabpanel" role="tabpanel" className="tab-pane" id="addDimension"><br />
 
-                            <div>
-                                <select className="selectpicker show-tick" value={this.state.selectedAsset} onChange={this.handleSelection}>
-                                    <optgroup label="Owned">
-                                        <option>MyCOID</option>
-                                        <option>My Car</option>
-                                    </optgroup>
-                                    <optgroup label="Controlled">
-                                        <option>Parents house</option>
-                                    </optgroup>
-                                </select>
-                            </div><br />
+                                <div>
+                                    <select className="selectpicker show-tick" value={this.state.selectedAsset} onChange={this.handleSelection}>
+                                        <optgroup label="Owned">
+                                            <option>MyCOID</option>
+                                            <option>My Car</option>
+                                        </optgroup>
+                                        <optgroup label="Controlled">
+                                            <option>Parents house</option>
+                                        </optgroup>
+                                    </select>
+                                </div><br />
 
 
-                            <div id="AttributesContainer">
-                                <form method="POST" id="register" role="form">
-                                    <div className="form-group">
-                                        <label htmlFor="unique_id">Enter Identity Dimension Details:</label>
-                                        {this.state.inputs.map(input => <DimensionAttributeForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
-                                    </div>
-                                    <div className="form-group">
-                                        <div className="col-md-offset-6 col-md-6 ">
-                                            <button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
-                                                <span className="glyphicon glyphicon-plus"></span>Add More
+                                <div id="AttributesContainer">
+                                    <form method="POST" id="register" role="form">
+                                        <div className="form-group">
+                                            <label htmlFor="unique_id">Enter Identity Dimension Details:</label>
+                                            {this.state.inputs.map(input => <DimensionAttributeForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+                                        </div>
+                                        <div className="form-group">
+                                            <div className="col-md-offset-6 col-md-6 ">
+                                                <button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
+                                                    <span className="glyphicon glyphicon-plus"></span>Add More
 							                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="form-group">
-                                        <div className="col-sm-6">
-                                            <hr />
-                                            <button className="btn btn-primary" data-loading-text="Submit" name="submit-form" type="button" onClick={this.createDimension.bind(this)}>Create Dimension</button>
+                                        <div className="form-group">
+                                            <div className="col-sm-6">
+                                                <hr />
+                                                <button className="btn btn-primary" data-loading-text="Submit" name="submit-form" type="button" onClick={this.createDimension.bind(this)}>Create Dimension</button>
+                                            </div>
                                         </div>
-                                    </div>
-                                </form>
-                                {this.state.showModal ? <UploadIpfsFile pubKey={this.state.pubKey} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}
-                            </div>{/*AttributesContainer*/}
+                                    </form>
+                                    {this.state.showModal ? <UploadIpfsFile pubKey={this.state.pubKey} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}
+                                </div>{/*AttributesContainer*/}
 
-                        </div>{/*tabpanel addDimension*/}
+                            </div>{/*tabpanel addDimension*/}
 
-                    </div>{/*tab-content*/}
+                        </div>{/*tab-content*/}
 
-                </div>{/*modal-body*/}
-
+                    </div>{/*modal-body*/}
 
 
 
 
 
-            </div >
-        );
-    }
 
-};
+                </div >
+            );
+        }
+
+    };
 
 
 
-export default IdentityDimensions
+    export default IdentityDimensions
 
 
 // //temp function

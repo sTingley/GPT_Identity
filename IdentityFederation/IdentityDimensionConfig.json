@@ -8,7 +8,6 @@
     "getDimensionAddress": "getDimensionAddress",
     "delegate": "delegate",
     "controllerExists": "controllerExists",
-    "addDelegation": "addDelegation",
     "revokeDelegation": "revokeDelegation",
     "removeController": "removeController",
     "spendTokens": "spendTokens",

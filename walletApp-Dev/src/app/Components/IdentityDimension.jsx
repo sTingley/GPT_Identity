@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-
 class DimensionForm extends Component {
 
     constructor(props) {
@@ -8,17 +7,11 @@ class DimensionForm extends Component {
         this.state = {
             dimension: this.props.dataHandler,
             dimension_data: {},
-            //dimension_dist: []
-
-            //to populate documents for adding attributes
-            //takes same form as it does in Documents.jsx and CoreIdentity.jsx/MyGatekeeper.jsx
-            docs: {},
+            docs: {}, //takes same form as it does in Documents.jsx and CoreIdentity.jsx/MyGatekeeper.jsx
             pubkey: localStorage.getItem("pubKey")
-
         };
 
         var owned = true
-
     }
 
     //HANDLE THE CHOICE OF USER INPUT
@@ -29,10 +22,13 @@ class DimensionForm extends Component {
         var button_val = parseInt(ele.attr("data-val"))
 
         var json = {
-            "publicKey": localStorage.getItem("pubKey")
+            "publicKey": localStorage.getItem("pubKey"),
+            "uniqueID": 'getUNIQUEID!!!!',
+            "typeInput": 'dimensionName',
+            "flag": "flag_value"
         }
 
-        // request to add dimension attribute
+        // request to add dimension descriptor/attribute pair
         if (button_val === 1) {
             console.log("hit add descriptor rq")
             let descriptor
@@ -44,7 +40,7 @@ class DimensionForm extends Component {
                 }
             })
 
-            //descriptor name, ex: 'financial history 1/2017'
+            //descriptor, ex: 'financial history 1/2017'
             json.descriptor = descriptor
 
             $.ajax({
@@ -59,11 +55,10 @@ class DimensionForm extends Component {
             });
         }//end if
 
-        // request to update controllers
         if (button_val === 2) {
-            console.log("hit controller rq")
+            console.log("hit delegation rq")
             $.ajax({
-                url: twinUrl + 'addController',
+                url: twinUrl + 'addDelegation',
                 type: 'POST',
                 data: json,
                 success: function (res) {
@@ -74,33 +69,14 @@ class DimensionForm extends Component {
             });
         }
 
-        // request to add delegations
-        // if (button_val === 3) {
-        //     console.log("hit delegation rq")
-        //     if (this.owned == true) {
-        //         $.ajax({
-        //             url: twinUrl + 'addDelegation',
-        //             type: 'POST',
-        //             data: json,
-        //             success: function (res) {
-        //                 if (res.status == "Ok" && res.msg == "true") {
-        //                     //var i_dimension = this.state.dimension.ID
-        //                 }
-        //             }
-        //         });
-        //     }
-        // }
-
     }//end submitHandler
 
 
 
     // componentWillMount(){
-
     // }
 
     componentDidMount() {
-
         this.setState({
             dimension_data: this.props.dimension
         });
@@ -116,16 +92,36 @@ class DimensionForm extends Component {
                 this.setState({ docs: resp.data.documents });
             }.bind(this)
         });
-
     }
 
-
-
     render() {
-
         console.log("state in DimensionForm" + JSON.stringify(this.state))
         var dims = this.state.dimension
-        console.log("dims: " + JSON.stringify(dims))
+        //console.log("dims: " + JSON.stringify(dims))
+
+        var dataArray = []
+        var arrayOfArrays = []
+        let data = dims.dimension.data //data comes from _dimension.json object structure
+        //console.log("Data.length " + data.length)
+
+        Object.keys(data).forEach(key => {
+            dataArray.push(data[key].descriptor)
+            dataArray.push(data[key].attribute)
+            dataArray.push(data[key].flag)
+            dataArray.push(data[key].ID)
+        })
+
+        //data.length will equal the number of dimensions
+        for (var i = 0; i < data.length; i++) {
+            var element = [dataArray[4 * i + 0], dataArray[4 * i + 1], dataArray[4 * i + 2], dataArray[4 * i + 3]]
+            arrayOfArrays.push(element)
+        }
+
+        // console.log("DataArray: " + dataArray)
+        // console.log("arrayOfArrays[0][0]: " + arrayOfArrays[0][0])
+        // console.log("arrayOfArrays[1][1]: " + arrayOfArrays[1][1])
+
+        var controllers = dims.dimension.controllers
 
         var syle = {
             marginRight: '15px'
@@ -133,8 +129,6 @@ class DimensionForm extends Component {
         var center = {
             textAlign: 'center'
         };
-
-        var controllers = ["dcfdsdf34423342121", "fsdsddfn344534y4422", "jhjghjfgfdrterg565340"]
 
         return (
             <div className="modal fade" id="dimension_Details" key={dims.ID} tabIndex="-1" role="dialog" aria-labelledby="dimension">
@@ -162,15 +156,27 @@ class DimensionForm extends Component {
                                             </tr>
                                             <tr>
                                                 <td>Dimension Type</td>
-                                                <td>{dims.dimensionType}</td>
+                                                <td>{dims.dimension.dimensionName}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Controller List</td>
+                                                <td>{(() => {
+                                                    if (!$.isEmptyObject(dims)) {
+                                                        return controllers.map((ids, i) => {
+                                                            return <p key={i}> {controllers[i]}</p>
+                                                        })
+                                                    }
+                                                })(this)}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <td colSpan="2"><b>Descriptors:</b></td>
                                             </tr>
                                             {(() => {
                                                 var ipfs_url = "http://10.101.114.231:8080/ipfs/";
-                                                if (dims.attr_list.length > 0) {
-                                                    return dims.attr_list.map((attrs, i) => {
+                                                if (arrayOfArrays.length > 0) {
+                                                    return arrayOfArrays.map((attrs, i) => {
+                                                        console.log("attrs[0]: " + attrs[0] + ", attrs[1]:" + attrs[1] + ", attrs[2]: " + attrs[2] + ", attrs[3]: " + attrs[3])
                                                         if (attrs[1].charAt(0) == "Q") {
                                                             return (
                                                                 <tr key={i}>
@@ -188,41 +194,15 @@ class DimensionForm extends Component {
                                                             )
                                                     });
                                                 }
-
                                                 else { return <tr><td colSpan="2">No descriptors found.</td></tr> }
                                             })(this)}
-
-
                                         </tbody>
                                     </table>
-                                </div>
+                                </div>{/*dimensionDetails*/}
 
                                 <div role="tabpanel" className="tab-pane" id="control">
                                     <table className="table table-striped table-hover" style={syle}>
                                         <tbody>
-                                            <tr>
-                                                <td>controllerList</td>
-                                            </tr>
-
-                                            {(() => {
-                                                if (!$.isArray(controllers) && controllers.length > 0) {
-                                                    return controllers.map((pubkeys, i) => {
-                                                        return (
-                                                            <tr key={i}>
-                                                                <td>{pubkeys[i]}</td>
-                                                            </tr>
-                                                        )
-                                                    })
-                                                }
-                                                else {
-                                                    return <tr><td colSpan="2">NO CONTROLLERS FOR THIS DIMENSION</td></tr>
-                                                }
-                                            })(this)}
-
-                                            <tr>
-                                                <td></td>
-                                            </tr>
-
                                             <tr>
                                                 <th><b>Add Dimension Descriptor and Attribute</b></th>
                                             </tr>
@@ -236,7 +216,7 @@ class DimensionForm extends Component {
                                         <form>
                                             <div className="form-group">
                                                 <label htmlFor="get-hash">Choose from documents</label>
-                                                <select className="form-control" onChange={this.inputChangeHandler}>
+                                                <select className="form-control col-md-4" onChange={this.inputChangeHandler}>
                                                     <option value="0">Select Document</option>
                                                     {(() => {
                                                         if (this.state.docs && this.state.docs.length > 0) {
@@ -258,10 +238,10 @@ class DimensionForm extends Component {
                                                 <input type="file" className="form-control" name="newdoc" onChange={this.inputChangeHandler} />
                                             </div>
                                         </form>
-                                    </div>
+                                    </div>{/*body*/}
 
                                     <button type="button" className="btn btn-info" data-val="1" onClick={this.submitHandler.bind(this)}> Add descriptor</button>
-                                </div>
+                                </div>{/*control*/}
 
                                 <div role="tabpanel" className="tab-pane" id="delegations">
                                     <table className="table table-striped table-hover" style={syle}>
@@ -270,22 +250,27 @@ class DimensionForm extends Component {
                                                 <th>Tokens delegated for this dimension: {0}</th>
                                             </tr>
                                         </thead>
+                                        <hr />
                                         <tbody>
                                             <tr>
-                                                <th><b>Delegate tokens</b></th>
+                                                <th colSpan="2"><b>Delegate tokens</b></th>
                                             </tr>
-
                                             <tr>
                                                 <td><input className="form-control col-md-4" type="text" placeholder="Delegatee Address" /></td>
+                                            </tr>
+                                            <tr>
                                                 <td><input className="form-control col-md-4" type="text" placeholder="Token Quantity" /></td>
                                             </tr>
                                             <tr>
+                                                <td><input className="form-control col-md-4" type="text" placeholder="Expiration" /></td>
+                                            </tr>
+                                            <tr>
+                                                ACCESS CATEGORIES
                                                 <option value="one">One</option>
                                                 <option value="two">Two</option>
                                                 <option value="three">Three</option>
                                                 <option value="four">Four</option>
                                             </tr>
-
                                         </tbody>
                                     </table>
                                     <button type="button" className="btn btn-info" data-val="2" onClick={this.submitHandler.bind(this)}>Delegate tokens</button>
@@ -486,9 +471,6 @@ class DimensionAttributeForm extends React.Component {
 };
 
 
-
-
-
 class IdentityDimensions extends Component {
 
     constructor(props) {
@@ -506,7 +488,6 @@ class IdentityDimensions extends Component {
             //TODO: BELIEVE WE CAN TAKE THIS OUT (for use it to genrte new unqiueID)
             file_attrs: [],
 
-
             //used to populate the select options for add dimension
             owned_assets_label: [],           //endpoint: getOwnedAssets
             controlled_assets: [],      //endpoint: getControlledAssets
@@ -517,6 +498,7 @@ class IdentityDimensions extends Component {
             //********************
             //DimensionForm
             iDimensions: [],
+
             delegations: [],
             showDetails: false,
             activeDimension: {}
@@ -528,51 +510,88 @@ class IdentityDimensions extends Component {
     }
 
     handleSelection() {
-
+        //make sure that we are interacting with proper asset
     }
 
-    //USED IF DIGITAL TWIN NOT AVAILABLE
-    // getDimensions() {
-    //     this.setState({
-    //         iDimensions: [
-    //             { "dimensionType": "financial history", "ID": "1234", "attr_list": ["jan1", "hash_jan1_ptr", "jan 2", "hash_jan2_ptr"], "flag": [0, 1] },
-    //             { "dimensionType": "personal", "ID": "6678", "attr_list": ["val 1", "hash_val_1_ptr", "val 2", "hash_val_2_ptr"], "flag": [1, 1] },
-    //             { "dimensionType": "photography", "ID": "4538", "attr_list": ["document_1", "hash_ptr_doc1", "document_2", "hash_ptr_doc2"], "flag": [0, 1, 1] }
-    //         ]
-    //     })
-    // }
+    getDimensions() {
+
+        let dimension1 = {}
+        dimension1.dimension = {
+            "dimensionName": "FINANCES",
+            "pubkey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+            "ID": 3432423423,
+            "address": "HEXSTRING_address",
+            "owner": ["pubkey1", "pubkey2"],
+            "controllers": ["c1", "c2"],
+            "delegations": [
+                { owner: "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055", delegatee: "d1", amount: "2", dimension: "", expiration: "thursday", accessCategories: "" },
+                { owner: "A1", delegatee: "D1", amount: "2", dimension: "", expiration: "friday", accessCategories: "" }
+            ],
+            "data": [
+                { "descriptor": "financial_FEB", "attribute": "QMfgsddfsdffsdfsdsdfsdf", flag: "0", ID: "4465" },
+                { "descriptor": "financial_MARCH", "attribute": "Qmsdfsdfsdfsdfsdfsdfsdfsdf", flag: "0", ID: "3433" },
+            ]
+        }
+
+        let dimension2 = {}
+        dimension2.dimension = {
+            "dimensionName": "EDUCATION",
+            "pubkey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+            "ID": 69696969,
+            "address": "HEXSTRING_address",
+            "owner": ["pubkey1", "pubkey2"],
+            "controllers": ["c1", "c2"],
+            "delegations": [
+                { owner: "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055", delegatee: "D1", amount: "2", dimension: "", expiration: "thursday", accessCategories: "" },
+            ],
+            "data": [
+                { "descriptor": "education_highschool", "attribute": "QMfgsddfsdffsdfsdsdfsdf", flag: "0", ID: "4465" },
+                { "descriptor": "education_college", "attribute": "Qmsdfsdfsdfsdfsdfsdfsdfsdf", flag: "0", ID: "3433" },
+            ]
+        }
+
+        var arry = []
+        arry.push(dimension1)
+        arry.push(dimension2)
+
+        this.setState({ iDimensions: arry })
+
+    }//end getDimensions
 
 
     componentWillMount() {
 
         let _this = this
-        //this.getDimensions();
-        $.ajax({
-            url: twinUrl + 'getMetaData',
-            type: 'POST',
-            data: {
-                //"pubKey": localStorage.getItem("pubKey")
-            },
-            success: function (result) {
-                var data = result;
-                if ($.type(result) != "object") {
-                    data = JSON.parse(result)
-                }
-                //console.log("data: " + JSON.stringify(data))
-                data = JSON.stringify(data)
-                data = JSON.parse(data).data
-                //console.log("data after parse: " + JSON.stringify(data))
-                data = JSON.stringify(data)
-                var dimensions = JSON.parse(data).Dimensions
-                //console.log("dimensions: " + JSON.stringify(dimensions))
 
-                _this.setState({ iDimensions: dimensions })
+        this.getDimensions();
 
-            }.bind(_this),
-            complete: function () {
 
-            }
-        })
+        // $.ajax({
+        //     url: twinUrl + 'getMetaData',
+        //     type: 'POST',
+        //     data: {
+        //         //"pubKey": localStorage.getItem("pubKey")
+        //     },
+        //     success: function (result) {
+        //         var data = result;
+        //         if ($.type(result) != "object") {
+        //             data = JSON.parse(result)
+        //         }
+        //         //console.log("data: " + JSON.stringify(data))
+        //         data = JSON.stringify(data)
+        //         data = JSON.parse(data).data
+        //         //console.log("data after parse: " + JSON.stringify(data))
+        //         data = JSON.stringify(data)
+        //         var dimensions = JSON.parse(data).Dimensions
+        //         //console.log("dimensions: " + JSON.stringify(dimensions))
+
+        //         _this.setState({ iDimensions: dimensions })
+
+        //     }.bind(_this),
+        //     complete: function () {
+
+        //     }
+        // })
 
 
         $.ajax({
@@ -595,7 +614,7 @@ class IdentityDimensions extends Component {
                     for (let i = 0; i < data.length; i++) {
                         owned_array.push(data[i])
                     }
-                    console.log(owned_array)
+                    console.log(owned_array) //should include MyCOID.json and other owned assets
                     _this.setState({ owned_assets_label: owned_array })
                     //****************************************************
 
@@ -616,10 +635,12 @@ class IdentityDimensions extends Component {
 
                                 console.log("length is: " + theArray.length) //get total number of owned assets
                                 console.log(JSON.stringify(theArray))
+                                //console.log("######uniqueID " + dataResult.uniqueId)
+                                console.log("getAsset result: " + JSON.stringify(dataResult))
                                 theArray[theArray.length] = { asset_id: dataResult.assetID, asset_name: dataResult }
                                 if (dataResult.assetID = "MyCOID")
                                     _this.setState({ own_assets: theArray });
-                                    console.log("this.state.own_assets: " + JSON.stringify(this.state.own_assets))
+                                //console.log("this.state.own_assets: " + JSON.stringify(this.state.own_assets))
 
                             }.bind(_this),
                             complete: function () {
@@ -639,248 +660,255 @@ class IdentityDimensions extends Component {
 
     }//componentWillMount
 
-        // $.ajax({
-        // 	type: "POST",
-        // 	url: twinUrl + 'getControlledAssets',
-        // 	data: { "pubKey": localStorage.getItem("pubKey") },
-        // 	success: function (result) {
-        // 		var data = result;
-        // 		if ($.type(result) != "object") {
-        // 			data = JSON.parseJSON(result)
-        // 		}
+    // $.ajax({
+    // 	type: "POST",
+    // 	url: twinUrl + 'getControlledAssets',
+    // 	data: { "pubKey": localStorage.getItem("pubKey") },
+    // 	success: function (result) {
+    // 		var data = result;
+    // 		if ($.type(result) != "object") {
+    // 			data = JSON.parseJSON(result)
+    // 		}
 
-        // 		//get the array:
-        // 		data = data.data;
+    // 		//get the array:
+    // 		data = data.data;
 
-        //         let ctrl_array = []
-        //         if(data.length > 0){
-        //             for(let i=0; i< data.length; i++){
-        //                 ctrl_array.push(data[i])
+    //         let ctrl_array = []
+    //         if(data.length > 0){
+    //             for(let i=0; i< data.length; i++){
+    //                 ctrl_array.push(data[i])
+    //             }
+    //             console.log(ctrl_array)
+    //             this.setState({controlled_assets: ctrl_array})
+    //         }
+
+    // 		//debugging:
+    // 		console.log("Get Controlled Assets result: " + data);
+
+    // 	}.bind(this),
+    // 	complete: function () {
+    // 		// do something
+    // 	},
+    // 	//console.log(result)
+    // })
+
+
+
+    hideHandler() {
+        this.setState({ showDetails: false });
+    }
+
+    dataHandler(index) {
+        return this.state.iDimensions[index];
+    }
+
+    getActiveData() {
+        return this.state.activeDimension;
+    }
+
+    //used to show activeDimension
+    showDimensionHandler(e) {
+        e.preventDefault();
+        this.setState({
+            showDetails: true,
+            activeDimension: this.dataHandler($(e.target).attr('data-index'))
+        });
+    }
+
+    getFileDetails(filedata) {
+        var obj = { [this.state.tmpFile]: filedata };
+        this.setState({ file_attrs: this.state.file_attrs.concat([obj]) });
+    }
+
+    handleHideModal() {
+        this.setState({ showModal: false });
+    }
+
+    handleShowModal(e) {
+        this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
+    }
+
+    appendInput() {
+        var inputLen = this.state.inputs.length;
+        if (inputLen < 10) {
+            var newInput = `input-${inputLen}`;
+            this.setState({ inputs: this.state.inputs.concat([newInput]) });
+        }
+        console.log("inputs: " + this.state.inputs)
+    }
+
+
+    createDimension(e) {
+
+        // e.preventDefault();
+        // console.log("hit createDimension")
+        // var json = this.prepareJSON()
+        // console.log("creating dimension with this data... " + JSON.stringify(json))
+        $.ajax({
+            type: "POST",
+            url: twinUrl + 'createDimension',
+            data: {
+                pubkey: localStorage.getItem("pubKey"),
+                flag: '1',
+                type: 'public'
+            },
+            success: function (result) {
+                var data = result;
+                if ($.type(result) != "object") {
+                    data = JSON.parseJSON(result)
+                }
+
+                //get the array:
+                data = data.data;
+
+                //debugging:
+                console.log("createDimensionforDEMO result: " + data);
+
+            }.bind(this),
+            complete: function () {
+                // do something
+            },
+        })
+    }
+
+
+    render() {
+
+        //console.log("******* "+JSON.stringify(this.state))
+        let dimensions = this.state.iDimensions;
+        console.log("dimensions.length " + dimensions.length)
+        console.log("the dimensions: " + JSON.stringify(dimensions))
+
+        // for(var dimension in dimensions){
+        //     if(dimensions.hasOwnProperty(dimension)){
+        //         var obj = dimensions[dimension];
+        //         for(var prop in obj){
+        //             if(obj.hasOwnPropety(prop)){
+        //                 console.log("prop = " + obj[prop])
         //             }
-        //             console.log(ctrl_array)
-        //             this.setState({controlled_assets: ctrl_array})
         //         }
+        //     }
+        // }
 
-        // 		//debugging:
-        // 		console.log("Get Controlled Assets result: " + data);
 
-        // 	}.bind(this),
-        // 	complete: function () {
-        // 		// do something
-        // 	},
-        // 	//console.log(result)
+        // Object.keys(dimensions).forEach(function(dimension){
+        //     console.log(dimension, dimensions(dimension))
         // })
 
 
+        var _that = this
 
-        hideHandler() {
-            this.setState({ showDetails: false });
+        var syle = {
+            marginRight: '15px'
         }
 
-        dataHandler(index) {
-            return this.state.iDimensions[index];
+        var table = {
+            margin: '0 auto'
         }
 
-        getActiveData() {
-            return this.state.activeDimension;
-        }
+        return (
+            <div id="IDENTITYDIMENSIONS_MODAL">
 
-        //used to show activeDimension
-        showDimensionHandler(e) {
-            e.preventDefault();
-            this.setState({
-                showDetails: true,
-                activeDimension: this.dataHandler($(e.target).attr('data-index'))
-            });
-        }
+                <h1>IDENTITY DIMENSIONS</h1><hr />
 
-        getFileDetails(filedata) {
-            var obj = { [this.state.tmpFile]: filedata };
-            this.setState({ file_attrs: this.state.file_attrs.concat([obj]) });
-        }
+                <div className="modal-header">
+                    <ul className="nav nav-tabs" role="tablist">
+                        <li role="presentation" className="active"><a href="#dimensions" role="tab" data-toggle="tab">Identity Dimensions</a></li>
+                        <li role="presentation"><a href="#addDimension" role="tab" data-toggle="tab">Create new dimension</a></li>
+                    </ul>
+                </div>
 
-        handleHideModal() {
-            this.setState({ showModal: false });
-        }
+                <div className="modal-body">
 
-        handleShowModal(e) {
-            this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-        }
+                    <div className="tab-content">
 
-        appendInput() {
-            var inputLen = this.state.inputs.length;
-            if (inputLen < 10) {
-                var newInput = `input-${inputLen}`;
-                this.setState({ inputs: this.state.inputs.concat([newInput]) });
-            }
-            console.log("inputs: " + this.state.inputs)
-        }
-
-        // prepareJSON(){
-
-        //     var inputObj = {
-        //         pubKey: this.state.pubKey,
-        //         uniqueID: "needs to be coid unique ID",
-        //         controlContractAddr: "434344423423423234",
-        //         type: "identityDimension",
-        //         bigchainHash: "",
-        //         bigchainID: ""
-        //     };
-        //     return inputObj
-        // }
-
-        createDimension(e) {
-
-            // e.preventDefault();
-            // console.log("hit createDimension")
-            // var json = this.prepareJSON()
-            // console.log("creating dimension with this data... " + JSON.stringify(json))
-
-            $.ajax({
-                type: "POST",
-                url: twinUrl + 'createDimension',
-                data: {
-                    pubkey: localStorage.getItem("pubKey"),
-                    flag: '1',
-                    type: 'public'
-                },
-                success: function (result) {
-                    var data = result;
-                    if ($.type(result) != "object") {
-                        data = JSON.parseJSON(result)
-                    }
-
-                    //get the array:
-                    data = data.data;
-
-                    //debugging:
-                    console.log("createDimensionforDEMO result: " + data);
-
-                }.bind(this),
-                complete: function () {
-                    // do something
-                },
-            })
-        }
-
-
-        render() {
-            //console.log(JSON.stringify(this.state))
-            let dimensions = this.state.iDimensions;
-
-            var _that = this
-
-            var syle = {
-                marginRight: '15px'
-            }
-
-            var table = {
-                margin: '0 auto'
-            }
-
-            return (
-                <div id="IDENTITYDIMENSIONS_MODAL">
-
-                    <h1>IDENTITY DIMENSIONS</h1><hr />
-
-                    <div className="modal-header">
-                        <ul className="nav nav-tabs" role="tablist">
-                            <li role="presentation" className="active"><a href="#dimensions" role="tab" data-toggle="tab">Identity Dimensions</a></li>
-                            <li role="presentation"><a href="#addDimension" role="tab" data-toggle="tab">Create new dimension</a></li>
-                        </ul>
-                    </div>
-
-                    <div className="modal-body">
-
-                        <div className="tab-content">
-
-                            <div className="tabpanel" role="tabpanel" className="tab-pane active" id="dimensions"><br />
-                                <table style={table} className="table table-striped center">
-                                    <tbody>
-                                        {(() => {
-                                            if ($.isArray(this.state.iDimensions) && this.state.iDimensions.length > 0) {
-                                                return this.state.iDimensions.map(function (el, i) {
-                                                    return (
-                                                        <tr key={i}>
-                                                            <td>
-                                                                <a data-item={el} data-index={i} onClick={_that.showDimensionHandler} >{el.dimensionType}</a>
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                });
-                                            } else {
+                        <div className="tabpanel" role="tabpanel" className="tab-pane active" id="dimensions"><br />
+                            <table style={table} className="table table-striped center">
+                                <tbody>
+                                    {(() => {
+                                        if ($.isArray(this.state.iDimensions) && this.state.iDimensions.length > 0) {
+                                            return this.state.iDimensions.map(function (el, i) {
                                                 return (
-                                                    <tr>
+                                                    <tr key={i}>
                                                         <td>
-                                                            <p>No identity dimensions</p>
+                                                            <a data-item={el.dimension} data-index={i} onClick={_that.showDimensionHandler} >{el.dimension.dimensionName}</a>
                                                         </td>
-                                                    </tr>);
-                                            }
-                                        })(this)}
-                                    </tbody>
-                                </table>
-                                {this.state.showDetails ? <DimensionForm hideHandler={this.hideHandler.bind(this)} dataHandler={this.state.activeDimension} /> : null}
+                                                    </tr>
+                                                );
+                                            });
+                                        } else {
+                                            return (
+                                                <tr>
+                                                    <td>
+                                                        <p>No identity dimensions</p>
+                                                    </td>
+                                                </tr>);
+                                        }
+                                    })(this)}
+                                </tbody>
+                            </table>
+                            {this.state.showDetails ? <DimensionForm hideHandler={this.hideHandler.bind(this)} dataHandler={this.state.activeDimension} /> : null}
 
-                            </div>{/*tabpanel dimensions*/}
+                        </div>{/*tabpanel dimensions*/}
 
-                            <div className="tabpanel" role="tabpanel" className="tab-pane" id="addDimension"><br />
+                        <div className="tabpanel" role="tabpanel" className="tab-pane" id="addDimension"><br />
 
-                                <div>
-                                    <select className="selectpicker show-tick" value={this.state.selectedAsset} onChange={this.handleSelection}>
-                                        <optgroup label="Owned">
-                                            <option>MyCOID</option>
-                                            <option>My Car</option>
-                                        </optgroup>
-                                        <optgroup label="Controlled">
-                                            <option>Parents house</option>
-                                        </optgroup>
-                                    </select>
-                                </div><br />
+                            <div>
+                                <select className="selectpicker show-tick" value={this.state.selectedAsset} onChange={this.handleSelection}>
+                                    <optgroup label="Owned">
+                                        <option>MyCOID</option>
+                                        <option>My Car</option>
+                                    </optgroup>
+                                    <optgroup label="Controlled">
+                                        <option>Parents house</option>
+                                    </optgroup>
+                                </select>
+                            </div><br />
 
 
-                                <div id="AttributesContainer">
-                                    <form method="POST" id="register" role="form">
-                                        <div className="form-group">
-                                            <label htmlFor="unique_id">Enter Identity Dimension Details:</label>
-                                            {this.state.inputs.map(input => <DimensionAttributeForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
-                                        </div>
-                                        <div className="form-group">
-                                            <div className="col-md-offset-6 col-md-6 ">
-                                                <button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
-                                                    <span className="glyphicon glyphicon-plus"></span>Add More
+                            <div id="AttributesContainer">
+                                <form method="POST" id="register" role="form">
+                                    <div className="form-group">
+                                        <label htmlFor="unique_id">Enter Identity Dimension Details:</label>
+                                        {this.state.inputs.map(input => <DimensionAttributeForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+                                    </div>
+                                    <div className="form-group">
+                                        <div className="col-md-offset-6 col-md-6 ">
+                                            <button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
+                                                <span className="glyphicon glyphicon-plus"></span>Add More
 							                </button>
-                                            </div>
                                         </div>
-                                        <div className="form-group">
-                                            <div className="col-sm-6">
-                                                <hr />
-                                                <button className="btn btn-primary" data-loading-text="Submit" name="submit-form" type="button" onClick={this.createDimension.bind(this)}>Create Dimension</button>
-                                            </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <div className="col-sm-6">
+                                            <hr />
+                                            <button className="btn btn-primary" data-loading-text="Submit" name="submit-form" type="button" onClick={this.createDimension.bind(this)}>Create Dimension</button>
                                         </div>
-                                    </form>
-                                    {this.state.showModal ? <UploadIpfsFile pubKey={this.state.pubKey} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}
-                                </div>{/*AttributesContainer*/}
+                                    </div>
+                                </form>
+                                {this.state.showModal ? <UploadIpfsFile pubKey={this.state.pubKey} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}
+                            </div>{/*AttributesContainer*/}
 
-                            </div>{/*tabpanel addDimension*/}
+                        </div>{/*tabpanel addDimension*/}
 
-                        </div>{/*tab-content*/}
+                    </div>{/*tab-content*/}
 
-                    </div>{/*modal-body*/}
-
-
-
+                </div>{/*modal-body*/}
 
 
 
-                </div >
-            );
-        }
-
-    };
 
 
 
-    export default IdentityDimensions
+            </div >
+        );
+    }
+
+};
+
+
+
+export default IdentityDimensions
 
 
 // //temp function

@@ -619,6 +619,7 @@ class IdentityDimensions extends Component {
                                 theArray[theArray.length] = { asset_id: dataResult.assetID, asset_name: dataResult }
                                 if (dataResult.assetID = "MyCOID")
                                     _this.setState({ own_assets: theArray });
+                                    console.log("this.state.own_assets: " + JSON.stringify(this.state.own_assets))
 
                             }.bind(_this),
                             complete: function () {
@@ -764,7 +765,7 @@ class IdentityDimensions extends Component {
 
 
         render() {
-            console.log(JSON.stringify(this.state))
+            //console.log(JSON.stringify(this.state))
             let dimensions = this.state.iDimensions;
 
             var _that = this

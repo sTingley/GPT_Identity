@@ -23,7 +23,7 @@ contract IdentityDimensionControlToken
         uint amount;
         string dimension;
         uint expiration;
-        string accessCategories;//if it is null, then the delegation is for all dimensions
+        string accessCategories;//if it is null, then the delegation is for all attributes
                                 //else, it is a list with delimiter comma
     }
 

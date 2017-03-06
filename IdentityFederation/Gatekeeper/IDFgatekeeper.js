@@ -54,15 +54,15 @@ var notifier = function () {
     //TODO: CHANGE THE ENDPOINT:
 
     //NOTE: THE DIGITAL TWIN will reject it without pubKey
-    this.notifyCoidCreation = function (pubKey, txnID, txnHash, gkAddr, coidAddr) {
+    this.notifyCoidCreation = function (pubKey, txnID, txnHash, gkAddr, coidAddr, dimensionCtrlAddr) {
         superAgent.post(this.twinUrl + "/setAsset")
             .send({
                 "pubKey": pubKey,
                 "flag": 0,
                 "fileName": "MyCOID.json",
                 "updateFlag": 1,
-                "keys": ["bigchainID", "bigchainHash", "gatekeeperAddr", "coidAddr"],
-                "values": [txnID, txnHash, gkAddr, coidAddr]
+                "keys": ["bigchainID", "bigchainHash", "gatekeeperAddr", "coidAddr", "dimensionCtrlAddr"],
+                "values": [txnID, txnHash, gkAddr, coidAddr, dimensionCtrlAddr]
             })
             .set('Accept', 'application/json')
             .end((err, res) => {
@@ -800,7 +800,7 @@ var eventListener = function () {
 
     //this is for bigchain writing
     //see the note (above var bigchainInput) for how to input data in this function
-    this.bigchainIt = function (proposalID, coidData, coidGKAddress, coidAddr, blockNumber, blockHash, blockchainID, timestamp, validatorSigs, gatekeeperSig, callback) {
+    this.bigchainIt = function (proposalID, coidData, coidGKAddress, coidAddr, dimensionCtrlAddr, blockNumber, blockHash, blockchainID, timestamp, validatorSigs, gatekeeperSig, callback) {
 
         //get public key
         var thePubkey = this.ErisAddress;
@@ -817,6 +817,7 @@ var eventListener = function () {
             "Coid_Data": coidData,
             "coidGK_Address": coidGKAddress,
             "coid_Address": coidAddr,
+            "dimensionCtrlAddr": dimensionCtrlAddr,
             "blockNumber": blockNumber,
             "blockHash": blockHash,
             "blockchainID": blockchainID,
@@ -932,6 +933,7 @@ var eventListener = function () {
             var resultMessage = (result.args).resultMessage;
             var coidGKAddr = (result.args).coidGKAddr;
             var coidAddr = (result.args).coidAddr;
+            var dimensionCtrlAddr = (result.args).dimensionCtrlAddr;
             var blockNumber = (result.args).blockNumberVal;
             var blockHashVal = (result.args).blockHashVal;
             var blockchainID = (result.args).blockchainIdVal;
@@ -944,6 +946,7 @@ var eventListener = function () {
             console.log("resultMessage is: " + resultMessage);
             console.log("coidGKAddr is: " + coidGKAddr);
             console.log("coidAddr is: " + coidAddr);
+            console.log("dimensionCtrlAddr is: " + dimensionCtrlAddr)
             console.log("blockNumber is: " + blockNumber);
             console.log("blockHashVal is: " + blockHashVal);
             console.log("blockchainID is: " + blockchainID);
@@ -984,13 +987,14 @@ var eventListener = function () {
 
                             var GKSig = { "signature": signatureGK, "pubkeyGK": pubkeyGK, "hashGK": hashGK }
                             console.log("GK Sig: " + JSON.stringify(GKSig));
-                            _this.bigchainIt(proposalId, formdataArray[index], coidGKAddr, coidAddr, blockNumber, blockHashVal, blockchainID, timestamp, validatorSigs, GKSig, function (result, theId, theHash) {
+                            _this.bigchainIt(proposalId, formdataArray[index], coidGKAddr, coidAddr, dimensionCtrlAddr, blockNumber, blockHashVal, blockchainID, timestamp, validatorSigs, GKSig, function (result, theId, theHash) {
                                 // console.log(result);
                                 console.log("THE TXN ID: " + theId)
                                 console.log("THE HASH: " + theHash)
                                 console.log("GK ADDR: " + coidGKAddr)
                                 console.log("COID ADDR: " + coidAddr)
-                                theNotifier.notifyCoidCreation(formdataArray[index].pubKey, theId, theHash, coidGKAddr, coidAddr)
+                                console.log("DIM_CTRL ADDR: " + dimensionCtrlAddr)
+                                theNotifier.notifyCoidCreation(formdataArray[index].pubKey, theId, theHash, coidGKAddr, coidAddr, dimensionCtrlAddr)
 
                                 //makes the core identity
                                 CoidMaker(coidAddr, formdataArray[index])

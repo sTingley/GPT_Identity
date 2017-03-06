@@ -17,7 +17,7 @@ contract GateKeeper {
 
     //To notify the user the CoreIdentity request is accepted or rejected
     // the gk.js mines the event and get the results if it is true or false as well as a message for the user
-    event resultReady(bytes32 proposalId, bool result, string resultMessage, address coidGKAddr, address coidAddr,uint blockNumberVal, bytes32 blockHashVal, bytes32 blockchainIdVal, uint timestamp);
+    event resultReady(bytes32 proposalId, bool result, string resultMessage, address coidGKAddr, address coidAddr, address dimensionCtrlAddr, uint blockNumberVal, bytes32 blockHashVal, bytes32 blockchainIdVal, uint timestamp);
     // event COIDgatekeeper(address gkAddr);
     event proposalDeleted(string notify); // notify user if the proposal got deleted after experation
 
@@ -535,6 +535,7 @@ contract GateKeeper {
                  address coidGKAddr;
                  address coidIdentityAddr;
                  uint blockNumber;
+                 address dimensionCtrlAddr;
 
         if (msg.sender == chairperson)  // only IDF gateKeeper has right to call this function
         {
@@ -546,18 +547,20 @@ contract GateKeeper {
 
                 coidGKAddr = createGateKeeper();
 
+                dimensionCtrlAddr = createDimensionControl();
+
                 //COIDgatekeeper(coidGKAddr);
 
                 proposals[proposalId].coidData.blockChainId = blockchainId;
 
                 proposals[proposalId].coidData.blockHash = 0x0;
 
-                resultReady(proposalId, result, "Your identity has been integrated.", coidGKAddr, coidIdentityAddr, blockNumber, proposals[proposalId].coidData.blockHash, blockchainId, now);
+                resultReady(proposalId, result, "Your identity has been integrated.", coidGKAddr, coidIdentityAddr, dimensionCtrlAddr, blockNumber, proposals[proposalId].coidData.blockHash, blockchainId, now);
 
             }
             else {
                 //dont make coid
-                resultReady(proposalId, result, "Sorry, your identity was rejected.", 0x0, 0x0, 0x0, 0x0,0X0,now);
+                resultReady(proposalId, result, "Sorry, your identity was rejected.", 0x0, 0x0, 0x0, 0x0, 0x0, 0X0, now);
 
             }
         }
@@ -583,6 +586,21 @@ contract GateKeeper {
             throw;
         }
         return MyCoidIdentity;
+    }
+
+    IdentityDimensionControl dimensionControl;
+
+    function createDimensionControl() returns (address)
+    {
+
+        if (msg.sender == chairperson)
+        {
+            dimensionControl = new IdentityDimensionControl();
+        }
+        else {
+            throw;
+        }
+        return dimensionControl;
     }
 
     // Instantiate coidGateKeepr contract

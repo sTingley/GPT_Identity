@@ -326,6 +326,7 @@ class MyGatekeeper extends React.Component {
 				}
 				localStorage.setItem("gatekeeperAddr", result.gatekeeperAddr) 
 				localStorage.setItem("coidAddr", result.coidAddr)
+				localStorage.setItem("dimensionCtrlAddr", result.dimensionCtrlAddr)
 
 			}.bind(this),
 			complete: function () {

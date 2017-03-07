@@ -6,8 +6,6 @@ import "IdentityDimensionControl.sol"
 
 contract GateKeeper {
 
-
-
     // Global variables
 
     bytes32[3] validatorsToVote; // randomly selected validators from the DAO list

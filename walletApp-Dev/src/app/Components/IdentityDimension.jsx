@@ -6,12 +6,11 @@ class DimensionForm extends Component {
         super(props);
         this.state = {
             dimension: this.props.dataHandler,
-            dimension_data: {},
+            //dimension_data: {},
+
             docs: {}, //takes same form as it does in Documents.jsx and CoreIdentity.jsx/MyGatekeeper.jsx
             pubkey: localStorage.getItem("pubKey")
         };
-
-        var owned = true
     }
 
     //HANDLE THE CHOICE OF USER INPUT
@@ -71,15 +70,15 @@ class DimensionForm extends Component {
 
     }//end submitHandler
 
-
-
+    //THIS METHOD IS THE CONSTRUCTOR
     // componentWillMount(){
     // }
 
     componentDidMount() {
-        this.setState({
-            dimension_data: this.props.dimension
-        });
+
+        // this.setState({
+        //     dimension_data: this.props.dimension
+        // });
         $("#dimension_Details").modal('show');
         $("#dimension_Details").on('hidden.bs.modal', this.props.hideHandler);
 
@@ -95,14 +94,13 @@ class DimensionForm extends Component {
     }
 
     render() {
-        console.log("state in DimensionForm" + JSON.stringify(this.state))
+        console.log("state in DimensionForm\n" + JSON.stringify(this.state))
         var dims = this.state.dimension
         //console.log("dims: " + JSON.stringify(dims))
 
         var dataArray = []
         var arrayOfArrays = []
         let data = dims.dimension.data //data comes from _dimension.json object structure
-        //console.log("Data.length " + data.length)
 
         Object.keys(data).forEach(key => {
             dataArray.push(data[key].descriptor)
@@ -319,8 +317,8 @@ class UploadIpfsFile extends React.Component {
 
 
 
-        $("#AttributesContainer .modal").modal('show');
-        $("#AttributesContainer .modal").on('hidden.bs.modal', this.props.handleHideModal);
+        $("#CreateDimensionContainer .modal").modal('show');
+        $("#CreateDimensionContainer .modal").on('hidden.bs.modal', this.props.handleHideModal);
     }
 
     uploadHandler(data, additionalParams) {
@@ -431,13 +429,13 @@ class UploadIpfsFile extends React.Component {
     }
 };
 
+//DISPLAY
 
 class DimensionAttributeForm extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-
             file_attrs: [],
             inputs: ['input-0'],
             tmpFile: '',
@@ -565,148 +563,73 @@ class IdentityDimensions extends Component {
 
         this.getDimensions();
 
-
-        // $.ajax({
-        //     url: twinUrl + 'getMetaData',
-        //     type: 'POST',
-        //     data: {
-        //         //"pubKey": localStorage.getItem("pubKey")
-        //     },
-        //     success: function (result) {
-        //         var data = result;
-        //         if ($.type(result) != "object") {
-        //             data = JSON.parse(result)
-        //         }
-        //         //console.log("data: " + JSON.stringify(data))
-        //         data = JSON.stringify(data)
-        //         data = JSON.parse(data).data
-        //         //console.log("data after parse: " + JSON.stringify(data))
-        //         data = JSON.stringify(data)
-        //         var dimensions = JSON.parse(data).Dimensions
-        //         //console.log("dimensions: " + JSON.stringify(dimensions))
-
-        //         _this.setState({ iDimensions: dimensions })
-
-        //     }.bind(_this),
-        //     complete: function () {
-
-        //     }
-        // })
-
-
         $.ajax({
             type: "POST",
             url: twinUrl + 'getOwnedAssets',
             data: { "pubKey": localStorage.getItem("pubKey") },
             success: function (result) {
                 var data = result;
+                //getOwnedAssets res: {"data":["CAR.json","MyCOID.json"]}
                 if ($.type(result) != "object") {
                     data = JSON.parseJSON(result)
                 }
-                //get the array:
-                data = data.data;
-                //DEBUGGING:
-                console.log("getOwnedAssets result: " + data);
-
+                data = data.data; //get the array:
                 let owned_array = []
 
                 if (data.length > 0) {
                     for (let i = 0; i < data.length; i++) {
                         owned_array.push(data[i])
                     }
-                    console.log(owned_array) //should include MyCOID.json and other owned assets
+                    console.log("owned array: " + owned_array) //should include MyCOID.json and other owned assets
                     _this.setState({ owned_assets_label: owned_array })
-                    //****************************************************
+                    //OWNED ARRAY HAS MYCOID.json and additional OWNED COIDs
+                    //***********************************************************************************
+                    //theArray will be populated as we iterate thru owned_array
+                    var theArray = []
+                    //loop through owned_array so that we can inspect each json file
+                    for (let i = 0; i < owned_array.length; i++) {
+                        console.log("looping..... got " + owned_array[i])
 
-                    //loop through OWNED assets
-                    for (let i = 0; i < data.length; i++) {
-                        //AJAX each asset:
-                        $.ajax({
+                        $.ajax({ //AJAX each asset (calls assetCtrl.js endpoint in DT)
                             type: "POST",
                             url: twinUrl + 'getAsset',
-                            data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": data[i] },
+                            data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": owned_array[i] },
                             success: function (result) {
                                 var dataResult = result;
+                                //dataResult is an object 
+                                //console.log("getAsset dataResult, index:  " + i + "...  " + JSON.stringify(dataResult))
                                 if ($.type(result) != "object") {
                                     dataResult = JSON.parseJSON(result)
                                 }
-                                //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-                                var theArray = _this.state.own_assets;
-
-                                console.log("length is: " + theArray.length) //get total number of owned assets
-                                console.log(JSON.stringify(theArray))
-                                //console.log("######uniqueID " + dataResult.uniqueId)
-                                console.log("getAsset result: " + JSON.stringify(dataResult))
-                                theArray[theArray.length] = { asset_id: dataResult.assetID, asset_name: dataResult }
-                                if (dataResult.assetID = "MyCOID")
-                                    _this.setState({ own_assets: theArray });
-                                //console.log("this.state.own_assets: " + JSON.stringify(this.state.own_assets))
-
+                                theArray[theArray.length] = {
+                                    asset_id: dataResult.assetID,
+                                    asset_uniqueId: dataResult.uniqueId,
+                                    asset_dimCtrAddr: dataResult.dimensionCtrlAddr
+                                }
+                                //console.log("iteration " + i + " ..theArray: " + JSON.stringify(theArray))
+                                //MYCOID is always pushed into last spot, so we know we are done if we go into this if
+                                if (dataResult.assetID = "MyCOID") {
+                                    this.setState({ own_assets: theArray })
+                                }
                             }.bind(_this),
-                            complete: function () {
-                                // for(let i in this.state.owned_assets){
-                                //     localStorage.setItem("uniqueID" + i, i.)
-                                // }
-                            },
+                            complete: function () { }
                         })
 
                     }//end for
+                }//end if data.length > 0
 
-                }//end if data>0
+            }//end success f'n of getOwnedAssets AJAX
 
-            }//end success
-
-        })
+        })//getOwnedAssets
 
     }//componentWillMount
+    //***************************************************************************************************
 
-    // $.ajax({
-    // 	type: "POST",
-    // 	url: twinUrl + 'getControlledAssets',
-    // 	data: { "pubKey": localStorage.getItem("pubKey") },
-    // 	success: function (result) {
-    // 		var data = result;
-    // 		if ($.type(result) != "object") {
-    // 			data = JSON.parseJSON(result)
-    // 		}
-
-    // 		//get the array:
-    // 		data = data.data;
-
-    //         let ctrl_array = []
-    //         if(data.length > 0){
-    //             for(let i=0; i< data.length; i++){
-    //                 ctrl_array.push(data[i])
-    //             }
-    //             console.log(ctrl_array)
-    //             this.setState({controlled_assets: ctrl_array})
-    //         }
-
-    // 		//debugging:
-    // 		console.log("Get Controlled Assets result: " + data);
-
-    // 	}.bind(this),
-    // 	complete: function () {
-    // 		// do something
-    // 	},
-    // 	//console.log(result)
-    // })
-
-
-
+    //*****************************************************************************
     hideHandler() {
         this.setState({ showDetails: false });
     }
-
-    dataHandler(index) {
-        return this.state.iDimensions[index];
-    }
-
-    getActiveData() {
-        return this.state.activeDimension;
-    }
-
-    //used to show activeDimension
+    //used to show activeDimension, is fired onClick
     showDimensionHandler(e) {
         e.preventDefault();
         this.setState({
@@ -714,19 +637,30 @@ class IdentityDimensions extends Component {
             activeDimension: this.dataHandler($(e.target).attr('data-index'))
         });
     }
+    //used to set activeDimension inside showDimensionHandler
+    //When we render a DimensionForm, dataHandler={this.state.activeDimension}
+    dataHandler(index) {
+        return this.state.iDimensions[index];
+    }
+    //*****************************************************************************
 
+    /*if this.state.showModal is true UploadIpfsFile component is rendered,
+        and passed the prop dataHandler={this.getFileDetails.bind(this)}*/
     getFileDetails(filedata) {
         var obj = { [this.state.tmpFile]: filedata };
         this.setState({ file_attrs: this.state.file_attrs.concat([obj]) });
     }
-
-    handleHideModal() {
-        this.setState({ showModal: false });
-    }
-
+    //*****************************************************************************
+    //Passed as a prop to DimensionAttributeForm
     handleShowModal(e) {
         this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
     }
+    //is passed to UploadIpfsFile so it knows when to close the modal window
+    //method also exists in DimensionForm
+    handleHideModal() {
+        this.setState({ showModal: false });
+    }
+    //*****************************************************************************
 
     appendInput() {
         var inputLen = this.state.inputs.length;
@@ -739,11 +673,10 @@ class IdentityDimensions extends Component {
 
 
     createDimension(e) {
+        e.preventDefault();
 
-        // e.preventDefault();
-        // console.log("hit createDimension")
-        // var json = this.prepareJSON()
-        // console.log("creating dimension with this data... " + JSON.stringify(json))
+        json = {}
+
         $.ajax({
             type: "POST",
             url: twinUrl + 'createDimension',
@@ -774,10 +707,12 @@ class IdentityDimensions extends Component {
 
     render() {
 
+        console.log("*****STATE\n" + JSON.stringify(this.state))
+
         //console.log("******* "+JSON.stringify(this.state))
         let dimensions = this.state.iDimensions;
-        console.log("dimensions.length " + dimensions.length)
-        console.log("the dimensions: " + JSON.stringify(dimensions))
+        //console.log("dimensions.length " + dimensions.length)
+        //console.log("the dimensions: " + JSON.stringify(dimensions))
 
         // for(var dimension in dimensions){
         //     if(dimensions.hasOwnProperty(dimension)){
@@ -789,11 +724,6 @@ class IdentityDimensions extends Component {
         //         }
         //     }
         // }
-
-
-        // Object.keys(dimensions).forEach(function(dimension){
-        //     console.log(dimension, dimensions(dimension))
-        // })
 
 
         var _that = this
@@ -866,7 +796,7 @@ class IdentityDimensions extends Component {
                             </div><br />
 
 
-                            <div id="AttributesContainer">
+                            <div id="CreateDimensionContainer">
                                 <form method="POST" id="register" role="form">
                                     <div className="form-group">
                                         <label htmlFor="unique_id">Enter Identity Dimension Details:</label>
@@ -887,17 +817,13 @@ class IdentityDimensions extends Component {
                                     </div>
                                 </form>
                                 {this.state.showModal ? <UploadIpfsFile pubKey={this.state.pubKey} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}
-                            </div>{/*AttributesContainer*/}
+                            </div>{/*CreateDimensionContainer*/}
 
                         </div>{/*tabpanel addDimension*/}
 
                     </div>{/*tab-content*/}
 
                 </div>{/*modal-body*/}
-
-
-
-
 
 
             </div >
@@ -907,35 +833,67 @@ class IdentityDimensions extends Component {
 };
 
 
-
 export default IdentityDimensions
 
+        //OLD (in DT still)
+        // $.ajax({
+        //     url: twinUrl + 'getMetaData',
+        //     type: 'POST',
+        //     data: {
+        //         //"pubKey": localStorage.getItem("pubKey")
+        //     },
+        //     success: function (result) {
+        //         var data = result;
+        //         if ($.type(result) != "object") {
+        //             data = JSON.parse(result)
+        //         }
+        //         //console.log("data: " + JSON.stringify(data))
+        //         data = JSON.stringify(data)
+        //         data = JSON.parse(data).data
+        //         //console.log("data after parse: " + JSON.stringify(data))
+        //         data = JSON.stringify(data)
+        //         var dimensions = JSON.parse(data).Dimensions
+        //         //console.log("dimensions: " + JSON.stringify(dimensions))
 
-// //temp function
-// app.post('/getMetaData', function(req,res)
-// {
-//         console.log("endpoint getMetaData was hit");
-//         var obj1 = {"dimensionType": "financial history", "ID": "1234", "attr_list": ["jan1", "hash_jan1_ptr", "jan 2", "hash_jan2_ptr"], "flag": [0,1] }
-//         var obj2 = {"dimensionType": "personal", "ID": "6678", "attr_list": ["val 1", "hash_val_1_ptr", "val 2", "hash_val_2_ptr"], "flag": [1,1] }
-//         var obj3 = {"dimensionType": "photography",  "ID": "4538", "attr_list": ["document_1", "hash_ptr_doc1", "document_2", "hash_ptr_doc2"], "flag": [0,1,1] }
-//         var response = { "Dimensions": [obj1, obj2, obj3] }
-//         res.json({"data": response})
+        //         _this.setState({ iDimensions: dimensions })
 
-// })
+        //     }.bind(_this),
+        //     complete: function () {
+
+        //     }
+        // })
 
 
-    //USED IF DIGITAL TWIN NOT AVAILABLE
-    // getDimensions() {
-    //     this.setState({
-    //         iDimensions: [
-    //             { dimensionType: 'FINANCIAL HISTORY', ID: '12234', owned: true, name: 'Football', descriptors: ["monday", "tuesday", "wednesday"], attributes: ["h1", "h2", "h3"] },
-    //             { dimensionType: 'EDUCATION', ID: '34334', owned: true, name: 'iPod Touch', descriptors: ["monday", "tuesday", "wednesday"], attributes: ["h1", "h2", "h3"] },
-    //             { dimensionType: 'DIGITAL ASSETS', ID: '56676', owned: false, name: 'iPhone 5', descriptors: ["monday", "tuesday", "wednesday"], attributes: ["h1", "h2", "h3"] }
-    //         ]
-    //     })
-    // }
+    // $.ajax({
+    // 	type: "POST",
+    // 	url: twinUrl + 'getControlledAssets',
+    // 	data: { "pubKey": localStorage.getItem("pubKey") },
+    // 	success: function (result) {
+    // 		var data = result;
+    // 		if ($.type(result) != "object") {
+    // 			data = JSON.parseJSON(result)
+    // 		}
 
+    // 		//get the array:
+    // 		data = data.data;
 
-//<AddDimension addDimension={this.handleAddDimension.bind(this) } /><br /><br />
+    //         let ctrl_array = []
+    //         if(data.length > 0){
+    //             for(let i=0; i< data.length; i++){
+    //                 ctrl_array.push(data[i])
+    //             }
+    //             console.log(ctrl_array)
+    //             this.setState({controlled_assets: ctrl_array})
+    //         }
+
+    // 		//debugging:
+    // 		console.log("Get Controlled Assets result: " + data);
+
+    // 	}.bind(this),
+    // 	complete: function () {
+    // 		// do something
+    // 	},
+    // 	//console.log(result)
+    // })
 
 //<IdentityDimensions dimensions={dimensions} onDelete={this.handleDeleteDimension.bind(this) } key={dimensions.ID} onClick={this.showHandler.bind(this)}/>

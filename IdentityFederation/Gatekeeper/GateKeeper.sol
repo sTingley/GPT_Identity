@@ -2,6 +2,7 @@ import "CoreIdentity.sol";
 import "ballot.sol";
 import "Dao.sol";
 import "MyGatekeeper.sol";
+import "IdentityDimensionControl.sol"
 
 contract GateKeeper {
 

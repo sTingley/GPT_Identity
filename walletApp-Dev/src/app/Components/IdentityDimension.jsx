@@ -431,7 +431,7 @@ class UploadIpfsFile extends React.Component {
 
 //DISPLAY
 
-class DimensionAttributeForm extends React.Component {
+class CreateDimensionForm extends React.Component {
 
     constructor(props) {
         super(props);
@@ -476,29 +476,30 @@ class IdentityDimensions extends Component {
         this.state = {
 
             pubKey: localStorage.getItem("pubKey"),
+            showModal: false,
 
             //********************
-            //UniqueIDAttributesForm
+            //inputs are mapped to add additional CreateDimensionForm instances
             inputs: ['input-0'],
-            showModal: false,
+            //tmp file always holds current input, ex: 'input-0'
             tmpFile: '',
 
-            //TODO: BELIEVE WE CAN TAKE THIS OUT (for use it to genrte new unqiueID)
+            //as we add more Dimension attributes, we end up shifting tmpFile and inputs
+            //so file_attrs will look like: [ {input-0: IPFS_hash0}, {input-1: IPFS_hash1} ]
             file_attrs: [],
 
-            //used to populate the select options for add dimension
-            owned_assets_label: [],           //endpoint: getOwnedAssets
-            controlled_assets: [],      //endpoint: getControlledAssets
+            controlled_assets: [],
 
             //contains actual asset data from DT
             own_assets: [],
+            //owned_assets_label: [],  
 
-            //********************
-            //DimensionForm
             iDimensions: [],
 
-            delegations: [],
+            //delegations: [],
             showDetails: false,
+
+            //prop dataHandler passes activeDimension to DimensionForm
             activeDimension: {}
 
         };
@@ -651,7 +652,7 @@ class IdentityDimensions extends Component {
         this.setState({ file_attrs: this.state.file_attrs.concat([obj]) });
     }
     //*****************************************************************************
-    //Passed as a prop to DimensionAttributeForm
+    //Passed as a prop to CreateDimensionForm
     handleShowModal(e) {
         this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
     }
@@ -800,7 +801,7 @@ class IdentityDimensions extends Component {
                                 <form method="POST" id="register" role="form">
                                     <div className="form-group">
                                         <label htmlFor="unique_id">Enter Identity Dimension Details:</label>
-                                        {this.state.inputs.map(input => <DimensionAttributeForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+                                        {this.state.inputs.map(input => <CreateDimensionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
                                     </div>
                                     <div className="form-group">
                                         <div className="col-md-offset-6 col-md-6 ">

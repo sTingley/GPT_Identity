@@ -56,7 +56,7 @@ var notifier = function () {
     //TODO: CHANGE THE ENDPOINT:
 
     //NOTE: THE DIGITAL TWIN will reject it without pubKey
-    this.notifyCoidCreation = function (pubKey, assetID, txnID, txnHash, gkAddr, coidAddr) {
+    this.notifyCoidCreation = function (pubKey, assetID, txnID, txnHash, gkAddr, coidAddr, dimensionCtrlAddr) {
 
 	console.log("ASSET ID IS: " + assetID);
         superAgent.post(this.twinUrl + "/setAsset")
@@ -65,8 +65,8 @@ var notifier = function () {
                 "flag": 0,
                 "fileName": assetID + ".json",
                 "updateFlag": 1,
-                "keys":["bigchainID","bigchainHash","gatekeeperAddr","coidAddr"],
-                "values":[txnID,txnHash,gkAddr,coidAddr]
+                "keys":["bigchainID","bigchainHash","gatekeeperAddr","coidAddr","dimensionCtrlAddr"],
+                "values":[txnID,txnHash,gkAddr,coidAddr,dimensionCtrlAddr]
             })
             .set('Accept', 'application/json')
             .end((err, res) => {
@@ -646,7 +646,7 @@ var gatekeeper = function (MyGKaddr) {
         var sync = true;
 
         _this.gateKeeperContract.setValidators(proposalId, validators, ballotAddress, function (err, res) {
-            //console.log(res); //has no return
+            console.log(res);
             console.log("proposalId: " + proposalId);
             console.log("ballotAddress: " + ballotAddress);
             console.log("validators: " + validators);
@@ -748,7 +748,7 @@ var eventListener = function (MyGKAddr) {
 
     //this is for bigchain writing
     //see the note (above var bigchainInput) for how to input data in this function
-    this.bigchainIt = function (proposalID, coidData, coidGKAddress, coidAddr, blockNumber, blockHash, blockchainID, timestamp, validatorSigs, gatekeeperSig, callback) {
+    this.bigchainIt = function (proposalID, coidData, coidGKAddress, coidAddr, dimensionCtrlAddr, blockNumber, blockHash, blockchainID, timestamp, validatorSigs, gatekeeperSig, callback) {
 
         //get public key
         var thePubkey = this.ErisAddress;
@@ -765,6 +765,7 @@ var eventListener = function (MyGKAddr) {
             "Coid_Data": coidData,
             "coidGK_Address": coidGKAddress,
             "coid_Address": coidAddr,
+            "dimensionCtrlAddr": dimensionCtrlAddr,
             "blockNumber": blockNumber,
             "blockHash": blockHash,
             "blockchainID": blockchainID,
@@ -874,6 +875,7 @@ var eventListener = function (MyGKAddr) {
             var resultMessage = (result.args).resultMessage;
             var coidGKAddr = (result.args).coidGKAddr;
             var coidAddr = (result.args).coidAddr;
+            var dimensionCtrlAddr = (result.args).dimensionCtrlAddr;
             var blockNumber = (result.args).blockNumberVal;
             var blockHashVal = (result.args).blockHashVal;
             var blockchainID = (result.args).blockchainIdVal;
@@ -885,11 +887,12 @@ var eventListener = function (MyGKAddr) {
             console.log("resultMessage is: " + resultMessage);
             console.log("coidGKAddr is: " + coidGKAddr);
             console.log("coidAddr is: " + coidAddr);
+            console.log("dimensionCtrlAddr is: " + dimensionCtrlAddr);
             console.log("blockNumber is: " + blockNumber);
             console.log("blockHashVal is: " + blockHashVal);
             console.log("blockchainID is: " + blockchainID);
             console.log("timestamp is: " + timestamp);
-            console.log(JSON.stringify(result.args));
+            console.log("result.args: " + JSON.stringify(result.args));
 
             //implement logic if and only if votingResult is true:
             if (votingResult) {
@@ -926,13 +929,14 @@ var eventListener = function (MyGKAddr) {
 
                             var GKSig = { "signature": signatureGK, "pubkeyGK": pubkeyGK, "hashGK": hashGK }
                             console.log("GK Sig: " + JSON.stringify(GKSig));
-                            _this.bigchainIt(proposalId, formdataArray[index], coidGKAddr, coidAddr, blockNumber, blockHashVal, blockchainID, timestamp, validatorSigs, GKSig, function (result, theId, theHash) {
+                            _this.bigchainIt(proposalId, formdataArray[index], coidGKAddr, coidAddr, dimensionCtrlAddr, blockNumber, blockHashVal, blockchainID, timestamp, validatorSigs, GKSig, function (result, theId, theHash) {
                                 // console.log(result);
                                 console.log("THE TXN ID: " + theId)
                                 console.log("THE HASH: " + theHash)
                                 console.log("GK ADDR: " + coidGKAddr)
                                 console.log("COID ADDR: " + coidAddr)
-                                theNotifier.notifyCoidCreation(formdataArray[index].pubKey, formdataArray[index].assetID, theId, theHash, coidGKAddr, coidAddr)
+                                console.log("DIM CTRL ADDR: " + dimensionCtrlAddr)
+                                theNotifier.notifyCoidCreation(formdataArray[index].pubKey, formdataArray[index].assetID, theId, theHash, coidGKAddr, coidAddr, dimensionCtrlAddr)
 
 
                                 //make the core identity

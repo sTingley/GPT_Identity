@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import TagsInput from 'react-tagsinput';
+import UploadIpfsFile from './UploadIpfsFile.jsx'
 
 class DimensionForm extends Component {
 
@@ -289,149 +291,10 @@ class DimensionForm extends Component {
 //                                <button type="button" className="btn btn-danger" onClick={this.submitHandler.bind(this)}>THIS BUTTON DOES SOMETHING</button>
 //                           </div>
 
-class UploadIpfsFile extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            docs: {},
-            pubKey: props.pubKey,
-            selected: '0',
-            files: ''
-        };
-        this.inputChangeHandler = this.inputChangeHandler.bind(this);
-    }
-
-    componentDidMount() {
-        $.ajax({
-            url: twinUrl + "ipfs/alldocs/" + this.state.pubKey,
-            dataType: 'json',
-            cache: false,
-            success: function (resp) {
-                this.setState({ docs: resp.data.documents });
-            }.bind(this),
-            error: function (xhr, status, err) {
-                console.error(this.props.url, status, err.toString());
-            }.bind(this)
-        });
-
-
-
-        $("#CreateDimensionContainer .modal").modal('show');
-        $("#CreateDimensionContainer .modal").on('hidden.bs.modal', this.props.handleHideModal);
-    }
-
-    uploadHandler(data, additionalParams) {
-        var params = {
-            url: twinUrl + "ipfs/upload",
-            type: 'POST',
-            data: data,
-            cache: false,
-            processData: false,
-            contentType: false,
-        };
-        $.extend(params, additionalParams);
-        $.ajax(params);
-    }
-
-    fileHandler(e) {
-        e.preventDefault();
-        if (this.state.selected != "0") {
-            var hash, fileHash;
-            this.props.dataHandler(this.state.selected);
-            $("button.close").trigger("click");
-        } else {
-            if (this.state.files.size > 0) {
-                var fileInput = $("input[name=newdoc]");
-                var fData = new FormData();
-                fData.append("user_pubkey", this.state.pubKey);
-                $.each(fileInput[0].files, function (key, value) {
-                    fData.append(key, value);
-                });
-                var _this = this;
-                var callbacks = {
-                    beforeSend: (xhr) => {
-                        $("button[name=uploadsubmit]").button('loading');
-                        $("button.close").hide();
-                    },
-                    success: function (resp) {
-                        if (resp.uploded && resp.uploded.length > 0) {
-                            var filedata = resp.uploded[0].hash + "|" + resp.uploded[0].file_hash;
-                            //data handler forms JSON object
-                            this.props.dataHandler(filedata);
-                            $("button.close").trigger("click");
-                        }
-                    }.bind(this),
-                    complete: () => {
-                        $("button[name=uploadsubmit]").button('reset');
-                        $("button.close").show();
-                    }
-                };
-                this.uploadHandler(fData, callbacks);
-            }
-        }
-    }
-
-    inputChangeHandler(e) {
-        if (e.target.tagName == "SELECT") {
-            this.setState({ selected: e.target.value });
-        } else
-            this.setState({ files: e.target.files[0] });
-    }
-
-    render() {
-        console.log("UploadIpfsFile state: " + JSON.stringify(this.state))
-        var center = {
-            textAlign: 'center'
-        };
-        return (
-            <div className="modal fade">
-                <div className="modal-dialog">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 className="modal-title">Upload Document</h4>
-                        </div>
-                        <div className="modal-body">
-                            <form>
-                                <div className="form-group">
-                                    <label htmlFor="get-hash">Choose from documents</label>
-                                    <select className="form-control" onChange={this.inputChangeHandler}>
-                                        <option value="0">Select Document</option>
-                                        {(() => {
-                                            if (this.state.docs && this.state.docs.length > 0) {
-                                                var i = 0;
-                                                return this.state.docs.map((obj) => {
-                                                    i++;
-                                                    var optsVal = obj.hash + "|" + obj.file_hash;
-                                                    return <option value={optsVal} key={i}>{obj.filename}</option>
-                                                });
-                                            } else {
-                                                return <option value="0">-- Empty --</option>
-                                            }
-                                        })()}
-                                    </select>
-                                </div>
-                                <p style={center}>(or)</p>
-                                <div className="form-group">
-                                    <label htmlFor="documents">Upload Document</label>
-                                    <input type="file" className="form-control" name="newdoc" onChange={this.inputChangeHandler} />
-                                </div>
-                            </form>
-                        </div>
-                        <div className="modal-footer">
-                            <button type="button" data-loading-text="Processing..." name="uploadsubmit" className="btn btn-success" onClick={this.fileHandler.bind(this)}>Submit</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        )
-    }
-};
 
 //DISPLAY
 
-class CreateDimensionForm extends React.Component {
+class DimensionAttributeForm extends React.Component {
 
     constructor(props) {
         super(props);
@@ -479,10 +342,11 @@ class IdentityDimensions extends Component {
             showModal: false,
 
             //********************
-            //inputs are mapped to add additional CreateDimensionForm instances
+            //inputs are mapped to add additional DimensionAttributeForm instances
             inputs: ['input-0'],
             //tmp file always holds current input, ex: 'input-0'
             tmpFile: '',
+            control_list:[],
 
             //as we add more Dimension attributes, we end up shifting tmpFile and inputs
             //so file_attrs will look like: [ {input-0: IPFS_hash0}, {input-1: IPFS_hash1} ]
@@ -505,8 +369,19 @@ class IdentityDimensions extends Component {
         };
         this.showDimensionHandler = this.showDimensionHandler.bind(this);
         this.handleHideModal = this.handleHideModal.bind(this);
+        this.onFieldChange = this.onFieldChange.bind(this);
 
     }
+
+    onFieldChange(inputField, e){
+		var multipleValues = {};
+		if(inputField == "name" || inputField == "signature" || inputField =="message"){
+			this.setState({[inputField]: e.target.value});
+		} else {
+			multipleValues[inputField] = e;
+			this.setState(multipleValues);
+		}
+	}
 
     handleSelection() {
         //make sure that we are interacting with proper asset
@@ -652,7 +527,7 @@ class IdentityDimensions extends Component {
         this.setState({ file_attrs: this.state.file_attrs.concat([obj]) });
     }
     //*****************************************************************************
-    //Passed as a prop to CreateDimensionForm
+    //Passed as a prop to DimensionAttributeForm
     handleShowModal(e) {
         this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
     }
@@ -663,6 +538,42 @@ class IdentityDimensions extends Component {
     }
     //*****************************************************************************
 
+    //used for DimensionAttributeForm to prepare attributes
+    getLabelValues() {
+        var labelVals = []
+        var _this = this;
+        //in DimensionForm
+        $.each($("input[name^='label-']"), function (obj) {
+            var value = $.trim($(this).val());
+            if (value.length > 0) {
+                labelVals.push({
+                    //replace the 'label' with the entered unique attribute descriptor, for example 'Name' or 'US SSN'
+                    [$(this).attr('name').replace("label-", "")]: value
+                });
+            }
+        });
+        return labelVals;
+    }
+
+    prepareAttrs() {
+        var newArr = [],
+            labels = this.getLabelValues();
+        //labelVals: [{"input-0":"mydocument"},{"input-1":"seconddocument"}]
+        for (var i = 0; i < labels.length; i++) {
+            var tmpArr = [];
+            for (var key in labels[i]) {
+                tmpArr.push(labels[i][key]);
+                var ipfsHash, fileHash;
+                [ipfsHash, fileHash] = this.state.file_attrs[i][key].split("|");
+                tmpArr.push(fileHash);
+                tmpArr.push(ipfsHash);
+            }
+            newArr.push(tmpArr);
+        }
+        return newArr;
+    }
+    //when we click add more, a new value is pushed into this.state.inputs,
+    //and a new DimensionAttributeForm is rendered
     appendInput() {
         var inputLen = this.state.inputs.length;
         if (inputLen < 10) {
@@ -672,11 +583,19 @@ class IdentityDimensions extends Component {
         console.log("inputs: " + this.state.inputs)
     }
 
-
+    //called onClick of 'Create Dimension' button
     createDimension(e) {
         e.preventDefault();
 
-        json = {}
+
+        this.prepareAttrs()
+        console.log("now file attrs: " + JSON.stringify(this.state.file_attrs))
+        //file_attrs looks like, [{key: "IPFS_hash | shaHash}]
+        
+        //[{"input-0":"QmPcY8sJ8hSfWhzqX8iLzQEbgiESjqTaeEEoJUrZwhLNk5|9bb7e24956771c4f1bbfe5eceff9e9e1457fafa5d3af3a56f4d7cef0bdd509dc"},
+        //{"input-1":"QmUJGfdKUCFiL2cKE3dcVFL5Q6PsvcWJSPxff5snJ46tuk|28a6ce8b3c55a60f5923cb87e5fd1c47decb973d1973f047f722141460fdad71"},]
+
+        var json = {}
 
         $.ajax({
             type: "POST",
@@ -708,7 +627,7 @@ class IdentityDimensions extends Component {
 
     render() {
 
-        console.log("*****STATE\n" + JSON.stringify(this.state))
+        //console.log("*****STATE\n" + JSON.stringify(this.state))
 
         //console.log("******* "+JSON.stringify(this.state))
         let dimensions = this.state.iDimensions;
@@ -736,6 +655,13 @@ class IdentityDimensions extends Component {
         var table = {
             margin: '0 auto'
         }
+        var inputAttrs = {
+			addKeys: [13,188],	// Enter and comma
+			inputProps: {
+				placeholder: "use comma(,) to add multiple values",
+				style:{width:'30%'}
+			}
+		};
 
         return (
             <div id="IDENTITYDIMENSIONS_MODAL">
@@ -797,11 +723,11 @@ class IdentityDimensions extends Component {
                             </div><br />
 
 
-                            <div id="CreateDimensionContainer">
+                            <div id="SubmitContainer">
                                 <form method="POST" id="register" role="form">
                                     <div className="form-group">
                                         <label htmlFor="unique_id">Enter Identity Dimension Details:</label>
-                                        {this.state.inputs.map(input => <CreateDimensionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+                                        {this.state.inputs.map(input => <DimensionAttributeForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
                                     </div>
                                     <div className="form-group">
                                         <div className="col-md-offset-6 col-md-6 ">
@@ -811,8 +737,12 @@ class IdentityDimensions extends Component {
                                         </div>
                                     </div>
                                     <div className="form-group">
+                                        <label htmlFor="control_dist">Enter Controller(s).</label>
+					                    <TagsInput {...inputAttrs} value={this.state.control_list} onChange={(e)=>{ this.onFieldChange("control_list", e) } } />
+				                    </div>
+                                    
+                                    <div className="form-group">
                                         <div className="col-sm-6">
-                                            <hr />
                                             <button className="btn btn-primary" data-loading-text="Submit" name="submit-form" type="button" onClick={this.createDimension.bind(this)}>Create Dimension</button>
                                         </div>
                                     </div>

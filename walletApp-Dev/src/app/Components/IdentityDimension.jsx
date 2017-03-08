@@ -320,7 +320,7 @@ class DimensionAttributeForm extends React.Component {
             <div className="form-group col-md-12">
                 <div className="col-md-10">
                     <label htmlFor="unique_id_attrs"> Dimension Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research". </label>
-                    <input name={'label-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Label" />
+                    <input name={'label-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Descriptor" />
                 </div>
                 <div className="col-md-2">
                     <button type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn btn-warning pull-right"><span className="glyphicon glyphicon-upload"></span>Upload File</button>
@@ -346,17 +346,18 @@ class IdentityDimensions extends Component {
             inputs: ['input-0'],
             //tmp file always holds current input, ex: 'input-0'
             tmpFile: '',
-            control_list:[],
+            control_list: [],
 
             //as we add more Dimension attributes, we end up shifting tmpFile and inputs
             //so file_attrs will look like: [ {input-0: IPFS_hash0}, {input-1: IPFS_hash1} ]
             file_attrs: [],
 
             controlled_assets: [],
+            controlled_assets_label: [],
 
             //contains actual asset data from DT
             own_assets: [],
-            //owned_assets_label: [],  
+            owned_assets_label: [],
 
             iDimensions: [],
 
@@ -373,15 +374,15 @@ class IdentityDimensions extends Component {
 
     }
 
-    onFieldChange(inputField, e){
-		var multipleValues = {};
-		if(inputField == "name" || inputField == "signature" || inputField =="message"){
-			this.setState({[inputField]: e.target.value});
-		} else {
-			multipleValues[inputField] = e;
-			this.setState(multipleValues);
-		}
-	}
+    onFieldChange(inputField, e) {
+        var multipleValues = {};
+        if (inputField == "name" || inputField == "signature" || inputField == "message") {
+            this.setState({ [inputField]: e.target.value });
+        } else {
+            multipleValues[inputField] = e;
+            this.setState(multipleValues);
+        }
+    }
 
     handleSelection() {
         //make sure that we are interacting with proper asset
@@ -555,7 +556,10 @@ class IdentityDimensions extends Component {
         return labelVals;
     }
 
-    prepareAttrs() {
+    /*file_attrs looks like: [{key: "IPFS_hash | shaHash}]
+        [{"input-0":"QmPcY8sJ8hSfWhzqX8iLzQEbgiESjqTaeEEoJUrZwhLNk5|9bb7e24956771c4f1bbfe5eceff9e9e1457fafa5d3af3a56f4d7cef0bdd509dc"},
+        {"input-1":"QmUJGfdKUCFiL2cKE3dcVFL5Q6PsvcWJSPxff5snJ46tuk|28a6ce8b3c55a60f5923cb87e5fd1c47decb973d1973f047f722141460fdad71"},]*/
+    prepareAttributes() {
         var newArr = [],
             labels = this.getLabelValues();
         //labelVals: [{"input-0":"mydocument"},{"input-1":"seconddocument"}]
@@ -563,12 +567,13 @@ class IdentityDimensions extends Component {
             var tmpArr = [];
             for (var key in labels[i]) {
                 tmpArr.push(labels[i][key]);
-                var ipfsHash, fileHash;
-                [ipfsHash, fileHash] = this.state.file_attrs[i][key].split("|");
-                tmpArr.push(fileHash);
+                let ipfsHash = this.state.file_attrs[i][key].split("|")
+                ipfsHash = ipfsHash[0] //not sending sha hash
                 tmpArr.push(ipfsHash);
+                console.log("tmpArray: " + tmpArr)
             }
             newArr.push(tmpArr);
+            console.log("newArr: " + newArr)
         }
         return newArr;
     }
@@ -582,40 +587,69 @@ class IdentityDimensions extends Component {
         }
         console.log("inputs: " + this.state.inputs)
     }
-
+    //*********************************************************************************************
     //called onClick of 'Create Dimension' button
+    //We need: pubkey, uniqueId, typeInput (name), descriptors&attributes, flag
     createDimension(e) {
         e.preventDefault();
 
+        let dimensionName
 
-        this.prepareAttrs()
-        console.log("now file attrs: " + JSON.stringify(this.state.file_attrs))
-        //file_attrs looks like, [{key: "IPFS_hash | shaHash}]
-        
-        //[{"input-0":"QmPcY8sJ8hSfWhzqX8iLzQEbgiESjqTaeEEoJUrZwhLNk5|9bb7e24956771c4f1bbfe5eceff9e9e1457fafa5d3af3a56f4d7cef0bdd509dc"},
-        //{"input-1":"QmUJGfdKUCFiL2cKE3dcVFL5Q6PsvcWJSPxff5snJ46tuk|28a6ce8b3c55a60f5923cb87e5fd1c47decb973d1973f047f722141460fdad71"},]
+        $.each($("input[name^='dimensionName']"), function (obj) {
+            var value = $.trim($(this).val())
+            if (value.length > 0) {
+                dimensionName = value
+            }
+            console.log("got dimensionName: " + dimensionName)
+        })
+
+        let attributes = this.prepareAttributes()
+        console.log("attributes: " + attributes)
+
+        var obj = {}
+        for(var i=0; i<attributes.length; i++){
+            obj.descriptor = attributes[i]
+            obj.attribute = attributes[i+1]
+        }
+
+        console.log("obj: " + JSON.stringify(obj))
+
 
         var json = {}
 
+        json.pubKey = localStorage.getItem("pubKey")
+        json.controllers = this.state.control_list
+        //[["desc1111","QmUJGfdKUCFiL2cKE3dcVFL5Q6PsvcWJSPxff5snJ46tuk","0"],[]]
+        json.data = attributes
+        json.flag = 0
+        json.typeInput = dimensionName
+
+        let selected_asset = $("#assetSelect option:selected").text()
+        this.state.own_assets.forEach(function (asset, index) {
+            if (selected_asset == asset.asset_id) {
+                json.uniqueId = asset.asset_uniqueId
+                json.dimensionCtrlAddr = asset.asset_dimCtrAddr
+            }
+        })
+
+        console.log("json: " + JSON.stringify(json))
+
         $.ajax({
             type: "POST",
-            url: twinUrl + 'createDimension',
-            data: {
-                pubkey: localStorage.getItem("pubKey"),
-                flag: '1',
-                type: 'public'
-            },
+            url: twinUrl + 'dimensions/CreateDimension',
+            data: json,
             success: function (result) {
                 var data = result;
                 if ($.type(result) != "object") {
                     data = JSON.parseJSON(result)
                 }
 
+                console.log("response createDimenson: " + JSON.stringify(data))
                 //get the array:
-                data = data.data;
+                //data = data.data;
 
                 //debugging:
-                console.log("createDimensionforDEMO result: " + data);
+                //console.log("createDimensionforDEMO result: " + data);
 
             }.bind(this),
             complete: function () {
@@ -629,21 +663,12 @@ class IdentityDimensions extends Component {
 
         //console.log("*****STATE\n" + JSON.stringify(this.state))
 
-        //console.log("******* "+JSON.stringify(this.state))
         let dimensions = this.state.iDimensions;
-        //console.log("dimensions.length " + dimensions.length)
-        //console.log("the dimensions: " + JSON.stringify(dimensions))
 
-        // for(var dimension in dimensions){
-        //     if(dimensions.hasOwnProperty(dimension)){
-        //         var obj = dimensions[dimension];
-        //         for(var prop in obj){
-        //             if(obj.hasOwnPropety(prop)){
-        //                 console.log("prop = " + obj[prop])
-        //             }
-        //         }
-        //     }
-        // }
+        var owned_label = this.state.owned_assets_label
+        console.log("owned_labels: " + owned_label)
+
+        var controlled_label = this.state.controlled_assets_label
 
 
         var _that = this
@@ -656,12 +681,12 @@ class IdentityDimensions extends Component {
             margin: '0 auto'
         }
         var inputAttrs = {
-			addKeys: [13,188],	// Enter and comma
-			inputProps: {
-				placeholder: "use comma(,) to add multiple values",
-				style:{width:'30%'}
-			}
-		};
+            addKeys: [13, 188],	// Enter and comma
+            inputProps: {
+                placeholder: "use comma(,) to add multiple values",
+                style: { width: '30%' }
+            }
+        };
 
         return (
             <div id="IDENTITYDIMENSIONS_MODAL">
@@ -711,22 +736,40 @@ class IdentityDimensions extends Component {
                         <div className="tabpanel" role="tabpanel" className="tab-pane" id="addDimension"><br />
 
                             <div>
-                                <select className="selectpicker show-tick" value={this.state.selectedAsset} onChange={this.handleSelection}>
+                                <select id="assetSelect" className="selectpicker show-tick">
                                     <optgroup label="Owned">
-                                        <option>MyCOID</option>
-                                        <option>My Car</option>
+                                        {(() => {
+                                            if (owned_label.length > 0) {
+                                                return owned_label.map((label, i) => {
+                                                    let val = label.split('.') //get rid of the .json
+                                                    return <option key={i} value={label}>{val[0]}</option>
+                                                })
+                                            }
+                                            else { return <option>None</option> }
+                                        })(this)}
                                     </optgroup>
                                     <optgroup label="Controlled">
-                                        <option>Parents house</option>
+                                        {(() => {
+                                            if (controlled_label.length > 0) {
+                                                return controlled_label.map((label, i) => {
+                                                    let val = label.split('.') //get rid of the .json
+                                                    return <option key={i} value={label}>{val[0]}</option>
+                                                })
+                                            }
+                                            else { return <option>None</option> }
+                                        })(this)}
                                     </optgroup>
                                 </select>
                             </div><br />
 
-
                             <div id="SubmitContainer">
                                 <form method="POST" id="register" role="form">
                                     <div className="form-group">
-                                        <label htmlFor="unique_id">Enter Identity Dimension Details:</label>
+                                        <label htmlFor="dimensionName">Dimension name:</label>
+                                        <input name="dimensionName" className="form-control col-md-4" type="text" placeholder="Dimension Name" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="unique_id">Enter descriptor(s) and attribute(s):</label>
                                         {this.state.inputs.map(input => <DimensionAttributeForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
                                     </div>
                                     <div className="form-group">
@@ -738,9 +781,9 @@ class IdentityDimensions extends Component {
                                     </div>
                                     <div className="form-group">
                                         <label htmlFor="control_dist">Enter Controller(s).</label>
-					                    <TagsInput {...inputAttrs} value={this.state.control_list} onChange={(e)=>{ this.onFieldChange("control_list", e) } } />
-				                    </div>
-                                    
+                                        <TagsInput {...inputAttrs} value={this.state.control_list} onChange={(e) => { this.onFieldChange("control_list", e) } } />
+                                    </div>
+
                                     <div className="form-group">
                                         <div className="col-sm-6">
                                             <button className="btn btn-primary" data-loading-text="Submit" name="submit-form" type="button" onClick={this.createDimension.bind(this)}>Create Dimension</button>
@@ -765,66 +808,5 @@ class IdentityDimensions extends Component {
 
 
 export default IdentityDimensions
-
-        //OLD (in DT still)
-        // $.ajax({
-        //     url: twinUrl + 'getMetaData',
-        //     type: 'POST',
-        //     data: {
-        //         //"pubKey": localStorage.getItem("pubKey")
-        //     },
-        //     success: function (result) {
-        //         var data = result;
-        //         if ($.type(result) != "object") {
-        //             data = JSON.parse(result)
-        //         }
-        //         //console.log("data: " + JSON.stringify(data))
-        //         data = JSON.stringify(data)
-        //         data = JSON.parse(data).data
-        //         //console.log("data after parse: " + JSON.stringify(data))
-        //         data = JSON.stringify(data)
-        //         var dimensions = JSON.parse(data).Dimensions
-        //         //console.log("dimensions: " + JSON.stringify(dimensions))
-
-        //         _this.setState({ iDimensions: dimensions })
-
-        //     }.bind(_this),
-        //     complete: function () {
-
-        //     }
-        // })
-
-
-    // $.ajax({
-    // 	type: "POST",
-    // 	url: twinUrl + 'getControlledAssets',
-    // 	data: { "pubKey": localStorage.getItem("pubKey") },
-    // 	success: function (result) {
-    // 		var data = result;
-    // 		if ($.type(result) != "object") {
-    // 			data = JSON.parseJSON(result)
-    // 		}
-
-    // 		//get the array:
-    // 		data = data.data;
-
-    //         let ctrl_array = []
-    //         if(data.length > 0){
-    //             for(let i=0; i< data.length; i++){
-    //                 ctrl_array.push(data[i])
-    //             }
-    //             console.log(ctrl_array)
-    //             this.setState({controlled_assets: ctrl_array})
-    //         }
-
-    // 		//debugging:
-    // 		console.log("Get Controlled Assets result: " + data);
-
-    // 	}.bind(this),
-    // 	complete: function () {
-    // 		// do something
-    // 	},
-    // 	//console.log(result)
-    // })
 
 //<IdentityDimensions dimensions={dimensions} onDelete={this.handleDeleteDimension.bind(this) } key={dimensions.ID} onClick={this.showHandler.bind(this)}/>

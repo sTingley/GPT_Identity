@@ -390,13 +390,15 @@ class IdentityDimensions extends Component {
 
     getDimensions() {
 
+        //MyCOID.json
         let dimension1 = {}
         dimension1.dimension = {
             "dimensionName": "FINANCES",
             "pubkey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+            "coidAddr": "7924DBF02BE23923790C5D82F8A39925F516CA0F",
             "ID": 3432423423,
             "address": "HEXSTRING_address",
-            "owner": ["pubkey1", "pubkey2"],
+            "owner": [],
             "controllers": ["c1", "c2"],
             "delegations": [
                 { owner: "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055", delegatee: "d1", amount: "2", dimension: "", expiration: "thursday", accessCategories: "" },
@@ -407,14 +409,15 @@ class IdentityDimensions extends Component {
                 { "descriptor": "financial_MARCH", "attribute": "Qmsdfsdfsdfsdfsdfsdfsdfsdf", flag: "0", ID: "3433" },
             ]
         }
-
+        //HOME.json
         let dimension2 = {}
         dimension2.dimension = {
             "dimensionName": "EDUCATION",
             "pubkey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+            "coidAddr": "872EDE47AEBC33CAD4AF1B8DA861E78D8E99BC56",
             "ID": 69696969,
             "address": "HEXSTRING_address",
-            "owner": ["pubkey1", "pubkey2"],
+            "owner": [],
             "controllers": ["c1", "c2"],
             "delegations": [
                 { owner: "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055", delegatee: "D1", amount: "2", dimension: "", expiration: "thursday", accessCategories: "" },
@@ -481,9 +484,9 @@ class IdentityDimensions extends Component {
                                 theArray[theArray.length] = {
                                     asset_id: dataResult.assetID,
                                     asset_uniqueId: dataResult.uniqueId,
-                                    asset_dimCtrAddr: dataResult.dimensionCtrlAddr
+                                    asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
+                                    asset_coidAddr: dataResult.coidAddr
                                 }
-                                //console.log("iteration " + i + " ..theArray: " + JSON.stringify(theArray))
                                 //MYCOID is always pushed into last spot, so we know we are done if we go into this if
                                 if (dataResult.assetID = "MyCOID") {
                                     this.setState({ own_assets: theArray })
@@ -607,13 +610,12 @@ class IdentityDimensions extends Component {
         console.log("attributes: " + attributes)
 
         var obj = {}
-        for(var i=0; i<attributes.length; i++){
+        for (var i = 0; i < attributes.length; i++) {
             obj.descriptor = attributes[i]
-            obj.attribute = attributes[i+1]
+            obj.attribute = attributes[i + 1]
         }
 
         console.log("obj: " + JSON.stringify(obj))
-
 
         var json = {}
 
@@ -628,11 +630,13 @@ class IdentityDimensions extends Component {
         this.state.own_assets.forEach(function (asset, index) {
             if (selected_asset == asset.asset_id) {
                 json.uniqueId = asset.asset_uniqueId
-                json.dimensionCtrlAddr = asset.asset_dimCtrAddr
+                json.dimensionCtrlAddr = asset.asset_dimCtrlAddr
+                json.coidAddr = asset.asset_coidAddr
+                //json.dimensions = asset.asset_dimensions
             }
         })
 
-        console.log("json: " + JSON.stringify(json))
+        console.log("JSON: " + JSON.stringify(json))
 
         $.ajax({
             type: "POST",
@@ -645,17 +649,24 @@ class IdentityDimensions extends Component {
                 }
 
                 console.log("response createDimenson: " + JSON.stringify(data))
+
+                console.log("data.Result: " + data.Result)
+
+                // var dimensionAddr = data.Result[2]
+                // console.log("dimensionAddr: " + dimensionAddr)
+                
+                //returns (bool success, bytes32 callerHash, address test)
+                //response createDimenson: {"Status":null,"Result":"true,8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,C48883966A3B2B8672CC4392C0E03758F7705C36"}
                 //get the array:
                 //data = data.data;
 
-                //debugging:
-                //console.log("createDimensionforDEMO result: " + data);
 
             }.bind(this),
             complete: function () {
                 // do something
             },
         })
+
     }
 
 

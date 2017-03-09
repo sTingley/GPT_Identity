@@ -230,7 +230,8 @@ class CoreIdentity extends React.Component {
 				"bigchainHash":  "",
 				"bigchainID": "",
 				"coidAddr": "",
-				"gatekeeperAddr": ""
+				"gatekeeperAddr": "",
+				"dimensions": ""
 
 		};
 		return inputObj;

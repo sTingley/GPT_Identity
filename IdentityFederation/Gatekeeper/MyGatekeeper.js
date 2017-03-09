@@ -101,17 +101,22 @@ var notifier = function () {
 var theNotifier = new notifier();
 
 //makes a coid
-function CoidMaker(coidAddr, formdata) {
+function CoidMaker(coidAddr, dimensionCtrlAddr, formdata) {
 
     //get params for their COID contract
     console.log("Inside CoidMaker function")
+    var chainUrl = chainConfig.chainURL;
     var contrData = require("./epm.json");
+    var accounts = require('./accounts.json')
+    var manager = erisContracts.newContractManagerDev(chainUrl, chainConfig.primaryAccount)
+
     var abiAddr = contrData['CoreIdentity'];
     var abi_COID = JSON.parse(fs.readFileSync('./abi/' + abiAddr, 'utf8'))
-    var accounts = require('./accounts.json')
-    var chainUrl = chainConfig.chainURL;
-    var manager = erisContracts.newContractManagerDev(chainUrl, chainConfig.primaryAccount)
     var contract = manager.newContractFactory(abi_COID).at(coidAddr)
+
+    var dimCtrlAddr = contrData['IdentityDimensionControl'];
+    var abi_dimCtrl = JSON.parse(fs.readFileSync('./abi/' + dimCtrlAddr, 'utf8'))
+    var dimCtrlContract = manager.newContractFactory(abi_dimCtrl).at(dimensionCtrlAddr)
 
     contract.getIt(function (error, result) {
         console.log(result + " is the result")
@@ -212,7 +217,12 @@ function CoidMaker(coidAddr, formdata) {
         })//end setUniqueID
     }, 3000)
 
-}
+    dimCtrlContract.IdentityDimensionControlInstantiation(coidAddr, function(err,result){
+        if(err){console.log("dimensioninstantiation error: " + err)}
+        console.log("DimensionInstantiation: " + JSON.stringify(result))
+    })
+
+}//end CoidMaker
 
 
 //Instantiate one of these
@@ -940,7 +950,7 @@ var eventListener = function (MyGKAddr) {
 
 
                                 //make the core identity
-                                CoidMaker(coidAddr, formdataArray[index])
+                                CoidMaker(coidAddr, dimensionCtrlAddr, formdataArray[index])
 
                                 //delete the proposal
                                 deleteProposal(proposalId);

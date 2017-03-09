@@ -106,22 +106,28 @@ var theNotifier = new notifier();
 
 
 //makes a coid
-function CoidMaker(coidAddr, formdata) {
+function CoidMaker(coidAddr, dimensionCtrlAddr, formdata) {
 
     //get params for their COID contract
     console.log("hi")
     var chain = 'primaryAccount';
     var chainUrl = chainConfig.URL;
     var contrData = require("./epm.json");
-    var abiAddr = contrData['CoreIdentity'];
-    var abi_COID = JSON.parse(fs.readFileSync('./abi/' + abiAddr, 'utf8'))
     var accounts = require('./accounts.json')
     var manager = erisContracts.newContractManagerDev(chainUrl, chainConfig[chain])
-    var contract = manager.newContractFactory(abi_COID).at(coidAddr)
 
-    contract.getIt(function (error, result) {
+    var COIDabiAddr = contrData['CoreIdentity'];
+    var abi_COID = JSON.parse(fs.readFileSync('./abi/' + COIDabiAddr, 'utf8'))
+    var COIDcontract = manager.newContractFactory(abi_COID).at(coidAddr)
+
+    var dimCtrlAddr = contrData['IdentityDimensionControl'];
+    var abi_dimCtrl = JSON.parse(fs.readFileSync('./abi/' + dimCtrlAddr, 'utf8'))
+    var dimCtrlContract = manager.newContractFactory(abi_dimCtrl).at(dimensionCtrlAddr)
+
+    COIDcontract.getIt(function (error, result) {
         console.log(result + " is the result")
     })
+    
     //parse the form data
     var sig = formdata.sig;
     var msg = formdata.msg;
@@ -168,33 +174,33 @@ function CoidMaker(coidAddr, formdata) {
 
         //instantiate coid   
         var _this = this;
-        contract.setUniqueID(myUniqueId, theUniqueIDAttributes, isHumanValue, function (error) {
+        COIDcontract.setUniqueID(myUniqueId, theUniqueIDAttributes, isHumanValue, function (error) {
             //debugging function (getIt)
-            contract.getIt(function (error, result) {
+            COIDcontract.getIt(function (error, result) {
                 console.log("setUniqueID: " + result);
 
-                contract.setOwnership(myOwnerIdList, myOwnershipTokenQuantity, function (error) {
+                COIDcontract.setOwnership(myOwnerIdList, myOwnershipTokenQuantity, function (error) {
                     //debugging function (getIt)
-                    contract.getIt(function (error, result) {
+                    COIDcontract.getIt(function (error, result) {
                         console.log("setOwnership: " + result);
 
-                        contract.setControl(myControlTokenQuantity, myControlIdList, function (error) {
+                        COIDcontract.setControl(myControlTokenQuantity, myControlIdList, function (error) {
 
                             //debugging function (getIt)
-                            contract.getIt(function (error, result) {
+                            COIDcontract.getIt(function (error, result) {
                                 console.log("setControl" + result);
 
-                                contract.setRecovery(myIdentityRecoveryIdList, myRecoveryCondition, function (error, result) {
+                                COIDcontract.setRecovery(myIdentityRecoveryIdList, myRecoveryCondition, function (error, result) {
 
                                     //debugging function (getIt)
-                                    contract.getIt(function (error, result) {
+                                    COIDcontract.getIt(function (error, result) {
                                         console.log("setRecovery: " + result);
 
-                                        contract.StartCoid(function (error, result) {
+                                        COIDcontract.StartCoid(function (error, result) {
                                             console.log("startCoid1: " + result);
 
                                             //debugging function (getIt)
-                                            contract.getIt(function (Error, result) {
+                                            COIDcontract.getIt(function (Error, result) {
                                                 console.log("startCoid: " + result);
 
                                             })//end getIT
@@ -217,6 +223,11 @@ function CoidMaker(coidAddr, formdata) {
 
         })//end setUniqueID
     }, 3000)
+
+    dimCtrlContract.IdentityDimensionControlInstantiation(coidAddr, function(err,result){
+        if(err){console.log("dimensioninstantiation error: " + err)}
+        console.log("DimensionInstantiation: " + JSON.stringify(result))
+    })
 
 }//end CoidMaker
 
@@ -997,7 +1008,7 @@ var eventListener = function () {
                                 theNotifier.notifyCoidCreation(formdataArray[index].pubKey, theId, theHash, coidGKAddr, coidAddr, dimensionCtrlAddr)
 
                                 //makes the core identity
-                                CoidMaker(coidAddr, formdataArray[index])
+                                CoidMaker(coidAddr, dimensionCtrlAddr, formdataArray[index])
 
                                 //delete the proposal
                                 //TODO- add this function back

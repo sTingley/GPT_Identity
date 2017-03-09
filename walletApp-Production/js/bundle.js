@@ -79,35 +79,35 @@
 	
 	var _CoreIdentityForm2 = _interopRequireDefault(_CoreIdentityForm);
 	
-	var _Upload = __webpack_require__(/*! ./Components/Upload.jsx */ 329);
+	var _Upload = __webpack_require__(/*! ./Components/Upload.jsx */ 330);
 	
 	var _Upload2 = _interopRequireDefault(_Upload);
 	
-	var _ToVote = __webpack_require__(/*! ./Components/ToVote.jsx */ 330);
+	var _ToVote = __webpack_require__(/*! ./Components/ToVote.jsx */ 331);
 	
 	var _ToVote2 = _interopRequireDefault(_ToVote);
 	
-	var _Notifications = __webpack_require__(/*! ./Components/Notifications.jsx */ 331);
+	var _Notifications = __webpack_require__(/*! ./Components/Notifications.jsx */ 332);
 	
 	var _Notifications2 = _interopRequireDefault(_Notifications);
 	
-	var _Assets = __webpack_require__(/*! ./Components/Assets.jsx */ 332);
+	var _Assets = __webpack_require__(/*! ./Components/Assets.jsx */ 333);
 	
 	var _Assets2 = _interopRequireDefault(_Assets);
 	
-	var _MyCOID = __webpack_require__(/*! ./Components/MyCOID.jsx */ 344);
+	var _MyCOID = __webpack_require__(/*! ./Components/MyCOID.jsx */ 345);
 	
 	var _MyCOID2 = _interopRequireDefault(_MyCOID);
 	
-	var _IdentityDimension = __webpack_require__(/*! ./Components/IdentityDimension.jsx */ 345);
+	var _IdentityDimension = __webpack_require__(/*! ./Components/IdentityDimension.jsx */ 346);
 	
 	var _IdentityDimension2 = _interopRequireDefault(_IdentityDimension);
 	
-	var _Documents = __webpack_require__(/*! ./Components/Documents.jsx */ 346);
+	var _Documents = __webpack_require__(/*! ./Components/Documents.jsx */ 347);
 	
 	var _Documents2 = _interopRequireDefault(_Documents);
 	
-	var _MyGateKeeper = __webpack_require__(/*! ./Components/MyGateKeeper.jsx */ 347);
+	var _MyGateKeeper = __webpack_require__(/*! ./Components/MyGateKeeper.jsx */ 348);
 	
 	var _MyGateKeeper2 = _interopRequireDefault(_MyGateKeeper);
 	
@@ -47383,6 +47383,10 @@
 	
 	var _jsSha = __webpack_require__(/*! js-sha3 */ 325);
 	
+	var _UploadIpfsFile = __webpack_require__(/*! ./UploadIpfsFile.jsx */ 329);
+	
+	var _UploadIpfsFile2 = _interopRequireDefault(_UploadIpfsFile);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -47398,231 +47402,18 @@
 	
 	//TODO : Namespace validation 
 	
-	var UploadIpfsFile = function (_React$Component) {
-		_inherits(UploadIpfsFile, _React$Component);
-	
-		function UploadIpfsFile(props) {
-			_classCallCheck(this, UploadIpfsFile);
-	
-			var _this2 = _possibleConstructorReturn(this, (UploadIpfsFile.__proto__ || Object.getPrototypeOf(UploadIpfsFile)).call(this, props));
-	
-			_this2.state = {
-				docs: {},
-				pubKey: props.pubKey,
-				selected: '0',
-				files: ''
-			};
-			_this2.inputChangeHandler = _this2.inputChangeHandler.bind(_this2);
-			return _this2;
-		}
-	
-		_createClass(UploadIpfsFile, [{
-			key: 'componentDidMount',
-			value: function componentDidMount() {
-				$.ajax({
-					url: twinUrl + "ipfs/alldocs/" + this.state.pubKey,
-					dataType: 'json',
-					cache: false,
-					success: function (resp) {
-						this.setState({ docs: resp.data.documents });
-					}.bind(this),
-					error: function (xhr, status, err) {
-						console.error(this.props.url, status, err.toString());
-					}.bind(this)
-				});
-	
-				$("#CoreIdentityContainer .modal").modal('show');
-				$("#CoreIdentityContainer .modal").on('hidden.bs.modal', this.props.handleHideModal);
-			}
-		}, {
-			key: 'uploadHandler',
-			value: function uploadHandler(data, additionalParams) {
-				var params = {
-					url: twinUrl + "ipfs/upload",
-					type: 'POST',
-					data: data,
-					cache: false,
-					processData: false,
-					contentType: false
-				};
-				$.extend(params, additionalParams);
-				$.ajax(params);
-			}
-		}, {
-			key: 'fileHandler',
-			value: function fileHandler(e) {
-				e.preventDefault();
-				if (this.state.selected != "0") {
-					var hash, fileHash;
-					this.props.dataHandler(this.state.selected);
-					$("button.close").trigger("click");
-				} else {
-					if (this.state.files.size > 0) {
-						var fileInput = $("input[name=newdoc]");
-						var fData = new FormData();
-						fData.append("user_pubkey", this.state.pubKey);
-						$.each(fileInput[0].files, function (key, value) {
-							fData.append(key, value);
-						});
-						//for (var key in fData) {console.log(key)}
-						//for(var pair of fData.entries()){console.log(pair[0] + ',' + pair[1])}
-						var _this = this;
-						var callbacks = {
-							beforeSend: function beforeSend(xhr) {
-								$("button[name=uploadsubmit]").button('loading');
-								$("button.close").hide();
-							},
-							success: function (resp) {
-								if (resp.uploded && resp.uploded.length > 0) {
-									var filedata = resp.uploded[0].hash + "|" + resp.uploded[0].file_hash;
-									//data handler forms JSON object
-									this.props.dataHandler(filedata);
-									$("button.close").trigger("click");
-								}
-							}.bind(this),
-							complete: function complete() {
-								$("button[name=uploadsubmit]").button('reset');
-								$("button.close").show();
-							}
-						};
-						this.uploadHandler(fData, callbacks);
-					}
-				}
-			}
-		}, {
-			key: 'inputChangeHandler',
-			value: function inputChangeHandler(e) {
-				if (e.target.tagName == "SELECT") {
-					this.setState({ selected: e.target.value });
-				} else this.setState({ files: e.target.files[0] });
-			}
-		}, {
-			key: 'render',
-			value: function render() {
-				var _this3 = this;
-	
-				var center = {
-					textAlign: 'center'
-				};
-				return _react2.default.createElement(
-					'div',
-					{ className: 'modal fade' },
-					_react2.default.createElement(
-						'div',
-						{ className: 'modal-dialog' },
-						_react2.default.createElement(
-							'div',
-							{ className: 'modal-content' },
-							_react2.default.createElement(
-								'div',
-								{ className: 'modal-header' },
-								_react2.default.createElement(
-									'button',
-									{ type: 'button', className: 'close', 'data-dismiss': 'modal', 'aria-label': 'Close' },
-									_react2.default.createElement(
-										'span',
-										{ 'aria-hidden': 'true' },
-										'×'
-									)
-								),
-								_react2.default.createElement(
-									'h4',
-									{ className: 'modal-title' },
-									'Upload Document'
-								)
-							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'modal-body' },
-								_react2.default.createElement(
-									'form',
-									null,
-									_react2.default.createElement(
-										'div',
-										{ className: 'form-group' },
-										_react2.default.createElement(
-											'label',
-											{ htmlFor: 'get-hash' },
-											'Choose from documents'
-										),
-										_react2.default.createElement(
-											'select',
-											{ className: 'form-control', onChange: this.inputChangeHandler },
-											_react2.default.createElement(
-												'option',
-												{ value: '0' },
-												'Select Document'
-											),
-											function () {
-												if (_this3.state.docs && _this3.state.docs.length > 0) {
-													var i = 0;
-													return _this3.state.docs.map(function (obj) {
-														i++;
-														var optsVal = obj.hash + "|" + obj.file_hash;
-														return _react2.default.createElement(
-															'option',
-															{ value: optsVal, key: i },
-															obj.filename
-														);
-													});
-												} else {
-													return _react2.default.createElement(
-														'option',
-														{ value: '0' },
-														'-- Empty --'
-													);
-												}
-											}()
-										)
-									),
-									_react2.default.createElement(
-										'p',
-										{ style: center },
-										'(or)'
-									),
-									_react2.default.createElement(
-										'div',
-										{ className: 'form-group' },
-										_react2.default.createElement(
-											'label',
-											{ htmlFor: 'documents' },
-											'Upload Document'
-										),
-										_react2.default.createElement('input', { type: 'file', className: 'form-control', name: 'newdoc', onChange: this.inputChangeHandler })
-									)
-								)
-							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'modal-footer' },
-								_react2.default.createElement(
-									'button',
-									{ type: 'button', 'data-loading-text': 'Processing...', name: 'uploadsubmit', className: 'btn btn-success', onClick: this.fileHandler.bind(this) },
-									'Submit'
-								)
-							)
-						)
-					)
-				);
-			}
-		}]);
-	
-		return UploadIpfsFile;
-	}(_react2.default.Component);
-	
-	;
 	
 	//form where we can add addtional labels (uniqueIDAttrs)
 	
-	var UniqueIDAttributesForm = function (_React$Component2) {
-		_inherits(UniqueIDAttributesForm, _React$Component2);
+	var UniqueIDAttributesForm = function (_React$Component) {
+		_inherits(UniqueIDAttributesForm, _React$Component);
 	
 		function UniqueIDAttributesForm(props) {
 			_classCallCheck(this, UniqueIDAttributesForm);
 	
-			var _this4 = _possibleConstructorReturn(this, (UniqueIDAttributesForm.__proto__ || Object.getPrototypeOf(UniqueIDAttributesForm)).call(this, props));
+			var _this2 = _possibleConstructorReturn(this, (UniqueIDAttributesForm.__proto__ || Object.getPrototypeOf(UniqueIDAttributesForm)).call(this, props));
 	
-			_this4.state = {
+			_this2.state = {
 				file_attrs: [],
 				inputs: ['input-0'],
 				tmpFile: '',
@@ -47630,7 +47421,7 @@
 				pubKey: localStorage.getItem("pubKey")
 			};
 	
-			return _this4;
+			return _this2;
 		}
 	
 		_createClass(UniqueIDAttributesForm, [{
@@ -47679,24 +47470,24 @@
 	
 	;
 	
-	var TokenDistributionForm = function (_React$Component3) {
-		_inherits(TokenDistributionForm, _React$Component3);
+	var TokenDistributionForm = function (_React$Component2) {
+		_inherits(TokenDistributionForm, _React$Component2);
 	
 		function TokenDistributionForm(props) {
 			_classCallCheck(this, TokenDistributionForm);
 	
-			var _this5 = _possibleConstructorReturn(this, (TokenDistributionForm.__proto__ || Object.getPrototypeOf(TokenDistributionForm)).call(this, props));
+			var _this3 = _possibleConstructorReturn(this, (TokenDistributionForm.__proto__ || Object.getPrototypeOf(TokenDistributionForm)).call(this, props));
 	
-			_this5.state = {
+			_this3.state = {
 				controltoken_quantity: [],
 				controltoken_list: [],
 	
 				showModal: false
 			};
-			_this5.maxUniqAttr = 10;
+			_this3.maxUniqAttr = 10;
 			//this.onFieldChange = this.onFieldChange.bind(this);
-			_this5.handleHideModal = _this5.handleHideModal.bind(_this5);
-			return _this5;
+			_this3.handleHideModal = _this3.handleHideModal.bind(_this3);
+			return _this3;
 		}
 	
 		_createClass(TokenDistributionForm, [{
@@ -47775,15 +47566,15 @@
 	
 	;
 	
-	var CoreIdentity = function (_React$Component4) {
-		_inherits(CoreIdentity, _React$Component4);
+	var CoreIdentity = function (_React$Component3) {
+		_inherits(CoreIdentity, _React$Component3);
 	
 		function CoreIdentity(props) {
 			_classCallCheck(this, CoreIdentity);
 	
-			var _this6 = _possibleConstructorReturn(this, (CoreIdentity.__proto__ || Object.getPrototypeOf(CoreIdentity)).call(this, props));
+			var _this4 = _possibleConstructorReturn(this, (CoreIdentity.__proto__ || Object.getPrototypeOf(CoreIdentity)).call(this, props));
 	
-			_this6.state = {
+			_this4.state = {
 				file_attrs: [],
 				inputs: ['input-0'], //removed input-1
 				inputs_name: ['input1-0'],
@@ -47806,10 +47597,10 @@
 				signature: ''
 			};
 	
-			_this6.maxUniqAttr = 10;
-			_this6.onFieldChange = _this6.onFieldChange.bind(_this6);
-			_this6.handleHideModal = _this6.handleHideModal.bind(_this6);
-			return _this6;
+			_this4.maxUniqAttr = 10;
+			_this4.onFieldChange = _this4.onFieldChange.bind(_this4);
+			_this4.handleHideModal = _this4.handleHideModal.bind(_this4);
+			return _this4;
 		}
 	
 		_createClass(CoreIdentity, [{
@@ -47920,7 +47711,8 @@
 					"bigchainHash": "",
 					"bigchainID": "",
 					"coidAddr": "",
-					"gatekeeperAddr": ""
+					"gatekeeperAddr": "",
+					"dimensions": ""
 	
 				};
 				return inputObj;
@@ -48124,7 +47916,7 @@
 		}, {
 			key: 'render',
 			value: function render() {
-				var _this7 = this;
+				var _this5 = this;
 	
 				var inputAttrs = {
 					addKeys: [13, 188], // Enter and comma
@@ -48138,7 +47930,7 @@
 				};
 				return _react2.default.createElement(
 					'div',
-					{ id: 'CoreIdentityContainer' },
+					{ id: 'SubmitContainer' },
 					_react2.default.createElement(
 						'h1',
 						null,
@@ -48156,7 +47948,7 @@
 								'Enter Unique ID Attributes. The first Attribute has to be name (first, last). Then add any official identification such as SSN or national ID number(s). Make sure to add the supporting file(s) through "Upload File".'
 							),
 							this.state.inputs.map(function (input) {
-								return _react2.default.createElement(UniqueIDAttributesForm, { handleShowModal: _this7.handleShowModal.bind(_this7), min: _this7.state.subform_cont, max: '10', key: input, labelref: input });
+								return _react2.default.createElement(UniqueIDAttributesForm, { handleShowModal: _this5.handleShowModal.bind(_this5), min: _this5.state.subform_cont, max: '10', key: input, labelref: input });
 							})
 						),
 						_react2.default.createElement(
@@ -48183,7 +47975,7 @@
 								'Enter Ownership Token Description. For example, \'Spencer tokens\'.'
 							),
 							_react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs, { value: this.state.owner_token_desc, onChange: function onChange(e) {
-									_this7.onFieldChange("owner_token_desc", e);
+									_this5.onFieldChange("owner_token_desc", e);
 								} }))
 						),
 						_react2.default.createElement(
@@ -48195,7 +47987,7 @@
 								'Enter Owner IDs. Owner IDs are the public keys of the identity owners. Only one owner for an individual (self).'
 							),
 							_react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs, { value: this.state.owner_id, onChange: function onChange(e) {
-									_this7.onFieldChange("owner_id", e);
+									_this5.onFieldChange("owner_id", e);
 								} }))
 						),
 						_react2.default.createElement(
@@ -48207,7 +47999,7 @@
 								'Enter Ownership Token Quantity. For example, 1 token for an individual.'
 							),
 							_react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs, { value: this.state.owner_token_quantity, onChange: function onChange(e) {
-									_this7.onFieldChange("owner_token_quantity", e);
+									_this5.onFieldChange("owner_token_quantity", e);
 								} }))
 						),
 						_react2.default.createElement(
@@ -48219,7 +48011,7 @@
 								'Control Token ID Description. For example, \'Spencer tokens\'.'
 							),
 							_react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs, { value: this.state.control_token_desc, onChange: function onChange(e) {
-									_this7.onFieldChange("control_token_desc", e);
+									_this5.onFieldChange("control_token_desc", e);
 								} }))
 						),
 						_react2.default.createElement(
@@ -48231,7 +48023,7 @@
 								'Enter Controllers and their control token(s).'
 							),
 							this.state.inputs_name.map(function (input) {
-								return _react2.default.createElement(TokenDistributionForm, { handleShowModal: _this7.handleShowModal.bind(_this7), min: _this7.state.subform_cont, max: '10', key: input, labelref: input });
+								return _react2.default.createElement(TokenDistributionForm, { handleShowModal: _this5.handleShowModal.bind(_this5), min: _this5.state.subform_cont, max: '10', key: input, labelref: input });
 							})
 						),
 						_react2.default.createElement(
@@ -48258,7 +48050,7 @@
 								'Recovery IDs (public keys of individuals who will attest to lost/stolen identity)'
 							),
 							_react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs, { value: this.state.recovery_id, onChange: function onChange(e) {
-									_this7.onFieldChange("recovery_id", e);
+									_this5.onFieldChange("recovery_id", e);
 								} }))
 						),
 						_react2.default.createElement(
@@ -48270,7 +48062,7 @@
 								'Recovery Condition (# of digital signatures of recovery ID owners needed to recover identity)'
 							),
 							_react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs, { value: this.state.recoveryCondition, onChange: function onChange(e) {
-									_this7.onFieldChange("recoveryCondition", e);
+									_this5.onFieldChange("recoveryCondition", e);
 								} }))
 						),
 						_react2.default.createElement(
@@ -48290,7 +48082,7 @@
 							)
 						)
 					),
-					this.state.showModal ? _react2.default.createElement(UploadIpfsFile, { pubKey: this.state.pubKey, dataHandler: this.getFileDetails.bind(this), handleHideModal: this.handleHideModal }) : null
+					this.state.showModal ? _react2.default.createElement(_UploadIpfsFile2.default, { pubKey: this.state.pubKey, dataHandler: this.getFileDetails.bind(this), handleHideModal: this.handleHideModal }) : null
 				);
 			}
 		}]);
@@ -48919,6 +48711,248 @@
 
 /***/ },
 /* 329 */
+/*!***********************************************!*\
+  !*** ./src/app/Components/UploadIpfsFile.jsx ***!
+  \***********************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var UploadIpfsFile = function (_React$Component) {
+	    _inherits(UploadIpfsFile, _React$Component);
+	
+	    function UploadIpfsFile(props) {
+	        _classCallCheck(this, UploadIpfsFile);
+	
+	        var _this2 = _possibleConstructorReturn(this, (UploadIpfsFile.__proto__ || Object.getPrototypeOf(UploadIpfsFile)).call(this, props));
+	
+	        _this2.state = {
+	            docs: {},
+	            pubKey: props.pubKey,
+	            selected: '0',
+	            files: ''
+	        };
+	        _this2.inputChangeHandler = _this2.inputChangeHandler.bind(_this2);
+	        return _this2;
+	    }
+	
+	    _createClass(UploadIpfsFile, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            $.ajax({
+	                url: twinUrl + "ipfs/alldocs/" + this.state.pubKey,
+	                dataType: 'json',
+	                cache: false,
+	                success: function (resp) {
+	                    this.setState({ docs: resp.data.documents });
+	                }.bind(this),
+	                error: function (xhr, status, err) {
+	                    console.error(this.props.url, status, err.toString());
+	                }.bind(this)
+	            });
+	
+	            $("#SubmitContainer .modal").modal('show');
+	            $("#SubmitContainer .modal").on('hidden.bs.modal', this.props.handleHideModal);
+	        }
+	    }, {
+	        key: 'uploadHandler',
+	        value: function uploadHandler(data, additionalParams) {
+	            var params = {
+	                url: twinUrl + "ipfs/upload",
+	                type: 'POST',
+	                data: data,
+	                cache: false,
+	                processData: false,
+	                contentType: false
+	            };
+	            $.extend(params, additionalParams);
+	            $.ajax(params);
+	        }
+	    }, {
+	        key: 'fileHandler',
+	        value: function fileHandler(e) {
+	            e.preventDefault();
+	            if (this.state.selected != "0") {
+	                var hash, fileHash;
+	                this.props.dataHandler(this.state.selected);
+	                $("button.close").trigger("click");
+	            } else {
+	                if (this.state.files.size > 0) {
+	                    var fileInput = $("input[name=newdoc]");
+	                    var fData = new FormData();
+	                    fData.append("user_pubkey", this.state.pubKey);
+	                    $.each(fileInput[0].files, function (key, value) {
+	                        fData.append(key, value);
+	                    });
+	                    var _this = this;
+	                    var callbacks = {
+	                        beforeSend: function beforeSend(xhr) {
+	                            $("button[name=uploadsubmit]").button('loading');
+	                            $("button.close").hide();
+	                        },
+	                        success: function (resp) {
+	                            if (resp.uploded && resp.uploded.length > 0) {
+	                                var filedata = resp.uploded[0].hash + "|" + resp.uploded[0].file_hash;
+	                                //data handler forms JSON object
+	                                this.props.dataHandler(filedata);
+	                                $("button.close").trigger("click");
+	                            }
+	                        }.bind(this),
+	                        complete: function complete() {
+	                            $("button[name=uploadsubmit]").button('reset');
+	                            $("button.close").show();
+	                        }
+	                    };
+	                    this.uploadHandler(fData, callbacks);
+	                }
+	            }
+	        }
+	    }, {
+	        key: 'inputChangeHandler',
+	        value: function inputChangeHandler(e) {
+	            if (e.target.tagName == "SELECT") {
+	                this.setState({ selected: e.target.value });
+	            } else this.setState({ files: e.target.files[0] });
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var _this3 = this;
+	
+	            console.log("UploadIpfsFile state: " + JSON.stringify(this.state));
+	            var center = {
+	                textAlign: 'center'
+	            };
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'modal fade' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'modal-dialog' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'modal-content' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'modal-header' },
+	                            _react2.default.createElement(
+	                                'button',
+	                                { type: 'button', className: 'close', 'data-dismiss': 'modal', 'aria-label': 'Close' },
+	                                _react2.default.createElement(
+	                                    'span',
+	                                    { 'aria-hidden': 'true' },
+	                                    '×'
+	                                )
+	                            ),
+	                            _react2.default.createElement(
+	                                'h4',
+	                                { className: 'modal-title' },
+	                                'Upload Document'
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'modal-body' },
+	                            _react2.default.createElement(
+	                                'form',
+	                                null,
+	                                _react2.default.createElement(
+	                                    'div',
+	                                    { className: 'form-group' },
+	                                    _react2.default.createElement(
+	                                        'label',
+	                                        { htmlFor: 'get-hash' },
+	                                        'Choose from documents'
+	                                    ),
+	                                    _react2.default.createElement(
+	                                        'select',
+	                                        { className: 'form-control', onChange: this.inputChangeHandler },
+	                                        _react2.default.createElement(
+	                                            'option',
+	                                            { value: '0' },
+	                                            'Select Document'
+	                                        ),
+	                                        function () {
+	                                            if (_this3.state.docs && _this3.state.docs.length > 0) {
+	                                                var i = 0;
+	                                                return _this3.state.docs.map(function (obj) {
+	                                                    i++;
+	                                                    var optsVal = obj.hash + "|" + obj.file_hash;
+	                                                    return _react2.default.createElement(
+	                                                        'option',
+	                                                        { value: optsVal, key: i },
+	                                                        obj.filename
+	                                                    );
+	                                                });
+	                                            } else {
+	                                                return _react2.default.createElement(
+	                                                    'option',
+	                                                    { value: '0' },
+	                                                    '-- Empty --'
+	                                                );
+	                                            }
+	                                        }()
+	                                    )
+	                                ),
+	                                _react2.default.createElement(
+	                                    'p',
+	                                    { style: center },
+	                                    '(or)'
+	                                ),
+	                                _react2.default.createElement(
+	                                    'div',
+	                                    { className: 'form-group' },
+	                                    _react2.default.createElement(
+	                                        'label',
+	                                        { htmlFor: 'documents' },
+	                                        'Upload Document'
+	                                    ),
+	                                    _react2.default.createElement('input', { type: 'file', className: 'form-control', name: 'newdoc', onChange: this.inputChangeHandler })
+	                                )
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'modal-footer' },
+	                            _react2.default.createElement(
+	                                'button',
+	                                { type: 'button', 'data-loading-text': 'Processing...', name: 'uploadsubmit', className: 'btn btn-success', onClick: this.fileHandler.bind(this) },
+	                                'Submit'
+	                            )
+	                        )
+	                    )
+	                )
+	            );
+	        }
+	    }]);
+	
+	    return UploadIpfsFile;
+	}(_react2.default.Component);
+	
+	;
+	
+	exports.default = UploadIpfsFile;
+
+/***/ },
+/* 330 */
 /*!***************************************!*\
   !*** ./src/app/Components/Upload.jsx ***!
   \***************************************/
@@ -49141,7 +49175,7 @@
 	exports.default = UploadKeyStore;
 
 /***/ },
-/* 330 */
+/* 331 */
 /*!***************************************!*\
   !*** ./src/app/Components/ToVote.jsx ***!
   \***************************************/
@@ -49889,7 +49923,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/buffer/index.js */ 239).Buffer))
 
 /***/ },
-/* 331 */
+/* 332 */
 /*!**********************************************!*\
   !*** ./src/app/Components/Notifications.jsx ***!
   \**********************************************/
@@ -50075,7 +50109,7 @@
 	exports.default = Notifications;
 
 /***/ },
-/* 332 */
+/* 333 */
 /*!***************************************!*\
   !*** ./src/app/Components/Assets.jsx ***!
   \***************************************/
@@ -50099,11 +50133,11 @@
 	
 	var _reactTagsinput2 = _interopRequireDefault(_reactTagsinput);
 	
-	var _qrcode = __webpack_require__(/*! qrcode.react */ 333);
+	var _qrcode = __webpack_require__(/*! qrcode.react */ 334);
 	
 	var _qrcode2 = _interopRequireDefault(_qrcode);
 	
-	var _classAndSubClass = __webpack_require__(/*! ./classAndSubClass.js */ 343);
+	var _classAndSubClass = __webpack_require__(/*! ./classAndSubClass.js */ 344);
 	
 	var _classAndSubClass2 = _interopRequireDefault(_classAndSubClass);
 	
@@ -51291,7 +51325,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/buffer/index.js */ 239).Buffer))
 
 /***/ },
-/* 333 */
+/* 334 */
 /*!*************************************!*\
   !*** ./~/qrcode.react/lib/index.js ***!
   \*************************************/
@@ -51302,8 +51336,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	// qr.js doesn't handle error level of zero (M) so we need to do it right,
 	// thus the deep require.
-	var QRCodeImpl = __webpack_require__(/*! qr.js/lib/QRCode */ 334);
-	var ErrorCorrectLevel = __webpack_require__(/*! qr.js/lib/ErrorCorrectLevel */ 338);
+	var QRCodeImpl = __webpack_require__(/*! qr.js/lib/QRCode */ 335);
+	var ErrorCorrectLevel = __webpack_require__(/*! qr.js/lib/ErrorCorrectLevel */ 339);
 	
 	function getBackingStorePixelRatio(ctx) {
 	  return ctx.webkitBackingStorePixelRatio || ctx.mozBackingStorePixelRatio || ctx.msBackingStorePixelRatio || ctx.oBackingStorePixelRatio || ctx.backingStorePixelRatio || 1;
@@ -51406,17 +51440,17 @@
 	module.exports = QRCode;
 
 /***/ },
-/* 334 */
+/* 335 */
 /*!*******************************!*\
   !*** ./~/qr.js/lib/QRCode.js ***!
   \*******************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var BitByte = __webpack_require__(/*! ./8BitByte */ 335);
-	var RSBlock = __webpack_require__(/*! ./RSBlock */ 337);
-	var BitBuffer = __webpack_require__(/*! ./BitBuffer */ 339);
-	var util = __webpack_require__(/*! ./util */ 340);
-	var Polynomial = __webpack_require__(/*! ./Polynomial */ 341);
+	var BitByte = __webpack_require__(/*! ./8BitByte */ 336);
+	var RSBlock = __webpack_require__(/*! ./RSBlock */ 338);
+	var BitBuffer = __webpack_require__(/*! ./BitBuffer */ 340);
+	var util = __webpack_require__(/*! ./util */ 341);
+	var Polynomial = __webpack_require__(/*! ./Polynomial */ 342);
 	
 	function QRCode(typeNumber, errorCorrectLevel) {
 		this.typeNumber = typeNumber;
@@ -51853,13 +51887,13 @@
 
 
 /***/ },
-/* 335 */
+/* 336 */
 /*!*********************************!*\
   !*** ./~/qr.js/lib/8BitByte.js ***!
   \*********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var mode = __webpack_require__(/*! ./mode */ 336);
+	var mode = __webpack_require__(/*! ./mode */ 337);
 	
 	function QR8bitByte(data) {
 		this.mode = mode.MODE_8BIT_BYTE;
@@ -51885,7 +51919,7 @@
 
 
 /***/ },
-/* 336 */
+/* 337 */
 /*!*****************************!*\
   !*** ./~/qr.js/lib/mode.js ***!
   \*****************************/
@@ -51900,14 +51934,14 @@
 
 
 /***/ },
-/* 337 */
+/* 338 */
 /*!********************************!*\
   !*** ./~/qr.js/lib/RSBlock.js ***!
   \********************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	// ErrorCorrectLevel
-	var ECL = __webpack_require__(/*! ./ErrorCorrectLevel */ 338);
+	var ECL = __webpack_require__(/*! ./ErrorCorrectLevel */ 339);
 	
 	function QRRSBlock(totalCount, dataCount) {
 		this.totalCount = totalCount;
@@ -52208,7 +52242,7 @@
 
 
 /***/ },
-/* 338 */
+/* 339 */
 /*!******************************************!*\
   !*** ./~/qr.js/lib/ErrorCorrectLevel.js ***!
   \******************************************/
@@ -52224,7 +52258,7 @@
 
 
 /***/ },
-/* 339 */
+/* 340 */
 /*!**********************************!*\
   !*** ./~/qr.js/lib/BitBuffer.js ***!
   \**********************************/
@@ -52271,15 +52305,15 @@
 
 
 /***/ },
-/* 340 */
+/* 341 */
 /*!*****************************!*\
   !*** ./~/qr.js/lib/util.js ***!
   \*****************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var Mode = __webpack_require__(/*! ./mode */ 336);
-	var Polynomial = __webpack_require__(/*! ./Polynomial */ 341);
-	var math = __webpack_require__(/*! ./math */ 342);
+	var Mode = __webpack_require__(/*! ./mode */ 337);
+	var Polynomial = __webpack_require__(/*! ./Polynomial */ 342);
+	var math = __webpack_require__(/*! ./math */ 343);
 	
 	var QRMaskPattern = {
 		PATTERN000 : 0,
@@ -52559,13 +52593,13 @@
 
 
 /***/ },
-/* 341 */
+/* 342 */
 /*!***********************************!*\
   !*** ./~/qr.js/lib/Polynomial.js ***!
   \***********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var math = __webpack_require__(/*! ./math */ 342);
+	var math = __webpack_require__(/*! ./math */ 343);
 	
 	function QRPolynomial(num, shift) {
 	
@@ -52635,7 +52669,7 @@
 
 
 /***/ },
-/* 342 */
+/* 343 */
 /*!*****************************!*\
   !*** ./~/qr.js/lib/math.js ***!
   \*****************************/
@@ -52688,7 +52722,7 @@
 
 
 /***/ },
-/* 343 */
+/* 344 */
 /*!************************************************!*\
   !*** ./src/app/Components/classAndSubClass.js ***!
   \************************************************/
@@ -52762,7 +52796,7 @@
 	exports.default = AssetTags;
 
 /***/ },
-/* 344 */
+/* 345 */
 /*!***************************************!*\
   !*** ./src/app/Components/MyCOID.jsx ***!
   \***************************************/
@@ -53618,23 +53652,33 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/buffer/index.js */ 239).Buffer))
 
 /***/ },
-/* 345 */
+/* 346 */
 /*!**************************************************!*\
   !*** ./src/app/Components/IdentityDimension.jsx ***!
   \**************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	var _react = __webpack_require__(/*! react */ 1);
 	
 	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactTagsinput = __webpack_require__(/*! react-tagsinput */ 328);
+	
+	var _reactTagsinput2 = _interopRequireDefault(_reactTagsinput);
+	
+	var _UploadIpfsFile = __webpack_require__(/*! ./UploadIpfsFile.jsx */ 329);
+	
+	var _UploadIpfsFile2 = _interopRequireDefault(_UploadIpfsFile);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -53656,18 +53700,11 @@
 	
 	        _this2.state = {
 	            dimension: _this2.props.dataHandler,
-	            dimension_data: {},
-	            //dimension_dist: []
+	            //dimension_data: {},
 	
-	            //to populate documents for adding attributes
-	            //takes same form as it does in Documents.jsx and CoreIdentity.jsx/MyGatekeeper.jsx
-	            docs: {},
+	            docs: {}, //takes same form as it does in Documents.jsx and CoreIdentity.jsx/MyGatekeeper.jsx
 	            pubkey: localStorage.getItem("pubKey")
-	
 	        };
-	
-	        var owned = true;
-	
 	        return _this2;
 	    }
 	
@@ -53675,7 +53712,7 @@
 	
 	
 	    _createClass(DimensionForm, [{
-	        key: "submitHandler",
+	        key: 'submitHandler',
 	        value: function submitHandler(e) {
 	            e.preventDefault();
 	            var ele = $(e.target);
@@ -53683,10 +53720,13 @@
 	            var button_val = parseInt(ele.attr("data-val"));
 	
 	            var json = {
-	                "publicKey": localStorage.getItem("pubKey")
+	                "publicKey": localStorage.getItem("pubKey"),
+	                "uniqueID": 'getUNIQUEID!!!!',
+	                "typeInput": 'dimensionName',
+	                "flag": "flag_value"
 	            };
 	
-	            // request to add dimension attribute
+	            // request to add dimension descriptor/attribute pair
 	            if (button_val === 1) {
 	                console.log("hit add descriptor rq");
 	                var descriptor = void 0;
@@ -53698,7 +53738,7 @@
 	                    }
 	                });
 	
-	                //descriptor name, ex: 'financial history 1/2017'
+	                //descriptor, ex: 'financial history 1/2017'
 	                json.descriptor = descriptor;
 	
 	                $.ajax({
@@ -53713,11 +53753,10 @@
 	                });
 	            } //end if
 	
-	            // request to update controllers
 	            if (button_val === 2) {
-	                console.log("hit controller rq");
+	                console.log("hit delegation rq");
 	                $.ajax({
-	                    url: twinUrl + 'addController',
+	                    url: twinUrl + 'addDelegation',
 	                    type: 'POST',
 	                    data: json,
 	                    success: function success(res) {
@@ -53727,37 +53766,19 @@
 	                    }
 	                });
 	            }
-	
-	            // request to add delegations
-	            // if (button_val === 3) {
-	            //     console.log("hit delegation rq")
-	            //     if (this.owned == true) {
-	            //         $.ajax({
-	            //             url: twinUrl + 'addDelegation',
-	            //             type: 'POST',
-	            //             data: json,
-	            //             success: function (res) {
-	            //                 if (res.status == "Ok" && res.msg == "true") {
-	            //                     //var i_dimension = this.state.dimension.ID
-	            //                 }
-	            //             }
-	            //         });
-	            //     }
-	            // }
 	        } //end submitHandler
 	
-	
+	        //THIS METHOD IS THE CONSTRUCTOR
 	        // componentWillMount(){
-	
 	        // }
 	
 	    }, {
-	        key: "componentDidMount",
+	        key: 'componentDidMount',
 	        value: function componentDidMount() {
 	
-	            this.setState({
-	                dimension_data: this.props.dimension
-	            });
+	            // this.setState({
+	            //     dimension_data: this.props.dimension
+	            // });
 	            $("#dimension_Details").modal('show');
 	            $("#dimension_Details").on('hidden.bs.modal', this.props.hideHandler);
 	
@@ -53772,13 +53793,36 @@
 	            });
 	        }
 	    }, {
-	        key: "render",
+	        key: 'render',
 	        value: function render() {
 	            var _this3 = this;
 	
-	            console.log("state in DimensionForm" + JSON.stringify(this.state));
+	            console.log("state in DimensionForm\n" + JSON.stringify(this.state));
 	            var dims = this.state.dimension;
-	            console.log("dims: " + JSON.stringify(dims));
+	            //console.log("dims: " + JSON.stringify(dims))
+	
+	            var dataArray = [];
+	            var arrayOfArrays = [];
+	            var data = dims.dimension.data; //data comes from _dimension.json object structure
+	
+	            Object.keys(data).forEach(function (key) {
+	                dataArray.push(data[key].descriptor);
+	                dataArray.push(data[key].attribute);
+	                dataArray.push(data[key].flag);
+	                dataArray.push(data[key].ID);
+	            });
+	
+	            //data.length will equal the number of dimensions
+	            for (var i = 0; i < data.length; i++) {
+	                var element = [dataArray[4 * i + 0], dataArray[4 * i + 1], dataArray[4 * i + 2], dataArray[4 * i + 3]];
+	                arrayOfArrays.push(element);
+	            }
+	
+	            // console.log("DataArray: " + dataArray)
+	            // console.log("arrayOfArrays[0][0]: " + arrayOfArrays[0][0])
+	            // console.log("arrayOfArrays[1][1]: " + arrayOfArrays[1][1])
+	
+	            var controllers = dims.dimension.controllers;
 	
 	            var syle = {
 	                marginRight: '15px'
@@ -53787,172 +53831,196 @@
 	                textAlign: 'center'
 	            };
 	
-	            var controllers = ["dcfdsdf34423342121", "fsdsddfn344534y4422", "jhjghjfgfdrterg565340"];
-	
 	            return _react2.default.createElement(
-	                "div",
-	                { className: "modal fade", id: "dimension_Details", key: dims.ID, tabIndex: "-1", role: "dialog", "aria-labelledby": "dimension" },
+	                'div',
+	                { className: 'modal fade', id: 'dimension_Details', key: dims.ID, tabIndex: '-1', role: 'dialog', 'aria-labelledby': 'dimension' },
 	                _react2.default.createElement(
-	                    "div",
-	                    { className: "modal-dialog modal-lg", role: "document" },
+	                    'div',
+	                    { className: 'modal-dialog modal-lg', role: 'document' },
 	                    _react2.default.createElement(
-	                        "div",
-	                        { className: "modal-content" },
+	                        'div',
+	                        { className: 'modal-content' },
 	                        _react2.default.createElement(
-	                            "div",
-	                            { className: "modal-header" },
+	                            'div',
+	                            { className: 'modal-header' },
 	                            _react2.default.createElement(
-	                                "button",
-	                                { type: "button", className: "close", "data-dismiss": "modal", "aria-label": "Close" },
+	                                'button',
+	                                { type: 'button', className: 'close', 'data-dismiss': 'modal', 'aria-label': 'Close' },
 	                                _react2.default.createElement(
-	                                    "span",
-	                                    { "aria-hidden": "true" },
-	                                    "× "
+	                                    'span',
+	                                    { 'aria-hidden': 'true' },
+	                                    '× '
 	                                )
 	                            ),
 	                            _react2.default.createElement(
-	                                "ul",
-	                                { className: "nav nav-pills", role: "tablist" },
+	                                'ul',
+	                                { className: 'nav nav-pills', role: 'tablist' },
 	                                _react2.default.createElement(
-	                                    "li",
-	                                    { role: "presentation", className: "active" },
+	                                    'li',
+	                                    { role: 'presentation', className: 'active' },
 	                                    _react2.default.createElement(
-	                                        "a",
-	                                        { href: "#dimensionDetails", role: "tab", "data-toggle": "tab" },
-	                                        "Identity Dimension Details"
+	                                        'a',
+	                                        { href: '#dimensionDetails', role: 'tab', 'data-toggle': 'tab' },
+	                                        'Identity Dimension Details'
 	                                    )
 	                                ),
 	                                _react2.default.createElement(
-	                                    "li",
-	                                    { role: "presentation" },
+	                                    'li',
+	                                    { role: 'presentation' },
 	                                    _react2.default.createElement(
-	                                        "a",
-	                                        { href: "#control", role: "tab", "data-toggle": "tab" },
-	                                        "Add Descriptor"
+	                                        'a',
+	                                        { href: '#control', role: 'tab', 'data-toggle': 'tab' },
+	                                        'Add Descriptor'
 	                                    )
 	                                ),
 	                                _react2.default.createElement(
-	                                    "li",
-	                                    { role: "presentation" },
+	                                    'li',
+	                                    { role: 'presentation' },
 	                                    _react2.default.createElement(
-	                                        "a",
-	                                        { href: "#delegations", role: "tab", "data-toggle": "tab" },
-	                                        "Token Delegations"
+	                                        'a',
+	                                        { href: '#delegations', role: 'tab', 'data-toggle': 'tab' },
+	                                        'Token Delegations'
 	                                    )
 	                                )
 	                            )
 	                        ),
 	                        _react2.default.createElement(
-	                            "div",
-	                            { className: "modal-body" },
+	                            'div',
+	                            { className: 'modal-body' },
 	                            _react2.default.createElement(
-	                                "div",
-	                                { className: "tab-content" },
+	                                'div',
+	                                { className: 'tab-content' },
 	                                _react2.default.createElement(
-	                                    "div",
-	                                    { role: "tabpanel", className: "tab-pane active", id: "dimensionDetails" },
+	                                    'div',
+	                                    { role: 'tabpanel', className: 'tab-pane active', id: 'dimensionDetails' },
 	                                    _react2.default.createElement(
-	                                        "table",
-	                                        { className: "table table-striped table-hover", style: syle },
+	                                        'table',
+	                                        { className: 'table table-striped table-hover', style: syle },
 	                                        _react2.default.createElement(
-	                                            "tbody",
+	                                            'tbody',
 	                                            null,
 	                                            _react2.default.createElement(
-	                                                "tr",
+	                                                'tr',
 	                                                null,
 	                                                _react2.default.createElement(
-	                                                    "td",
+	                                                    'td',
 	                                                    null,
-	                                                    "Asset"
+	                                                    'Asset'
 	                                                ),
 	                                                _react2.default.createElement(
-	                                                    "td",
+	                                                    'td',
 	                                                    null,
-	                                                    "MyCOID"
+	                                                    'MyCOID'
 	                                                )
 	                                            ),
 	                                            _react2.default.createElement(
-	                                                "tr",
+	                                                'tr',
 	                                                null,
 	                                                _react2.default.createElement(
-	                                                    "td",
+	                                                    'td',
 	                                                    null,
-	                                                    "Dimension Type"
+	                                                    'Dimension Type'
 	                                                ),
 	                                                _react2.default.createElement(
-	                                                    "td",
+	                                                    'td',
 	                                                    null,
-	                                                    dims.dimensionType
+	                                                    dims.dimension.dimensionName
 	                                                )
 	                                            ),
 	                                            _react2.default.createElement(
-	                                                "tr",
+	                                                'tr',
 	                                                null,
 	                                                _react2.default.createElement(
-	                                                    "td",
-	                                                    { colSpan: "2" },
+	                                                    'td',
+	                                                    null,
+	                                                    'Controller List'
+	                                                ),
+	                                                _react2.default.createElement(
+	                                                    'td',
+	                                                    null,
+	                                                    function () {
+	                                                        if (!$.isEmptyObject(dims)) {
+	                                                            return controllers.map(function (ids, i) {
+	                                                                return _react2.default.createElement(
+	                                                                    'p',
+	                                                                    { key: i },
+	                                                                    ' ',
+	                                                                    controllers[i]
+	                                                                );
+	                                                            });
+	                                                        }
+	                                                    }(this)
+	                                                )
+	                                            ),
+	                                            _react2.default.createElement(
+	                                                'tr',
+	                                                null,
+	                                                _react2.default.createElement(
+	                                                    'td',
+	                                                    { colSpan: '2' },
 	                                                    _react2.default.createElement(
-	                                                        "b",
+	                                                        'b',
 	                                                        null,
-	                                                        "Descriptors:"
+	                                                        'Descriptors:'
 	                                                    )
 	                                                )
 	                                            ),
 	                                            function () {
 	                                                var ipfs_url = "http://10.101.114.231:8080/ipfs/";
-	                                                if (dims.attr_list.length > 0) {
-	                                                    return dims.attr_list.map(function (attrs, i) {
+	                                                if (arrayOfArrays.length > 0) {
+	                                                    return arrayOfArrays.map(function (attrs, i) {
+	                                                        console.log("attrs[0]: " + attrs[0] + ", attrs[1]:" + attrs[1] + ", attrs[2]: " + attrs[2] + ", attrs[3]: " + attrs[3]);
 	                                                        if (attrs[1].charAt(0) == "Q") {
 	                                                            return _react2.default.createElement(
-	                                                                "tr",
+	                                                                'tr',
 	                                                                { key: i },
 	                                                                _react2.default.createElement(
-	                                                                    "td",
+	                                                                    'td',
 	                                                                    null,
 	                                                                    attrs[0]
 	                                                                ),
 	                                                                _react2.default.createElement(
-	                                                                    "td",
+	                                                                    'td',
 	                                                                    null,
 	                                                                    _react2.default.createElement(
-	                                                                        "p",
+	                                                                        'p',
 	                                                                        null,
 	                                                                        _react2.default.createElement(
-	                                                                            "a",
-	                                                                            { target: "_blank", href: ipfs_url + "/" + attrs[1] },
+	                                                                            'a',
+	                                                                            { target: '_blank', href: ipfs_url + "/" + attrs[1] },
 	                                                                            attrs[1]
 	                                                                        )
 	                                                                    )
 	                                                                )
 	                                                            );
 	                                                        } else return _react2.default.createElement(
-	                                                            "tr",
+	                                                            'tr',
 	                                                            { key: i },
 	                                                            _react2.default.createElement(
-	                                                                "td",
+	                                                                'td',
 	                                                                null,
 	                                                                attrs[0]
 	                                                            ),
 	                                                            _react2.default.createElement(
-	                                                                "td",
+	                                                                'td',
 	                                                                null,
 	                                                                _react2.default.createElement(
-	                                                                    "a",
+	                                                                    'a',
 	                                                                    null,
 	                                                                    attrs[1],
-	                                                                    ">"
+	                                                                    '>'
 	                                                                )
 	                                                            )
 	                                                        );
 	                                                    });
 	                                                } else {
 	                                                    return _react2.default.createElement(
-	                                                        "tr",
+	                                                        'tr',
 	                                                        null,
 	                                                        _react2.default.createElement(
-	                                                            "td",
-	                                                            { colSpan: "2" },
-	                                                            "No descriptors found."
+	                                                            'td',
+	                                                            { colSpan: '2' },
+	                                                            'No descriptors found.'
 	                                                        )
 	                                                    );
 	                                                }
@@ -53961,98 +54029,59 @@
 	                                    )
 	                                ),
 	                                _react2.default.createElement(
-	                                    "div",
-	                                    { role: "tabpanel", className: "tab-pane", id: "control" },
+	                                    'div',
+	                                    { role: 'tabpanel', className: 'tab-pane', id: 'control' },
 	                                    _react2.default.createElement(
-	                                        "table",
-	                                        { className: "table table-striped table-hover", style: syle },
+	                                        'table',
+	                                        { className: 'table table-striped table-hover', style: syle },
 	                                        _react2.default.createElement(
-	                                            "tbody",
+	                                            'tbody',
 	                                            null,
 	                                            _react2.default.createElement(
-	                                                "tr",
+	                                                'tr',
 	                                                null,
 	                                                _react2.default.createElement(
-	                                                    "td",
-	                                                    null,
-	                                                    "controllerList"
-	                                                )
-	                                            ),
-	                                            function () {
-	                                                if (!$.isArray(controllers) && controllers.length > 0) {
-	                                                    return controllers.map(function (pubkeys, i) {
-	                                                        return _react2.default.createElement(
-	                                                            "tr",
-	                                                            { key: i },
-	                                                            _react2.default.createElement(
-	                                                                "td",
-	                                                                null,
-	                                                                pubkeys[i]
-	                                                            )
-	                                                        );
-	                                                    });
-	                                                } else {
-	                                                    return _react2.default.createElement(
-	                                                        "tr",
-	                                                        null,
-	                                                        _react2.default.createElement(
-	                                                            "td",
-	                                                            { colSpan: "2" },
-	                                                            "NO CONTROLLERS FOR THIS DIMENSION"
-	                                                        )
-	                                                    );
-	                                                }
-	                                            }(this),
-	                                            _react2.default.createElement(
-	                                                "tr",
-	                                                null,
-	                                                _react2.default.createElement("td", null)
-	                                            ),
-	                                            _react2.default.createElement(
-	                                                "tr",
-	                                                null,
-	                                                _react2.default.createElement(
-	                                                    "th",
+	                                                    'th',
 	                                                    null,
 	                                                    _react2.default.createElement(
-	                                                        "b",
+	                                                        'b',
 	                                                        null,
-	                                                        "Add Dimension Descriptor and Attribute"
+	                                                        'Add Dimension Descriptor and Attribute'
 	                                                    )
 	                                                )
 	                                            ),
 	                                            _react2.default.createElement(
-	                                                "tr",
+	                                                'tr',
 	                                                null,
 	                                                _react2.default.createElement(
-	                                                    "td",
+	                                                    'td',
 	                                                    null,
-	                                                    _react2.default.createElement("input", { name: "descriptor", className: "form-control col-md-4", type: "text", placeholder: "descriptor name" })
+	                                                    _react2.default.createElement('input', { name: 'descriptor', className: 'form-control col-md-4', type: 'text', placeholder: 'descriptor name' })
 	                                                )
 	                                            )
 	                                        )
 	                                    ),
 	                                    _react2.default.createElement(
-	                                        "div",
-	                                        { className: "body" },
+	                                        'div',
+	                                        { className: 'body' },
 	                                        _react2.default.createElement(
-	                                            "form",
+	                                            'form',
 	                                            null,
 	                                            _react2.default.createElement(
-	                                                "div",
-	                                                { className: "form-group" },
+	                                                'div',
+	                                                { className: 'form-group' },
 	                                                _react2.default.createElement(
-	                                                    "label",
-	                                                    { htmlFor: "get-hash" },
-	                                                    "Choose from documents"
+	                                                    'label',
+	                                                    { htmlFor: 'get-hash' },
+	                                                    'Choose from documents'
 	                                                ),
 	                                                _react2.default.createElement(
-	                                                    "select",
-	                                                    { className: "form-control", onChange: this.inputChangeHandler },
+	                                                    'select',
+	                                                    { className: 'form-control col-md-4', onChange: this.inputChangeHandler },
 	                                                    _react2.default.createElement(
-	                                                        "option",
-	                                                        { value: "0" },
-	                                                        "Select Document"
+	                                                        'option',
+	                                                        { value: '0' },
+	                                                        'Select Document'
 	                                                    ),
 	                                                    function () {
 	                                                        if (_this3.state.docs && _this3.state.docs.length > 0) {
@@ -54061,124 +54090,139 @@
 	                                                                i++;
 	                                                                var optsVal = obj.hash + "|" + obj.file_hash;
 	                                                                return _react2.default.createElement(
-	                                                                    "option",
+	                                                                    'option',
 	                                                                    { value: optsVal, key: i },
 	                                                                    obj.filename
 	                                                                );
 	                                                            });
 	                                                        } else {
 	                                                            return _react2.default.createElement(
-	                                                                "option",
-	                                                                { value: "0" },
-	                                                                "-- Empty --"
+	                                                                'option',
+	                                                                { value: '0' },
+	                                                                '-- Empty --'
 	                                                            );
 	                                                        }
 	                                                    }()
 	                                                )
 	                                            ),
 	                                            _react2.default.createElement(
-	                                                "p",
+	                                                'p',
 	                                                { style: center },
-	                                                "(or)"
+	                                                '(or)'
 	                                            ),
 	                                            _react2.default.createElement(
-	                                                "div",
-	                                                { className: "form-group" },
+	                                                'div',
+	                                                { className: 'form-group' },
 	                                                _react2.default.createElement(
-	                                                    "label",
-	                                                    { htmlFor: "documents" },
-	                                                    "Upload Document"
+	                                                    'label',
+	                                                    { htmlFor: 'documents' },
+	                                                    'Upload Document'
 	                                                ),
-	                                                _react2.default.createElement("input", { type: "file", className: "form-control", name: "newdoc", onChange: this.inputChangeHandler })
+	                                                _react2.default.createElement('input', { type: 'file', className: 'form-control', name: 'newdoc', onChange: this.inputChangeHandler })
 	                                            )
 	                                        )
 	                                    ),
 	                                    _react2.default.createElement(
-	                                        "button",
-	                                        { type: "button", className: "btn btn-info", "data-val": "1", onClick: this.submitHandler.bind(this) },
-	                                        " Add descriptor"
+	                                        'button',
+	                                        { type: 'button', className: 'btn btn-info', 'data-val': '1', onClick: this.submitHandler.bind(this) },
+	                                        ' Add descriptor'
 	                                    )
 	                                ),
 	                                _react2.default.createElement(
-	                                    "div",
-	                                    { role: "tabpanel", className: "tab-pane", id: "delegations" },
+	                                    'div',
+	                                    { role: 'tabpanel', className: 'tab-pane', id: 'delegations' },
 	                                    _react2.default.createElement(
-	                                        "table",
-	                                        { className: "table table-striped table-hover", style: syle },
+	                                        'table',
+	                                        { className: 'table table-striped table-hover', style: syle },
 	                                        _react2.default.createElement(
-	                                            "thead",
+	                                            'thead',
 	                                            null,
 	                                            _react2.default.createElement(
-	                                                "tr",
+	                                                'tr',
 	                                                null,
 	                                                _react2.default.createElement(
-	                                                    "th",
+	                                                    'th',
 	                                                    null,
-	                                                    "Tokens delegated for this dimension: ",
+	                                                    'Tokens delegated for this dimension: ',
 	                                                    0
 	                                                )
 	                                            )
 	                                        ),
+	                                        _react2.default.createElement('hr', null),
 	                                        _react2.default.createElement(
-	                                            "tbody",
+	                                            'tbody',
 	                                            null,
 	                                            _react2.default.createElement(
-	                                                "tr",
+	                                                'tr',
 	                                                null,
 	                                                _react2.default.createElement(
-	                                                    "th",
-	                                                    null,
+	                                                    'th',
+	                                                    { colSpan: '2' },
 	                                                    _react2.default.createElement(
-	                                                        "b",
+	                                                        'b',
 	                                                        null,
-	                                                        "Delegate tokens"
+	                                                        'Delegate tokens'
 	                                                    )
 	                                                )
 	                                            ),
 	                                            _react2.default.createElement(
-	                                                "tr",
+	                                                'tr',
 	                                                null,
 	                                                _react2.default.createElement(
-	                                                    "td",
+	                                                    'td',
 	                                                    null,
-	                                                    _react2.default.createElement("input", { className: "form-control col-md-4", type: "text", placeholder: "Delegatee Address" })
-	                                                ),
-	                                                _react2.default.createElement(
-	                                                    "td",
-	                                                    null,
-	                                                    _react2.default.createElement("input", { className: "form-control col-md-4", type: "text", placeholder: "Token Quantity" })
+	                                                    _react2.default.createElement('input', { className: 'form-control col-md-4', type: 'text', placeholder: 'Delegatee Address' })
 	                                                )
 	                                            ),
 	                                            _react2.default.createElement(
-	                                                "tr",
+	                                                'tr',
 	                                                null,
 	                                                _react2.default.createElement(
-	                                                    "option",
-	                                                    { value: "one" },
-	                                                    "One"
+	                                                    'td',
+	                                                    null,
+	                                                    _react2.default.createElement('input', { className: 'form-control col-md-4', type: 'text', placeholder: 'Token Quantity' })
+	                                                )
+	                                            ),
+	                                            _react2.default.createElement(
+	                                                'tr',
+	                                                null,
+	                                                _react2.default.createElement(
+	                                                    'td',
+	                                                    null,
+	                                                    _react2.default.createElement('input', { className: 'form-control col-md-4', type: 'text', placeholder: 'Expiration' })
+	                                                )
+	                                            ),
+	                                            _react2.default.createElement(
+	                                                'tr',
+	                                                null,
+	                                                'ACCESS CATEGORIES',
+	                                                _react2.default.createElement(
+	                                                    'option',
+	                                                    { value: 'one' },
+	                                                    'One'
 	                                                ),
 	                                                _react2.default.createElement(
-	                                                    "option",
-	                                                    { value: "two" },
-	                                                    "Two"
+	                                                    'option',
+	                                                    { value: 'two' },
+	                                                    'Two'
 	                                                ),
 	                                                _react2.default.createElement(
-	                                                    "option",
-	                                                    { value: "three" },
-	                                                    "Three"
+	                                                    'option',
+	                                                    { value: 'three' },
+	                                                    'Three'
 	                                                ),
 	                                                _react2.default.createElement(
-	                                                    "option",
-	                                                    { value: "four" },
-	                                                    "Four"
+	                                                    'option',
+	                                                    { value: 'four' },
+	                                                    'Four'
 	                                                )
 	                                            )
 	                                        )
 	                                    ),
 	                                    _react2.default.createElement(
-	                                        "button",
-	                                        { type: "button", className: "btn btn-info", "data-val": "2", onClick: this.submitHandler.bind(this) },
-	                                        "Delegate tokens"
+	                                        'button',
+	                                        { type: 'button', className: 'btn btn-info', 'data-val': '2', onClick: this.submitHandler.bind(this) },
+	                                        'Delegate tokens'
 	                                    )
 	                                )
 	                            )
@@ -54196,272 +54240,61 @@
 	//                                <button type="button" className="btn btn-danger" onClick={this.submitHandler.bind(this)}>THIS BUTTON DOES SOMETHING</button>
 	//                           </div>
 	
-	var UploadIpfsFile = function (_React$Component) {
-	    _inherits(UploadIpfsFile, _React$Component);
 	
-	    function UploadIpfsFile(props) {
-	        _classCallCheck(this, UploadIpfsFile);
+	//DISPLAY
 	
-	        var _this4 = _possibleConstructorReturn(this, (UploadIpfsFile.__proto__ || Object.getPrototypeOf(UploadIpfsFile)).call(this, props));
-	
-	        _this4.state = {
-	            docs: {},
-	            pubKey: props.pubKey,
-	            selected: '0',
-	            files: ''
-	        };
-	        _this4.inputChangeHandler = _this4.inputChangeHandler.bind(_this4);
-	        return _this4;
-	    }
-	
-	    _createClass(UploadIpfsFile, [{
-	        key: "componentDidMount",
-	        value: function componentDidMount() {
-	            $.ajax({
-	                url: twinUrl + "ipfs/alldocs/" + this.state.pubKey,
-	                dataType: 'json',
-	                cache: false,
-	                success: function (resp) {
-	                    this.setState({ docs: resp.data.documents });
-	                }.bind(this),
-	                error: function (xhr, status, err) {
-	                    console.error(this.props.url, status, err.toString());
-	                }.bind(this)
-	            });
-	
-	            $("#AttributesContainer .modal").modal('show');
-	            $("#AttributesContainer .modal").on('hidden.bs.modal', this.props.handleHideModal);
-	        }
-	    }, {
-	        key: "uploadHandler",
-	        value: function uploadHandler(data, additionalParams) {
-	            var params = {
-	                url: twinUrl + "ipfs/upload",
-	                type: 'POST',
-	                data: data,
-	                cache: false,
-	                processData: false,
-	                contentType: false
-	            };
-	            $.extend(params, additionalParams);
-	            $.ajax(params);
-	        }
-	    }, {
-	        key: "fileHandler",
-	        value: function fileHandler(e) {
-	            e.preventDefault();
-	            if (this.state.selected != "0") {
-	                var hash, fileHash;
-	                this.props.dataHandler(this.state.selected);
-	                $("button.close").trigger("click");
-	            } else {
-	                if (this.state.files.size > 0) {
-	                    var fileInput = $("input[name=newdoc]");
-	                    var fData = new FormData();
-	                    fData.append("user_pubkey", this.state.pubKey);
-	                    $.each(fileInput[0].files, function (key, value) {
-	                        fData.append(key, value);
-	                    });
-	                    var _this = this;
-	                    var callbacks = {
-	                        beforeSend: function beforeSend(xhr) {
-	                            $("button[name=uploadsubmit]").button('loading');
-	                            $("button.close").hide();
-	                        },
-	                        success: function (resp) {
-	                            if (resp.uploded && resp.uploded.length > 0) {
-	                                var filedata = resp.uploded[0].hash + "|" + resp.uploded[0].file_hash;
-	                                //data handler forms JSON object
-	                                this.props.dataHandler(filedata);
-	                                $("button.close").trigger("click");
-	                            }
-	                        }.bind(this),
-	                        complete: function complete() {
-	                            $("button[name=uploadsubmit]").button('reset');
-	                            $("button.close").show();
-	                        }
-	                    };
-	                    this.uploadHandler(fData, callbacks);
-	                }
-	            }
-	        }
-	    }, {
-	        key: "inputChangeHandler",
-	        value: function inputChangeHandler(e) {
-	            if (e.target.tagName == "SELECT") {
-	                this.setState({ selected: e.target.value });
-	            } else this.setState({ files: e.target.files[0] });
-	        }
-	    }, {
-	        key: "render",
-	        value: function render() {
-	            var _this5 = this;
-	
-	            console.log("UploadIpfsFile state: " + JSON.stringify(this.state));
-	            var center = {
-	                textAlign: 'center'
-	            };
-	            return _react2.default.createElement(
-	                "div",
-	                { className: "modal fade" },
-	                _react2.default.createElement(
-	                    "div",
-	                    { className: "modal-dialog" },
-	                    _react2.default.createElement(
-	                        "div",
-	                        { className: "modal-content" },
-	                        _react2.default.createElement(
-	                            "div",
-	                            { className: "modal-header" },
-	                            _react2.default.createElement(
-	                                "button",
-	                                { type: "button", className: "close", "data-dismiss": "modal", "aria-label": "Close" },
-	                                _react2.default.createElement(
-	                                    "span",
-	                                    { "aria-hidden": "true" },
-	                                    "×"
-	                                )
-	                            ),
-	                            _react2.default.createElement(
-	                                "h4",
-	                                { className: "modal-title" },
-	                                "Upload Document"
-	                            )
-	                        ),
-	                        _react2.default.createElement(
-	                            "div",
-	                            { className: "modal-body" },
-	                            _react2.default.createElement(
-	                                "form",
-	                                null,
-	                                _react2.default.createElement(
-	                                    "div",
-	                                    { className: "form-group" },
-	                                    _react2.default.createElement(
-	                                        "label",
-	                                        { htmlFor: "get-hash" },
-	                                        "Choose from documents"
-	                                    ),
-	                                    _react2.default.createElement(
-	                                        "select",
-	                                        { className: "form-control", onChange: this.inputChangeHandler },
-	                                        _react2.default.createElement(
-	                                            "option",
-	                                            { value: "0" },
-	                                            "Select Document"
-	                                        ),
-	                                        function () {
-	                                            if (_this5.state.docs && _this5.state.docs.length > 0) {
-	                                                var i = 0;
-	                                                return _this5.state.docs.map(function (obj) {
-	                                                    i++;
-	                                                    var optsVal = obj.hash + "|" + obj.file_hash;
-	                                                    return _react2.default.createElement(
-	                                                        "option",
-	                                                        { value: optsVal, key: i },
-	                                                        obj.filename
-	                                                    );
-	                                                });
-	                                            } else {
-	                                                return _react2.default.createElement(
-	                                                    "option",
-	                                                    { value: "0" },
-	                                                    "-- Empty --"
-	                                                );
-	                                            }
-	                                        }()
-	                                    )
-	                                ),
-	                                _react2.default.createElement(
-	                                    "p",
-	                                    { style: center },
-	                                    "(or)"
-	                                ),
-	                                _react2.default.createElement(
-	                                    "div",
-	                                    { className: "form-group" },
-	                                    _react2.default.createElement(
-	                                        "label",
-	                                        { htmlFor: "documents" },
-	                                        "Upload Document"
-	                                    ),
-	                                    _react2.default.createElement("input", { type: "file", className: "form-control", name: "newdoc", onChange: this.inputChangeHandler })
-	                                )
-	                            )
-	                        ),
-	                        _react2.default.createElement(
-	                            "div",
-	                            { className: "modal-footer" },
-	                            _react2.default.createElement(
-	                                "button",
-	                                { type: "button", "data-loading-text": "Processing...", name: "uploadsubmit", className: "btn btn-success", onClick: this.fileHandler.bind(this) },
-	                                "Submit"
-	                            )
-	                        )
-	                    )
-	                )
-	            );
-	        }
-	    }]);
-	
-	    return UploadIpfsFile;
-	}(_react2.default.Component);
-	
-	;
-	
-	var DimensionAttributeForm = function (_React$Component2) {
-	    _inherits(DimensionAttributeForm, _React$Component2);
+	var DimensionAttributeForm = function (_React$Component) {
+	    _inherits(DimensionAttributeForm, _React$Component);
 	
 	    function DimensionAttributeForm(props) {
 	        _classCallCheck(this, DimensionAttributeForm);
 	
-	        var _this6 = _possibleConstructorReturn(this, (DimensionAttributeForm.__proto__ || Object.getPrototypeOf(DimensionAttributeForm)).call(this, props));
+	        var _this4 = _possibleConstructorReturn(this, (DimensionAttributeForm.__proto__ || Object.getPrototypeOf(DimensionAttributeForm)).call(this, props));
 	
-	        _this6.state = {
-	
+	        _this4.state = {
 	            file_attrs: [],
 	            inputs: ['input-0'],
 	            tmpFile: '',
 	            showModal: false,
 	            pubKey: localStorage.getItem("pubKey")
 	        };
-	        return _this6;
+	        return _this4;
 	    }
 	
 	    _createClass(DimensionAttributeForm, [{
-	        key: "handleShowModal",
+	        key: 'handleShowModal',
 	        value: function handleShowModal(e) {
 	            this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
 	        }
 	    }, {
-	        key: "handleHideModal",
+	        key: 'handleHideModal',
 	        value: function handleHideModal() {
 	            this.setState({ showModal: false });
 	        }
 	    }, {
-	        key: "render",
+	        key: 'render',
 	        value: function render() {
 	            return _react2.default.createElement(
-	                "div",
-	                { className: "form-group col-md-12" },
+	                'div',
+	                { className: 'form-group col-md-12' },
 	                _react2.default.createElement(
-	                    "div",
-	                    { className: "col-md-10" },
+	                    'div',
+	                    { className: 'col-md-10' },
 	                    _react2.default.createElement(
-	                        "label",
-	                        { htmlFor: "unique_id_attrs" },
-	                        " Dimension Attributes e.g. \"My college transcript\", \"Chase Bank KYC\", or \"My blockchain research\". "
+	                        'label',
+	                        { htmlFor: 'unique_id_attrs' },
+	                        ' Dimension Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research". '
 	                    ),
-	                    _react2.default.createElement("input", { name: 'label-' + this.props.labelref, className: "form-control col-md-4", type: "text", placeholder: "Label" })
+	                    _react2.default.createElement('input', { name: 'label-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: 'Descriptor' })
 	                ),
 	                _react2.default.createElement(
-	                    "div",
-	                    { className: "col-md-2" },
+	                    'div',
+	                    { className: 'col-md-2' },
 	                    _react2.default.createElement(
-	                        "button",
-	                        { type: "button", "data-id": this.props.labelref, onClick: this.props.handleShowModal, className: "btn btn-warning pull-right" },
-	                        _react2.default.createElement("span", { className: "glyphicon glyphicon-upload" }),
-	                        "Upload File"
+	                        'button',
+	                        { type: 'button', 'data-id': this.props.labelref, onClick: this.props.handleShowModal, className: 'btn btn-warning pull-right' },
+	                        _react2.default.createElement('span', { className: 'glyphicon glyphicon-upload' }),
+	                        'Upload File'
 	                    )
 	                )
 	            );
@@ -54479,87 +54312,109 @@
 	    function IdentityDimensions(props) {
 	        _classCallCheck(this, IdentityDimensions);
 	
-	        var _this7 = _possibleConstructorReturn(this, (IdentityDimensions.__proto__ || Object.getPrototypeOf(IdentityDimensions)).call(this, props));
+	        var _this5 = _possibleConstructorReturn(this, (IdentityDimensions.__proto__ || Object.getPrototypeOf(IdentityDimensions)).call(this, props));
 	
-	        _this7.state = {
+	        _this5.state = {
 	
 	            pubKey: localStorage.getItem("pubKey"),
+	            showModal: false,
 	
 	            //********************
-	            //UniqueIDAttributesForm
+	            //inputs are mapped to add additional DimensionAttributeForm instances
 	            inputs: ['input-0'],
-	            showModal: false,
+	            //tmp file always holds current input, ex: 'input-0'
 	            tmpFile: '',
+	            control_list: [],
 	
-	            //TODO: BELIEVE WE CAN TAKE THIS OUT (for use it to genrte new unqiueID)
+	            //as we add more Dimension attributes, we end up shifting tmpFile and inputs
+	            //so file_attrs will look like: [ {input-0: IPFS_hash0}, {input-1: IPFS_hash1} ]
 	            file_attrs: [],
 	
-	            //used to populate the select options for add dimension
-	            owned_assets_label: [], //endpoint: getOwnedAssets
-	            controlled_assets: [], //endpoint: getControlledAssets
+	            controlled_assets: [],
+	            controlled_assets_label: [],
 	
 	            //contains actual asset data from DT
 	            own_assets: [],
+	            owned_assets_label: [],
 	
-	            //********************
-	            //DimensionForm
 	            iDimensions: [],
-	            delegations: [],
+	
+	            //delegations: [],
 	            showDetails: false,
+	
+	            //prop dataHandler passes activeDimension to DimensionForm
 	            activeDimension: {}
 	
 	        };
-	        _this7.showDimensionHandler = _this7.showDimensionHandler.bind(_this7);
-	        _this7.handleHideModal = _this7.handleHideModal.bind(_this7);
+	        _this5.showDimensionHandler = _this5.showDimensionHandler.bind(_this5);
+	        _this5.handleHideModal = _this5.handleHideModal.bind(_this5);
+	        _this5.onFieldChange = _this5.onFieldChange.bind(_this5);
 	
-	        return _this7;
+	        return _this5;
 	    }
 	
 	    _createClass(IdentityDimensions, [{
-	        key: "handleSelection",
-	        value: function handleSelection() {}
+	        key: 'onFieldChange',
+	        value: function onFieldChange(inputField, e) {
+	            var multipleValues = {};
+	            if (inputField == "name" || inputField == "signature" || inputField == "message") {
+	                this.setState(_defineProperty({}, inputField, e.target.value));
+	            } else {
+	                multipleValues[inputField] = e;
+	                this.setState(multipleValues);
+	            }
+	        }
+	    }, {
+	        key: 'handleSelection',
+	        value: function handleSelection() {
+	            //make sure that we are interacting with proper asset
+	        }
+	    }, {
+	        key: 'getDimensions',
+	        value: function getDimensions() {
 	
-	        //USED IF DIGITAL TWIN NOT AVAILABLE
-	        // getDimensions() {
-	        //     this.setState({
-	        //         iDimensions: [
-	        //             { "dimensionType": "financial history", "ID": "1234", "attr_list": ["jan1", "hash_jan1_ptr", "jan 2", "hash_jan2_ptr"], "flag": [0, 1] },
-	        //             { "dimensionType": "personal", "ID": "6678", "attr_list": ["val 1", "hash_val_1_ptr", "val 2", "hash_val_2_ptr"], "flag": [1, 1] },
-	        //             { "dimensionType": "photography", "ID": "4538", "attr_list": ["document_1", "hash_ptr_doc1", "document_2", "hash_ptr_doc2"], "flag": [0, 1, 1] }
-	        //         ]
-	        //     })
-	        // }
+	            //MyCOID.json
+	            var dimension1 = {};
+	            dimension1.dimension = {
+	                "dimensionName": "FINANCES",
+	                "pubkey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+	                "coidAddr": "7924DBF02BE23923790C5D82F8A39925F516CA0F",
+	                "ID": 3432423423,
+	                "address": "HEXSTRING_address",
+	                "owner": [],
+	                "controllers": ["c1", "c2"],
+	                "delegations": [{ owner: "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055", delegatee: "d1", amount: "2", dimension: "", expiration: "thursday", accessCategories: "" }, { owner: "A1", delegatee: "D1", amount: "2", dimension: "", expiration: "friday", accessCategories: "" }],
+	                "data": [{ "descriptor": "financial_FEB", "attribute": "QMfgsddfsdffsdfsdsdfsdf", flag: "0", ID: "4465" }, { "descriptor": "financial_MARCH", "attribute": "Qmsdfsdfsdfsdfsdfsdfsdfsdf", flag: "0", ID: "3433" }]
+	            };
+	            //HOME.json
+	            var dimension2 = {};
+	            dimension2.dimension = {
+	                "dimensionName": "EDUCATION",
+	                "pubkey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+	                "coidAddr": "872EDE47AEBC33CAD4AF1B8DA861E78D8E99BC56",
+	                "ID": 69696969,
+	                "address": "HEXSTRING_address",
+	                "owner": [],
+	                "controllers": ["c1", "c2"],
+	                "delegations": [{ owner: "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055", delegatee: "D1", amount: "2", dimension: "", expiration: "thursday", accessCategories: "" }],
+	                "data": [{ "descriptor": "education_highschool", "attribute": "QMfgsddfsdffsdfsdsdfsdf", flag: "0", ID: "4465" }, { "descriptor": "education_college", "attribute": "Qmsdfsdfsdfsdfsdfsdfsdfsdf", flag: "0", ID: "3433" }]
+	            };
+	
+	            var arry = [];
+	            arry.push(dimension1);
+	            arry.push(dimension2);
+	
+	            this.setState({ iDimensions: arry });
+	        } //end getDimensions
 	
 	
 	    }, {
-	        key: "componentWillMount",
+	        key: 'componentWillMount',
 	        value: function componentWillMount() {
 	
 	            var _this = this;
-	            //this.getDimensions();
-	            $.ajax({
-	                url: twinUrl + 'getMetaData',
-	                type: 'POST',
-	                data: {
-	                    //"pubKey": localStorage.getItem("pubKey")
-	                },
-	                success: function (result) {
-	                    var data = result;
-	                    if ($.type(result) != "object") {
-	                        data = JSON.parse(result);
-	                    }
-	                    //console.log("data: " + JSON.stringify(data))
-	                    data = JSON.stringify(data);
-	                    data = JSON.parse(data).data;
-	                    //console.log("data after parse: " + JSON.stringify(data))
-	                    data = JSON.stringify(data);
-	                    var dimensions = JSON.parse(data).Dimensions;
-	                    //console.log("dimensions: " + JSON.stringify(dimensions))
 	
-	                    _this.setState({ iDimensions: dimensions });
-	                }.bind(_this),
-	                complete: function complete() {}
-	            });
+	            this.getDimensions();
 	
 	            $.ajax({
 	                type: "POST",
@@ -54567,111 +54422,70 @@
 	                data: { "pubKey": localStorage.getItem("pubKey") },
 	                success: function success(result) {
 	                    var data = result;
+	                    //getOwnedAssets res: {"data":["CAR.json","MyCOID.json"]}
 	                    if ($.type(result) != "object") {
 	                        data = JSON.parseJSON(result);
 	                    }
-	                    //get the array:
-	                    data = data.data;
-	                    //DEBUGGING:
-	                    console.log("getOwnedAssets result: " + data);
-	
+	                    data = data.data; //get the array:
 	                    var owned_array = [];
 	
 	                    if (data.length > 0) {
 	                        for (var i = 0; i < data.length; i++) {
 	                            owned_array.push(data[i]);
 	                        }
-	                        console.log(owned_array);
+	                        console.log("owned array: " + owned_array); //should include MyCOID.json and other owned assets
 	                        _this.setState({ owned_assets_label: owned_array });
-	                        //****************************************************
+	                        //OWNED ARRAY HAS MYCOID.json and additional OWNED COIDs
+	                        //***********************************************************************************
+	                        //theArray will be populated as we iterate thru owned_array
+	                        var theArray = [];
+	                        //loop through owned_array so that we can inspect each json file
+	                        for (var _i = 0; _i < owned_array.length; _i++) {
+	                            console.log("looping..... got " + owned_array[_i]);
 	
-	                        //loop through OWNED assets
-	                        for (var _i = 0; _i < data.length; _i++) {
-	                            //AJAX each asset:
-	                            $.ajax({
+	                            $.ajax({ //AJAX each asset (calls assetCtrl.js endpoint in DT)
 	                                type: "POST",
 	                                url: twinUrl + 'getAsset',
-	                                data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": data[_i] },
+	                                data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": owned_array[_i] },
 	                                success: function (result) {
 	                                    var dataResult = result;
+	                                    //dataResult is an object 
+	                                    //console.log("getAsset dataResult, index:  " + i + "...  " + JSON.stringify(dataResult))
 	                                    if ($.type(result) != "object") {
 	                                        dataResult = JSON.parseJSON(result);
 	                                    }
-	                                    //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-	                                    var theArray = _this.state.own_assets;
-	
-	                                    console.log("length is: " + theArray.length); //get total number of owned assets
-	                                    console.log(JSON.stringify(theArray));
-	                                    theArray[theArray.length] = { asset_id: dataResult.assetID, asset_name: dataResult };
-	                                    if (dataResult.assetID = "MyCOID") _this.setState({ own_assets: theArray });
-	                                    console.log("this.state.own_assets: " + JSON.stringify(this.state.own_assets));
+	                                    theArray[theArray.length] = {
+	                                        asset_id: dataResult.assetID,
+	                                        asset_uniqueId: dataResult.uniqueId,
+	                                        asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
+	                                        asset_coidAddr: dataResult.coidAddr
+	                                    };
+	                                    //MYCOID is always pushed into last spot, so we know we are done if we go into this if
+	                                    if (dataResult.assetID = "MyCOID") {
+	                                        this.setState({ own_assets: theArray });
+	                                    }
 	                                }.bind(_this),
-	                                complete: function complete() {
-	                                    // for(let i in this.state.owned_assets){
-	                                    //     localStorage.setItem("uniqueID" + i, i.)
-	                                    // }
-	                                }
+	                                complete: function complete() {}
 	                            });
 	                        } //end for
-	                    } //end if data>0
-	                } //end success
+	                    } //end if data.length > 0
+	                } //end success f'n of getOwnedAssets AJAX
 	
-	            });
+	            }); //getOwnedAssets
 	        } //componentWillMount
+	        //***************************************************************************************************
 	
-	        // $.ajax({
-	        // 	type: "POST",
-	        // 	url: twinUrl + 'getControlledAssets',
-	        // 	data: { "pubKey": localStorage.getItem("pubKey") },
-	        // 	success: function (result) {
-	        // 		var data = result;
-	        // 		if ($.type(result) != "object") {
-	        // 			data = JSON.parseJSON(result)
-	        // 		}
-	
-	        // 		//get the array:
-	        // 		data = data.data;
-	
-	        //         let ctrl_array = []
-	        //         if(data.length > 0){
-	        //             for(let i=0; i< data.length; i++){
-	        //                 ctrl_array.push(data[i])
-	        //             }
-	        //             console.log(ctrl_array)
-	        //             this.setState({controlled_assets: ctrl_array})
-	        //         }
-	
-	        // 		//debugging:
-	        // 		console.log("Get Controlled Assets result: " + data);
-	
-	        // 	}.bind(this),
-	        // 	complete: function () {
-	        // 		// do something
-	        // 	},
-	        // 	//console.log(result)
-	        // })
-	
+	        //*****************************************************************************
 	
 	    }, {
-	        key: "hideHandler",
+	        key: 'hideHandler',
 	        value: function hideHandler() {
 	            this.setState({ showDetails: false });
 	        }
-	    }, {
-	        key: "dataHandler",
-	        value: function dataHandler(index) {
-	            return this.state.iDimensions[index];
-	        }
-	    }, {
-	        key: "getActiveData",
-	        value: function getActiveData() {
-	            return this.state.activeDimension;
-	        }
-	
-	        //used to show activeDimension
+	        //used to show activeDimension, is fired onClick
 	
 	    }, {
-	        key: "showDimensionHandler",
+	        key: 'showDimensionHandler',
 	        value: function showDimensionHandler(e) {
 	            e.preventDefault();
 	            this.setState({
@@ -54679,74 +54493,170 @@
 	                activeDimension: this.dataHandler($(e.target).attr('data-index'))
 	            });
 	        }
+	        //used to set activeDimension inside showDimensionHandler
+	        //When we render a DimensionForm, dataHandler={this.state.activeDimension}
+	
 	    }, {
-	        key: "getFileDetails",
+	        key: 'dataHandler',
+	        value: function dataHandler(index) {
+	            return this.state.iDimensions[index];
+	        }
+	        //*****************************************************************************
+	
+	        /*if this.state.showModal is true UploadIpfsFile component is rendered,
+	            and passed the prop dataHandler={this.getFileDetails.bind(this)}*/
+	
+	    }, {
+	        key: 'getFileDetails',
 	        value: function getFileDetails(filedata) {
 	            var obj = _defineProperty({}, this.state.tmpFile, filedata);
 	            this.setState({ file_attrs: this.state.file_attrs.concat([obj]) });
 	        }
+	        //*****************************************************************************
+	        //Passed as a prop to DimensionAttributeForm
+	
 	    }, {
-	        key: "handleHideModal",
-	        value: function handleHideModal() {
-	            this.setState({ showModal: false });
-	        }
-	    }, {
-	        key: "handleShowModal",
+	        key: 'handleShowModal',
 	        value: function handleShowModal(e) {
 	            this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
 	        }
+	        //is passed to UploadIpfsFile so it knows when to close the modal window
+	        //method also exists in DimensionForm
+	
 	    }, {
-	        key: "appendInput",
+	        key: 'handleHideModal',
+	        value: function handleHideModal() {
+	            this.setState({ showModal: false });
+	        }
+	        //*****************************************************************************
+	
+	        //used for DimensionAttributeForm to prepare attributes
+	
+	    }, {
+	        key: 'getLabelValues',
+	        value: function getLabelValues() {
+	            var labelVals = [];
+	            var _this = this;
+	            //in DimensionForm
+	            $.each($("input[name^='label-']"), function (obj) {
+	                var value = $.trim($(this).val());
+	                if (value.length > 0) {
+	                    labelVals.push(_defineProperty({}, $(this).attr('name').replace("label-", ""), value));
+	                }
+	            });
+	            return labelVals;
+	        }
+	
+	        /*file_attrs looks like: [{key: "IPFS_hash | shaHash}]
+	            [{"input-0":"QmPcY8sJ8hSfWhzqX8iLzQEbgiESjqTaeEEoJUrZwhLNk5|9bb7e24956771c4f1bbfe5eceff9e9e1457fafa5d3af3a56f4d7cef0bdd509dc"},
+	            {"input-1":"QmUJGfdKUCFiL2cKE3dcVFL5Q6PsvcWJSPxff5snJ46tuk|28a6ce8b3c55a60f5923cb87e5fd1c47decb973d1973f047f722141460fdad71"},]*/
+	
+	    }, {
+	        key: 'prepareAttributes',
+	        value: function prepareAttributes() {
+	            var newArr = [],
+	                labels = this.getLabelValues();
+	            //labelVals: [{"input-0":"mydocument"},{"input-1":"seconddocument"}]
+	            for (var i = 0; i < labels.length; i++) {
+	                var tmpArr = [];
+	                for (var key in labels[i]) {
+	                    tmpArr.push(labels[i][key]);
+	                    var ipfsHash = this.state.file_attrs[i][key].split("|");
+	                    ipfsHash = ipfsHash[0]; //not sending sha hash
+	                    tmpArr.push(ipfsHash);
+	                    console.log("tmpArray: " + tmpArr);
+	                }
+	                newArr.push(tmpArr);
+	                console.log("newArr: " + newArr);
+	            }
+	            return newArr;
+	        }
+	        //when we click add more, a new value is pushed into this.state.inputs,
+	        //and a new DimensionAttributeForm is rendered
+	
+	    }, {
+	        key: 'appendInput',
 	        value: function appendInput() {
 	            var inputLen = this.state.inputs.length;
 	            if (inputLen < 10) {
-	                var newInput = "input-" + inputLen;
+	                var newInput = 'input-' + inputLen;
 	                this.setState({ inputs: this.state.inputs.concat([newInput]) });
 	            }
 	            console.log("inputs: " + this.state.inputs);
 	        }
-	
-	        // prepareJSON(){
-	
-	        //     var inputObj = {
-	        //         pubKey: this.state.pubKey,
-	        //         uniqueID: "needs to be coid unique ID",
-	        //         controlContractAddr: "434344423423423234",
-	        //         type: "identityDimension",
-	        //         bigchainHash: "",
-	        //         bigchainID: ""
-	        //     };
-	        //     return inputObj
-	        // }
+	        //*********************************************************************************************
+	        //called onClick of 'Create Dimension' button
+	        //We need: pubkey, uniqueId, typeInput (name), descriptors&attributes, flag
 	
 	    }, {
-	        key: "createDimension",
+	        key: 'createDimension',
 	        value: function createDimension(e) {
+	            e.preventDefault();
 	
-	            // e.preventDefault();
-	            // console.log("hit createDimension")
-	            // var json = this.prepareJSON()
-	            // console.log("creating dimension with this data... " + JSON.stringify(json))
+	            var dimensionName = void 0;
+	
+	            $.each($("input[name^='dimensionName']"), function (obj) {
+	                var value = $.trim($(this).val());
+	                if (value.length > 0) {
+	                    dimensionName = value;
+	                }
+	                console.log("got dimensionName: " + dimensionName);
+	            });
+	
+	            var attributes = this.prepareAttributes();
+	            console.log("attributes: " + attributes);
+	
+	            var obj = {};
+	            for (var i = 0; i < attributes.length; i++) {
+	                obj.descriptor = attributes[i];
+	                obj.attribute = attributes[i + 1];
+	            }
+	
+	            console.log("obj: " + JSON.stringify(obj));
+	
+	            var json = {};
+	
+	            json.pubKey = localStorage.getItem("pubKey");
+	            json.controllers = this.state.control_list;
+	            //[["desc1111","QmUJGfdKUCFiL2cKE3dcVFL5Q6PsvcWJSPxff5snJ46tuk","0"],[]]
+	            json.data = attributes;
+	            json.flag = 0;
+	            json.typeInput = dimensionName;
+	
+	            var selected_asset = $("#assetSelect option:selected").text();
+	            this.state.own_assets.forEach(function (asset, index) {
+	                if (selected_asset == asset.asset_id) {
+	                    json.uniqueId = asset.asset_uniqueId;
+	                    json.dimensionCtrlAddr = asset.asset_dimCtrlAddr;
+	                    json.coidAddr = asset.asset_coidAddr;
+	                    //json.dimensions = asset.asset_dimensions
+	                }
+	            });
+	
+	            console.log("JSON: " + JSON.stringify(json));
 	
 	            $.ajax({
 	                type: "POST",
-	                url: twinUrl + 'createDimension',
-	                data: {
-	                    pubkey: localStorage.getItem("pubKey"),
-	                    flag: '1',
-	                    type: 'public'
-	                },
+	                url: twinUrl + 'dimensions/CreateDimension',
+	                data: json,
 	                success: function (result) {
 	                    var data = result;
 	                    if ($.type(result) != "object") {
 	                        data = JSON.parseJSON(result);
 	                    }
 	
-	                    //get the array:
-	                    data = data.data;
+	                    console.log("response createDimenson: " + JSON.stringify(data));
 	
-	                    //debugging:
-	                    console.log("createDimensionforDEMO result: " + data);
+	                    console.log("data.Result: " + data.Result);
+	
+	                    // var dimensionAddr = data.Result[2]
+	                    // console.log("dimensionAddr: " + dimensionAddr)
+	
+	                    //returns (bool success, bytes32 callerHash, address test)
+	                    //response createDimenson: {"Status":null,"Result":"true,8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,C48883966A3B2B8672CC4392C0E03758F7705C36"}
+	                    //get the array:
+	                    //data = data.data;
+	
 	                }.bind(this),
 	                complete: function complete() {
 	                    // do something
@@ -54754,14 +54664,20 @@
 	            });
 	        }
 	    }, {
-	        key: "render",
+	        key: 'render',
 	        value: function render() {
-	            var _this8 = this,
+	            var _this6 = this,
 	                _React$createElement,
 	                _React$createElement2;
 	
-	            //console.log(JSON.stringify(this.state))
+	            //console.log("*****STATE\n" + JSON.stringify(this.state))
+	
 	            var dimensions = this.state.iDimensions;
+	
+	            var owned_label = this.state.owned_assets_label;
+	            console.log("owned_labels: " + owned_label);
+	
+	            var controlled_label = this.state.controlled_assets_label;
 	
 	            var _that = this;
 	
@@ -54772,86 +54688,93 @@
 	            var table = {
 	                margin: '0 auto'
 	            };
+	            var inputAttrs = {
+	                addKeys: [13, 188], // Enter and comma
+	                inputProps: {
+	                    placeholder: "use comma(,) to add multiple values",
+	                    style: { width: '30%' }
+	                }
+	            };
 	
 	            return _react2.default.createElement(
-	                "div",
-	                { id: "IDENTITYDIMENSIONS_MODAL" },
+	                'div',
+	                { id: 'IDENTITYDIMENSIONS_MODAL' },
 	                _react2.default.createElement(
-	                    "h1",
+	                    'h1',
 	                    null,
-	                    "IDENTITY DIMENSIONS"
+	                    'IDENTITY DIMENSIONS'
 	                ),
-	                _react2.default.createElement("hr", null),
+	                _react2.default.createElement('hr', null),
 	                _react2.default.createElement(
-	                    "div",
-	                    { className: "modal-header" },
+	                    'div',
+	                    { className: 'modal-header' },
 	                    _react2.default.createElement(
-	                        "ul",
-	                        { className: "nav nav-tabs", role: "tablist" },
+	                        'ul',
+	                        { className: 'nav nav-tabs', role: 'tablist' },
 	                        _react2.default.createElement(
-	                            "li",
-	                            { role: "presentation", className: "active" },
+	                            'li',
+	                            { role: 'presentation', className: 'active' },
 	                            _react2.default.createElement(
-	                                "a",
-	                                { href: "#dimensions", role: "tab", "data-toggle": "tab" },
-	                                "Identity Dimensions"
+	                                'a',
+	                                { href: '#dimensions', role: 'tab', 'data-toggle': 'tab' },
+	                                'Identity Dimensions'
 	                            )
 	                        ),
 	                        _react2.default.createElement(
-	                            "li",
-	                            { role: "presentation" },
+	                            'li',
+	                            { role: 'presentation' },
 	                            _react2.default.createElement(
-	                                "a",
-	                                { href: "#addDimension", role: "tab", "data-toggle": "tab" },
-	                                "Create new dimension"
+	                                'a',
+	                                { href: '#addDimension', role: 'tab', 'data-toggle': 'tab' },
+	                                'Create new dimension'
 	                            )
 	                        )
 	                    )
 	                ),
 	                _react2.default.createElement(
-	                    "div",
-	                    { className: "modal-body" },
+	                    'div',
+	                    { className: 'modal-body' },
 	                    _react2.default.createElement(
-	                        "div",
-	                        { className: "tab-content" },
+	                        'div',
+	                        { className: 'tab-content' },
 	                        _react2.default.createElement(
-	                            "div",
-	                            (_React$createElement = { className: "tabpanel", role: "tabpanel" }, _defineProperty(_React$createElement, "className", "tab-pane active"), _defineProperty(_React$createElement, "id", "dimensions"), _React$createElement),
-	                            _react2.default.createElement("br", null),
+	                            'div',
+	                            (_React$createElement = { className: 'tabpanel', role: 'tabpanel' }, _defineProperty(_React$createElement, 'className', 'tab-pane active'), _defineProperty(_React$createElement, 'id', 'dimensions'), _React$createElement),
+	                            _react2.default.createElement('br', null),
 	                            _react2.default.createElement(
-	                                "table",
-	                                { style: table, className: "table table-striped center" },
+	                                'table',
+	                                { style: table, className: 'table table-striped center' },
 	                                _react2.default.createElement(
-	                                    "tbody",
+	                                    'tbody',
 	                                    null,
 	                                    function () {
-	                                        if ($.isArray(_this8.state.iDimensions) && _this8.state.iDimensions.length > 0) {
-	                                            return _this8.state.iDimensions.map(function (el, i) {
+	                                        if ($.isArray(_this6.state.iDimensions) && _this6.state.iDimensions.length > 0) {
+	                                            return _this6.state.iDimensions.map(function (el, i) {
 	                                                return _react2.default.createElement(
-	                                                    "tr",
+	                                                    'tr',
 	                                                    { key: i },
 	                                                    _react2.default.createElement(
-	                                                        "td",
+	                                                        'td',
 	                                                        null,
 	                                                        _react2.default.createElement(
-	                                                            "a",
-	                                                            { "data-item": el, "data-index": i, onClick: _that.showDimensionHandler },
-	                                                            el.dimensionType
+	                                                            'a',
+	                                                            { 'data-item': el.dimension, 'data-index': i, onClick: _that.showDimensionHandler },
+	                                                            el.dimension.dimensionName
 	                                                        )
 	                                                    )
 	                                                );
 	                                            });
 	                                        } else {
 	                                            return _react2.default.createElement(
-	                                                "tr",
+	                                                'tr',
 	                                                null,
 	                                                _react2.default.createElement(
-	                                                    "td",
+	                                                    'td',
 	                                                    null,
 	                                                    _react2.default.createElement(
-	                                                        "p",
+	                                                        'p',
 	                                                        null,
-	                                                        "No identity dimensions"
+	                                                        'No identity dimensions'
 	                                                    )
 	                                                )
 	                                            );
@@ -54862,89 +54785,131 @@
 	                            this.state.showDetails ? _react2.default.createElement(DimensionForm, { hideHandler: this.hideHandler.bind(this), dataHandler: this.state.activeDimension }) : null
 	                        ),
 	                        _react2.default.createElement(
-	                            "div",
-	                            (_React$createElement2 = { className: "tabpanel", role: "tabpanel" }, _defineProperty(_React$createElement2, "className", "tab-pane"), _defineProperty(_React$createElement2, "id", "addDimension"), _React$createElement2),
-	                            _react2.default.createElement("br", null),
+	                            'div',
+	                            (_React$createElement2 = { className: 'tabpanel', role: 'tabpanel' }, _defineProperty(_React$createElement2, 'className', 'tab-pane'), _defineProperty(_React$createElement2, 'id', 'addDimension'), _React$createElement2),
+	                            _react2.default.createElement('br', null),
 	                            _react2.default.createElement(
-	                                "div",
+	                                'div',
 	                                null,
 	                                _react2.default.createElement(
-	                                    "select",
-	                                    { className: "selectpicker show-tick", value: this.state.selectedAsset, onChange: this.handleSelection },
+	                                    'select',
+	                                    { id: 'assetSelect', className: 'selectpicker show-tick' },
 	                                    _react2.default.createElement(
-	                                        "optgroup",
-	                                        { label: "Owned" },
-	                                        _react2.default.createElement(
-	                                            "option",
-	                                            null,
-	                                            "MyCOID"
-	                                        ),
-	                                        _react2.default.createElement(
-	                                            "option",
-	                                            null,
-	                                            "My Car"
-	                                        )
+	                                        'optgroup',
+	                                        { label: 'Owned' },
+	                                        function () {
+	                                            if (owned_label.length > 0) {
+	                                                return owned_label.map(function (label, i) {
+	                                                    var val = label.split('.'); //get rid of the .json
+	                                                    return _react2.default.createElement(
+	                                                        'option',
+	                                                        { key: i, value: label },
+	                                                        val[0]
+	                                                    );
+	                                                });
+	                                            } else {
+	                                                return _react2.default.createElement(
+	                                                    'option',
+	                                                    null,
+	                                                    'None'
+	                                                );
+	                                            }
+	                                        }(this)
 	                                    ),
 	                                    _react2.default.createElement(
-	                                        "optgroup",
-	                                        { label: "Controlled" },
-	                                        _react2.default.createElement(
-	                                            "option",
-	                                            null,
-	                                            "Parents house"
-	                                        )
+	                                        'optgroup',
+	                                        { label: 'Controlled' },
+	                                        function () {
+	                                            if (controlled_label.length > 0) {
+	                                                return controlled_label.map(function (label, i) {
+	                                                    var val = label.split('.'); //get rid of the .json
+	                                                    return _react2.default.createElement(
+	                                                        'option',
+	                                                        { key: i, value: label },
+	                                                        val[0]
+	                                                    );
+	                                                });
+	                                            } else {
+	                                                return _react2.default.createElement(
+	                                                    'option',
+	                                                    null,
+	                                                    'None'
+	                                                );
+	                                            }
+	                                        }(this)
 	                                    )
 	                                )
 	                            ),
-	                            _react2.default.createElement("br", null),
+	                            _react2.default.createElement('br', null),
 	                            _react2.default.createElement(
-	                                "div",
-	                                { id: "AttributesContainer" },
+	                                'div',
+	                                { id: 'SubmitContainer' },
 	                                _react2.default.createElement(
-	                                    "form",
-	                                    { method: "POST", id: "register", role: "form" },
+	                                    'form',
+	                                    { method: 'POST', id: 'register', role: 'form' },
 	                                    _react2.default.createElement(
-	                                        "div",
-	                                        { className: "form-group" },
+	                                        'div',
+	                                        { className: 'form-group' },
 	                                        _react2.default.createElement(
-	                                            "label",
-	                                            { htmlFor: "unique_id" },
-	                                            "Enter Identity Dimension Details:"
+	                                            'label',
+	                                            { htmlFor: 'dimensionName' },
+	                                            'Dimension name:'
+	                                        ),
+	                                        _react2.default.createElement('input', { name: 'dimensionName', className: 'form-control col-md-4', type: 'text', placeholder: 'Dimension Name' })
+	                                    ),
+	                                    _react2.default.createElement(
+	                                        'div',
+	                                        null,
+	                                        _react2.default.createElement(
+	                                            'label',
+	                                            { htmlFor: 'unique_id' },
+	                                            'Enter descriptor(s) and attribute(s):'
 	                                        ),
 	                                        this.state.inputs.map(function (input) {
-	                                            return _react2.default.createElement(DimensionAttributeForm, { handleShowModal: _this8.handleShowModal.bind(_this8), min: _this8.state.subform_cont, max: "10", key: input, labelref: input });
+	                                            return _react2.default.createElement(DimensionAttributeForm, { handleShowModal: _this6.handleShowModal.bind(_this6), min: _this6.state.subform_cont, max: '10', key: input, labelref: input });
 	                                        })
 	                                    ),
 	                                    _react2.default.createElement(
-	                                        "div",
-	                                        { className: "form-group" },
+	                                        'div',
+	                                        { className: 'form-group' },
 	                                        _react2.default.createElement(
-	                                            "div",
-	                                            { className: "col-md-offset-6 col-md-6 " },
+	                                            'div',
+	                                            { className: 'col-md-offset-6 col-md-6 ' },
 	                                            _react2.default.createElement(
-	                                                "button",
-	                                                { type: "button", className: "btn btn-info pull-right", style: syle, onClick: this.appendInput.bind(this) },
-	                                                _react2.default.createElement("span", { className: "glyphicon glyphicon-plus" }),
-	                                                "Add More"
+	                                                'button',
+	                                                { type: 'button', className: 'btn btn-info pull-right', style: syle, onClick: this.appendInput.bind(this) },
+	                                                _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
+	                                                'Add More'
 	                                            )
 	                                        )
 	                                    ),
 	                                    _react2.default.createElement(
-	                                        "div",
-	                                        { className: "form-group" },
+	                                        'div',
+	                                        { className: 'form-group' },
 	                                        _react2.default.createElement(
-	                                            "div",
-	                                            { className: "col-sm-6" },
-	                                            _react2.default.createElement("hr", null),
+	                                            'label',
+	                                            { htmlFor: 'control_dist' },
+	                                            'Enter Controller(s).'
+	                                        ),
+	                                        _react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs, { value: this.state.control_list, onChange: function onChange(e) {
+	                                                _this6.onFieldChange("control_list", e);
+	                                            } }))
+	                                    ),
+	                                    _react2.default.createElement(
+	                                        'div',
+	                                        { className: 'form-group' },
+	                                        _react2.default.createElement(
+	                                            'div',
+	                                            { className: 'col-sm-6' },
 	                                            _react2.default.createElement(
-	                                                "button",
-	                                                { className: "btn btn-primary", "data-loading-text": "Submit", name: "submit-form", type: "button", onClick: this.createDimension.bind(this) },
-	                                                "Create Dimension"
+	                                                'button',
+	                                                { className: 'btn btn-primary', 'data-loading-text': 'Submit', name: 'submit-form', type: 'button', onClick: this.createDimension.bind(this) },
+	                                                'Create Dimension'
 	                                            )
 	                                        )
 	                                    )
 	                                ),
-	                                this.state.showModal ? _react2.default.createElement(UploadIpfsFile, { pubKey: this.state.pubKey, dataHandler: this.getFileDetails.bind(this), handleHideModal: this.handleHideModal }) : null
+	                                this.state.showModal ? _react2.default.createElement(_UploadIpfsFile2.default, { pubKey: this.state.pubKey, dataHandler: this.getFileDetails.bind(this), handleHideModal: this.handleHideModal }) : null
 	                            )
 	                        )
 	                    )
@@ -54960,37 +54925,10 @@
 	
 	exports.default = IdentityDimensions;
 	
-	// //temp function
-	// app.post('/getMetaData', function(req,res)
-	// {
-	//         console.log("endpoint getMetaData was hit");
-	//         var obj1 = {"dimensionType": "financial history", "ID": "1234", "attr_list": ["jan1", "hash_jan1_ptr", "jan 2", "hash_jan2_ptr"], "flag": [0,1] }
-	//         var obj2 = {"dimensionType": "personal", "ID": "6678", "attr_list": ["val 1", "hash_val_1_ptr", "val 2", "hash_val_2_ptr"], "flag": [1,1] }
-	//         var obj3 = {"dimensionType": "photography",  "ID": "4538", "attr_list": ["document_1", "hash_ptr_doc1", "document_2", "hash_ptr_doc2"], "flag": [0,1,1] }
-	//         var response = { "Dimensions": [obj1, obj2, obj3] }
-	//         res.json({"data": response})
-	
-	// })
-	
-	
-	//USED IF DIGITAL TWIN NOT AVAILABLE
-	// getDimensions() {
-	//     this.setState({
-	//         iDimensions: [
-	//             { dimensionType: 'FINANCIAL HISTORY', ID: '12234', owned: true, name: 'Football', descriptors: ["monday", "tuesday", "wednesday"], attributes: ["h1", "h2", "h3"] },
-	//             { dimensionType: 'EDUCATION', ID: '34334', owned: true, name: 'iPod Touch', descriptors: ["monday", "tuesday", "wednesday"], attributes: ["h1", "h2", "h3"] },
-	//             { dimensionType: 'DIGITAL ASSETS', ID: '56676', owned: false, name: 'iPhone 5', descriptors: ["monday", "tuesday", "wednesday"], attributes: ["h1", "h2", "h3"] }
-	//         ]
-	//     })
-	// }
-	
-	
-	//<AddDimension addDimension={this.handleAddDimension.bind(this) } /><br /><br />
-	
 	//<IdentityDimensions dimensions={dimensions} onDelete={this.handleDeleteDimension.bind(this) } key={dimensions.ID} onClick={this.showHandler.bind(this)}/>
 
 /***/ },
-/* 346 */
+/* 347 */
 /*!******************************************!*\
   !*** ./src/app/Components/Documents.jsx ***!
   \******************************************/
@@ -55399,7 +55337,7 @@
 	exports.default = Documents;
 
 /***/ },
-/* 347 */
+/* 348 */
 /*!*********************************************!*\
   !*** ./src/app/Components/MyGateKeeper.jsx ***!
   \*********************************************/
@@ -55948,7 +55886,9 @@
 				//gatekeeperAddr: localStorage.getItem("MyGatekeeperAddr"),
 				validators: [],
 				signature: '',
-				assetID: []
+				assetID: '',
+				dimensions: ""
+	
 			};
 	
 			_this7.maxUniqAttr = 10;
@@ -55972,6 +55912,7 @@
 						}
 						localStorage.setItem("gatekeeperAddr", result.gatekeeperAddr);
 						localStorage.setItem("coidAddr", result.coidAddr);
+						localStorage.setItem("dimensionCtrlAddr", result.dimensionCtrlAddr);
 					}.bind(this),
 					complete: function complete() {}
 				});

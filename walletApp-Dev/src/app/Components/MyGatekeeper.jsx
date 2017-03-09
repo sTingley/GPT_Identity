@@ -305,7 +305,9 @@ class MyGatekeeper extends React.Component {
 			//gatekeeperAddr: localStorage.getItem("MyGatekeeperAddr"),
 			validators:[],
 			signature:'',
-            assetID: []
+            assetID: '',
+			dimensions: ""
+			
 		};
 		
 		this.maxUniqAttr = 10;

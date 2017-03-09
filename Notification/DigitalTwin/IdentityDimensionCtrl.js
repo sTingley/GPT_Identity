@@ -17,7 +17,7 @@ flagMap[1] = ControlDirectory;
 flagMap[2] = DelegateDirectory;
 
 //Makes the user's directories in case they don't exist
-var directoryManager = function (pubkey) {
+var directoryManager = function (pubKey) {
     var sync = true;
 
     //uer's folder path:
@@ -29,7 +29,7 @@ var directoryManager = function (pubkey) {
     //TODO: CHECK -- will this cause an async error?
     //make the ownership, control and delegate folders:
     for (let i = 0; i < flagMap.length; i++) {
-        fs.existsSync(currentPath + "/" + flagMap[i] || fs.mkdir(currentPath + "/" + flagMap[i]))
+        fs.existsSync(currentPath + "/" + flagMap[i]) || fs.mkdir(currentPath + "/" + flagMap[i]))
     }
 
     sync = false;

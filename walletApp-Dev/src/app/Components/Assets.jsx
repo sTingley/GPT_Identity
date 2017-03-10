@@ -338,7 +338,7 @@ class Modal extends Component {
 								<div role="tabpanel" className="tab-pane center-block" id="qrcode" style={qrStyle}>
 									<QRCode value={qrConfig} size={200} />
 								</div>
-
+{/*
 								<div role="tabpanel" className="tab-pane" id="dimension">
 									<label className="custom-file">
 										<input type="file" id="file" className="custom-file-input"></input>
@@ -376,7 +376,7 @@ class Modal extends Component {
 
 
 								</div>
-
+*/}
 							</div>
 						</div>
 

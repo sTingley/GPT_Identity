@@ -305,8 +305,8 @@ class MyGatekeeper extends React.Component {
 			//gatekeeperAddr: localStorage.getItem("MyGatekeeperAddr"),
 			validators:[],
 			signature:'',
-            assetID: '',
-			dimensions: ""
+			assetID: [],
+			dimensions: ''
 			
 		};
 		

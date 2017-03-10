@@ -258,6 +258,8 @@ var IPFS = {
 	},
 
 	//*****************************************************************************************
+	// THIS METHOD IS COMMENTED OUT BC WE HAVENT INTEGRATED IT YET,
+	// NEEDS TO BE CALLED WHENEVER WE NEED TO VALIDATE FILES
 	//*****************************************************************************************
 	//called from DT endpoint /ipfs/validateFiles
 	getHashFromIpfsFile(req, res) {

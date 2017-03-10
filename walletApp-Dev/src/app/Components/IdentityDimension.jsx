@@ -761,7 +761,8 @@ class IdentityDimensions extends Component {
                 json.uniqueId = asset.asset_uniqueId
                 json.dimensionCtrlAddr = asset.asset_dimCtrlAddr
                 json.coidAddr = asset.asset_coidAddr
-                //json.dimensions = asset.asset_dimensions
+                json.controllers = asset.asset_controllers,
+                json.owners = asset.asset_owners
             }
         })
 

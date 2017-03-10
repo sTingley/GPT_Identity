@@ -9,6 +9,7 @@ class DimensionForm extends Component {
         this.state = {
             dimension: this.props.dataHandler,
             //dimension_data: {},
+            selected: false,
 
             docs: {}, //takes same form as it does in Documents.jsx and CoreIdentity.jsx/MyGatekeeper.jsx
             pubkey: localStorage.getItem("pubKey")
@@ -17,18 +18,24 @@ class DimensionForm extends Component {
 
     //HANDLE THE CHOICE OF USER INPUT
     submitHandler(e) {
+
+        let dimension = this.state.dimension.dimension
+        //*********************************************/
+
         e.preventDefault();
         var ele = $(e.target);
+
+        const typeInput = dimension.dimensionName
 
         var button_val = parseInt(ele.attr("data-val"))
 
         var json = {
             "publicKey": localStorage.getItem("pubKey"),
-            "uniqueID": 'getUNIQUEID!!!!',
-            "typeInput": 'dimensionName',
-            "flag": "flag_value"
+            "typeInput": typeInput,
+            "flag": "0"
         }
 
+        //*********************************************************************
         // request to add dimension descriptor/attribute pair
         if (button_val === 1) {
             console.log("hit add descriptor rq")
@@ -57,24 +64,65 @@ class DimensionForm extends Component {
         }//end if
 
         if (button_val === 2) {
-            console.log("hit delegation rq")
-            $.ajax({
-                url: twinUrl + 'addDelegation',
-                type: 'POST',
-                data: json,
-                success: function (res) {
-                    if (res.status == "Ok" && res.msg == "true") {
-                        //var i_dimension = this.state.dimension.ID
-                    }
-                }
+
+            var x = $("#allAttrs").is(":checked");
+            console.log("checkbox: " + x)
+
+            if ($("#allAttrs").is(":checked")) {
+                $('#accessCategories').hide();
+            }
+
+            let accessCategories = []
+            json.accessCategories = ""
+            //Getting the value (index) of selected access categories
+            //the index represents the desriptor/attribute
+            $('#accessCategories option:selected').each(function () {
+                accessCategories.push($(this).val());
             });
+
+            console.log("dimension.data[0]: " + JSON.stringify(dimension.data[0]))
+
+            console.log("selectedCategories: " + accessCategories)
+
+            accessCategories.forEach(function (element) {
+                //dimension.data[element]
+                console.log("got element: " + element)
+                json.accessCategories += dimension.data[element].descriptor + ","
+
+                console.log("json.accessCategories: " + json.accessCategories)
+            })
+
+            json.accessCategories = json.accessCategories.substring(0, json.accessCategories.length - 1)
+
+
+            console.log("hit delegation rq")
+
+            console.log("json.accessCategories: " + json.accessCategories)
+            // $.ajax({
+            //     url: twinUrl + 'addDelegation',
+            //     type: 'POST',
+            //     data: json,
+            //     success: function (res) {
+            //         if (res.status == "Ok" && res.msg == "true") {
+            //             //var i_dimension = this.state.dimension.ID
+            //         }
+            //     }
+            // });
         }
+        //*********************************************************************
 
     }//end submitHandler
 
     //THIS METHOD IS THE CONSTRUCTOR
-    // componentWillMount(){
-    // }
+    componentWillMount() {
+        if ($("#allAttrs").is(":checked")) {
+            this.state.selected = true
+        }
+        if(this.state.selected = true){
+            $('#accessCategories').hide();
+        }
+        else $('#accessCategories').show();
+    }
 
     componentDidMount() {
 
@@ -93,6 +141,7 @@ class DimensionForm extends Component {
                 this.setState({ docs: resp.data.documents });
             }.bind(this)
         });
+
     }
 
     render() {
@@ -177,7 +226,7 @@ class DimensionForm extends Component {
                                                 if (arrayOfArrays.length > 0) {
                                                     return arrayOfArrays.map((attrs, i) => {
                                                         console.log("attrs[0]: " + attrs[0] + ", attrs[1]:" + attrs[1] + ", attrs[2]: " + attrs[2] + ", attrs[3]: " + attrs[3])
-                                                        if (attrs[1].charAt(0) == "Q") {
+                                                        if (attrs[1] && attrs[1].charAt(0) == "Q") {
                                                             return (
                                                                 <tr key={i}>
                                                                     <td>{attrs[0]}</td>
@@ -253,7 +302,7 @@ class DimensionForm extends Component {
                                         <hr />
                                         <tbody>
                                             <tr>
-                                                <th colSpan="2"><b>Delegate tokens</b></th>
+                                                <th><b>Delegate tokens</b></th>
                                             </tr>
                                             <tr>
                                                 <td><input className="form-control col-md-4" type="text" placeholder="Delegatee Address" /></td>
@@ -265,11 +314,27 @@ class DimensionForm extends Component {
                                                 <td><input className="form-control col-md-4" type="text" placeholder="Expiration" /></td>
                                             </tr>
                                             <tr>
-                                                ACCESS CATEGORIES
-                                                <option value="one">One</option>
-                                                <option value="two">Two</option>
-                                                <option value="three">Three</option>
-                                                <option value="four">Four</option>
+                                                <th><b>Delegate access to all attributes:</b></th>
+                                            </tr>
+                                            <tr>
+                                                <td><input id="allAttrs" type="checkbox" />YES</td>
+                                            </tr>
+                                            <tr>
+                                                <th><b>Access Categories (select 1 or many):</b></th>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <select id="accessCategories" className="selectpicker" multiple="multiple">
+                                                        {(() => {
+                                                            if (arrayOfArrays.length > 0) {
+                                                                return arrayOfArrays.map((attrs, i) => {
+                                                                    return (<option key={i} value={i}>{attrs[0]}</option>)
+                                                                })
+
+                                                            }
+                                                        })(this)}
+                                                    </select>
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -390,6 +455,8 @@ class IdentityDimensions extends Component {
 
     getDimensions() {
 
+        var _this = this
+
         //MyCOID.json
         let dimension1 = {}
         dimension1.dimension = {
@@ -434,6 +501,64 @@ class IdentityDimensions extends Component {
 
         this.setState({ iDimensions: arry })
 
+        // let owned_dimensions = []
+        // let controlled_dimensions = []
+
+        // $.ajax({
+        //     type: "POST",
+        //     url: twinUrl + 'getOwnedDimensions',
+        //     data: { "pubKey": localStorage.getItem("pubKey") },
+        //     success: function (result) {
+        //         var data = result
+        //         if ($.type(result) != "object") {
+        //             data = JSON.parseJSON(result)
+        //         }
+
+        //         data = data.data; //get the array:
+
+        //         if (data.length > 0) {
+        //             for (let i = 0; i < data.length; i++) {
+        //                 owned_dimensions.push(data[i])
+        //             }
+        //             console.log("owned_dimensions: " + owned_dimensions)
+
+        //             var theArray = []
+
+        //             for (let i = 0; i < owned_dimensions.length; i++) {
+
+        //                 $.ajax({ //AJAX each asset (calls assetCtrl.js endpoint in DT)
+        //                     type: "POST",
+        //                     url: twinUrl + 'getDimension',
+        //                     data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": owned_dimensions[i] },
+        //                     success: function (result) {
+        //                         var dataResult = result;
+        //                         //dataResult is an object 
+        //                         console.log("getDimension dataResult, index:  " + i + "...  " + JSON.stringify(dataResult))
+        //                         if ($.type(result) != "object") {
+        //                             dataResult = JSON.parseJSON(result)
+        //                         }
+        //                         theArray[theArray.length] = {
+        //                             dimension: dataResult.dimension,
+        //                         }
+
+        //                         console.log("theArry: " + JSON.stringify(theArray))
+        //                         // //MYCOID is always pushed into last spot, so we know we are done if we go into this if
+        //                         // if (dataResult.assetID = "MyCOID") {
+        //                         //     this.setState({ own_assets: theArray })
+        //                         // }
+        //                     }.bind(this),
+        //                 })
+
+        //             }//end for(dimensions.length)
+
+        //             _this.setState({ iDimensions: theArray })
+
+
+        //         }//end if(data.length > 0)
+
+        //     }//end success callback
+        // })
+
     }//end getDimensions
 
 
@@ -442,6 +567,8 @@ class IdentityDimensions extends Component {
         let _this = this
 
         this.getDimensions();
+
+
 
         $.ajax({
             type: "POST",
@@ -468,7 +595,7 @@ class IdentityDimensions extends Component {
                     var theArray = []
                     //loop through owned_array so that we can inspect each json file
                     for (let i = 0; i < owned_array.length; i++) {
-                        console.log("looping..... got " + owned_array[i])
+                        //console.log("looping..... got " + owned_array[i])
 
                         $.ajax({ //AJAX each asset (calls assetCtrl.js endpoint in DT)
                             type: "POST",
@@ -485,7 +612,9 @@ class IdentityDimensions extends Component {
                                     asset_id: dataResult.assetID,
                                     asset_uniqueId: dataResult.uniqueId,
                                     asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
-                                    asset_coidAddr: dataResult.coidAddr
+                                    asset_coidAddr: dataResult.coidAddr,
+                                    asset_owners: dataResult.ownerIdList,
+                                    asset_controllers: dataResult.controlIdList
                                 }
                                 //MYCOID is always pushed into last spot, so we know we are done if we go into this if
                                 if (dataResult.assetID = "MyCOID") {
@@ -624,7 +753,7 @@ class IdentityDimensions extends Component {
         //[["desc1111","QmUJGfdKUCFiL2cKE3dcVFL5Q6PsvcWJSPxff5snJ46tuk","0"],[]]
         json.data = attributes
         json.flag = 0
-        json.typeInput = dimensionName
+        json.dimensionName = dimensionName
 
         let selected_asset = $("#assetSelect option:selected").text()
         this.state.own_assets.forEach(function (asset, index) {
@@ -635,6 +764,7 @@ class IdentityDimensions extends Component {
                 //json.dimensions = asset.asset_dimensions
             }
         })
+
 
         console.log("JSON: " + JSON.stringify(json))
 
@@ -654,7 +784,7 @@ class IdentityDimensions extends Component {
 
                 // var dimensionAddr = data.Result[2]
                 // console.log("dimensionAddr: " + dimensionAddr)
-                
+
                 //returns (bool success, bytes32 callerHash, address test)
                 //response createDimenson: {"Status":null,"Result":"true,8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,C48883966A3B2B8672CC4392C0E03758F7705C36"}
                 //get the array:
@@ -672,12 +802,11 @@ class IdentityDimensions extends Component {
 
     render() {
 
-        //console.log("*****STATE\n" + JSON.stringify(this.state))
+        //console.log("\nthis.state: " + JSON.stringify(this.state))
 
         let dimensions = this.state.iDimensions;
 
         var owned_label = this.state.owned_assets_label
-        console.log("owned_labels: " + owned_label)
 
         var controlled_label = this.state.controlled_assets_label
 

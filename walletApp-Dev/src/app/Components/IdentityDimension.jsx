@@ -32,7 +32,8 @@ class DimensionForm extends Component {
         var json = {
             "publicKey": localStorage.getItem("pubKey"),
             "typeInput": typeInput,
-            "flag": "0"
+            "flag": "0",
+            "accessCategories": ""
         }
 
         //*********************************************************************
@@ -77,29 +78,31 @@ class DimensionForm extends Component {
             }
 
             let accessCategories = []
-            json.accessCategories = ""
+
             //Getting the value (index) of selected access categories
             //the index represents the desriptor/attribute
             $('#accessCategories option:selected').each(function () {
                 accessCategories.push($(this).val());
+                //accessCategories now contains the selected indices
             });
 
-            console.log("dimension.data[0]: " + JSON.stringify(dimension.data[0]))
             console.log("selectedCategories: " + accessCategories)
 
             accessCategories.forEach(function (element) {
-                console.log("got element: " + element)
+                //console.log("got element: " + element)
                 json.accessCategories += dimension.data[element].descriptor + ","
             })
 
             json.accessCategories = json.accessCategories.substring(0, json.accessCategories.length - 1)
 
-            $("input[name^='descriptor']"), function (obj) {
-                var value = $.trim($(this).val())
-                if (value.length > 0) {
-                    descriptor = value
-                }
-            }
+            let delegatee = $("input[name^='delegatee']").val()
+             let tokenQuantity = $("input[name^='tokenQuantity']").val()
+
+
+             if(delegatee) json.delegatee = delegatee
+             if(tokenQuantity) json.tokenQuantity = tokenQuantity
+
+             
 
             console.log("\n JSON body: " + JSON.stringify(json))
             // $.ajax({
@@ -309,10 +312,10 @@ class DimensionForm extends Component {
                                                 <th><b>Delegate tokens</b></th>
                                             </tr>
                                             <tr>
-                                                <td><input className="form-control col-md-4" type="text" placeholder="Delegatee Address" /></td>
+                                                <td><input name="delegatee" className="form-control col-md-4" type="text" placeholder="Delegatee Address" /></td>
                                             </tr>
                                             <tr>
-                                                <td><input className="form-control col-md-4" type="text" placeholder="Token Quantity" /></td>
+                                                <td><input name="tokenQuantity" className="form-control col-md-4" type="text" placeholder="Token Quantity" /></td>
                                             </tr>
                                             <tr>
                                                 <td><input className="form-control col-md-4" type="text" placeholder="Expiration" /></td>

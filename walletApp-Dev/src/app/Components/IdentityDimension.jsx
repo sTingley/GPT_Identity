@@ -99,7 +99,7 @@ class DimensionForm extends Component {
                 if (value.length > 0) {
                     descriptor = value
                 }
-            })
+            }
 
             console.log("\n JSON body: " + JSON.stringify(json))
             // $.ajax({

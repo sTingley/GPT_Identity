@@ -62,9 +62,13 @@ class DimensionForm extends Component {
                 }
             });
         }//end if
-
+        //*********************************************************************
+        // request to add a delegation for a dimension (one or many descriptors)
         if (button_val === 2) {
+            console.log("hit delegation rq")
 
+            //checking if they want to delegate access to all attrs
+            //this mean accessCategories (contract) will be null
             var x = $("#allAttrs").is(":checked");
             console.log("checkbox: " + x)
 
@@ -81,23 +85,23 @@ class DimensionForm extends Component {
             });
 
             console.log("dimension.data[0]: " + JSON.stringify(dimension.data[0]))
-
             console.log("selectedCategories: " + accessCategories)
 
             accessCategories.forEach(function (element) {
-                //dimension.data[element]
                 console.log("got element: " + element)
                 json.accessCategories += dimension.data[element].descriptor + ","
-
-                console.log("json.accessCategories: " + json.accessCategories)
             })
 
             json.accessCategories = json.accessCategories.substring(0, json.accessCategories.length - 1)
 
+            $("input[name^='descriptor']"), function (obj) {
+                var value = $.trim($(this).val())
+                if (value.length > 0) {
+                    descriptor = value
+                }
+            })
 
-            console.log("hit delegation rq")
-
-            console.log("json.accessCategories: " + json.accessCategories)
+            console.log("\n JSON body: " + JSON.stringify(json))
             // $.ajax({
             //     url: twinUrl + 'addDelegation',
             //     type: 'POST',

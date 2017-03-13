@@ -456,8 +456,11 @@ class Assets extends Component {
 								console.log(theArray)
 								//TODO: RENAME asset_name TO ASSET DETAILS
 								theArray[theArray.length] = { asset_id: dataResult.assetID, asset_name: dataResult }
+
 								this.setState({ own_assets: theArray });
 								console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets))
+
+								localStorage.setItem("owned_assets", JSON.stringify(this.state.own_assets))
 
 							}.bind(this),
 							complete: function () {
@@ -467,6 +470,8 @@ class Assets extends Component {
 						})
 
 					}
+					console.log("owned_assets*****: " + JSON.stringify(this.state.own_assets))
+
 				}
 			}.bind(this),
 			complete: function () {

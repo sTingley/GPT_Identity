@@ -175,7 +175,7 @@ var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
                 log.dimension.data=data;
 
                 //change contract using calls
-                /*
+                
                 function createWrite(){
                     var max=Math.max(controller.length,owner.length);
                     console.log("MAX :"+max);
@@ -190,31 +190,31 @@ var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
 
                 // the reason they are nested is because the other functions also read/write the json. Due to the async nature of js you want to make sure
                 // that the file being pulled is the latest.
+                var addPayload = {"pubKey":pubKey,"dimensionName":dimensionName,"data":data};
                 if(data.length>0 && data[0].descriptor!="" && delegations.length>0 && delegations[0].owner !=""){
-                    self.addEntry(data,function(error,result){
+                    self.addEntry(addPayload,function(error,result){
                         self.delegate(delegations,function(error,result){
                             createWrite();
-                        }
-                    }
+                        })
+                    })
                 }
                 else if(data.length>0 && data[0].descriptor!=""){
-                    self.addEntry(data,function(error,result){
+                    self.addEntry(addPayload,function(error,result){
                         createWrite();
-                    }
+                    })
                 }
                 else if(delegations.length>0 && delegations[0].owner !=""){
                     self.delegate(delegations,function(error,result){
                         createWrite();
-                    }
+                    })
                 }
                 else{
                     createWrite();
                 }
-
-                */
+             
                 //log.dimension.data[0].flag=flag;
                 //send json
-                var max=Math.max(controller.length,owner.length);
+                /*var max=Math.max(controller.length,owner.length);
                 console.log("MAX :"+max);
                 for(var i=0;i<max;i++){
                     if(typeof(owner[i])!='undefined' && typeof(owner[i])!='null'){connector.SetDimension(owner[i],typeInput+".json",0,0,log,"","",function(){})}
@@ -222,9 +222,10 @@ var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
                     if(i==(max-1)){callback(error,result);}
                     console.log("OWNER :"+typeof(owner[i]))
                     console.log("CONTROLLER :"+typeof(controller[i]))
-                }
+                }*/
                 //connector.SetDimension(pubKey,typeInput+".json",0,0,log,"","",function(){callback(error,result)})
             }
+            else{callback(error,result);}
             console.log("\n\nCreation LOG: "+JSON.stringify(log) + "\n\n");
 //            callback(error,result);
         })
@@ -282,14 +283,15 @@ var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
     //result is the boolean success from the contract
     this.addEntry = function (formdata, callback) {
 
+        var pubKey = formdata.pubKey;
+        var type = formdata.dimensionName;
+
         for(var i=0;i<formdata.length;i++){
 
-            var pubKey = formdata[i].pubKey;
-            var type = formdata[i].type;
-            var ID = formdata[i].ID;
-            var attribute = formdata[i].attribute;
-            var descriptor = formdata[i].descriptor;
-            var flag = formdata[i].flag;
+            var ID = formdata.data[i].ID;
+            var attribute = formdata.data[i].attribute;
+            var descriptor = formdata.data[i].descriptor;
+            var flag = formdata.data[i].flag;
             console.log("----------ADD ENTRY--------------");
             console.log("PUBKEY :"+pubKey);
             console.log("TYPE :"+type);
@@ -355,6 +357,7 @@ var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
     }
 
     //result is the boolean success from the contract
+    //updateAttribute
     this.updateEntry = function (formdata, callback) {
 
         var pubKey = formdata.pubKey;

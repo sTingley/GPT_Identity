@@ -50865,79 +50865,6 @@
 										'div',
 										{ role: 'tabpanel', className: 'tab-pane center-block', id: 'qrcode', style: qrStyle },
 										_react2.default.createElement(_qrcode2.default, { value: qrConfig, size: 200 })
-									),
-									_react2.default.createElement(
-										'div',
-										{ role: 'tabpanel', className: 'tab-pane', id: 'dimension' },
-										_react2.default.createElement(
-											'label',
-											{ className: 'custom-file' },
-											_react2.default.createElement('input', { type: 'file', id: 'file', className: 'custom-file-input' }),
-											_react2.default.createElement('span', { className: 'custom-file-control' })
-										),
-										_react2.default.createElement(
-											'form',
-											{ className: 'form-horizontal' },
-											_react2.default.createElement(
-												'div',
-												{ className: 'form-group' },
-												_react2.default.createElement(
-													'label',
-													{ 'for': 'inputEmail', className: 'control-label col-xs-2' },
-													'Email'
-												),
-												_react2.default.createElement(
-													'div',
-													{ className: 'col-xs-10' },
-													_react2.default.createElement('input', { type: 'email', className: 'form-control', id: 'inputEmail', placeholder: 'Email' })
-												)
-											),
-											_react2.default.createElement(
-												'div',
-												{ className: 'form-group' },
-												_react2.default.createElement(
-													'label',
-													{ 'for': 'inputPassword', className: 'control-label col-xs-2' },
-													'Password'
-												),
-												_react2.default.createElement(
-													'div',
-													{ className: 'col-xs-10' },
-													_react2.default.createElement('input', { type: 'password', className: 'form-control', id: 'inputPassword', placeholder: 'Password' })
-												)
-											),
-											_react2.default.createElement(
-												'div',
-												{ className: 'form-group' },
-												_react2.default.createElement(
-													'div',
-													{ className: 'col-xs-offset-2 col-xs-10' },
-													_react2.default.createElement(
-														'div',
-														{ className: 'checkbox' },
-														_react2.default.createElement(
-															'label',
-															null,
-															_react2.default.createElement('input', { type: 'checkbox' }),
-															' Remember me'
-														)
-													)
-												)
-											),
-											_react2.default.createElement(
-												'div',
-												{ className: 'form-group' },
-												_react2.default.createElement(
-													'div',
-													{ className: 'col-xs-offset-2 col-xs-10' },
-													_react2.default.createElement(
-														'button',
-														{ type: 'submit', className: 'btn btn-primary' },
-														'Login'
-													)
-												)
-											)
-										)
 									)
 								)
 							)
@@ -51025,12 +50952,16 @@
 										console.log(theArray);
 										//TODO: RENAME asset_name TO ASSET DETAILS
 										theArray[theArray.length] = { asset_id: dataResult.assetID, asset_name: dataResult };
+	
 										this.setState({ own_assets: theArray });
 										console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets));
+	
+										localStorage.setItem("owned_assets", JSON.stringify(this.state.own_assets));
 									}.bind(this),
 									complete: function complete() {}
 								});
 							}
+							console.log("owned_assets*****: " + JSON.stringify(this.state.own_assets));
 						}
 					}.bind(this),
 					complete: function complete() {}
@@ -53701,6 +53632,7 @@
 	        _this2.state = {
 	            dimension: _this2.props.dataHandler,
 	            //dimension_data: {},
+	            selected: false,
 	
 	            docs: {}, //takes same form as it does in Documents.jsx and CoreIdentity.jsx/MyGatekeeper.jsx
 	            pubkey: localStorage.getItem("pubKey")
@@ -53714,18 +53646,25 @@
 	    _createClass(DimensionForm, [{
 	        key: 'submitHandler',
 	        value: function submitHandler(e) {
+	
+	            var dimension = this.state.dimension.dimension;
+	            //*********************************************/
+	
 	            e.preventDefault();
 	            var ele = $(e.target);
+	
+	            var typeInput = dimension.dimensionName;
 	
 	            var button_val = parseInt(ele.attr("data-val"));
 	
 	            var json = {
 	                "publicKey": localStorage.getItem("pubKey"),
-	                "uniqueID": 'getUNIQUEID!!!!',
-	                "typeInput": 'dimensionName',
-	                "flag": "flag_value"
+	                "typeInput": typeInput,
+	                "flag": "0",
+	                "accessCategories": ""
 	            };
 	
+	            //*********************************************************************
 	            // request to add dimension descriptor/attribute pair
 	            if (button_val === 1) {
 	                console.log("hit add descriptor rq");
@@ -53752,26 +53691,76 @@
 	                    }
 	                });
 	            } //end if
-	
+	            //*********************************************************************
+	            // request to add a delegation for a dimension (one or many descriptors)
 	            if (button_val === 2) {
-	                console.log("hit delegation rq");
-	                $.ajax({
-	                    url: twinUrl + 'addDelegation',
-	                    type: 'POST',
-	                    data: json,
-	                    success: function success(res) {
-	                        if (res.status == "Ok" && res.msg == "true") {
-	                            //var i_dimension = this.state.dimension.ID
-	                        }
+	                var x;
+	
+	                (function () {
+	                    console.log("hit delegation rq");
+	
+	                    //checking if they want to delegate access to all attrs
+	                    //this mean accessCategories (contract) will be null
+	                    x = $("#allAttrs").is(":checked");
+	
+	                    console.log("checkbox: " + x);
+	
+	                    if ($("#allAttrs").is(":checked")) {
+	                        $('#accessCategories').hide();
 	                    }
-	                });
+	
+	                    var accessCategories = [];
+	
+	                    //Getting the value (index) of selected access categories
+	                    //the index represents the desriptor/attribute
+	                    $('#accessCategories option:selected').each(function () {
+	                        accessCategories.push($(this).val());
+	                        //accessCategories now contains the selected indices
+	                    });
+	
+	                    console.log("selectedCategories: " + accessCategories);
+	
+	                    accessCategories.forEach(function (element) {
+	                        //console.log("got element: " + element)
+	                        json.accessCategories += dimension.data[element].descriptor + ",";
+	                    });
+	
+	                    json.accessCategories = json.accessCategories.substring(0, json.accessCategories.length - 1);
+	
+	                    var delegatee = $("input[name^='delegatee']").val();
+	                    var tokenQuantity = $("input[name^='tokenQuantity']").val();
+	
+	                    if (delegatee) json.delegatee = delegatee;
+	                    if (tokenQuantity) json.tokenQuantity = tokenQuantity;
+	
+	                    console.log("\n JSON body: " + JSON.stringify(json));
+	                    // $.ajax({
+	                    //     url: twinUrl + 'addDelegation',
+	                    //     type: 'POST',
+	                    //     data: json,
+	                    //     success: function (res) {
+	                    //         if (res.status == "Ok" && res.msg == "true") {
+	                    //             //var i_dimension = this.state.dimension.ID
+	                    //         }
+	                    //     }
+	                    // });
+	                })();
 	            }
+	            //*********************************************************************
 	        } //end submitHandler
 	
 	        //THIS METHOD IS THE CONSTRUCTOR
-	        // componentWillMount(){
-	        // }
 	
+	    }, {
+	        key: 'componentWillMount',
+	        value: function componentWillMount() {
+	            if ($("#allAttrs").is(":checked")) {
+	                this.state.selected = true;
+	            }
+	            if (this.state.selected = true) {
+	                $('#accessCategories').hide();
+	            } else $('#accessCategories').show();
+	        }
 	    }, {
 	        key: 'componentDidMount',
 	        value: function componentDidMount() {
@@ -53970,7 +53959,7 @@
 	                                                if (arrayOfArrays.length > 0) {
 	                                                    return arrayOfArrays.map(function (attrs, i) {
 	                                                        console.log("attrs[0]: " + attrs[0] + ", attrs[1]:" + attrs[1] + ", attrs[2]: " + attrs[2] + ", attrs[3]: " + attrs[3]);
-	                                                        if (attrs[1].charAt(0) == "Q") {
+	                                                        if (attrs[1] && attrs[1].charAt(0) == "Q") {
 	                                                            return _react2.default.createElement(
 	                                                                'tr',
 	                                                                { key: i },
@@ -54157,7 +54146,7 @@
 	                                                null,
 	                                                _react2.default.createElement(
 	                                                    'th',
-	                                                    { colSpan: '2' },
+	                                                    null,
 	                                                    _react2.default.createElement(
 	                                                        'b',
 	                                                        null,
@@ -54171,7 +54160,7 @@
 	                                                _react2.default.createElement(
 	                                                    'td',
 	                                                    null,
-	                                                    _react2.default.createElement('input', { className: 'form-control col-md-4', type: 'text', placeholder: 'Delegatee Address' })
+	                                                    _react2.default.createElement('input', { name: 'delegatee', className: 'form-control col-md-4', type: 'text', placeholder: 'Delegatee Address' })
 	                                                )
 	                                            ),
 	                                            _react2.default.createElement(
@@ -54180,7 +54169,7 @@
 	                                                _react2.default.createElement(
 	                                                    'td',
 	                                                    null,
-	                                                    _react2.default.createElement('input', { className: 'form-control col-md-4', type: 'text', placeholder: 'Token Quantity' })
+	                                                    _react2.default.createElement('input', { name: 'tokenQuantity', className: 'form-control col-md-4', type: 'text', placeholder: 'Token Quantity' })
 	                                                )
 	                                            ),
 	                                            _react2.default.createElement(
@@ -54195,26 +54184,60 @@
 	                                            _react2.default.createElement(
 	                                                'tr',
 	                                                null,
-	                                                'ACCESS CATEGORIES',
 	                                                _react2.default.createElement(
-	                                                    'option',
-	                                                    { value: 'one' },
-	                                                    'One'
-	                                                ),
+	                                                    'th',
+	                                                    null,
+	                                                    _react2.default.createElement(
+	                                                        'b',
+	                                                        null,
+	                                                        'Delegate access to all attributes:'
+	                                                    )
+	                                                )
+	                                            ),
+	                                            _react2.default.createElement(
+	                                                'tr',
+	                                                null,
 	                                                _react2.default.createElement(
-	                                                    'option',
-	                                                    { value: 'two' },
-	                                                    'Two'
-	                                                ),
+	                                                    'td',
+	                                                    null,
+	                                                    _react2.default.createElement('input', { id: 'allAttrs', type: 'checkbox' }),
+	                                                    'YES'
+	                                                )
+	                                            ),
+	                                            _react2.default.createElement(
+	                                                'tr',
+	                                                null,
 	                                                _react2.default.createElement(
-	                                                    'option',
-	                                                    { value: 'three' },
-	                                                    'Three'
-	                                                ),
+	                                                    'th',
+	                                                    null,
+	                                                    _react2.default.createElement(
+	                                                        'b',
+	                                                        null,
+	                                                        'Access Categories (select 1 or many):'
+	                                                    )
+	                                                )
+	                                            ),
+	                                            _react2.default.createElement(
+	                                                'tr',
+	                                                null,
 	                                                _react2.default.createElement(
-	                                                    'option',
-	                                                    { value: 'four' },
-	                                                    'Four'
+	                                                    'td',
+	                                                    null,
+	                                                    _react2.default.createElement(
+	                                                        'select',
+	                                                        { id: 'accessCategories', className: 'selectpicker', multiple: 'multiple' },
+	                                                        function () {
+	                                                            if (arrayOfArrays.length > 0) {
+	                                                                return arrayOfArrays.map(function (attrs, i) {
+	                                                                    return _react2.default.createElement(
+	                                                                        'option',
+	                                                                        { key: i, value: i },
+	                                                                        attrs[0]
+	                                                                    );
+	                                                                });
+	                                                            }
+	                                                        }(this)
+	                                                    )
 	                                                )
 	                                            )
 	                                        )
@@ -54373,6 +54396,8 @@
 	        key: 'getDimensions',
 	        value: function getDimensions() {
 	
+	            var _this = this;
+	
 	            //MyCOID.json
 	            var dimension1 = {};
 	            dimension1.dimension = {
@@ -54405,6 +54430,64 @@
 	            arry.push(dimension2);
 	
 	            this.setState({ iDimensions: arry });
+	
+	            // let owned_dimensions = []
+	            // let controlled_dimensions = []
+	
+	            // $.ajax({
+	            //     type: "POST",
+	            //     url: twinUrl + 'getOwnedDimensions',
+	            //     data: { "pubKey": localStorage.getItem("pubKey") },
+	            //     success: function (result) {
+	            //         var data = result
+	            //         if ($.type(result) != "object") {
+	            //             data = JSON.parseJSON(result)
+	            //         }
+	
+	            //         data = data.data; //get the array:
+	
+	            //         if (data.length > 0) {
+	            //             for (let i = 0; i < data.length; i++) {
+	            //                 owned_dimensions.push(data[i])
+	            //             }
+	            //             console.log("owned_dimensions: " + owned_dimensions)
+	
+	            //             var theArray = []
+	
+	            //             for (let i = 0; i < owned_dimensions.length; i++) {
+	
+	            //                 $.ajax({ //AJAX each asset (calls assetCtrl.js endpoint in DT)
+	            //                     type: "POST",
+	            //                     url: twinUrl + 'getDimension',
+	            //                     data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": owned_dimensions[i] },
+	            //                     success: function (result) {
+	            //                         var dataResult = result;
+	            //                         //dataResult is an object 
+	            //                         console.log("getDimension dataResult, index:  " + i + "...  " + JSON.stringify(dataResult))
+	            //                         if ($.type(result) != "object") {
+	            //                             dataResult = JSON.parseJSON(result)
+	            //                         }
+	            //                         theArray[theArray.length] = {
+	            //                             dimension: dataResult.dimension,
+	            //                         }
+	
+	            //                         console.log("theArry: " + JSON.stringify(theArray))
+	            //                         // //MYCOID is always pushed into last spot, so we know we are done if we go into this if
+	            //                         // if (dataResult.assetID = "MyCOID") {
+	            //                         //     this.setState({ own_assets: theArray })
+	            //                         // }
+	            //                     }.bind(this),
+	            //                 })
+	
+	            //             }//end for(dimensions.length)
+	
+	            //             _this.setState({ iDimensions: theArray })
+	
+	
+	            //         }//end if(data.length > 0)
+	
+	            //     }//end success callback
+	            // })
 	        } //end getDimensions
 	
 	
@@ -54441,7 +54524,7 @@
 	                        var theArray = [];
 	                        //loop through owned_array so that we can inspect each json file
 	                        for (var _i = 0; _i < owned_array.length; _i++) {
-	                            console.log("looping..... got " + owned_array[_i]);
+	                            //console.log("looping..... got " + owned_array[i])
 	
 	                            $.ajax({ //AJAX each asset (calls assetCtrl.js endpoint in DT)
 	                                type: "POST",
@@ -54458,7 +54541,9 @@
 	                                        asset_id: dataResult.assetID,
 	                                        asset_uniqueId: dataResult.uniqueId,
 	                                        asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
-	                                        asset_coidAddr: dataResult.coidAddr
+	                                        asset_coidAddr: dataResult.coidAddr,
+	                                        asset_owners: dataResult.ownerIdList,
+	                                        asset_controllers: dataResult.controlIdList
 	                                    };
 	                                    //MYCOID is always pushed into last spot, so we know we are done if we go into this if
 	                                    if (dataResult.assetID = "MyCOID") {
@@ -54564,10 +54649,9 @@
 	                    var ipfsHash = this.state.file_attrs[i][key].split("|");
 	                    ipfsHash = ipfsHash[0]; //not sending sha hash
 	                    tmpArr.push(ipfsHash);
-	                    console.log("tmpArray: " + tmpArr);
+	                    //console.log("tmpArray: " + tmpArr)
 	                }
 	                newArr.push(tmpArr);
-	                console.log("newArr: " + newArr);
 	            }
 	            return newArr;
 	        }
@@ -54621,7 +54705,7 @@
 	            //[["desc1111","QmUJGfdKUCFiL2cKE3dcVFL5Q6PsvcWJSPxff5snJ46tuk","0"],[]]
 	            json.data = attributes;
 	            json.flag = 0;
-	            json.typeInput = dimensionName;
+	            json.dimensionName = dimensionName;
 	
 	            var selected_asset = $("#assetSelect option:selected").text();
 	            this.state.own_assets.forEach(function (asset, index) {
@@ -54629,39 +54713,40 @@
 	                    json.uniqueId = asset.asset_uniqueId;
 	                    json.dimensionCtrlAddr = asset.asset_dimCtrlAddr;
 	                    json.coidAddr = asset.asset_coidAddr;
-	                    //json.dimensions = asset.asset_dimensions
+	                    json.controllers = asset.asset_controllers, json.owners = asset.asset_owners;
 	                }
 	            });
 	
 	            console.log("JSON: " + JSON.stringify(json));
 	
-	            $.ajax({
-	                type: "POST",
-	                url: twinUrl + 'dimensions/CreateDimension',
-	                data: json,
-	                success: function (result) {
-	                    var data = result;
-	                    if ($.type(result) != "object") {
-	                        data = JSON.parseJSON(result);
-	                    }
+	            // $.ajax({
+	            //     type: "POST",
+	            //     url: twinUrl + 'dimensions/CreateDimension',
+	            //     data: json,
+	            //     success: function (result) {
+	            //         var data = result;
+	            //         if ($.type(result) != "object") {
+	            //             data = JSON.parseJSON(result)
+	            //         }
 	
-	                    console.log("response createDimenson: " + JSON.stringify(data));
+	            //         console.log("response createDimenson: " + JSON.stringify(data))
 	
-	                    console.log("data.Result: " + data.Result);
+	            //         console.log("data.Result: " + data.Result)
 	
-	                    // var dimensionAddr = data.Result[2]
-	                    // console.log("dimensionAddr: " + dimensionAddr)
+	            //         // var dimensionAddr = data.Result[2]
+	            //         // console.log("dimensionAddr: " + dimensionAddr)
 	
-	                    //returns (bool success, bytes32 callerHash, address test)
-	                    //response createDimenson: {"Status":null,"Result":"true,8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,C48883966A3B2B8672CC4392C0E03758F7705C36"}
-	                    //get the array:
-	                    //data = data.data;
+	            //         //returns (bool success, bytes32 callerHash, address test)
+	            //         //response createDimenson: {"Status":null,"Result":"true,8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,C48883966A3B2B8672CC4392C0E03758F7705C36"}
+	            //         //get the array:
+	            //         //data = data.data;
 	
-	                }.bind(this),
-	                complete: function complete() {
-	                    // do something
-	                }
-	            });
+	
+	            //     }.bind(this),
+	            //     complete: function () {
+	            //         // do something
+	            //     },
+	            // })
 	        }
 	    }, {
 	        key: 'render',
@@ -54670,12 +54755,11 @@
 	                _React$createElement,
 	                _React$createElement2;
 	
-	            //console.log("*****STATE\n" + JSON.stringify(this.state))
+	            //console.log("\nthis.state: " + JSON.stringify(this.state))
 	
 	            var dimensions = this.state.iDimensions;
 	
 	            var owned_label = this.state.owned_assets_label;
-	            console.log("owned_labels: " + owned_label);
 	
 	            var controlled_label = this.state.controlled_assets_label;
 	
@@ -55886,8 +55970,8 @@
 				//gatekeeperAddr: localStorage.getItem("MyGatekeeperAddr"),
 				validators: [],
 				signature: '',
-				assetID: '',
-				dimensions: ""
+				assetID: [],
+				dimensions: ''
 	
 			};
 	

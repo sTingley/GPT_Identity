@@ -43,7 +43,8 @@ class Modal extends Component {
 		$("#assetDetails").modal('show');
 		$("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
 
-		var prop = this.props.asset.asset_name;
+		var prop = this.props.asset.asset_details;
+
 
 		var theTime = (new Date()).toString()
 
@@ -154,7 +155,7 @@ class Modal extends Component {
 
 	render() {
 
-		var prop = this.props.asset.asset_name;
+		var prop = this.props.asset.asset_details;
 		var style = {
 			fontSize: '12.5px'
 		}
@@ -452,15 +453,29 @@ class Assets extends Component {
 								//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
 								var theArray = this.state.own_assets;
 
+								//var localStorage_owned = this.state.own_assets
+
 								console.log("length is: " + theArray.length)
 								console.log(theArray)
 								//TODO: RENAME asset_name TO ASSET DETAILS
-								theArray[theArray.length] = { asset_id: dataResult.assetID, asset_name: dataResult }
+								theArray[theArray.length] = {
+									asset_id: dataResult.assetID,
+									asset_details: dataResult
+								}
+
+								// localStorage[localStorage.length] = {
+								// 	asset_id: dataResult.assetID,
+                                //     asset_uniqueId: dataResult.uniqueId,
+                                //     asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
+                                //     asset_coidAddr: dataResult.coidAddr,
+                                //     asset_owners: dataResult.ownerIdList,
+                                //     asset_controllers: dataResult.controlIdList
+								// }
+
+								// localStorage.setItem("owned_assets", JSON.stringify(localStorage_owned))								
 
 								this.setState({ own_assets: theArray });
 								console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets))
-
-								localStorage.setItem("owned_assets", JSON.stringify(this.state.own_assets))
 
 							}.bind(this),
 							complete: function () {
@@ -470,7 +485,7 @@ class Assets extends Component {
 						})
 
 					}
-					console.log("owned_assets*****: " + JSON.stringify(this.state.own_assets))
+					
 
 				}
 			}.bind(this),
@@ -514,7 +529,7 @@ class Assets extends Component {
 								}
 
 								//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-								this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_name: dataResult }] });
+								this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
 
 							}.bind(this),
 							complete: function () {
@@ -569,7 +584,7 @@ class Assets extends Component {
 								}
 
 								//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-								this.setState({ delegated_assets: [{ asset_id: dataResult.assetID, asset_name: dataResult }] });
+								this.setState({ delegated_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
 
 							}.bind(this),
 							complete: function () {

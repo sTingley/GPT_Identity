@@ -48837,7 +48837,7 @@
 	        value: function render() {
 	            var _this3 = this;
 	
-	            console.log("UploadIpfsFile state: " + JSON.stringify(this.state));
+	            //console.log("UploadIpfsFile state: " + JSON.stringify(this.state))
 	            var center = {
 	                textAlign: 'center'
 	            };
@@ -53633,7 +53633,6 @@
 	            dimension: _this2.props.dataHandler,
 	            //dimension_data: {},
 	            selected: false,
-	
 	            docs: {}, //takes same form as it does in Documents.jsx and CoreIdentity.jsx/MyGatekeeper.jsx
 	            pubkey: localStorage.getItem("pubKey")
 	        };
@@ -54259,13 +54258,6 @@
 	    return DimensionForm;
 	}(_react.Component);
 	
-	//                             <div className="modal-footer">
-	//                                <button type="button" className="btn btn-danger" onClick={this.submitHandler.bind(this)}>THIS BUTTON DOES SOMETHING</button>
-	//                           </div>
-	
-	
-	//DISPLAY
-	
 	var DimensionAttributeForm = function (_React$Component) {
 	    _inherits(DimensionAttributeForm, _React$Component);
 	
@@ -54347,6 +54339,8 @@
 	            inputs: ['input-0'],
 	            //tmp file always holds current input, ex: 'input-0'
 	            tmpFile: '',
+	
+	            //CONTROLLERS FOR A DIMENSION* (entered when creating dimension)
 	            control_list: [],
 	
 	            //as we add more Dimension attributes, we end up shifting tmpFile and inputs
@@ -54688,22 +54682,25 @@
 	            });
 	
 	            var attributes = this.prepareAttributes();
-	            console.log("attributes: " + attributes);
+	            console.log("attributes: " + attributes + "\n size: " + attributes.length);
+	            console.log("attributes[0]: " + attributes[0]);
+	            console.log("attributes[0][0]: " + attributes[0][0]); //going to give desc1111
+	            console.log("attributes[0][1]: " + attributes[0][1]);
 	
-	            var obj = {};
+	            var objArray = [];
 	            for (var i = 0; i < attributes.length; i++) {
-	                obj.descriptor = attributes[i];
-	                obj.attribute = attributes[i + 1];
+	                var obj = {};
+	                obj.descriptor = attributes[i][0];
+	                obj.attribute = attributes[i][1];
+	                obj.flag = 0;
+	                objArray.push(obj);
+	                //console.log("objArray: " + JSON.stringify(objArray))
 	            }
 	
-	            console.log("obj: " + JSON.stringify(obj));
-	
 	            var json = {};
-	
+	            json.data = objArray;
 	            json.pubKey = localStorage.getItem("pubKey");
 	            json.controllers = this.state.control_list;
-	            //[["desc1111","QmUJGfdKUCFiL2cKE3dcVFL5Q6PsvcWJSPxff5snJ46tuk","0"],[]]
-	            json.data = attributes;
 	            json.flag = 0;
 	            json.dimensionName = dimensionName;
 	
@@ -54717,36 +54714,38 @@
 	                }
 	            });
 	
+	            //TODO: add ability to delegate on dimension creation
+	            json.delegations = [];
+	
 	            console.log("JSON: " + JSON.stringify(json));
 	
-	            // $.ajax({
-	            //     type: "POST",
-	            //     url: twinUrl + 'dimensions/CreateDimension',
-	            //     data: json,
-	            //     success: function (result) {
-	            //         var data = result;
-	            //         if ($.type(result) != "object") {
-	            //             data = JSON.parseJSON(result)
-	            //         }
+	            $.ajax({
+	                type: "POST",
+	                url: twinUrl + 'dimensions/CreateDimension',
+	                data: json,
+	                success: function (result) {
+	                    var data = result;
+	                    if ($.type(result) != "object") {
+	                        data = JSON.parseJSON(result);
+	                    }
 	
-	            //         console.log("response createDimenson: " + JSON.stringify(data))
+	                    console.log("response createDimenson: " + JSON.stringify(data));
 	
-	            //         console.log("data.Result: " + data.Result)
+	                    console.log("data.Result: " + data.Result);
 	
-	            //         // var dimensionAddr = data.Result[2]
-	            //         // console.log("dimensionAddr: " + dimensionAddr)
+	                    // var dimensionAddr = data.Result[2]
+	                    // console.log("dimensionAddr: " + dimensionAddr)
 	
-	            //         //returns (bool success, bytes32 callerHash, address test)
-	            //         //response createDimenson: {"Status":null,"Result":"true,8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,C48883966A3B2B8672CC4392C0E03758F7705C36"}
-	            //         //get the array:
-	            //         //data = data.data;
+	                    //returns (bool success, bytes32 callerHash, address test)
+	                    //response createDimenson: {"Status":null,"Result":"true,8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,C48883966A3B2B8672CC4392C0E03758F7705C36"}
+	                    //get the array:
+	                    //data = data.data;
 	
-	
-	            //     }.bind(this),
-	            //     complete: function () {
-	            //         // do something
-	            //     },
-	            // })
+	                }.bind(this),
+	                complete: function complete() {
+	                    // do something
+	                }
+	            });
 	        }
 	    }, {
 	        key: 'render',
@@ -54756,8 +54755,6 @@
 	                _React$createElement2;
 	
 	            //console.log("\nthis.state: " + JSON.stringify(this.state))
-	
-	            var dimensions = this.state.iDimensions;
 	
 	            var owned_label = this.state.owned_assets_label;
 	

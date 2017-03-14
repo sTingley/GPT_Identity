@@ -91,7 +91,7 @@ class UploadIpfsFile extends React.Component {
     }
 
     render() {
-        console.log("UploadIpfsFile state: " + JSON.stringify(this.state))
+        //console.log("UploadIpfsFile state: " + JSON.stringify(this.state))
         var center = {
             textAlign: 'center'
         };

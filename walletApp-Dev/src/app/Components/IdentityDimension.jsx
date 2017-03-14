@@ -709,10 +709,9 @@ class IdentityDimensions extends Component {
                 let ipfsHash = this.state.file_attrs[i][key].split("|")
                 ipfsHash = ipfsHash[0] //not sending sha hash
                 tmpArr.push(ipfsHash);
-                console.log("tmpArray: " + tmpArr)
+                //console.log("tmpArray: " + tmpArr)
             }
             newArr.push(tmpArr);
-            console.log("newArr: " + newArr)
         }
         return newArr;
     }
@@ -776,34 +775,34 @@ class IdentityDimensions extends Component {
 
         console.log("JSON: " + JSON.stringify(json))
 
-        $.ajax({
-            type: "POST",
-            url: twinUrl + 'dimensions/CreateDimension',
-            data: json,
-            success: function (result) {
-                var data = result;
-                if ($.type(result) != "object") {
-                    data = JSON.parseJSON(result)
-                }
+        // $.ajax({
+        //     type: "POST",
+        //     url: twinUrl + 'dimensions/CreateDimension',
+        //     data: json,
+        //     success: function (result) {
+        //         var data = result;
+        //         if ($.type(result) != "object") {
+        //             data = JSON.parseJSON(result)
+        //         }
 
-                console.log("response createDimenson: " + JSON.stringify(data))
+        //         console.log("response createDimenson: " + JSON.stringify(data))
 
-                console.log("data.Result: " + data.Result)
+        //         console.log("data.Result: " + data.Result)
 
-                // var dimensionAddr = data.Result[2]
-                // console.log("dimensionAddr: " + dimensionAddr)
+        //         // var dimensionAddr = data.Result[2]
+        //         // console.log("dimensionAddr: " + dimensionAddr)
 
-                //returns (bool success, bytes32 callerHash, address test)
-                //response createDimenson: {"Status":null,"Result":"true,8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,C48883966A3B2B8672CC4392C0E03758F7705C36"}
-                //get the array:
-                //data = data.data;
+        //         //returns (bool success, bytes32 callerHash, address test)
+        //         //response createDimenson: {"Status":null,"Result":"true,8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,C48883966A3B2B8672CC4392C0E03758F7705C36"}
+        //         //get the array:
+        //         //data = data.data;
 
 
-            }.bind(this),
-            complete: function () {
-                // do something
-            },
-        })
+        //     }.bind(this),
+        //     complete: function () {
+        //         // do something
+        //     },
+        // })
 
     }
 

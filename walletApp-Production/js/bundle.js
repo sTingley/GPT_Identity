@@ -50197,7 +50197,7 @@
 				$("#assetDetails").modal('show');
 				$("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
 	
-				var prop = this.props.asset.asset_name;
+				var prop = this.props.asset.asset_details;
 	
 				var theTime = new Date().toString();
 	
@@ -50312,7 +50312,7 @@
 			key: 'render',
 			value: function render() {
 	
-				var prop = this.props.asset.asset_name;
+				var prop = this.props.asset.asset_details;
 				var style = {
 					fontSize: '12.5px'
 				};
@@ -50948,20 +50948,33 @@
 										//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
 										var theArray = this.state.own_assets;
 	
+										//var localStorage_owned = this.state.own_assets
+	
 										console.log("length is: " + theArray.length);
 										console.log(theArray);
 										//TODO: RENAME asset_name TO ASSET DETAILS
-										theArray[theArray.length] = { asset_id: dataResult.assetID, asset_name: dataResult };
+										theArray[theArray.length] = {
+											asset_id: dataResult.assetID,
+											asset_details: dataResult
+										};
+	
+										// localStorage[localStorage.length] = {
+										// 	asset_id: dataResult.assetID,
+										//     asset_uniqueId: dataResult.uniqueId,
+										//     asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
+										//     asset_coidAddr: dataResult.coidAddr,
+										//     asset_owners: dataResult.ownerIdList,
+										//     asset_controllers: dataResult.controlIdList
+										// }
+	
+										// localStorage.setItem("owned_assets", JSON.stringify(localStorage_owned))								
 	
 										this.setState({ own_assets: theArray });
 										console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets));
-	
-										localStorage.setItem("owned_assets", JSON.stringify(this.state.own_assets));
 									}.bind(this),
 									complete: function complete() {}
 								});
 							}
-							console.log("owned_assets*****: " + JSON.stringify(this.state.own_assets));
 						}
 					}.bind(this),
 					complete: function complete() {}
@@ -51003,7 +51016,7 @@
 										}
 	
 										//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-										this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_name: dataResult }] });
+										this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
 									}.bind(this),
 									complete: function complete() {
 										// do something
@@ -51053,7 +51066,7 @@
 										}
 	
 										//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-										this.setState({ delegated_assets: [{ asset_id: dataResult.assetID, asset_name: dataResult }] });
+										this.setState({ delegated_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
 									}.bind(this),
 									complete: function complete() {
 										// do something
@@ -53621,22 +53634,117 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
+	var DelegationForm = function (_React$Component) {
+	    _inherits(DelegationForm, _React$Component);
+	
+	    function DelegationForm(props) {
+	        _classCallCheck(this, DelegationForm);
+	
+	        var _this2 = _possibleConstructorReturn(this, (DelegationForm.__proto__ || Object.getPrototypeOf(DelegationForm)).call(this, props));
+	
+	        _this2.state = {
+	
+	            delegatee_list: [],
+	            delegatee_tokens: []
+	
+	        };
+	        _this2.maxDelegations = 10;
+	        _this2.handleHideModal = _this2.handleHideModal.bind(_this2);
+	        return _this2;
+	    }
+	
+	    _createClass(DelegationForm, [{
+	        key: 'handleShowModal',
+	        value: function handleShowModal(e) {
+	            this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
+	        }
+	    }, {
+	        key: 'handleHideModal',
+	        value: function handleHideModal() {
+	            this.setState({ showModal: false });
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var style = {
+	                fontSize: '12.5px'
+	            };
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'form-group col-md-12' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'col-md-10' },
+	                    _react2.default.createElement(
+	                        'table',
+	                        { className: 'table table-striped table-hover', style: style },
+	                        _react2.default.createElement(
+	                            'tbody',
+	                            null,
+	                            _react2.default.createElement(
+	                                'tr',
+	                                null,
+	                                _react2.default.createElement(
+	                                    'th',
+	                                    null,
+	                                    _react2.default.createElement(
+	                                        'b',
+	                                        null,
+	                                        'Public Key of Delegatee'
+	                                    )
+	                                ),
+	                                _react2.default.createElement(
+	                                    'th',
+	                                    null,
+	                                    _react2.default.createElement(
+	                                        'b',
+	                                        null,
+	                                        'Control Token Quantity'
+	                                    )
+	                                )
+	                            ),
+	                            _react2.default.createElement(
+	                                'tr',
+	                                null,
+	                                _react2.default.createElement(
+	                                    'td',
+	                                    null,
+	                                    _react2.default.createElement('input', { name: 'delegatee-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: 'Public Key of Delegatee' })
+	                                ),
+	                                _react2.default.createElement(
+	                                    'td',
+	                                    null,
+	                                    _react2.default.createElement('input', { name: 'delegatee-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: 'Control Token Quantity' })
+	                                )
+	                            )
+	                        )
+	                    )
+	                )
+	            );
+	        }
+	    }]);
+	
+	    return DelegationForm;
+	}(_react2.default.Component);
+	
+	;
+	
 	var DimensionForm = function (_Component) {
 	    _inherits(DimensionForm, _Component);
 	
 	    function DimensionForm(props) {
 	        _classCallCheck(this, DimensionForm);
 	
-	        var _this2 = _possibleConstructorReturn(this, (DimensionForm.__proto__ || Object.getPrototypeOf(DimensionForm)).call(this, props));
+	        var _this3 = _possibleConstructorReturn(this, (DimensionForm.__proto__ || Object.getPrototypeOf(DimensionForm)).call(this, props));
 	
-	        _this2.state = {
-	            dimension: _this2.props.dataHandler,
+	        _this3.state = {
+	            dimension: _this3.props.dataHandler,
 	            //dimension_data: {},
 	            selected: false,
 	            docs: {}, //takes same form as it does in Documents.jsx and CoreIdentity.jsx/MyGatekeeper.jsx
 	            pubkey: localStorage.getItem("pubKey")
 	        };
-	        return _this2;
+	        return _this3;
 	    }
 	
 	    //HANDLE THE CHOICE OF USER INPUT
@@ -53645,6 +53753,7 @@
 	    _createClass(DimensionForm, [{
 	        key: 'submitHandler',
 	        value: function submitHandler(e) {
+	            var _this4 = this;
 	
 	            var dimension = this.state.dimension.dimension;
 	            //*********************************************/
@@ -53726,23 +53835,25 @@
 	
 	                    json.accessCategories = json.accessCategories.substring(0, json.accessCategories.length - 1);
 	
-	                    var delegatee = $("input[name^='delegatee']").val();
-	                    var tokenQuantity = $("input[name^='tokenQuantity']").val();
-	
+	                    var delegatee = $("input[name^='delegatee_addr']").val();
 	                    if (delegatee) json.delegatee = delegatee;
+	                    var tokenQuantity = $("input[name^='tokenQuantity']").val();
 	                    if (tokenQuantity) json.tokenQuantity = tokenQuantity;
 	
+	                    json.coidAddr = _this4.state.dimension.coidAddr;
+	                    json.dimensionCtrlAddr = _this4.state.dimension.dimensionCtrlAddr;
+	
 	                    console.log("\n JSON body: " + JSON.stringify(json));
-	                    // $.ajax({
-	                    //     url: twinUrl + 'addDelegation',
-	                    //     type: 'POST',
-	                    //     data: json,
-	                    //     success: function (res) {
-	                    //         if (res.status == "Ok" && res.msg == "true") {
-	                    //             //var i_dimension = this.state.dimension.ID
-	                    //         }
-	                    //     }
-	                    // });
+	                    $.ajax({
+	                        url: twinUrl + 'dimensions/addDelegation',
+	                        type: 'POST',
+	                        data: json,
+	                        success: function success(res) {
+	                            if (res.status == "Ok" && res.msg == "true") {
+	                                //var i_dimension = this.state.dimension.ID
+	                            }
+	                        }
+	                    });
 	                })();
 	            }
 	            //*********************************************************************
@@ -53783,7 +53894,7 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _this3 = this;
+	            var _this5 = this;
 	
 	            console.log("state in DimensionForm\n" + JSON.stringify(this.state));
 	            var dims = this.state.dimension;
@@ -54072,9 +54183,9 @@
 	                                                        'Select Document'
 	                                                    ),
 	                                                    function () {
-	                                                        if (_this3.state.docs && _this3.state.docs.length > 0) {
+	                                                        if (_this5.state.docs && _this5.state.docs.length > 0) {
 	                                                            var i = 0;
-	                                                            return _this3.state.docs.map(function (obj) {
+	                                                            return _this5.state.docs.map(function (obj) {
 	                                                                i++;
 	                                                                var optsVal = obj.hash + "|" + obj.file_hash;
 	                                                                return _react2.default.createElement(
@@ -54159,7 +54270,7 @@
 	                                                _react2.default.createElement(
 	                                                    'td',
 	                                                    null,
-	                                                    _react2.default.createElement('input', { name: 'delegatee', className: 'form-control col-md-4', type: 'text', placeholder: 'Delegatee Address' })
+	                                                    _react2.default.createElement('input', { name: 'delegatee_addr', className: 'form-control col-md-4', type: 'text', placeholder: 'Delegatee Address' })
 	                                                )
 	                                            ),
 	                                            _react2.default.createElement(
@@ -54258,22 +54369,22 @@
 	    return DimensionForm;
 	}(_react.Component);
 	
-	var DimensionAttributeForm = function (_React$Component) {
-	    _inherits(DimensionAttributeForm, _React$Component);
+	var DimensionAttributeForm = function (_React$Component2) {
+	    _inherits(DimensionAttributeForm, _React$Component2);
 	
 	    function DimensionAttributeForm(props) {
 	        _classCallCheck(this, DimensionAttributeForm);
 	
-	        var _this4 = _possibleConstructorReturn(this, (DimensionAttributeForm.__proto__ || Object.getPrototypeOf(DimensionAttributeForm)).call(this, props));
+	        var _this6 = _possibleConstructorReturn(this, (DimensionAttributeForm.__proto__ || Object.getPrototypeOf(DimensionAttributeForm)).call(this, props));
 	
-	        _this4.state = {
+	        _this6.state = {
 	            file_attrs: [],
 	            inputs: ['input-0'],
 	            tmpFile: '',
 	            showModal: false,
 	            pubKey: localStorage.getItem("pubKey")
 	        };
-	        return _this4;
+	        return _this6;
 	    }
 	
 	    _createClass(DimensionAttributeForm, [{
@@ -54327,65 +54438,116 @@
 	    function IdentityDimensions(props) {
 	        _classCallCheck(this, IdentityDimensions);
 	
-	        var _this5 = _possibleConstructorReturn(this, (IdentityDimensions.__proto__ || Object.getPrototypeOf(IdentityDimensions)).call(this, props));
+	        var _this7 = _possibleConstructorReturn(this, (IdentityDimensions.__proto__ || Object.getPrototypeOf(IdentityDimensions)).call(this, props));
 	
-	        _this5.state = {
+	        _this7.state = {
 	
 	            pubKey: localStorage.getItem("pubKey"),
-	            showModal: false,
 	
-	            //********************
+	            //Dimensions pulled from DT
+	            iDimensions: [],
+	            //prop dataHandler passes activeDimension to DimensionForm
+	            activeDimension: {},
+	
 	            //inputs are mapped to add additional DimensionAttributeForm instances
 	            inputs: ['input-0'],
-	            //tmp file always holds current input, ex: 'input-0'
-	            tmpFile: '',
-	
-	            //CONTROLLERS FOR A DIMENSION* (entered when creating dimension)
-	            control_list: [],
-	
 	            //as we add more Dimension attributes, we end up shifting tmpFile and inputs
-	            //so file_attrs will look like: [ {input-0: IPFS_hash0}, {input-1: IPFS_hash1} ]
+	            //tmp file always holds current input label, ex: 'input-0'
+	            tmpFile: '',
+	            //file_attrs will look like: [ {input-0: IPFS_hash0}, {input-1: IPFS_hash1} ]
 	            file_attrs: [],
 	
-	            controlled_assets: [],
-	            controlled_assets_label: [],
+	            //delegations array is pushed if 'addMore' is clicked
+	            delegations: ['input1-0'],
 	
 	            //contains actual asset data from DT
+	            controlled_assets: [],
+	            controlled_assets_label: [],
 	            own_assets: [],
 	            owned_assets_label: [],
 	
-	            iDimensions: [],
+	            showModal: false,
 	
-	            //delegations: [],
 	            showDetails: false,
 	
-	            //prop dataHandler passes activeDimension to DimensionForm
-	            activeDimension: {}
+	            //Controllers for dimension (not necessarily COID controllers)
+	            control_list: []
 	
 	        };
-	        _this5.showDimensionHandler = _this5.showDimensionHandler.bind(_this5);
-	        _this5.handleHideModal = _this5.handleHideModal.bind(_this5);
-	        _this5.onFieldChange = _this5.onFieldChange.bind(_this5);
+	        _this7.showDimensionHandler = _this7.showDimensionHandler.bind(_this7);
+	        _this7.handleHideModal = _this7.handleHideModal.bind(_this7);
+	        _this7.onFieldChange = _this7.onFieldChange.bind(_this7);
 	
-	        return _this5;
+	        return _this7;
 	    }
+	    //*****************************************************************************
+	    //watch for inputs on control_list
+	
 	
 	    _createClass(IdentityDimensions, [{
 	        key: 'onFieldChange',
 	        value: function onFieldChange(inputField, e) {
 	            var multipleValues = {};
-	            if (inputField == "name" || inputField == "signature" || inputField == "message") {
-	                this.setState(_defineProperty({}, inputField, e.target.value));
-	            } else {
-	                multipleValues[inputField] = e;
-	                this.setState(multipleValues);
-	            }
+	            multipleValues[inputField] = e;
+	            this.setState(multipleValues);
 	        }
+	        //*****************************************************************************
+	
 	    }, {
-	        key: 'handleSelection',
-	        value: function handleSelection() {
-	            //make sure that we are interacting with proper asset
+	        key: 'hideHandler',
+	        value: function hideHandler() {
+	            this.setState({ showDetails: false });
 	        }
+	        //*****************************************************************************
+	        //used to show activeDimension, is fired onClick
+	
+	    }, {
+	        key: 'showDimensionHandler',
+	        value: function showDimensionHandler(e) {
+	            e.preventDefault();
+	            this.setState({
+	                showDetails: true,
+	                activeDimension: this.dataHandler($(e.target).attr('data-index'))
+	            });
+	        }
+	        //*****************************************************************************
+	        //used to set activeDimension inside showDimensionHandler
+	        //When we render a DimensionForm, dataHandler={this.state.activeDimension}
+	
+	    }, {
+	        key: 'dataHandler',
+	        value: function dataHandler(index) {
+	            return this.state.iDimensions[index];
+	        }
+	        //*****************************************************************************
+	        /*if this.state.showModal is true UploadIpfsFile component is rendered,
+	            and passed the prop dataHandler={this.getFileDetails.bind(this)}*/
+	
+	    }, {
+	        key: 'getFileDetails',
+	        value: function getFileDetails(filedata) {
+	            var obj = _defineProperty({}, this.state.tmpFile, filedata);
+	            this.setState({ file_attrs: this.state.file_attrs.concat([obj]) });
+	        }
+	        //*****************************************************************************
+	        //Passed as a prop to DimensionAttributeForm
+	
+	    }, {
+	        key: 'handleShowModal',
+	        value: function handleShowModal(e) {
+	            this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
+	        }
+	        //is passed to UploadIpfsFile so it knows when to close the modal window
+	        //method also exists in DimensionForm
+	
+	    }, {
+	        key: 'handleHideModal',
+	        value: function handleHideModal() {
+	            this.setState({ showModal: false });
+	        }
+	        //*****************************************************************************
+	        // Get DT Dimension Data. Call this in componentWillMount
+	
 	    }, {
 	        key: 'getDimensions',
 	        value: function getDimensions() {
@@ -54398,6 +54560,7 @@
 	                "dimensionName": "FINANCES",
 	                "pubkey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
 	                "coidAddr": "7924DBF02BE23923790C5D82F8A39925F516CA0F",
+	                "dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
 	                "ID": 3432423423,
 	                "address": "HEXSTRING_address",
 	                "owner": [],
@@ -54411,6 +54574,7 @@
 	                "dimensionName": "EDUCATION",
 	                "pubkey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
 	                "coidAddr": "872EDE47AEBC33CAD4AF1B8DA861E78D8E99BC56",
+	                "dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
 	                "ID": 69696969,
 	                "address": "HEXSTRING_address",
 	                "owner": [],
@@ -54472,18 +54636,15 @@
 	            //                         // }
 	            //                     }.bind(this),
 	            //                 })
-	
 	            //             }//end for(dimensions.length)
 	
 	            //             _this.setState({ iDimensions: theArray })
-	
 	
 	            //         }//end if(data.length > 0)
 	
 	            //     }//end success callback
 	            // })
 	        } //end getDimensions
-	
 	
 	    }, {
 	        key: 'componentWillMount',
@@ -54552,63 +54713,14 @@
 	
 	            }); //getOwnedAssets
 	        } //componentWillMount
-	        //***************************************************************************************************
 	
-	        //*****************************************************************************
-	
-	    }, {
-	        key: 'hideHandler',
-	        value: function hideHandler() {
-	            this.setState({ showDetails: false });
-	        }
-	        //used to show activeDimension, is fired onClick
-	
-	    }, {
-	        key: 'showDimensionHandler',
-	        value: function showDimensionHandler(e) {
-	            e.preventDefault();
-	            this.setState({
-	                showDetails: true,
-	                activeDimension: this.dataHandler($(e.target).attr('data-index'))
-	            });
-	        }
-	        //used to set activeDimension inside showDimensionHandler
-	        //When we render a DimensionForm, dataHandler={this.state.activeDimension}
-	
-	    }, {
-	        key: 'dataHandler',
-	        value: function dataHandler(index) {
-	            return this.state.iDimensions[index];
-	        }
-	        //*****************************************************************************
-	
-	        /*if this.state.showModal is true UploadIpfsFile component is rendered,
-	            and passed the prop dataHandler={this.getFileDetails.bind(this)}*/
-	
-	    }, {
-	        key: 'getFileDetails',
-	        value: function getFileDetails(filedata) {
-	            var obj = _defineProperty({}, this.state.tmpFile, filedata);
-	            this.setState({ file_attrs: this.state.file_attrs.concat([obj]) });
-	        }
-	        //*****************************************************************************
-	        //Passed as a prop to DimensionAttributeForm
-	
-	    }, {
-	        key: 'handleShowModal',
-	        value: function handleShowModal(e) {
-	            this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-	        }
-	        //is passed to UploadIpfsFile so it knows when to close the modal window
-	        //method also exists in DimensionForm
-	
-	    }, {
-	        key: 'handleHideModal',
-	        value: function handleHideModal() {
-	            this.setState({ showModal: false });
-	        }
-	        //*****************************************************************************
-	
+	        /*****************************************************************************
+	        /*****************************************************************************
+	         * IN ORDER TO ADD DIMENSION ATTRIBUTES, we have these functions
+	         * 1) define getLabelValues
+	         * 2) call getLabelValues inside prepareAttributes (where we group descriptors and attributes)
+	         * (use appendAttribute to make sure max limit isnt hit) ????
+	        *****************************************************************************/
 	        //used for DimensionAttributeForm to prepare attributes
 	
 	    }, {
@@ -54625,7 +54737,6 @@
 	            });
 	            return labelVals;
 	        }
-	
 	        /*file_attrs looks like: [{key: "IPFS_hash | shaHash}]
 	            [{"input-0":"QmPcY8sJ8hSfWhzqX8iLzQEbgiESjqTaeEEoJUrZwhLNk5|9bb7e24956771c4f1bbfe5eceff9e9e1457fafa5d3af3a56f4d7cef0bdd509dc"},
 	            {"input-1":"QmUJGfdKUCFiL2cKE3dcVFL5Q6PsvcWJSPxff5snJ46tuk|28a6ce8b3c55a60f5923cb87e5fd1c47decb973d1973f047f722141460fdad71"},]*/
@@ -54649,43 +54760,100 @@
 	            }
 	            return newArr;
 	        }
-	        //when we click add more, a new value is pushed into this.state.inputs,
+	        //*****************************************************************************
+	        //when we click Add More, a new value is pushed into this.state.inputs,
 	        //and a new DimensionAttributeForm is rendered
 	
 	    }, {
-	        key: 'appendInput',
-	        value: function appendInput() {
+	        key: 'appendAttribute',
+	        value: function appendAttribute() {
 	            var inputLen = this.state.inputs.length;
 	            if (inputLen < 10) {
 	                var newInput = 'input-' + inputLen;
 	                this.setState({ inputs: this.state.inputs.concat([newInput]) });
+	                //inputs: input-0
 	            }
-	            console.log("inputs: " + this.state.inputs);
 	        }
-	        //*********************************************************************************************
+	        /*****************************************************************************
+	        /*****************************************************************************
+	         * SAME PROCESS TO ADD DELEGATIONS
+	         * 1) define getDelegationInputValues
+	         * 2) getDelegationInputValues inside prepareDelegationDistribution
+	        *****************************************************************************/
+	
+	    }, {
+	        key: 'getDelegationInputValues',
+	        value: function getDelegationInputValues() {
+	            var labelVals = [];
+	            var _this = this;
+	            //in DimensionForm
+	            $.each($("input[name^='delegatee-']"), function (obj) {
+	                var value = $.trim($(this).val());
+	                if (value.length > 0) {
+	                    labelVals.push(_defineProperty({}, $(this).attr('name').replace("label-", ""), value));
+	                }
+	            });
+	            return labelVals;
+	            //returns an object array: [{"delegatee-input1-0":"pubkey"},{"delegatee-input1-0":"2"}
+	        }
+	        //*****************************************************************************
+	        //prepare the delegations object array
+	
+	    }, {
+	        key: 'prepareDelegationDistribution',
+	        value: function prepareDelegationDistribution() {
+	            var labels = this.getDelegationInputValues();
+	            var delegatee = [];
+	            var delegatee_token_quantity = [];
+	            for (var i = 0; i < labels.length; i += 2) {
+	                for (var key in labels[i]) {
+	                    delegatee.push(labels[i][key]);
+	                    delegatee_token_quantity.push(labels[i + 1][key]);
+	                }
+	            }
+	            var delegationsArray = [];
+	            //{ owner: "", delegatee: "", amount: "", dimension: "", expiration: "", accessCategories: "" },
+	            if (delegatee.length == delegatee_token_quantity.length) {
+	                for (var i = 0; i < delegatee.length; i++) {
+	                    var delegationObj = {};
+	                    delegationObj.owner = "COID_OWNER"; // EDIT!!!!!!!!!!
+	                    delegationObj.delegatee = delegatee[i];
+	                    delegationObj.amount = delegatee_token_quantity[i];
+	                    delegationObj.accessCategories = "";
+	                    delegationsArray.push(delegationObj);
+	                }
+	                //console.log("delegationObj: " + JSON.stringify(delegationsArray))
+	            }
+	            return delegationsArray;
+	        }
+	        //*****************************************************************************
+	
+	    }, {
+	        key: 'appendDelegation',
+	        value: function appendDelegation() {
+	            var inputLen = this.state.delegations.length;
+	            console.log("delegations length: " + inputLen);
+	            if (inputLen < 10) {
+	                var newInput1 = 'input1-' + inputLen;
+	                this.setState({ delegations: this.state.delegations.concat([newInput1]) });
+	            }
+	        }
+	        //*****************************************************************************
+	        //*****************************************************************************
+	
 	        //called onClick of 'Create Dimension' button
-	        //We need: pubkey, uniqueId, typeInput (name), descriptors&attributes, flag
 	
 	    }, {
 	        key: 'createDimension',
 	        value: function createDimension(e) {
 	            e.preventDefault();
 	
-	            var dimensionName = void 0;
+	            //let delegatee = $("input[name^='delegatee_addr']").val()
 	
-	            $.each($("input[name^='dimensionName']"), function (obj) {
-	                var value = $.trim($(this).val());
-	                if (value.length > 0) {
-	                    dimensionName = value;
-	                }
-	                console.log("got dimensionName: " + dimensionName);
-	            });
+	            var dimensionName = $("input[name^='dimensionName']").val();
 	
 	            var attributes = this.prepareAttributes();
-	            console.log("attributes: " + attributes + "\n size: " + attributes.length);
-	            console.log("attributes[0]: " + attributes[0]);
-	            console.log("attributes[0][0]: " + attributes[0][0]); //going to give desc1111
-	            console.log("attributes[0][1]: " + attributes[0][1]);
+	            console.log("attributes: " + attributes);
 	
 	            var objArray = [];
 	            for (var i = 0; i < attributes.length; i++) {
@@ -54698,11 +54866,14 @@
 	            }
 	
 	            var json = {};
+	            if (dimensionName) {
+	                json.dimensionName = dimensionName;
+	            }
 	            json.data = objArray;
+	            json.delegations = this.prepareDelegationDistribution();
 	            json.pubKey = localStorage.getItem("pubKey");
 	            json.controllers = this.state.control_list;
 	            json.flag = 0;
-	            json.dimensionName = dimensionName;
 	
 	            var selected_asset = $("#assetSelect option:selected").text();
 	            this.state.own_assets.forEach(function (asset, index) {
@@ -54713,9 +54884,6 @@
 	                    json.controllers = asset.asset_controllers, json.owners = asset.asset_owners;
 	                }
 	            });
-	
-	            //TODO: add ability to delegate on dimension creation
-	            json.delegations = [];
 	
 	            console.log("JSON: " + JSON.stringify(json));
 	
@@ -54746,29 +54914,23 @@
 	                    // do something
 	                }
 	            });
-	        }
+	        } //end creationDimension
+	
+	        //*****************************************************************************
+	
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _this6 = this,
+	            var _this8 = this,
 	                _React$createElement,
 	                _React$createElement2;
 	
-	            //console.log("\nthis.state: " + JSON.stringify(this.state))
-	
-	            var owned_label = this.state.owned_assets_label;
-	
-	            var controlled_label = this.state.controlled_assets_label;
-	
 	            var _that = this;
 	
-	            var syle = {
-	                marginRight: '15px'
-	            };
+	            var syle = { marginRight: '15px' };
 	
-	            var table = {
-	                margin: '0 auto'
-	            };
+	            var table = { margin: '0 auto' };
+	
 	            var inputAttrs = {
 	                addKeys: [13, 188], // Enter and comma
 	                inputProps: {
@@ -54829,8 +54991,8 @@
 	                                    'tbody',
 	                                    null,
 	                                    function () {
-	                                        if ($.isArray(_this6.state.iDimensions) && _this6.state.iDimensions.length > 0) {
-	                                            return _this6.state.iDimensions.map(function (el, i) {
+	                                        if ($.isArray(_this8.state.iDimensions) && _this8.state.iDimensions.length > 0) {
+	                                            return _this8.state.iDimensions.map(function (el, i) {
 	                                                return _react2.default.createElement(
 	                                                    'tr',
 	                                                    { key: i },
@@ -54873,14 +55035,23 @@
 	                                'div',
 	                                null,
 	                                _react2.default.createElement(
+	                                    'h5',
+	                                    null,
+	                                    _react2.default.createElement(
+	                                        'b',
+	                                        null,
+	                                        'Select asset:'
+	                                    )
+	                                ),
+	                                _react2.default.createElement(
 	                                    'select',
 	                                    { id: 'assetSelect', className: 'selectpicker show-tick' },
 	                                    _react2.default.createElement(
 	                                        'optgroup',
 	                                        { label: 'Owned' },
 	                                        function () {
-	                                            if (owned_label.length > 0) {
-	                                                return owned_label.map(function (label, i) {
+	                                            if (_this8.state.owned_assets_label.length > 0) {
+	                                                return _this8.state.owned_assets_label.map(function (label, i) {
 	                                                    var val = label.split('.'); //get rid of the .json
 	                                                    return _react2.default.createElement(
 	                                                        'option',
@@ -54901,8 +55072,8 @@
 	                                        'optgroup',
 	                                        { label: 'Controlled' },
 	                                        function () {
-	                                            if (controlled_label.length > 0) {
-	                                                return controlled_label.map(function (label, i) {
+	                                            if (_this8.state.controlled_assets_label.length > 0) {
+	                                                return _this8.state.controlled_assets_label.map(function (label, i) {
 	                                                    var val = label.split('.'); //get rid of the .json
 	                                                    return _react2.default.createElement(
 	                                                        'option',
@@ -54921,7 +55092,6 @@
 	                                    )
 	                                )
 	                            ),
-	                            _react2.default.createElement('br', null),
 	                            _react2.default.createElement(
 	                                'div',
 	                                { id: 'SubmitContainer' },
@@ -54940,14 +55110,14 @@
 	                                    ),
 	                                    _react2.default.createElement(
 	                                        'div',
-	                                        null,
+	                                        { className: 'form-group' },
 	                                        _react2.default.createElement(
 	                                            'label',
 	                                            { htmlFor: 'unique_id' },
 	                                            'Enter descriptor(s) and attribute(s):'
 	                                        ),
 	                                        this.state.inputs.map(function (input) {
-	                                            return _react2.default.createElement(DimensionAttributeForm, { handleShowModal: _this6.handleShowModal.bind(_this6), min: _this6.state.subform_cont, max: '10', key: input, labelref: input });
+	                                            return _react2.default.createElement(DimensionAttributeForm, { handleShowModal: _this8.handleShowModal.bind(_this8), min: _this8.state.subform_cont, max: '10', key: input, labelref: input });
 	                                        })
 	                                    ),
 	                                    _react2.default.createElement(
@@ -54958,7 +55128,34 @@
 	                                            { className: 'col-md-offset-6 col-md-6 ' },
 	                                            _react2.default.createElement(
 	                                                'button',
-	                                                { type: 'button', className: 'btn btn-info pull-right', style: syle, onClick: this.appendInput.bind(this) },
+	                                                { type: 'button', className: 'btn btn-info pull-right', style: syle, onClick: this.appendAttribute.bind(this) },
+	                                                _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
+	                                                'Add More'
+	                                            )
+	                                        )
+	                                    ),
+	                                    _react2.default.createElement(
+	                                        'div',
+	                                        { className: 'form-group' },
+	                                        _react2.default.createElement(
+	                                            'label',
+	                                            { htmlFor: 'control_dist' },
+	                                            'Enter Delegations and their delegated control token(s).'
+	                                        ),
+	                                        this.state.delegations.map(function (input) {
+	                                            return _react2.default.createElement(DelegationForm, { handleShowModal: _this8.handleShowModal.bind(_this8), min: _this8.state.subform_cont, max: '10', key: input, labelref: input });
+	                                        })
+	                                    ),
+	                                    _react2.default.createElement(
+	                                        'div',
+	                                        { className: 'form-group' },
+	                                        _react2.default.createElement(
+	                                            'div',
+	                                            { className: 'col-md-offset-6 col-md-6 ' },
+	                                            _react2.default.createElement('p', null),
+	                                            _react2.default.createElement(
+	                                                'button',
+	                                                { type: 'button', className: 'btn btn-info pull-right', style: syle, onClick: this.appendDelegation.bind(this) },
 	                                                _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
 	                                                'Add More'
 	                                            )
@@ -54973,7 +55170,7 @@
 	                                            'Enter Controller(s).'
 	                                        ),
 	                                        _react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs, { value: this.state.control_list, onChange: function onChange(e) {
-	                                                _this6.onFieldChange("control_list", e);
+	                                                _this8.onFieldChange("control_list", e);
 	                                            } }))
 	                                    ),
 	                                    _react2.default.createElement(

@@ -1,97 +1,93 @@
 {
-    "ports": [5050,5051,5052],
-    "GK_CONFIG":
-    {
-        "TARGET": "http://10.100.99.207:3000/",
-        "ENDPOINT":"/gatekeeper"
-    },
-    "BALLOT_CONFIG":
-    {
-        "TARGET": "http://10.100.99.207:8082/",
-        "ENDPOINT": "/vote"
-    },
-    "MY_GK_CONFIG":
-    {
-        "TARGET": "http://10.100.99.207:3002/",
-        "ENDPOINT": "/MyGatekeeper"
-    },
-    "MY_COID_CONFIG":
-    {
-        "TARGET": "http://10.100.99.207:3012/",
+	"ALLOWED_ORIGINS": "*",
+	"ports": [
+		5050,
+		5051,
+		5052
+	],
+	"GK_CONFIG": {
+		"TARGET": "http://10.100.99.207:3000/",
+		"ENDPOINT": "/gatekeeper"
+	},
+	"BALLOT_CONFIG": {
+		"TARGET": "http://10.100.99.207:8082/",
+		"ENDPOINT": "/vote"
+	},
+	"MY_GK_CONFIG": {
+		"TARGET": "http://10.100.99.207:3002/",
+		"ENDPOINT": "/MyGatekeeper"
+	},
+	"MY_COID_CONFIG": {
+		"TARGET": "http://10.100.99.207:3012/",
 		"TWIN_ENDPOINTS": {
-						"getControllers" : "/MyCOID/getControllers",
-						"revokeControlDelegation": "/MyCOID/revokeControlDelegation",
-						"spendMyTokens": "/MyCOID/spendMyTokens",
-						"myAmount": "/MyCOID/myAmount",
-						"delegate": "/MyCOID/delegate",
-						"changeTokenController": "/MyCOID/changeTokenController",
-						"amountDelegated": "/MyCOID/amountDelegated",
-						"addController": "/MyCOID/addController",
-						"removeController": "/MyCOID/removeController",
-						"addRecoveryID": "/MyCOID/addRecoveryID",
-						"myTokenAmount": "/MyCOID/myTokenAmount",
-						"addOwner": "/MyCOID/addOwner",
-						"removeOwner": "/MyCOID/removeOwner",
-						"giveTokens": "/MyCOID/giveTokens",
-						"getControllerList": "/MyCOID/getControllerList",
-						"getControllerTokens": "/MyCOID/getControllerTokens"
-					},
-        "NEW_ENDPOINTS": {
-						"getControllers" : "/getControllers",
-						"revokeControlDelegation": "/revokeControlDelegation",
-						"spendMyTokens": "/spendMyTokens",
-						"myAmount": "/myAmount",
-						"delegate": "/delegate",
-						"changeTokenController": "/changeTokenController",
-						"amountDelegated": "/amountDelegated",
-						"addController": "/addController",
-						"removeController": "/removeController",
-						"addRecoveryID": "/addRecoveryID",
-						"myTokenAmount": "/myTokenAmount",
-						"addOwner": "/addOwner",
-						"removeOwner": "/removeOwner",
-						"giveTokens": "/giveTokens",
-						"getControllerList": "/getControllerList",
-						"getControllerTokens": "/getControllerTokens"
-					}
-    },
-    "IDENTITY_DIMENSION_CONFIG":
-    {
-        "TARGET": "http://10.100.99.207:8001/",
-        "TWIN_ENDPOINTS": {
-						"CreateDimension": "/dimensions/CreateDimension",
-						"RemoveDimension": "/dimensions/RemoveDimension",
-						"addEntry": "/dimensions/addEntry",
-						"removeEntry": "/dimensions/removeEntry",
-						"updateEntry": "/dimensions/updateEntry",
-						"getDimensionAddress": "/dimensions/getDimensionAddress",
-						"delegate": "/dimensions/delegate",
-						"controllerExists": "/dimensions/controllerExists",
-						"addDelegation": "/dimensions/addDelegation",
-						"revokeDelegation": "/dimensions/revokeDelegation",
-						"removeController": "/dimensions/removeController",
-						"spendTokens": "/dimensions/spendTokens",
-						"delegateeAmount": "/dimensions/delegateeAmount",
-						"addController": "/dimensions/addController"
-					},
-		"NEW_ENDPOINTS":{
-						"CreateDimension": "/CreateDimension",
-						"RemoveDimension": "/RemoveDimension",
-						"addEntry": "/addEntry",
-						"removeEntry": "/removeEntry",
-						"updateEntry": "/updateEntry",
-						"getDimensionAddress": "/getDimensionAddress",
-						"delegate": "/delegate",
-						"controllerExists": "/controllerExists",
-						"addDelegation": "/addDelegation",
-						"revokeDelegation": "/revokeDelegation",
-						"removeController": "/removeController",
-						"spendTokens": "/spendTokens",
-						"delegateeAmount": "/delegateeAmount",
-						"addController": "/addController"
-					}
-    },
-
-    "ALLOWED_ORIGINS":"*"
+			"getControllers": "/MyCOID/getControllers",
+			"revokeControlDelegation": "/MyCOID/revokeControlDelegation",
+			"spendMyTokens": "/MyCOID/spendMyTokens",
+			"myAmount": "/MyCOID/myAmount",
+			"delegate": "/MyCOID/delegate",
+			"changeTokenController": "/MyCOID/changeTokenController",
+			"amountDelegated": "/MyCOID/amountDelegated",
+			"addController": "/MyCOID/addController",
+			"removeController": "/MyCOID/removeController",
+			"addRecoveryID": "/MyCOID/addRecoveryID",
+			"myTokenAmount": "/MyCOID/myTokenAmount",
+			"addOwner": "/MyCOID/addOwner",
+			"removeOwner": "/MyCOID/removeOwner",
+			"giveTokens": "/MyCOID/giveTokens",
+			"getControllerList": "/MyCOID/getControllerList",
+			"getControllerTokens": "/MyCOID/getControllerTokens"
+		},
+		"NEW_ENDPOINTS": {
+			"getControllers": "/getControllers",
+			"revokeControlDelegation": "/revokeControlDelegation",
+			"spendMyTokens": "/spendMyTokens",
+			"myAmount": "/myAmount",
+			"delegate": "/delegate",
+			"changeTokenController": "/changeTokenController",
+			"amountDelegated": "/amountDelegated",
+			"addController": "/addController",
+			"removeController": "/removeController",
+			"addRecoveryID": "/addRecoveryID",
+			"myTokenAmount": "/myTokenAmount",
+			"addOwner": "/addOwner",
+			"removeOwner": "/removeOwner",
+			"giveTokens": "/giveTokens",
+			"getControllerList": "/getControllerList",
+			"getControllerTokens": "/getControllerTokens"
+		}
+	},
+	"IDENTITY_DIMENSION_CONFIG": {
+		"TARGET": "http://10.100.99.207:8001/",
+		"TWIN_ENDPOINTS": {
+			"CreateDimension": "/dimensions/CreateDimension",
+			"RemoveDimension": "/dimensions/RemoveDimension",
+			"addEntry": "/dimensions/addEntry",
+			"removeEntry": "/dimensions/removeEntry",
+			"updateEntry": "/dimensions/updateEntry",
+			"getDimensionAddress": "/dimensions/getDimensionAddress",
+			"delegate": "/dimensions/delegate",
+			"controllerExists": "/dimensions/controllerExists",
+			"addDelegation": "/dimensions/addDelegation",
+			"revokeDelegation": "/dimensions/revokeDelegation",
+			"removeController": "/dimensions/removeController",
+			"spendTokens": "/dimensions/spendTokens",
+			"delegateeAmount": "/dimensions/delegateeAmount",
+			"addController": "/dimensions/addController"
+		},
+		"NEW_ENDPOINTS": {
+			"CreateDimension": "/CreateDimension",
+			"RemoveDimension": "/RemoveDimension",
+			"addEntry": "/addEntry",
+			"removeEntry": "/removeEntry",
+			"updateEntry": "/updateEntry",
+			"getDimensionAddress": "/getDimensionAddress",
+			"addDelegation": "/delegate",
+			"controllerExists": "/controllerExists",
+			"revokeDelegation": "/revokeDelegation",
+			"removeController": "/removeController",
+			"spendTokens": "/spendTokens",
+			"delegateeAmount": "/delegateeAmount",
+			"addController": "/addController"
+		}
+	}
 }
-

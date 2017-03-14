@@ -90,16 +90,17 @@ var TwinConnector = function () {
 
 } //end var notifier
 
+//********************************************* */
+
 var connector = new TwinConnector();
 
+//********************************************* */
 
 var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
-    //get the contract:
     this.chain = 'primaryAccount'
     this.erisdburl = chainConfig.chainURL
     this.contractData = require('./epm.json')
     var iDimensionCtrlContractAddress = iDimensionCtrlContractAddress
-    console.log("iDimCtrl contract addr: " + iDimensionCtrlContractAddress)
     this.contractAbiAddress = this.contractData['IdentityDimensionControl'];
     this.erisAbi = JSON.parse(fs.readFileSync("./abi/" + this.contractAbiAddress));
     this.accountData = require("./accounts.json");
@@ -114,7 +115,9 @@ var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
             callback(error, result);
         })
     }
-    //first function:
+    //***********************************************************************************************
+    //MUST BE CALLED FIRST!!!!
+    //THIS FUNCTION IS CALLED BY GATEKEEPER app(s) when setting new COID contract data
     this.Instantiation = function (formdata, callback) {
 
         console.log("formdata inside Instantiation: " + JSON.stringify(formdata))
@@ -126,14 +129,16 @@ var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
             callback(error, result);
         })
     }
-    //result is boolean success from the contract
+    //***********************************************************************************************
+    //Contract returns, (bool success, bytes32 callerHash, address test)
     this.CreateDimension = function (formdata, callback) {
-        //create a json
-        console.log("\n fordata: \n" + JSON.stringify(formdata))
 
+        //create a json
         var log = {
             "dimension": {
                 "dimensionName": "",
+                "coidAddr": "",
+                "dimensionCtrlAddr": "",
                 "address": "",
                 "uniqueID": "",
                 "pubKey": "",
@@ -150,6 +155,8 @@ var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
                 ]
             }
         }
+        var coidAddr = formdata.coidAddr;
+        var dimensionCtrlAddr = formdata.dimensionCtrlAddr
         var pubKey = formdata.pubKey;
         var uniqueID = formdata.uniqueId;
         var typeInput = formdata.dimensionName;
@@ -169,11 +176,8 @@ var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
         console.log("TYPE :" + typeInput);
         console.log("ID :" + uniqueID);
 
-        console.log("data.length: " + data.length)
-
         self.contract.CreateDimension(pubKey, uniqueID, typeInput, flag, function (error, result) {
             if (result[0]) {
-                console.log("createDimension return: " + result)
                 console.log("made it create");
                 log.dimension.dimensionName = typeInput;
                 log.dimension.address = result[2];
@@ -185,7 +189,7 @@ var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
                 log.dimension.delegations = delegations;
                 log.dimension.data = data;
 
-                console.log("log: \n" + JSON.stringify(log))
+                console.log("dimension JSON to be created: \n" + JSON.stringify(log))
 
                 //change contract using calls
 
@@ -244,6 +248,7 @@ var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
             //            callback(error,result);
         })
     }
+    //***********************************************************************************************
 
     //result is boolean success from the contract
     this.RemoveDimension = function (formdata, callback) {
@@ -449,6 +454,8 @@ var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
 
     //result is the bool success
     this.delegate = function (formdata, callback) {
+        console.log("hit delegate")
+        console.log("formdata: \n" + JSON.stringify(formdata))
 
         for (var i = 0; i < formdata.length; i++) {
 
@@ -481,7 +488,7 @@ var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
                 }
                 else {
                     callback(error, result);
-                    i = formdata.length;
+                    //i = formdata.length;
                     console.log("Error occurred while delegating");
                 }
             })
@@ -708,14 +715,14 @@ for (let endpoint in IdentityConfig) {
     console.log("endpoint: " + endpoint)
     app.post('/' + endpoint, function (req, res) {
 
-        console.log("POSTED ENDPOINT: " + endpoint);
+        console.log("\nPOSTED ENDPOINT: " + endpoint);
         console.log("req: " + JSON.stringify(req.body))
 
         var formdata = req.body
 
         //their contract address
         var contractAddress = formdata.dimensionCtrlAddr;
-        console.log("dimensionCtrl address: " + contractAddress)
+        console.log("\ndimensionCtrl address: " + contractAddress)
         //instantiate their IdentityDimensionControl
         var dimension = new IdentityDimensionControl(contractAddress)
 
@@ -730,7 +737,7 @@ for (let endpoint in IdentityConfig) {
         toExecute = toExecute + "})"
 
         //for debugging
-        console.log("calling eval on: " + toExecute);
+        console.log("\ncalling eval on: " + toExecute);
 
         //evaulate the given function
         eval(toExecute, function (err, res) {

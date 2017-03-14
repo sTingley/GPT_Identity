@@ -2,27 +2,11 @@ import React, { Component } from 'react';
 import TagsInput from 'react-tagsinput';
 import UploadIpfsFile from './UploadIpfsFile.jsx'
 
-
-class DelegationForm extends React.Component {
+class DimensionDelegationForm extends React.Component {
 
     constructor(props) {
         super(props)
-        this.state = {
-
-            delegatee_list: [],
-            delegatee_tokens: [],
-
-            //showModal: false
-        };
-        this.maxDelegations = 10;
-        this.handleHideModal = this.handleHideModal.bind(this);
-    }
-    handleShowModal(e) {
-        this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-    }
-
-    handleHideModal() {
-        this.setState({ showModal: false });
+        this.maxDelegations = this.props.max
     }
     render() {
         var style = {
@@ -43,7 +27,27 @@ class DelegationForm extends React.Component {
                             </tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+        );
+    }
+};
 
+class DimensionAttributeForm extends React.Component {
+
+    constructor(props) {
+        super(props)
+        this.maxDelegations = this.props.max
+    }
+    render() {
+        return (
+            <div className="form-group col-md-12">
+                <div className="col-md-10">
+                    <label htmlFor="unique_id_attrs"> Dimension Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research". </label>
+                    <input name={'label-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Descriptor" />
+                </div>
+                <div className="col-md-2">
+                    <button type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn btn-warning pull-right"><span className="glyphicon glyphicon-upload"></span>Upload File</button>
                 </div>
             </div>
         );
@@ -407,44 +411,6 @@ class DimensionForm extends Component {
 }
 
 
-class DimensionAttributeForm extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            file_attrs: [],
-            inputs: ['input-0'],
-            tmpFile: '',
-            showModal: false,
-            pubKey: localStorage.getItem("pubKey")
-        };
-    }
-
-    handleShowModal(e) {
-        this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-    }
-
-    handleHideModal() {
-        this.setState({ showModal: false });
-    }
-
-    render() {
-        return (
-            <div className="form-group col-md-12">
-                <div className="col-md-10">
-                    <label htmlFor="unique_id_attrs"> Dimension Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research". </label>
-                    <input name={'label-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Descriptor" />
-                </div>
-                <div className="col-md-2">
-                    <button type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn btn-warning pull-right"><span className="glyphicon glyphicon-upload"></span>Upload File</button>
-                </div>
-            </div>
-        );
-    }
-
-};
-
-
 class IdentityDimensions extends Component {
 
     constructor(props) {
@@ -458,7 +424,7 @@ class IdentityDimensions extends Component {
             //prop dataHandler passes activeDimension to DimensionForm
             activeDimension: {},
 
-            //inputs are mapped to add additional DimensionAttributeForm instances
+            //inputs array is pushed when addimg DimensionAttributeForm instances
             inputs: ['input-0'],
             //as we add more Dimension attributes, we end up shifting tmpFile and inputs
             //tmp file always holds current input label, ex: 'input-0'
@@ -739,6 +705,7 @@ class IdentityDimensions extends Component {
     prepareAttributes() {
         var newArr = [],
             labels = this.getLabelValues();
+            console.log("labelVals: " + JSON.stringify(labels))
         //labelVals: [{"input-0":"mydocument"},{"input-1":"seconddocument"}]
         for (var i = 0; i < labels.length; i++) {
             var tmpArr = [];
@@ -867,34 +834,33 @@ class IdentityDimensions extends Component {
 
         console.log("JSON: " + JSON.stringify(json))
 
-        $.ajax({
-            type: "POST",
-            url: twinUrl + 'dimensions/CreateDimension',
-            data: json,
-            success: function (result) {
-                var data = result;
-                if ($.type(result) != "object") {
-                    data = JSON.parseJSON(result)
-                }
+        // $.ajax({
+        //     type: "POST",
+        //     url: twinUrl + 'dimensions/CreateDimension',
+        //     data: json,
+        //     success: function (result) {
+        //         var data = result;
+        //         if ($.type(result) != "object") {
+        //             data = JSON.parseJSON(result)
+        //         }
 
-                console.log("response createDimenson: " + JSON.stringify(data))
+        //         console.log("response createDimenson: " + JSON.stringify(data))
 
-                console.log("data.Result: " + data.Result)
+        //         console.log("data.Result: " + data.Result)
 
-                // var dimensionAddr = data.Result[2]
-                // console.log("dimensionAddr: " + dimensionAddr)
+        //         // var dimensionAddr = data.Result[2]
+        //         // console.log("dimensionAddr: " + dimensionAddr)
 
-                //returns (bool success, bytes32 callerHash, address test)
-                //response createDimenson: {"Status":null,"Result":"true,8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,C48883966A3B2B8672CC4392C0E03758F7705C36"}
-                //get the array:
-                //data = data.data;
+        //         //returns (bool success, bytes32 callerHash, address test)
+        //         //response createDimenson: {"Status":null,"Result":"true,8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,C48883966A3B2B8672CC4392C0E03758F7705C36"}
+        //         //get the array:
+        //         //data = data.data;
 
-
-            }.bind(this),
-            complete: function () {
-                // do something
-            },
-        })
+        //     }.bind(this),
+        //     complete: function () {
+        //         // do something
+        //     },
+        // })
 
     }//end creationDimension
 
@@ -990,7 +956,7 @@ class IdentityDimensions extends Component {
                                     </div>
                                     <div className="form-group">
                                         <label htmlFor="unique_id">Enter descriptor(s) and attribute(s):</label>
-                                        {this.state.inputs.map(input => <DimensionAttributeForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+                                        {this.state.inputs.map(input => <DimensionAttributeForm handleShowModal={this.handleShowModal.bind(this)} max="10" key={input} labelref={input} />)}
                                     </div>
                                     <div className="form-group">
                                         <div className="col-md-offset-6 col-md-6 ">
@@ -1001,7 +967,7 @@ class IdentityDimensions extends Component {
                                     </div>
                                     <div className="form-group">
                                         <label htmlFor="control_dist">Enter Delegations and their delegated control token(s).</label>
-                                        {this.state.delegations.map(input => <DelegationForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+                                        {this.state.delegations.map(input => <DimensionDelegationForm max="10" key={input} labelref={input} />)}
                                     </div>
                                     <div className="form-group">
                                         <div className="col-md-offset-6 col-md-6 ">
@@ -1042,3 +1008,4 @@ class IdentityDimensions extends Component {
 export default IdentityDimensions
 
 //<IdentityDimensions dimensions={dimensions} onDelete={this.handleDeleteDimension.bind(this) } key={dimensions.ID} onClick={this.showHandler.bind(this)}/>
+//handleShowModal={this.handleShowModal.bind(this)}

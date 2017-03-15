@@ -1,14 +1,13 @@
 'use strict'
-
+const Crypto = require('./cryptoCtr.js')
 const fs = require('fs')
 const keccak_256 = require('js-sha3').keccak_256
 const configuration = require('./DimensionCtrlConfig.json')
 
-
-var PATH = configuration.PATH;
-var ControlDirectory = configuration.ControlDirectory;
-var OwnershipDirectory = configuration.OwnershipDirectory;
-var DelegateDirectory = configuration.DelegateDirectory;
+const PATH = configuration.PATH;
+const ControlDirectory = configuration.ControlDirectory;
+const OwnershipDirectory = configuration.OwnershipDirectory;
+const DelegateDirectory = configuration.DelegateDirectory;
 
 //maps ints to directories
 var flagMap = [];
@@ -16,7 +15,7 @@ flagMap[0] = OwnershipDirectory;
 flagMap[1] = ControlDirectory;
 flagMap[2] = DelegateDirectory;
 
-//Makes the user's directories in case they don't exist
+//Makes the user's directories in case they don't exist NEEDS FIXING
 var directoryManager = function (pubKey) {
     var sync = true;
 
@@ -29,7 +28,7 @@ var directoryManager = function (pubKey) {
     //TODO: CHECK -- will this cause an async error?
     //make the ownership, control and delegate folders:
     for (let i = 0; i < flagMap.length; i++) {
-        fs.existsSync(currentPath + "/" + flagMap[i]) || fs.mkdir(currentPath + "/" + flagMap[i]))
+        fs.existsSync(currentPath + "/" + flagMap[i]) || fs.mkdir(currentPath + "/" + flagMap[i]);
     }
 
     sync = false;
@@ -47,13 +46,13 @@ var DimensionCtrl = {
     //INPUT: pubKey
     getOwnedDimensions: function (req, res) {
 
-        var pubkey = req.body.pubKey;
+        var pubKey = req.body.pubKey;
 
         //call in case their folders have not been created:
         var manager = new directoryManager(pubKey);
 
         //debugging
-        console.log("INPUT, pubkey: " + pubkey)
+        console.log("INPUT, pubkey: " + pubKey)
 
         //get file path
         var filePath = PATH + "/" + keccak_256(pubKey).toUpperCase() + "/" + OwnershipDirectory;
@@ -149,7 +148,7 @@ var DimensionCtrl = {
     //flag (0 = owned, 1 = controlled, 2 = delegated)
     //fileName
     getDimension: function (req, res) {
-
+        console.log("\nHit getDimesion endpoint\n");
         //get public key
         var pubKey = req.body.pubKey;
 
@@ -188,7 +187,7 @@ var DimensionCtrl = {
             console.log("debugging...file content is: " + fileContent)
 
             fileContent = JSON.parse(fileContent)
-
+            console.log("File Sent");
             res.json(fileContent)
 
         }
@@ -274,61 +273,66 @@ var DimensionCtrl = {
         }
         else //this is a creation
         {
+            console.log("This is a CREATION command");
             var data = req.body.data; //json input
             var cryptoData = cryptoEncr.encrypt(JSON.stringify(data));
             fs.writeFile(fileName, cryptoData, (err) => {
                 if (err) {
-                    res.status(400).json({ "Error": "Unable to write message in " + fileName });
+                    res.status(400).json({ "Error": "Unable to write message in " + fileName }); console.log("This is a CREATION command AFTER ERR");
                 }
-                res.json({ "Msg": "Proposal updated successfully" });
+                else {
+                    console.log("This is a CREATION command RES.JSON");
+                    res.json({ Msg: 'Proposal updated successfully' }); console.log("This is a CREATION command AFTER RES");
+                }
             });
         }
 
     },//end setDimension
 
     //To delete a dimension
-        //INPUT: pubKey
-        //flag (0 = owned, 1 = controlled, 2 = delegated)
-        //fileName
-        deleteDimension: function (req, res) {
-            //get public key
-            var pubKey = req.body.pubKey;
+    //INPUT: pubKey
+    //flag (0 = owned, 1 = controlled, 2 = delegated)
+    //fileName
+    deleteDimension: function (req, res) {
+        //get public key
+        var pubKey = req.body.pubKey;
 
-            //get flag
-            var flag = req.body.flag;
+        //get flag
+        var flag = req.body.flag;
 
-            //get fileName
-            var fileName = req.body.fileName;
+        //get fileName
+        var fileName = req.body.fileName;
 
-            //get the directory
-            var directory = PATH + "/" + keccak_256(pubKey).toUpperCase() + "/";
-            if (flag == 0) {
-                directory = directory + OwnershipDirectory + "/" + fileName;
-            }
-            if (flag == 1) {
-                directory = directory + ControlDirectory + "/" + fileName;
-            }
-            if (flag == 2) {
-                directory = directory + DelegateDirectory + + "/" + fileName;
-            }
+        //get the directory
+        var directory = PATH + "/" + keccak_256(pubKey).toUpperCase() + "/";
+        if (flag == 0) {
+            directory = directory + OwnershipDirectory + "/" + fileName;
+        }
+        if (flag == 1) {
+            directory = directory + ControlDirectory + "/" + fileName;
+        }
+        if (flag == 2) {
+            directory = directory + DelegateDirectory + + "/" + fileName;
+        }
 
-            //debugging
-            var fileName = directory;
-            console.log("FILE NAME: " + directory)
+        //debugging
+        var fileName = directory;
+        console.log("FILE NAME: " + directory)
 
-            if (fs.existsSync(fileName)) {
-                console.log("File exists")
-                console.log(fs.existsSync(fileName))
+        if (fs.existsSync(fileName)) {
+            console.log("File exists")
+            console.log(fs.existsSync(fileName))
 
-                fs.unlinkSync(fileName);
+            fs.unlinkSync(fileName);
 
-                res.json({ "Msg": "File Deleted." })
+            res.json({ "Msg": "File Deleted." })
 
-            }
-            else {
-                res.json({ "Msg": "File Not found." })
-            }
-        }//end deleteAsset
+        }
+        else {
+            res.json({ "Msg": "File Not found." })
+        }
+    }//end deleteAsset
 
 
 } //end DimensionCtrl
+module.exports = DimensionCtrl;

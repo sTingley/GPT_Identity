@@ -306,31 +306,36 @@ var MyCOID = function (contractAddress) {
         var fileName = "MyCOID.json";
         var flag = 0;
 
-        //1. Get Current Controllers
-        theNotifier.GetAsset(pubKey, fileName, flag, function (result) {
-
-            var obj = result;
-
-            console.log("INSIDE ADD CONTROLLER: " + JSON.stringify(obj))
-            var controllers = obj.controlIdList;
-
-            console.log("CONTROLLERS: " + controllers);
-
-            //2. Modify Array
-            controllers.push(controllerHash)
-            console.log("WITH ADDED CONTROLLER HASH: " + controllers);
-            var keys = ["controlIdList"]
-            var values = []
-            values.push(controllers);
-            console.log("Array of arrays: " + values)
-
-            //3. Update
-            theNotifier.UpdateAsset(pubKey, fileName, flag, "", keys, values)
+        self.contract.addController(controllerHash,function(error,result){
+            if(err){console.log("error: " + error)}
+            if(result){console.log("result: " + result)}
         })
+
+        //1. Get Current Controllers
+        // theNotifier.GetAsset(pubKey, fileName, flag, function (result) {
+
+        //     var obj = result;
+
+        //     console.log("INSIDE ADD CONTROLLER: " + JSON.stringify(obj))
+        //     var controllers = obj.controlIdList;
+
+        //     console.log("CONTROLLERS: " + controllers);
+
+        //     //2. Modify Array
+        //     controllers.push(controllerHash)
+        //     console.log("WITH ADDED CONTROLLER HASH: " + controllers);
+        //     var keys = ["controlIdList"]
+        //     var values = []
+        //     values.push(controllers);
+        //     console.log("Array of arrays: " + values)
+
+        //     //3. Update
+        //     theNotifier.UpdateAsset(pubKey, fileName, flag, "", keys, values)
+        // })
 
         //self.contract.addController(controllerHash,function(error,result)
         //{
-        //    callback(error,result)
+           callback(error,result)
         //})
     }
 

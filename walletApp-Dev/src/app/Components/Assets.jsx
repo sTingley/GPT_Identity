@@ -435,8 +435,10 @@ class Assets extends Component {
 
 				//DEBUGGING:
 				console.log("getOwnedAssets result: " + data);
+				var assetData = []
 
 				if (data.length > 0) {
+					
 					//loop through OWNED assets
 					for (let i = 0; i < data.length; i++) {
 						//AJAX each asset:
@@ -463,18 +465,20 @@ class Assets extends Component {
 									asset_details: dataResult
 								}
 
-								// localStorage[localStorage.length] = {
-								// 	asset_id: dataResult.assetID,
-                                //     asset_uniqueId: dataResult.uniqueId,
-                                //     asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
-                                //     asset_coidAddr: dataResult.coidAddr,
-                                //     asset_owners: dataResult.ownerIdList,
-                                //     asset_controllers: dataResult.controlIdList
-								// }
-
-								// localStorage.setItem("owned_assets", JSON.stringify(localStorage_owned))								
-
 								this.setState({ own_assets: theArray });
+
+								assetData[assetData.length] = {
+									asset_id: dataResult.assetID,
+                                    asset_uniqueId: dataResult.uniqueId,
+                                    asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
+                                    asset_coidAddr: dataResult.coidAddr,
+									asset_gatekeeperAddr: dataResult.gatekeeperAddr,
+                                    asset_owners: dataResult.ownerIdList,
+                                    asset_controllers: dataResult.controlIdList
+								}
+
+								console.log("assetData " + JSON.stringify(assetData))
+								localStorage.setItem("owned_assets", JSON.stringify(assetData))
 								console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets))
 
 							}.bind(this),

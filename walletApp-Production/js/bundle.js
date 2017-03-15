@@ -50930,8 +50930,10 @@
 	
 						//DEBUGGING:
 						console.log("getOwnedAssets result: " + data);
+						var assetData = [];
 	
 						if (data.length > 0) {
+	
 							//loop through OWNED assets
 							for (var i = 0; i < data.length; i++) {
 								//AJAX each asset:
@@ -50958,18 +50960,20 @@
 											asset_details: dataResult
 										};
 	
-										// localStorage[localStorage.length] = {
-										// 	asset_id: dataResult.assetID,
-										//     asset_uniqueId: dataResult.uniqueId,
-										//     asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
-										//     asset_coidAddr: dataResult.coidAddr,
-										//     asset_owners: dataResult.ownerIdList,
-										//     asset_controllers: dataResult.controlIdList
-										// }
-	
-										// localStorage.setItem("owned_assets", JSON.stringify(localStorage_owned))								
-	
 										this.setState({ own_assets: theArray });
+	
+										assetData[assetData.length] = {
+											asset_id: dataResult.assetID,
+											asset_uniqueId: dataResult.uniqueId,
+											asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
+											asset_coidAddr: dataResult.coidAddr,
+											asset_gatekeeperAddr: dataResult.gatekeeperAddr,
+											asset_owners: dataResult.ownerIdList,
+											asset_controllers: dataResult.controlIdList
+										};
+	
+										console.log("assetData " + JSON.stringify(assetData));
+										localStorage.setItem("owned_assets", JSON.stringify(assetData));
 										console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets));
 									}.bind(this),
 									complete: function complete() {}
@@ -53634,36 +53638,19 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var DelegationForm = function (_React$Component) {
-	    _inherits(DelegationForm, _React$Component);
+	var DimensionDelegationForm = function (_React$Component) {
+	    _inherits(DimensionDelegationForm, _React$Component);
 	
-	    function DelegationForm(props) {
-	        _classCallCheck(this, DelegationForm);
+	    function DimensionDelegationForm(props) {
+	        _classCallCheck(this, DimensionDelegationForm);
 	
-	        var _this2 = _possibleConstructorReturn(this, (DelegationForm.__proto__ || Object.getPrototypeOf(DelegationForm)).call(this, props));
+	        var _this2 = _possibleConstructorReturn(this, (DimensionDelegationForm.__proto__ || Object.getPrototypeOf(DimensionDelegationForm)).call(this, props));
 	
-	        _this2.state = {
-	
-	            delegatee_list: [],
-	            delegatee_tokens: []
-	
-	        };
-	        _this2.maxDelegations = 10;
-	        _this2.handleHideModal = _this2.handleHideModal.bind(_this2);
+	        _this2.maxDelegations = _this2.props.max;
 	        return _this2;
 	    }
 	
-	    _createClass(DelegationForm, [{
-	        key: 'handleShowModal',
-	        value: function handleShowModal(e) {
-	            this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-	        }
-	    }, {
-	        key: 'handleHideModal',
-	        value: function handleHideModal() {
-	            this.setState({ showModal: false });
-	        }
-	    }, {
+	    _createClass(DimensionDelegationForm, [{
 	        key: 'render',
 	        value: function render() {
 	            var style = {
@@ -53724,7 +53711,54 @@
 	        }
 	    }]);
 	
-	    return DelegationForm;
+	    return DimensionDelegationForm;
+	}(_react2.default.Component);
+	
+	;
+	
+	var DimensionAttributeForm = function (_React$Component2) {
+	    _inherits(DimensionAttributeForm, _React$Component2);
+	
+	    function DimensionAttributeForm(props) {
+	        _classCallCheck(this, DimensionAttributeForm);
+	
+	        var _this3 = _possibleConstructorReturn(this, (DimensionAttributeForm.__proto__ || Object.getPrototypeOf(DimensionAttributeForm)).call(this, props));
+	
+	        _this3.maxDelegations = _this3.props.max;
+	        return _this3;
+	    }
+	
+	    _createClass(DimensionAttributeForm, [{
+	        key: 'render',
+	        value: function render() {
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'form-group col-md-12' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'col-md-10' },
+	                    _react2.default.createElement(
+	                        'label',
+	                        { htmlFor: 'unique_id_attrs' },
+	                        ' Dimension Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research". '
+	                    ),
+	                    _react2.default.createElement('input', { name: 'label-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: 'Descriptor' })
+	                ),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'col-md-2' },
+	                    _react2.default.createElement(
+	                        'button',
+	                        { type: 'button', 'data-id': this.props.labelref, onClick: this.props.handleShowModal, className: 'btn btn-warning pull-right' },
+	                        _react2.default.createElement('span', { className: 'glyphicon glyphicon-upload' }),
+	                        'Upload File'
+	                    )
+	                )
+	            );
+	        }
+	    }]);
+	
+	    return DimensionAttributeForm;
 	}(_react2.default.Component);
 	
 	;
@@ -53735,16 +53769,16 @@
 	    function DimensionForm(props) {
 	        _classCallCheck(this, DimensionForm);
 	
-	        var _this3 = _possibleConstructorReturn(this, (DimensionForm.__proto__ || Object.getPrototypeOf(DimensionForm)).call(this, props));
+	        var _this4 = _possibleConstructorReturn(this, (DimensionForm.__proto__ || Object.getPrototypeOf(DimensionForm)).call(this, props));
 	
-	        _this3.state = {
-	            dimension: _this3.props.dataHandler,
+	        _this4.state = {
+	            dimension: _this4.props.dataHandler,
 	            //dimension_data: {},
 	            selected: false,
 	            docs: {}, //takes same form as it does in Documents.jsx and CoreIdentity.jsx/MyGatekeeper.jsx
 	            pubkey: localStorage.getItem("pubKey")
 	        };
-	        return _this3;
+	        return _this4;
 	    }
 	
 	    //HANDLE THE CHOICE OF USER INPUT
@@ -53753,7 +53787,7 @@
 	    _createClass(DimensionForm, [{
 	        key: 'submitHandler',
 	        value: function submitHandler(e) {
-	            var _this4 = this;
+	            var _this5 = this;
 	
 	            var dimension = this.state.dimension.dimension;
 	            //*********************************************/
@@ -53840,8 +53874,8 @@
 	                    var tokenQuantity = $("input[name^='tokenQuantity']").val();
 	                    if (tokenQuantity) json.tokenQuantity = tokenQuantity;
 	
-	                    json.coidAddr = _this4.state.dimension.coidAddr;
-	                    json.dimensionCtrlAddr = _this4.state.dimension.dimensionCtrlAddr;
+	                    json.coidAddr = _this5.state.dimension.coidAddr;
+	                    json.dimensionCtrlAddr = _this5.state.dimension.dimensionCtrlAddr;
 	
 	                    console.log("\n JSON body: " + JSON.stringify(json));
 	                    $.ajax({
@@ -53894,7 +53928,7 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _this5 = this;
+	            var _this6 = this;
 	
 	            console.log("state in DimensionForm\n" + JSON.stringify(this.state));
 	            var dims = this.state.dimension;
@@ -54183,9 +54217,9 @@
 	                                                        'Select Document'
 	                                                    ),
 	                                                    function () {
-	                                                        if (_this5.state.docs && _this5.state.docs.length > 0) {
+	                                                        if (_this6.state.docs && _this6.state.docs.length > 0) {
 	                                                            var i = 0;
-	                                                            return _this5.state.docs.map(function (obj) {
+	                                                            return _this6.state.docs.map(function (obj) {
 	                                                                i++;
 	                                                                var optsVal = obj.hash + "|" + obj.file_hash;
 	                                                                return _react2.default.createElement(
@@ -54369,69 +54403,6 @@
 	    return DimensionForm;
 	}(_react.Component);
 	
-	var DimensionAttributeForm = function (_React$Component2) {
-	    _inherits(DimensionAttributeForm, _React$Component2);
-	
-	    function DimensionAttributeForm(props) {
-	        _classCallCheck(this, DimensionAttributeForm);
-	
-	        var _this6 = _possibleConstructorReturn(this, (DimensionAttributeForm.__proto__ || Object.getPrototypeOf(DimensionAttributeForm)).call(this, props));
-	
-	        _this6.state = {
-	            file_attrs: [],
-	            inputs: ['input-0'],
-	            tmpFile: '',
-	            showModal: false,
-	            pubKey: localStorage.getItem("pubKey")
-	        };
-	        return _this6;
-	    }
-	
-	    _createClass(DimensionAttributeForm, [{
-	        key: 'handleShowModal',
-	        value: function handleShowModal(e) {
-	            this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-	        }
-	    }, {
-	        key: 'handleHideModal',
-	        value: function handleHideModal() {
-	            this.setState({ showModal: false });
-	        }
-	    }, {
-	        key: 'render',
-	        value: function render() {
-	            return _react2.default.createElement(
-	                'div',
-	                { className: 'form-group col-md-12' },
-	                _react2.default.createElement(
-	                    'div',
-	                    { className: 'col-md-10' },
-	                    _react2.default.createElement(
-	                        'label',
-	                        { htmlFor: 'unique_id_attrs' },
-	                        ' Dimension Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research". '
-	                    ),
-	                    _react2.default.createElement('input', { name: 'label-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: 'Descriptor' })
-	                ),
-	                _react2.default.createElement(
-	                    'div',
-	                    { className: 'col-md-2' },
-	                    _react2.default.createElement(
-	                        'button',
-	                        { type: 'button', 'data-id': this.props.labelref, onClick: this.props.handleShowModal, className: 'btn btn-warning pull-right' },
-	                        _react2.default.createElement('span', { className: 'glyphicon glyphicon-upload' }),
-	                        'Upload File'
-	                    )
-	                )
-	            );
-	        }
-	    }]);
-	
-	    return DimensionAttributeForm;
-	}(_react2.default.Component);
-	
-	;
-	
 	var IdentityDimensions = function (_Component2) {
 	    _inherits(IdentityDimensions, _Component2);
 	
@@ -54449,7 +54420,7 @@
 	            //prop dataHandler passes activeDimension to DimensionForm
 	            activeDimension: {},
 	
-	            //inputs are mapped to add additional DimensionAttributeForm instances
+	            //inputs array is pushed when addimg DimensionAttributeForm instances
 	            inputs: ['input-0'],
 	            //as we add more Dimension attributes, we end up shifting tmpFile and inputs
 	            //tmp file always holds current input label, ex: 'input-0'
@@ -54746,6 +54717,7 @@
 	        value: function prepareAttributes() {
 	            var newArr = [],
 	                labels = this.getLabelValues();
+	            console.log("labelVals: " + JSON.stringify(labels));
 	            //labelVals: [{"input-0":"mydocument"},{"input-1":"seconddocument"}]
 	            for (var i = 0; i < labels.length; i++) {
 	                var tmpArr = [];
@@ -54855,6 +54827,24 @@
 	            var attributes = this.prepareAttributes();
 	            console.log("attributes: " + attributes);
 	
+	            var json = {};
+	            if (dimensionName) {
+	                json.dimensionName = dimensionName;
+	            }
+	            json.pubKey = localStorage.getItem("pubKey");
+	            json.address = "";
+	            json.flag = 0;
+	            json.ID = 0;
+	
+	            var selected_asset = $("#assetSelect option:selected").text();
+	            this.state.own_assets.forEach(function (asset, index) {
+	                if (selected_asset == asset.asset_id) {
+	                    json.coidAddr = asset.asset_coidAddr, json.dimensionCtrlAddr = asset.asset_dimCtrlAddr, json.uniqueId = asset.asset_uniqueId, json.owners = asset.asset_owners, json.controllers = asset.asset_controllers;
+	                }
+	            });
+	
+	            json.delegations = this.prepareDelegationDistribution();
+	
 	            var objArray = [];
 	            for (var i = 0; i < attributes.length; i++) {
 	                var obj = {};
@@ -54862,28 +54852,8 @@
 	                obj.attribute = attributes[i][1];
 	                obj.flag = 0;
 	                objArray.push(obj);
-	                //console.log("objArray: " + JSON.stringify(objArray))
-	            }
-	
-	            var json = {};
-	            if (dimensionName) {
-	                json.dimensionName = dimensionName;
 	            }
 	            json.data = objArray;
-	            json.delegations = this.prepareDelegationDistribution();
-	            json.pubKey = localStorage.getItem("pubKey");
-	            json.controllers = this.state.control_list;
-	            json.flag = 0;
-	
-	            var selected_asset = $("#assetSelect option:selected").text();
-	            this.state.own_assets.forEach(function (asset, index) {
-	                if (selected_asset == asset.asset_id) {
-	                    json.uniqueId = asset.asset_uniqueId;
-	                    json.dimensionCtrlAddr = asset.asset_dimCtrlAddr;
-	                    json.coidAddr = asset.asset_coidAddr;
-	                    json.controllers = asset.asset_controllers, json.owners = asset.asset_owners;
-	                }
-	            });
 	
 	            console.log("JSON: " + JSON.stringify(json));
 	
@@ -54901,14 +54871,13 @@
 	
 	                    console.log("data.Result: " + data.Result);
 	
-	                    // var dimensionAddr = data.Result[2]
-	                    // console.log("dimensionAddr: " + dimensionAddr)
+	                    var dimensionAddr = data.Result[2];
+	                    console.log("created dimension address: " + dimensionAddr);
 	
 	                    //returns (bool success, bytes32 callerHash, address test)
 	                    //response createDimenson: {"Status":null,"Result":"true,8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,C48883966A3B2B8672CC4392C0E03758F7705C36"}
 	                    //get the array:
 	                    //data = data.data;
-	
 	                }.bind(this),
 	                complete: function complete() {
 	                    // do something
@@ -55117,7 +55086,7 @@
 	                                            'Enter descriptor(s) and attribute(s):'
 	                                        ),
 	                                        this.state.inputs.map(function (input) {
-	                                            return _react2.default.createElement(DimensionAttributeForm, { handleShowModal: _this8.handleShowModal.bind(_this8), min: _this8.state.subform_cont, max: '10', key: input, labelref: input });
+	                                            return _react2.default.createElement(DimensionAttributeForm, { handleShowModal: _this8.handleShowModal.bind(_this8), max: '10', key: input, labelref: input });
 	                                        })
 	                                    ),
 	                                    _react2.default.createElement(
@@ -55143,7 +55112,7 @@
 	                                            'Enter Delegations and their delegated control token(s).'
 	                                        ),
 	                                        this.state.delegations.map(function (input) {
-	                                            return _react2.default.createElement(DelegationForm, { handleShowModal: _this8.handleShowModal.bind(_this8), min: _this8.state.subform_cont, max: '10', key: input, labelref: input });
+	                                            return _react2.default.createElement(DimensionDelegationForm, { max: '10', key: input, labelref: input });
 	                                        })
 	                                    ),
 	                                    _react2.default.createElement(
@@ -55204,6 +55173,7 @@
 	exports.default = IdentityDimensions;
 	
 	//<IdentityDimensions dimensions={dimensions} onDelete={this.handleDeleteDimension.bind(this) } key={dimensions.ID} onClick={this.showHandler.bind(this)}/>
+	//handleShowModal={this.handleShowModal.bind(this)}
 
 /***/ },
 /* 347 */

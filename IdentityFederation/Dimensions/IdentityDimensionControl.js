@@ -208,8 +208,11 @@ var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
                 // the reason they are nested is because the other functions also read/write the json. Due to the async nature of js you want to make sure
                 // that the file being pulled is the latest.
                 var addPayload = { "pubKey": pubKey, "dimensionName": typeInput, "data": data };
+                console.log("addpayload: " + JSON.stringify(addPayload))
                 if (data.length > 0 && data[0].descriptor != "" && delegations.length > 0 && delegations[0].owners != "") {
+                    console.log("line 213 trying to add entry...")
                     self.addEntry(addPayload, function (error, result) {
+                        if (error) { console.log("error: " + error) }
                         console.log("about to call delegate line 194")
                         self.delegate(delegations, function (error, result) {
                             createWrite();
@@ -243,10 +246,16 @@ var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
                 }*/
                 //connector.SetDimension(pubKey,typeInput+".json",0,0,log,"","",function(){callback(error,result)})
             }
-            else { callback(error, result); }
-            console.log("\n\nCreation LOG: " + JSON.stringify(log) + "\n\n");
-            //            callback(error,result);
-        })
+            else {
+                callback(error, result)
+                if (error) { console.log("callback error: " + error) }
+                if (result) { console.log("callback result: " + result) }
+            }
+
+            console.log("\n\calling final callback (end of createdimension).. \n" );
+            callback(error, result);
+
+        })//end createDimension
     }
     //***********************************************************************************************
 
@@ -737,10 +746,11 @@ for (let endpoint in IdentityConfig) {
         toExecute = toExecute + "})"
 
         //for debugging
-        console.log("\ncalling eval on: " + toExecute);
+        console.log("\ncalling eval on: " + toExecute + "\n");
 
         //evaulate the given function
         eval(toExecute, function (err, res) {
+            console.log("inside eval function")
             if (err) { console.log("error: " + err) }
             console.log("res from eval: " + res)
         });

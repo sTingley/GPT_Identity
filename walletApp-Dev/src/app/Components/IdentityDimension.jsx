@@ -705,7 +705,7 @@ class IdentityDimensions extends Component {
     prepareAttributes() {
         var newArr = [],
             labels = this.getLabelValues();
-            console.log("labelVals: " + JSON.stringify(labels))
+        console.log("labelVals: " + JSON.stringify(labels))
         //labelVals: [{"input-0":"mydocument"},{"input-1":"seconddocument"}]
         for (var i = 0; i < labels.length; i++) {
             var tmpArr = [];
@@ -803,6 +803,26 @@ class IdentityDimensions extends Component {
         let attributes = this.prepareAttributes()
         console.log("attributes: " + attributes)
 
+        var json = {}
+        if (dimensionName) { json.dimensionName = dimensionName }
+        json.pubKey = localStorage.getItem("pubKey")
+        json.address = ""
+        json.flag = 0
+        json.ID = 0
+
+        let selected_asset = $("#assetSelect option:selected").text()
+        this.state.own_assets.forEach(function (asset, index) {
+            if (selected_asset == asset.asset_id) {
+                json.coidAddr = asset.asset_coidAddr,
+                    json.dimensionCtrlAddr = asset.asset_dimCtrlAddr,
+                    json.uniqueId = asset.asset_uniqueId,
+                    json.owners = asset.asset_owners,
+                    json.controllers = asset.asset_controllers
+            }
+        })
+
+        json.delegations = this.prepareDelegationDistribution()
+
         var objArray = []
         for (var i = 0; i < attributes.length; i++) {
             let obj = {}
@@ -810,57 +830,38 @@ class IdentityDimensions extends Component {
             obj.attribute = attributes[i][1]
             obj.flag = 0
             objArray.push(obj)
-            //console.log("objArray: " + JSON.stringify(objArray))
         }
-
-        var json = {}
-        if (dimensionName) { json.dimensionName = dimensionName }
         json.data = objArray
-        json.delegations = this.prepareDelegationDistribution()
-        json.pubKey = localStorage.getItem("pubKey")
-        json.controllers = this.state.control_list
-        json.flag = 0
-
-        let selected_asset = $("#assetSelect option:selected").text()
-        this.state.own_assets.forEach(function (asset, index) {
-            if (selected_asset == asset.asset_id) {
-                json.uniqueId = asset.asset_uniqueId
-                json.dimensionCtrlAddr = asset.asset_dimCtrlAddr
-                json.coidAddr = asset.asset_coidAddr
-                json.controllers = asset.asset_controllers,
-                    json.owners = asset.asset_owners
-            }
-        })
 
         console.log("JSON: " + JSON.stringify(json))
 
-        // $.ajax({
-        //     type: "POST",
-        //     url: twinUrl + 'dimensions/CreateDimension',
-        //     data: json,
-        //     success: function (result) {
-        //         var data = result;
-        //         if ($.type(result) != "object") {
-        //             data = JSON.parseJSON(result)
-        //         }
+        $.ajax({
+            type: "POST",
+            url: twinUrl + 'dimensions/CreateDimension',
+            data: json,
+            success: function (result) {
+                var data = result;
+                if ($.type(result) != "object") {
+                    data = JSON.parseJSON(result)
+                }
 
-        //         console.log("response createDimenson: " + JSON.stringify(data))
+                console.log("response createDimenson: " + JSON.stringify(data))
 
-        //         console.log("data.Result: " + data.Result)
+                console.log("data.Result: " + data.Result)
 
-        //         // var dimensionAddr = data.Result[2]
-        //         // console.log("dimensionAddr: " + dimensionAddr)
+                var dimensionAddr = data.Result[2]
+                console.log("created dimension address: " + dimensionAddr)
 
-        //         //returns (bool success, bytes32 callerHash, address test)
-        //         //response createDimenson: {"Status":null,"Result":"true,8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,C48883966A3B2B8672CC4392C0E03758F7705C36"}
-        //         //get the array:
-        //         //data = data.data;
+                //returns (bool success, bytes32 callerHash, address test)
+                //response createDimenson: {"Status":null,"Result":"true,8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,C48883966A3B2B8672CC4392C0E03758F7705C36"}
+                //get the array:
+                //data = data.data;
 
-        //     }.bind(this),
-        //     complete: function () {
-        //         // do something
-        //     },
-        // })
+            }.bind(this),
+            complete: function () {
+                // do something
+            },
+        })
 
     }//end creationDimension
 
@@ -996,7 +997,6 @@ class IdentityDimensions extends Component {
                     </div>{/*tab-content*/}
 
                 </div>{/*modal-body*/}
-
 
             </div >
         );

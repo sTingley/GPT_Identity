@@ -1,0 +1,37 @@
+{
+    "dimensionName": "LIVING_ROOM",
+    "pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+    "address": "",
+    "flag": 0,
+    "ID": 0,
+    "coidAddr": "E2B24811DB9B23DDEA8313D82D11A82014C8E3BC",
+    "dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
+    "uniqueId": "9aaddf7caa690217bddc743102dc7e417608a93418ad5da2c0c82c501004f26f",
+    "owners": [
+        "59d110a3ab34a2ebd0ddb9d72ead24e8e906bebe794ea13c8c35b8a6c81314cd"
+    ],
+    "controllers": [
+        "a016d3445c892d76d9efc222d9598b4bfaf889ef5c5323c5cec67ab20c96c01c",
+        "16f121833eee6c25847aa9e63d4aa1b5cc2bf72d0d48f46ad25316b6e9bc5976"
+    ],
+    "delegations": [
+        {
+            "owner": "COID_OWNER",
+            "delegatee": "03683536757fdb821c10810b51caa51a84fc1dfab5c17edbf5246f9713ffe31adf",
+            "amount": "2",
+            "accessCategories": ""
+        }
+    ],
+    "data": [
+        {
+            "descriptor": "smartTV",
+            "attribute": "QmXVFStSMEcoAWPVKLrxJ8wf5ohn2UdmdAxcnfB8TtSAZG",
+            "flag": 0
+        },
+        {
+            "descriptor": "family_laptop",
+            "attribute": "QmSMWeGPjtgzQ75Y1YXbnC4uByni8bwHcB4vPXrPVcUTUM",
+            "flag": 0
+        }
+    ]
+}

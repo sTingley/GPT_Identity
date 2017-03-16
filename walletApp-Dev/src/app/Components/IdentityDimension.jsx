@@ -66,22 +66,18 @@ class DimensionForm extends Component {
             docs: {}, //takes same form as it does in Documents.jsx and CoreIdentity.jsx/MyGatekeeper.jsx
             pubkey: localStorage.getItem("pubKey"),
             delegations: ['input-0']
-
         };
     }
 
     //HANDLE THE CHOICE OF USER INPUT
     submitHandler(e) {
 
-        let dimension = this.state.dimension.dimension
-        //*********************************************/
-
         e.preventDefault();
         var ele = $(e.target);
-
-        const typeInput = dimension.dimensionName
-
         var button_val = parseInt(ele.attr("data-val"))
+        //*********************************************/
+        let dimension = this.state.dimension.dimension
+        const typeInput = dimension.dimensionName
 
         var json = {
             "publicKey": localStorage.getItem("pubKey"),
@@ -102,7 +98,6 @@ class DimensionForm extends Component {
                     descriptor = value
                 }
             })
-
             //descriptor, ex: 'financial history 1/2017'
             json.descriptor = descriptor
 
@@ -149,7 +144,9 @@ class DimensionForm extends Component {
 
             json.accessCategories = json.accessCategories.substring(0, json.accessCategories.length - 1)
 
-            json.delegations = this.prepareDelegationDistribution()
+            json.delegations = this.prepareDelegationDistribution(function(err){
+                if(err){console.log("ERROR DELEGATIONS: " + err)}
+            })
 
             json.owner = this.state.dimension.owner
 
@@ -192,17 +189,17 @@ class DimensionForm extends Component {
         $("#dimension_Details").modal('show');
         $("#dimension_Details").on('hidden.bs.modal', this.props.hideHandler);
 
-        $.ajax({
-            url: twinUrl + "ipfs/alldocs/" + this.state.pubKey,
-            dataType: 'json',
-            cache: false,
-            success: function (resp) {
-                this.setState({ docs: resp.data.documents });
-            }.bind(this),
-            error: function (xhr, status, err) {
-                console.error(this.props.url, status, err.toString());
-            }.bind(this)
-        });
+        // $.ajax({
+        //     url: twinUrl + "ipfs/alldocs/" + this.state.pubKey,
+        //     dataType: 'json',
+        //     cache: false,
+        //     success: function (resp) {
+        //         this.setState({ docs: resp.data.documents });
+        //     }.bind(this),
+        //     error: function (xhr, status, err) {
+        //         console.error(this.props.url, status, err.toString());
+        //     }.bind(this)
+        // });
 
     }
 
@@ -825,9 +822,13 @@ class IdentityDimensions extends Component {
                     data = JSON.parseJSON(result)
                 }
                 console.log("response createDimenson: " + JSON.stringify(data))
+
+                data = data.Result
                 console.log("data.Result: " + data.Result)
 
-                console.log("data[1]: " + data[1])
+                data = data.split(",")
+                console.log("DATA: " + data)
+
                 //var dimensionAddr = data.Result[2]
                 //console.log("created dimension address: " + dimensionAddr)
 

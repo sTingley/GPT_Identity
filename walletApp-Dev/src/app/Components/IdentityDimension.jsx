@@ -64,7 +64,9 @@ class DimensionForm extends Component {
             //dimension_data: {},
             selected: false,
             docs: {}, //takes same form as it does in Documents.jsx and CoreIdentity.jsx/MyGatekeeper.jsx
-            pubkey: localStorage.getItem("pubKey")
+            pubkey: localStorage.getItem("pubKey"),
+            delegations: ['input-0']
+
         };
     }
 
@@ -147,10 +149,7 @@ class DimensionForm extends Component {
 
             json.accessCategories = json.accessCategories.substring(0, json.accessCategories.length - 1)
 
-            let delegatee = $("input[name^='delegatee_addr']").val()
-            if (delegatee) json.delegatee = delegatee
-            let tokenQuantity = $("input[name^='tokenQuantity']").val()
-            if (tokenQuantity) json.tokenQuantity = tokenQuantity
+            json.delegations = this.prepareDelegationDistribution()
 
             json.owner = this.state.dimension.owner
 
@@ -158,16 +157,16 @@ class DimensionForm extends Component {
             json.dimensionCtrlAddr = this.state.dimension.dimensionCtrlAddr
 
             console.log("\n JSON body: " + JSON.stringify(json))
-            $.ajax({
-                url: twinUrl + 'dimensions/addDelegation',
-                type: 'POST',
-                data: json,
-                success: function (res) {
-                    if (res.status == "Ok" && res.msg == "true") {
-                        //var i_dimension = this.state.dimension.ID
-                    }
-                }
-            });
+            // $.ajax({
+            //     url: twinUrl + 'dimensions/addDelegation',
+            //     type: 'POST',
+            //     data: json,
+            //     success: function (res) {
+            //         if (res.status == "Ok" && res.msg == "true") {
+            //             //var i_dimension = this.state.dimension.ID
+            //         }
+            //     }
+            // });
         }
         //*********************************************************************
 
@@ -175,20 +174,21 @@ class DimensionForm extends Component {
 
     //THIS METHOD IS THE CONSTRUCTOR
     componentWillMount() {
+
+        $('#accessCategories').show();
+
         if ($("#allAttrs").is(":checked")) {
             this.state.selected = true
         }
         if (this.state.selected = true) {
             $('#accessCategories').hide();
         }
-        else $('#accessCategories').show();
+
     }
 
     componentDidMount() {
 
-        // this.setState({
-        //     dimension_data: this.props.dimension
-        // });
+        // this.setState({dimension_data: this.props.dimension});
         $("#dimension_Details").modal('show');
         $("#dimension_Details").on('hidden.bs.modal', this.props.hideHandler);
 
@@ -197,17 +197,79 @@ class DimensionForm extends Component {
             dataType: 'json',
             cache: false,
             success: function (resp) {
-                //console.log("Response Data in Documents (parent) component: ", JSON.stringify(resp.data.documents))
                 this.setState({ docs: resp.data.documents });
+            }.bind(this),
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
             }.bind(this)
         });
 
     }
 
+    /*****************************************************************************
+ * SAME PROCESS TO ADD DELEGATIONS
+ * 1) define getDelegationInputValues
+ * 2) getDelegationInputValues inside prepareDelegationDistribution
+*****************************************************************************/
+    getDelegationInputValues() {
+        var labelVals = []
+        var _this = this;
+        //in DimensionForm
+        $.each($("input[name^='delegatee-']"), function (obj) {
+            var value = $.trim($(this).val());
+            if (value.length > 0) {
+                labelVals.push({
+                    //replace the 'label' with the entered unique attribute descriptor, for example 'Name' or 'US SSN'
+                    [$(this).attr('name').replace("label-", "")]: value
+                });
+            }
+        });
+        return labelVals;
+        //returns an object array: [{"delegatee-input1-0":"pubkey"},{"delegatee-input1-0":"2"}
+    }
+    //*****************************************************************************
+    //prepare the delegations object array
+    prepareDelegationDistribution() {
+        var labels = this.getDelegationInputValues();
+        console.log("labels: " + JSON.stringify(labels))
+        let delegatee = []
+        let delegatee_token_quantity = []
+        for (var i = 0; i < labels.length; i += 2) {
+            for (var key in labels[i]) {
+                delegatee.push(labels[i][key]);
+                delegatee_token_quantity.push(labels[i + 1][key]);
+            }
+        }
+        let delegationsArray = []
+        //{ owner: "", delegatee: "", amount: "", dimension: "", expiration: "", accessCategories: "" },
+        if (delegatee.length == delegatee_token_quantity.length) {
+            for (var i = 0; i < delegatee.length; i++) {
+                var delegationObj = {}
+                delegationObj.owner = "COID_OWNER"// EDIT!!!!!!!!!!
+                delegationObj.delegatee = delegatee[i]
+                delegationObj.amount = delegatee_token_quantity[i]
+                delegationObj.accessCategories = ""
+                delegationsArray.push(delegationObj)
+            }
+            console.log("delegationObj: " + JSON.stringify(delegationsArray))
+        }
+        return delegationsArray
+    }
+    //*****************************************************************************
+    appendDelegation() {
+        var inputLen = this.state.delegations.length;
+        console.log("dimensionForm delegations length: " + inputLen)
+        if (inputLen < 10) {
+            var newInput1 = `input1-${inputLen}`;
+            this.setState({ delegations: this.state.delegations.concat([newInput1]) });
+        }
+    }
+    //*****************************************************************************
+    //*****************************************************************************
+
     render() {
-        console.log("state in DimensionForm\n" + JSON.stringify(this.state))
+        //console.log("state in DimensionForm\n" + JSON.stringify(this.state))
         var dims = this.state.dimension
-        //console.log("dims: " + JSON.stringify(dims))
 
         var dataArray = []
         var arrayOfArrays = []
@@ -285,7 +347,7 @@ class DimensionForm extends Component {
                                                 var ipfs_url = "http://10.101.114.231:8080/ipfs/";
                                                 if (arrayOfArrays.length > 0) {
                                                     return arrayOfArrays.map((attrs, i) => {
-                                                        console.log("attrs[0]: " + attrs[0] + ", attrs[1]:" + attrs[1] + ", attrs[2]: " + attrs[2] + ", attrs[3]: " + attrs[3])
+                                                        //console.log("attrs[0]: " + attrs[0] + ", attrs[1]:" + attrs[1] + ", attrs[2]: " + attrs[2] + ", attrs[3]: " + attrs[3])
                                                         if (attrs[1] && attrs[1].charAt(0) == "Q") {
                                                             return (
                                                                 <tr key={i}>
@@ -356,19 +418,22 @@ class DimensionForm extends Component {
                                     <table className="table table-striped table-hover" style={syle}>
                                         <thead>
                                             <tr>
-                                                <th>Tokens delegated for this dimension: {0}</th>
+                                                <th>Tokens delegated for this dimension: 0</th>
                                             </tr>
                                         </thead>
                                         <hr />
                                         <tbody>
                                             <tr>
-                                                <th><b>Delegate tokens</b></th>
+                                                <td>
+                                                    <label htmlFor="control_dist">Enter Delegations and their delegated control token(s).</label>
+                                                    {this.state.delegations.map(input => <DimensionDelegationForm max="10" key={input} labelref={input} />)}
+                                                </td>
                                             </tr>
                                             <tr>
-                                                <td><input name="delegatee_addr" className="form-control col-md-4" type="text" placeholder="Delegatee Address" /></td>
-                                            </tr>
-                                            <tr>
-                                                <td><input name="tokenQuantity" className="form-control col-md-4" type="text" placeholder="Token Quantity" /></td>
+                                                <td>
+                                                    <button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendDelegation.bind(this)}>
+                                                        <span className="glyphicon glyphicon-plus"></span>Add More</button>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <td><input className="form-control col-md-4" type="text" placeholder="Expiration" /></td>
@@ -423,6 +488,7 @@ class IdentityDimensions extends Component {
 
             //Dimensions pulled from DT
             iDimensions: [],
+            ctrlDimensions: [],
             //prop dataHandler passes activeDimension to DimensionForm
             activeDimension: {},
 
@@ -753,20 +819,18 @@ class IdentityDimensions extends Component {
             url: twinUrl + 'dimensions/CreateDimension',
             data: json,
             success: function (result) {
+                //returns (bool success, bytes32 callerHash, address test)
                 var data = result;
                 if ($.type(result) != "object") {
                     data = JSON.parseJSON(result)
                 }
-
                 console.log("response createDimenson: " + JSON.stringify(data))
-
                 console.log("data.Result: " + data.Result)
 
-                var dimensionAddr = data.Result[2]
-                console.log("created dimension address: " + dimensionAddr)
+                console.log("data[1]: " + data[1])
+                //var dimensionAddr = data.Result[2]
+                //console.log("created dimension address: " + dimensionAddr)
 
-                //returns (bool success, bytes32 callerHash, address test)
-                //response createDimenson: {"Status":null,"Result":"true,8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,C48883966A3B2B8672CC4392C0E03758F7705C36"}
                 //get the array:
                 //data = data.data;
 
@@ -780,8 +844,6 @@ class IdentityDimensions extends Component {
 
     //*****************************************************************************
     render() {
-
-        console.log("this.state.own_Assets: " + JSON.stringify(this.state.own_assets))
 
         var _that = this
 
@@ -803,7 +865,7 @@ class IdentityDimensions extends Component {
                 <h1>IDENTITY DIMENSIONS</h1><hr />
                 <div className="modal-header">
                     <ul className="nav nav-tabs" role="tablist">
-                        <li role="presentation" className="active"><a href="#dimensions" role="tab" data-toggle="tab">Identity Dimensions</a></li>
+                        <li role="presentation" className="active"><a href="#dimensions" role="tab" data-toggle="tab">Dimensions</a></li>
                         <li role="presentation"><a href="#addDimension" role="tab" data-toggle="tab">Create new dimension</a></li>
                     </ul>
                 </div>
@@ -813,24 +875,50 @@ class IdentityDimensions extends Component {
                     <div className="tab-content">
 
                         <div className="tabpanel" role="tabpanel" className="tab-pane active" id="dimensions"><br />
-                            <table style={table} className="table table-striped center">
-                                <tbody>
-                                    {(() => {
-                                        if ($.isArray(this.state.iDimensions) && this.state.iDimensions.length > 0) {
-                                            return this.state.iDimensions.map(function (el, i) {
-                                                return (
-                                                    <tr key={i}>
-                                                        <td>
-                                                            <a data-item={el.dimension} data-index={i} onClick={_that.showDimensionHandler} >{el.dimension.dimensionName}</a>
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            });
-                                        } else { return (<tr><td><p>No identity dimensions</p></td></tr>) }
-                                    })(this)}
-                                </tbody>
-                            </table>
-                            {this.state.showDetails ? <DimensionForm hideHandler={this.hideHandler.bind(this)} dataHandler={this.state.activeDimension} /> : null}
+
+                            <div id="ownedDimensions">
+                                <h5><b>My Owned Dimensions</b></h5> <hr />
+                                <table style={table} className="table table-striped center">
+                                    <tbody>
+                                        {(() => {
+                                            if ($.isArray(this.state.iDimensions) && this.state.iDimensions.length > 0) {
+                                                return this.state.iDimensions.map(function (el, i) {
+                                                    return (
+                                                        <tr key={i}>
+                                                            <td>
+                                                                <a data-item={el.dimension} data-index={i} onClick={_that.showDimensionHandler} >{el.dimension.dimensionName}</a>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                });
+                                            } else { return (<tr><td><p>No owned identity dimensions.</p></td></tr>) }
+                                        })(this)}
+                                    </tbody>
+                                </table>
+                                {this.state.showDetails ? <DimensionForm hideHandler={this.hideHandler.bind(this)} dataHandler={this.state.activeDimension} /> : null}
+                            </div><br />
+
+                            <div id="controlledDimensions">
+                                <h5><b>My Controlled Dimensions</b></h5> <hr />
+                                <table style={table} className="table table-striped center">
+                                    <tbody>
+                                        {(() => {
+                                            if ($.isArray(this.state.ctrlDimensions) && this.state.ctrlDimensions.length > 0) {
+                                                return this.state.ctrlDimensions.map(function (el, i) {
+                                                    return (
+                                                        <tr key={i}>
+                                                            <td>
+                                                                <a data-item={el.dimension} data-index={i} onClick={_that.showDimensionHandler} >{el.dimension.dimensionName}</a>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                });
+                                            } else { return (<tr><td><p>No controlled identity dimensions.</p></td></tr>) }
+                                        })(this)}
+                                    </tbody>
+                                </table>
+                                {this.state.showDetails ? <DimensionForm hideHandler={this.hideHandler.bind(this)} dataHandler={this.state.activeDimension} /> : null}
+                            </div>
 
                         </div>{/*tabpanel dimensions*/}
 
@@ -887,7 +975,6 @@ class IdentityDimensions extends Component {
                                     </div>
                                     <div className="form-group">
                                         <div className="col-md-offset-6 col-md-6 ">
-                                            <p></p>
                                             <button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendDelegation.bind(this)}>
                                                 <span className="glyphicon glyphicon-plus"></span>Add More
                                             </button>
@@ -924,3 +1011,18 @@ export default IdentityDimensions
 
 //<IdentityDimensions dimensions={dimensions} onDelete={this.handleDeleteDimension.bind(this) } key={dimensions.ID} onClick={this.showHandler.bind(this)}/>
 //handleShowModal={this.handleShowModal.bind(this)}
+
+            // let delegatee = $("input[name^='delegatee_addr']").val()
+            // if (delegatee) json.delegatee = delegatee
+            // let tokenQuantity = $("input[name^='tokenQuantity']").val()
+            // if (tokenQuantity) json.tokenQuantity = tokenQuantity
+
+// <tr>
+//     <th><b>Delegate tokens</b></th>
+// </tr>
+// <tr>
+//     <td><input name="delegatee_addr" className="form-control col-md-4" type="text" placeholder="Delegatee Address" /></td>
+// </tr>
+// <tr>
+//     <td><input name="tokenQuantity" className="form-control col-md-4" type="text" placeholder="Token Quantity" /></td>
+// </tr>

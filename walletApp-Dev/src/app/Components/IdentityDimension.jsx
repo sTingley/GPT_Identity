@@ -152,6 +152,8 @@ class DimensionForm extends Component {
             let tokenQuantity = $("input[name^='tokenQuantity']").val()
             if (tokenQuantity) json.tokenQuantity = tokenQuantity
 
+            json.owner = this.state.dimension.owner
+
             json.coidAddr = this.state.dimension.coidAddr
             json.dimensionCtrlAddr = this.state.dimension.dimensionCtrlAddr
 
@@ -436,7 +438,7 @@ class IdentityDimensions extends Component {
             delegations: ['input1-0'],
 
             //contains actual asset data from DT
-            controlled_assets: [],
+            control_assets: [],
             controlled_assets_label: [],
             own_assets: [],
             owned_assets_label: [],
@@ -501,8 +503,6 @@ class IdentityDimensions extends Component {
     // Get DT Dimension Data. Call this in componentWillMount
     getDimensions() {
 
-        var _this = this
-
         //MyCOID.json
         let dimension1 = {}
         dimension1.dimension = {
@@ -549,130 +549,43 @@ class IdentityDimensions extends Component {
 
         this.setState({ iDimensions: arry })
 
-        // let owned_dimensions = []
-        // let controlled_dimensions = []
-
-        // $.ajax({
-        //     type: "POST",
-        //     url: twinUrl + 'getOwnedDimensions',
-        //     data: { "pubKey": localStorage.getItem("pubKey") },
-        //     success: function (result) {
-        //         var data = result
-        //         if ($.type(result) != "object") {
-        //             data = JSON.parseJSON(result)
-        //         }
-
-        //         data = data.data; //get the array:
-
-        //         if (data.length > 0) {
-        //             for (let i = 0; i < data.length; i++) {
-        //                 owned_dimensions.push(data[i])
-        //             }
-        //             console.log("owned_dimensions: " + owned_dimensions)
-
-        //             var theArray = []
-
-        //             for (let i = 0; i < owned_dimensions.length; i++) {
-
-        //                 $.ajax({ //AJAX each asset (calls assetCtrl.js endpoint in DT)
-        //                     type: "POST",
-        //                     url: twinUrl + 'getDimension',
-        //                     data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": owned_dimensions[i] },
-        //                     success: function (result) {
-        //                         var dataResult = result;
-        //                         //dataResult is an object 
-        //                         console.log("getDimension dataResult, index:  " + i + "...  " + JSON.stringify(dataResult))
-        //                         if ($.type(result) != "object") {
-        //                             dataResult = JSON.parseJSON(result)
-        //                         }
-        //                         theArray[theArray.length] = {
-        //                             dimension: dataResult.dimension,
-        //                         }
-
-        //                         console.log("theArry: " + JSON.stringify(theArray))
-        //                         // //MYCOID is always pushed into last spot, so we know we are done if we go into this if
-        //                         // if (dataResult.assetID = "MyCOID") {
-        //                         //     this.setState({ own_assets: theArray })
-        //                         // }
-        //                     }.bind(this),
-        //                 })
-        //             }//end for(dimensions.length)
-
-        //             _this.setState({ iDimensions: theArray })
-
-        //         }//end if(data.length > 0)
-
-        //     }//end success callback
-        // })
-
     }//end getDimensions
 
     componentWillMount() {
 
-        let _this = this
-
         this.getDimensions();
+        //****************************************************** */
 
-        $.ajax({
-            type: "POST",
-            url: twinUrl + 'getOwnedAssets',
-            data: { "pubKey": localStorage.getItem("pubKey") },
-            success: function (result) {
-                var data = result;
-                //getOwnedAssets res: {"data":["CAR.json","MyCOID.json"]}
-                if ($.type(result) != "object") {
-                    data = JSON.parseJSON(result)
-                }
-                data = data.data; //get the array:
-                let owned_array = []
+        if (localStorage.getItem("owned_assets")) {
+            let owned_labels = []
+            let own_assets = []
 
-                if (data.length > 0) {
-                    for (let i = 0; i < data.length; i++) {
-                        owned_array.push(data[i])
-                    }
-                    console.log("owned array: " + owned_array) //should include MyCOID.json and other owned assets
-                    _this.setState({ owned_assets_label: owned_array })
-                    //OWNED ARRAY HAS MYCOID.json and additional OWNED COIDs
-                    //***********************************************************************************
-                    //theArray will be populated as we iterate thru owned_array
-                    var theArray = []
-                    //loop through owned_array so that we can inspect each json file
-                    for (let i = 0; i < owned_array.length; i++) {
-                        //console.log("looping..... got " + owned_array[i])
+            let owned = localStorage.getItem("owned_assets")
+            owned = JSON.parse(owned)
 
-                        $.ajax({ //AJAX each asset (calls assetCtrl.js endpoint in DT)
-                            type: "POST",
-                            url: twinUrl + 'getAsset',
-                            data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": owned_array[i] },
-                            success: function (result) {
-                                var dataResult = result;
-                                //dataResult is an object 
-                                //console.log("getAsset dataResult, index:  " + i + "...  " + JSON.stringify(dataResult))
-                                if ($.type(result) != "object") {
-                                    dataResult = JSON.parseJSON(result)
-                                }
-                                theArray[theArray.length] = {
-                                    asset_id: dataResult.assetID,
-                                    asset_uniqueId: dataResult.uniqueId,
-                                    asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
-                                    asset_coidAddr: dataResult.coidAddr,
-                                    asset_owners: dataResult.ownerIdList,
-                                    asset_controllers: dataResult.controlIdList
-                                }
-                                //MYCOID is always pushed into last spot, so we know we are done if we go into this if
-                                if (dataResult.assetID = "MyCOID") {
-                                    this.setState({ own_assets: theArray })
-                                }
-                            }.bind(_this),
-                            complete: function () { }
-                        })
+            //for loop is preparing arrays to set state vars 'own_assets' and 'owned_assets_label'
+            for (var i = 0; i < owned.length; i++) {
+                owned_labels.push(owned[i].asset_id)
+                own_assets[own_assets.length] = owned[i]
+            }
+            this.setState({ own_assets: own_assets, owned_assets_label: owned_labels })
+        }
 
-                    }//end for
-                }//end if data.length > 0
+        if (localStorage.getItem("controlled_assets")) {
+            console.log("WE HAVE CONTROLLED ASSETS!!!!!")
+            let controlled_labels = []//set this.state.controlled_assets_label
+            let control_assets = []
 
-            }//end success f'n of getOwnedAssets AJAX
+            let controlled = localStorage.getItem("controlled_asets")
+            controlled = JSON.parse(controlled)
 
-        })//getOwnedAssets
+            for (var i = 0; i < controlled.length; i++) {
+                controlled_labels.push(controlled[i].asset_id)
+                control_assets[control_assets.length] = controlled[i]
+            }
+            this.setState({ control_assets: control_assets, controlled_assets_label: controlled_labels })
+        }
+
 
     }//componentWillMount
 
@@ -868,6 +781,8 @@ class IdentityDimensions extends Component {
     //*****************************************************************************
     render() {
 
+        console.log("this.state.own_Assets: " + JSON.stringify(this.state.own_assets))
+
         var _that = this
 
         var syle = { marginRight: '15px' }
@@ -928,8 +843,8 @@ class IdentityDimensions extends Component {
                                         {(() => {
                                             if (this.state.owned_assets_label.length > 0) {
                                                 return this.state.owned_assets_label.map((label, i) => {
-                                                    let val = label.split('.') //get rid of the .json
-                                                    return <option key={i} value={label}>{val[0]}</option>
+                                                    //let val = label.split(',') //get rid of the .json
+                                                    return <option key={i} value={label}>{label}</option>
                                                 })
                                             }
                                             else { return <option>None</option> }
@@ -939,8 +854,8 @@ class IdentityDimensions extends Component {
                                         {(() => {
                                             if (this.state.controlled_assets_label.length > 0) {
                                                 return this.state.controlled_assets_label.map((label, i) => {
-                                                    let val = label.split('.') //get rid of the .json
-                                                    return <option key={i} value={label}>{val[0]}</option>
+                                                    //let val = label.split(',') //get rid of the .json
+                                                    return <option key={i} value={label}>{label}</option>
                                                 })
                                             }
                                             else { return <option>None</option> }

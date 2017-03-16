@@ -477,7 +477,7 @@ class Assets extends Component {
                                     asset_controllers: dataResult.controlIdList
 								}
 
-								console.log("assetData " + JSON.stringify(assetData))
+								//console.log("assetData " + JSON.stringify(assetData))
 								localStorage.setItem("owned_assets", JSON.stringify(assetData))
 								console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets))
 

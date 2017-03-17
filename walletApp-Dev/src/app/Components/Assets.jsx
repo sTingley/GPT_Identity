@@ -339,7 +339,7 @@ class Modal extends Component {
 								<div role="tabpanel" className="tab-pane center-block" id="qrcode" style={qrStyle}>
 									<QRCode value={qrConfig} size={200} />
 								</div>
-{/*
+								{/*
 								<div role="tabpanel" className="tab-pane" id="dimension">
 									<label className="custom-file">
 										<input type="file" id="file" className="custom-file-input"></input>
@@ -438,7 +438,7 @@ class Assets extends Component {
 				var assetData = []
 
 				if (data.length > 0) {
-					
+
 					//loop through OWNED assets
 					for (let i = 0; i < data.length; i++) {
 						//AJAX each asset:
@@ -469,12 +469,12 @@ class Assets extends Component {
 
 								assetData[assetData.length] = {
 									asset_id: dataResult.assetID,
-                                    asset_uniqueId: dataResult.uniqueId,
-                                    asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
-                                    asset_coidAddr: dataResult.coidAddr,
+									asset_uniqueId: dataResult.uniqueId,
+									asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
+									asset_coidAddr: dataResult.coidAddr,
 									asset_gatekeeperAddr: dataResult.gatekeeperAddr,
-                                    asset_owners: dataResult.ownerIdList,
-                                    asset_controllers: dataResult.controlIdList
+									asset_owners: dataResult.ownerIdList,
+									asset_controllers: dataResult.controlIdList
 								}
 
 								//console.log("assetData " + JSON.stringify(assetData))
@@ -489,7 +489,7 @@ class Assets extends Component {
 						})
 
 					}
-					
+
 
 				}
 			}.bind(this),
@@ -650,7 +650,8 @@ class Assets extends Component {
 			<div id="assets-container" className="assets">
 				<div className="row" id="search-bar">
 					<div className="col-md-6">
-						<h3 className="margin0px">Manage Assets</h3>
+						<h3 className="margin0px">Manage Assets</h3><hr />
+						<p><b>Public Key: </b>{this.state.wallet.pubKey}</p><hr />
 					</div>
 					<div className="col-md-6">
 						<form className="form-inline">
@@ -662,19 +663,10 @@ class Assets extends Component {
 							</div>
 						</form>
 					</div>
-				</div>
-
-				<div id="my-accounts">
-					<h4>My Wallet</h4> <hr />
-					<div className="all-accounts">
-						<div className="row accounts">
-							<p><b>Public Key: </b>{this.state.wallet.pubKey}</p>
-						</div>
-					</div>
-				</div>
+				</div><br />
 
 				<div id="own-assets">
-					<h4>My Owned Assets</h4> <hr />
+					<h4>My Owned Assets</h4><hr />
 					<div className="own-assets">
 						<div className="row assets">
 							{this.state.own_assets.map((asset, i) => {
@@ -693,10 +685,10 @@ class Assets extends Component {
 							})}
 						</div>
 					</div>
-				</div>
+				</div><br />
 
 				<div id="controlled-assets">
-					<h4>My Controlled Assets</h4> <hr />
+					<h4>My Controlled Assets</h4><hr />
 					<div className="row assets">
 						{this.state.controlled_assets.map((asset) => {
 							var cssClass = "btn btn-info";
@@ -713,7 +705,27 @@ class Assets extends Component {
 							);
 						})}
 					</div>
-				</div>
+				</div><br />
+
+				<div id="delegated-assets">
+					<h4>My Delegated Assets</h4><hr />
+					<div className="row assets">
+						{this.state.delegated_assets.map((asset) => {
+							var cssClass = "btn btn-info";
+							if (this.state.show_only.length > 0) {
+								if (this.state.show_only.toString().indexOf(asset.asset_id.toString()) >= 0) {
+									cssClass += " show";
+								} else cssClass += " hidden";
+							}
+							return (
+								<button type="button" key={asset.asset_id} className={cssClass} onClick={() => this.assetHandler(asset)}>
+									<span className="glyphicon glyphicon-piggy-bank"></span>
+									{asset.asset_name}
+								</button>
+							);
+						})}
+					</div>
+				</div><br />
 
 				{this.state.showDetails ? <Modal hideHandler={this.hideHandler} asset={this.state.active_asset} /> : null}
 			</div>

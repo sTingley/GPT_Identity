@@ -153,6 +153,8 @@ class DimensionForm extends Component {
             json.coidAddr = this.state.dimension.coidAddr
             json.dimensionCtrlAddr = this.state.dimension.dimensionCtrlAddr
 
+            json.dimension = this.state.dimension.dimensionName
+
             console.log("\n JSON body: " + JSON.stringify(json))
             // $.ajax({
             //     url: twinUrl + 'dimensions/addDelegation',
@@ -265,7 +267,7 @@ class DimensionForm extends Component {
     //*****************************************************************************
 
     render() {
-        //console.log("state in DimensionForm\n" + JSON.stringify(this.state))
+        console.log("state in DimensionForm\n" + JSON.stringify(this.state))
         var dims = this.state.dimension
 
         var dataArray = []
@@ -731,7 +733,10 @@ class IdentityDimensions extends Component {
     }
     //*****************************************************************************
     //prepare the delegations object array
-    prepareDelegationDistribution() {
+    prepareDelegationDistribution(dimension) {
+        var dimensionName = dimension
+
+        console.log("preparedelegation dimensionName: " + dimensionName)
         var labels = this.getDelegationInputValues();
         let delegatee = []
         let delegatee_token_quantity = []
@@ -746,10 +751,12 @@ class IdentityDimensions extends Component {
         if (delegatee.length == delegatee_token_quantity.length) {
             for (var i = 0; i < delegatee.length; i++) {
                 var delegationObj = {}
+                delegationObj.dimension = dimensionName
                 delegationObj.owner = "COID_OWNER"// EDIT!!!!!!!!!!
                 delegationObj.delegatee = delegatee[i]
                 delegationObj.amount = delegatee_token_quantity[i]
                 delegationObj.accessCategories = ""
+                delegationObj.timeFrame = "1111"
                 delegationsArray.push(delegationObj)
             }
             //console.log("delegationObj: " + JSON.stringify(delegationsArray))
@@ -797,19 +804,36 @@ class IdentityDimensions extends Component {
             }
         })
 
-        json.delegations = this.prepareDelegationDistribution()
+        console.log("json.controllers: " + json.controllers)
 
+        let delegations = this.prepareDelegationDistribution(dimensionName)
+        json.delegations = JSON.stringify(delegations)
+        //**************************************************************
         var objArray = []
         for (var i = 0; i < attributes.length; i++) {
             let obj = {}
             obj.descriptor = attributes[i][0]
+            console.log("obj.descriptor: " + obj.descriptor + ", type: " + typeof(obj.descriptor))
             obj.attribute = attributes[i][1]
+            //console.log("obj.attribute: " + obj.attribute + ", type: " + typeof(obj.attribute))
             obj.flag = 0
+            //console.log("obj.flag: " + obj.flag + ", type: " + typeof(obj.flag))
+            //console.log("object: " + obj)
             objArray.push(obj)
+            //console.log("objArray: " + objArray + ", type: " + typeof(objArray))
         }
+
         json.data = objArray
 
-        console.log("JSON: " + JSON.stringify(json))
+        json.data = JSON.stringify(json.data)
+        console.log("tostring: " + json.data)
+
+        //json.data = JSON.stringify(objArray)
+
+        //json.notDATA = objArray
+
+       console.log("JSON: " + JSON.stringify(json))
+       
 
         $.ajax({
             type: "POST",

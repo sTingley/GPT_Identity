@@ -563,13 +563,13 @@ class Assets extends Component {
 								}
 
 								//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-								var theArray = this.state.delegated_assets;
+								var theArray1 = this.state.delegated_assets;
 
-								theArray[theArray.length] = {
+								theArray1[theArray1.length] = {
 									asset_id: dataResult.assetID,
 									asset_details: dataResult
 								}
-								this.setState({ delegated_assets: theArray });
+								this.setState({ delegated_assets: theArray1 });
 
 							}.bind(this),
 							complete: function () { },
@@ -639,7 +639,7 @@ class Assets extends Component {
 
 				<div id="own-assets">
 					<h4>My Owned Assets</h4><hr />
-					<div className="own-assets">
+					<div className="owned-assets">
 						<div className="row assets">
 							{this.state.own_assets.map((asset, i) => {
 								var cssClass = "btn btn-success";
@@ -661,41 +661,45 @@ class Assets extends Component {
 
 				<div id="controlled-assets">
 					<h4>My Controlled Assets</h4><hr />
-					<div className="row assets">
-						{this.state.controlled_assets.map((asset) => {
-							var cssClass = "btn btn-info";
-							if (this.state.show_only.length > 0) {
-								if (this.state.show_only.toString().indexOf(asset.asset_id.toString()) >= 0) {
-									cssClass += " show";
-								} else cssClass += " hidden";
-							}
-							return (
-								<button type="button" key={asset.asset_id} className={cssClass} onClick={() => this.assetHandler(asset)}>
-									<span className="glyphicon glyphicon-link"></span>
-									{asset.asset_name}
-								</button>
-							);
-						})}
+					<div className="controlled-assets">
+						<div className="row assets">
+							{this.state.controlled_assets.map((asset) => {
+								var cssClass = "btn btn-info";
+								if (this.state.show_only.length > 0) {
+									if (this.state.show_only.toString().indexOf(asset.asset_id.toString()) >= 0) {
+										cssClass += " show";
+									} else cssClass += " hidden";
+								}
+								return (
+									<button type="button" key={asset.asset_id} className={cssClass} onClick={() => this.assetHandler(asset)}>
+										<span className="glyphicon glyphicon-link"></span>
+										{asset.asset_name}
+									</button>
+								);
+							})}
+						</div>
 					</div>
 				</div><br />
 
 				<div id="delegated-assets">
 					<h4>My Delegated Assets</h4><hr />
-					<div className="row assets">
-						{this.state.delegated_assets.map((asset) => {
-							var cssClass = "btn btn-info";
-							if (this.state.show_only.length > 0) {
-								if (this.state.show_only.toString().indexOf(asset.asset_id.toString()) >= 0) {
-									cssClass += " show";
-								} else cssClass += " hidden";
-							}
-							return (
-								<button type="button" key={asset.asset_id} className={cssClass} onClick={() => this.assetHandler(asset)}>
-									<span className="glyphicon glyphicon-piggy-bank"></span>
-									{asset.asset_name}
-								</button>
-							);
-						})}
+					<div className="delegated-assets">
+						<div className="row assets">
+							{this.state.delegated_assets.map((asset, i) => {
+								var cssClass = "btn btn-danger";
+								if (this.state.show_only.length > 0) {
+									if (this.state.show_only.toString().indexOf(asset.asset_id.toString()) >= 0) {
+										cssClass += " show";
+									} else cssClass += " hidden";
+								}
+								return (
+									<button type="button" key={i} className={cssClass} onClick={() => this.assetHandler(asset)}>
+										<span className="glyphicon glyphicon-piggy-bank"></span>
+										{asset.asset_id}
+									</button>
+								);
+							})}
+						</div>
 					</div>
 				</div><br />
 

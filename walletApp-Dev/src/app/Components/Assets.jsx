@@ -397,13 +397,12 @@ class Assets extends Component {
 	constructor(props) {
 		super(props);
 
-		// static values
 		this.state = {
 			showDetails: false,
 			wallet: { pubKey: localStorage.getItem("pubKey") },
 			own_assets: [],
 			controlled_assets: [{ asset_id: 161718, asset_name: 'Parents House' }, { asset_id: 192021, asset_name: 'My Car' }],
-			delegated_assets: [{}],
+			delegated_assets: [],
 			active_asset: {},
 			show_only: []
 		};
@@ -414,10 +413,9 @@ class Assets extends Component {
 		this.searchHandler = this.searchHandler.bind(this);
 	}
 
+	//*******************************************************************************
+	//get all assets, OWNED, CONTROLLED, DELEGATAED:
 	componentWillMount() {
-
-		//get all assets, OWNED, CONTROLLED, DELEGATAED:        
-
 		// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
 		// -> -> -> START get OWNED assets -> -> ->
 		$.ajax({
@@ -455,8 +453,6 @@ class Assets extends Component {
 								//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
 								var theArray = this.state.own_assets;
 
-								//var localStorage_owned = this.state.own_assets
-
 								console.log("length is: " + theArray.length)
 								console.log(theArray)
 								//TODO: RENAME asset_name TO ASSET DETAILS
@@ -464,7 +460,6 @@ class Assets extends Component {
 									asset_id: dataResult.assetID,
 									asset_details: dataResult
 								}
-
 								this.setState({ own_assets: theArray });
 
 								assetData[assetData.length] = {
@@ -476,30 +471,17 @@ class Assets extends Component {
 									asset_owners: dataResult.ownerIdList,
 									asset_controllers: dataResult.controlIdList
 								}
-
-								//console.log("assetData " + JSON.stringify(assetData))
 								localStorage.setItem("owned_assets", JSON.stringify(assetData))
-								console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets))
-
+								//console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets))
 							}.bind(this),
-							complete: function () {
-
-							},
-							//console.log(result)	
+							complete: function () { },
 						})
-
-					}
-
-
-				}
-			}.bind(this),
-			complete: function () {
-			},
+					}//end for
+				}//end if (data > 0)
+			}.bind(this)
 		})
 		// <- <- <- END get OWNED assets <- <- <-
 		// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
-
-
 		// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
 		// -> -> -> START get CONTROLLED assets -> -> ->
 		$.ajax({
@@ -512,11 +494,9 @@ class Assets extends Component {
 					data = JSON.parseJSON(result)
 				}
 
-				//get the array:
 				data = data.data;
-
-				//debugging:
 				console.log("Get Controlled Assets result: " + data);
+				var assetData = []
 
 				if (data.length > 0) {
 					//loop through OWNED assets
@@ -531,30 +511,28 @@ class Assets extends Component {
 								if ($.type(result) != "object") {
 									dataResult = JSON.parseJSON(result)
 								}
-
-								//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
 								this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
 
-							}.bind(this),
-							complete: function () {
-								// do something
-							},
-							//console.log(result)	
-						})
+								// assetData[assetData.length] = {
+								// 	asset_id: dataResult.assetID,
+								// 	asset_uniqueId: dataResult.uniqueId,
+								// 	asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
+								// 	asset_coidAddr: dataResult.coidAddr,
+								// 	asset_gatekeeperAddr: dataResult.gatekeeperAddr,
+								// 	asset_owners: dataResult.ownerIdList,
+								// 	asset_controllers: dataResult.controlIdList
+								// }
+								// localStorage.setItem("owned_assets", JSON.stringify(assetData))
 
-					}
+							}.bind(this),
+							complete: function () { },
+						})
+					}//end for
 				}
-			}.bind(this),
-			complete: function () {
-				// do something
-			},
-			//console.log(result)
+			}.bind(this)
 		})
 		// <- <- <- END get CONTROLLED assets <- <- <-
 		// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
-
-
-
 		// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
 		// -> -> -> START get DELEGATED assets -> -> ->
 		$.ajax({
@@ -567,10 +545,7 @@ class Assets extends Component {
 					data = JSON.parseJSON(result)
 				}
 
-				//get the array:
 				data = data.data;
-
-				//debugging:
 				console.log("Get Delegated Assets result: " + data)
 
 				if (data.length > 0) {
@@ -588,26 +563,23 @@ class Assets extends Component {
 								}
 
 								//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-								this.setState({ delegated_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
+								var theArray = this.state.delegated_assets;
+
+								theArray[theArray.length] = {
+									asset_id: dataResult.assetID,
+									asset_details: dataResult
+								}
+								this.setState({ delegated_assets: theArray });
 
 							}.bind(this),
-							complete: function () {
-								// do something
-							},
-							//console.log(result)	
+							complete: function () { },
 						})
-
-					}
+					}//end for
 				}
-			}.bind(this),
-			complete: function () {
-				// do something
-			},
-			//console.log(result)
+			}.bind(this)
 		})
 		// <- <- <- END get DELEGATED assets <- <- <-
 		// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
-
 
 	}
 

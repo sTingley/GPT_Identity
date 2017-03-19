@@ -144,8 +144,8 @@ class DimensionForm extends Component {
 
             json.accessCategories = json.accessCategories.substring(0, json.accessCategories.length - 1)
 
-            json.delegations = this.prepareDelegationDistribution(function(err){
-                if(err){console.log("ERROR DELEGATIONS: " + err)}
+            json.delegations = this.prepareDelegationDistribution(function (err) {
+                if (err) { console.log("ERROR DELEGATIONS: " + err) }
             })
 
             json.owner = this.state.dimension.owner
@@ -681,22 +681,29 @@ class IdentityDimensions extends Component {
         [{"input-0":"QmPcY8sJ8hSfWhzqX8iLzQEbgiESjqTaeEEoJUrZwhLNk5|9bb7e24956771c4f1bbfe5eceff9e9e1457fafa5d3af3a56f4d7cef0bdd509dc"},
         {"input-1":"QmUJGfdKUCFiL2cKE3dcVFL5Q6PsvcWJSPxff5snJ46tuk|28a6ce8b3c55a60f5923cb87e5fd1c47decb973d1973f047f722141460fdad71"},]*/
     prepareAttributes() {
-        var newArr = [],
-            labels = this.getLabelValues();
-        console.log("labelVals: " + JSON.stringify(labels))
+        let attrs = [];
+        let labels = this.getLabelValues();
         //labelVals: [{"input-0":"mydocument"},{"input-1":"seconddocument"}]
         for (var i = 0; i < labels.length; i++) {
             var tmpArr = [];
             for (var key in labels[i]) {
                 tmpArr.push(labels[i][key]);
-                let ipfsHash = this.state.file_attrs[i][key].split("|")
-                ipfsHash = ipfsHash[0] //not sending sha hash
+                let ipfsHash = this.state.file_attrs[i][key].split("|");
+                ipfsHash = ipfsHash[0]; //not sending sha3 hash
                 tmpArr.push(ipfsHash);
-                //console.log("tmpArray: " + tmpArr)
             }
-            newArr.push(tmpArr);
+            attrs.push(tmpArr);
         }
-        return newArr;
+        var objArray = [];
+        for (var i = 0; i < attrs.length; i++) {
+            let obj = {}
+            obj.descriptor = attrs[i][0]
+            //console.log("obj.descriptor: " + obj.descriptor + ", type: " + typeof(obj.descriptor))
+            obj.attribute = attrs[i][1]
+            obj.flag = 0
+            objArray.push(obj)
+        }
+        return objArray
     }
     //*****************************************************************************
     //when we click Add More, a new value is pushed into this.state.inputs,
@@ -779,20 +786,16 @@ class IdentityDimensions extends Component {
     createDimension(e) {
         e.preventDefault();
 
-        //let delegatee = $("input[name^='delegatee_addr']").val()
-
-        let dimensionName = $("input[name^='dimensionName']").val()
-
-        let attributes = this.prepareAttributes()
-        console.log("attributes: " + attributes)
-
-        var json = {}
+        var json = {};
+        //**************************************************************
+        let dimensionName = $("input[name^='dimensionName']").val();
         if (dimensionName) { json.dimensionName = dimensionName }
         json.pubKey = localStorage.getItem("pubKey")
         json.address = ""
         json.flag = 0
         json.ID = 0
-
+        //**************************************************************
+        // GET PROPER DATA FROM SELECTED ASSET
         let selected_asset = $("#assetSelect option:selected").text()
         this.state.own_assets.forEach(function (asset, index) {
             if (selected_asset == asset.asset_id) {
@@ -803,37 +806,20 @@ class IdentityDimensions extends Component {
                     json.controllers = asset.asset_controllers
             }
         })
-
-        console.log("json.controllers: " + json.controllers)
-
+        //**************************************************************
         let delegations = this.prepareDelegationDistribution(dimensionName)
         json.delegations = JSON.stringify(delegations)
         //**************************************************************
-        var objArray = []
-        for (var i = 0; i < attributes.length; i++) {
-            let obj = {}
-            obj.descriptor = attributes[i][0]
-            console.log("obj.descriptor: " + obj.descriptor + ", type: " + typeof(obj.descriptor))
-            obj.attribute = attributes[i][1]
-            //console.log("obj.attribute: " + obj.attribute + ", type: " + typeof(obj.attribute))
-            obj.flag = 0
-            //console.log("obj.flag: " + obj.flag + ", type: " + typeof(obj.flag))
-            //console.log("object: " + obj)
-            objArray.push(obj)
-            //console.log("objArray: " + objArray + ", type: " + typeof(objArray))
-        }
+        let attributes = this.prepareAttributes();
 
-        json.data = objArray
+        console.log("attributes: " + attributes + ", type: " + typeof (attributes));
 
-        json.data = JSON.stringify(json.data)
-        console.log("tostring: " + json.data)
+        json.data = attributes;
+        json.data = JSON.stringify(json.data);
+        console.log("tostring: " + json.data);
 
-        //json.data = JSON.stringify(objArray)
+        console.log("JSON: " + JSON.stringify(json));
 
-        //json.notDATA = objArray
-
-       console.log("JSON: " + JSON.stringify(json))
-       
 
         $.ajax({
             type: "POST",

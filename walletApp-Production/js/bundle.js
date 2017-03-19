@@ -50887,7 +50887,6 @@
 		function Assets(props) {
 			_classCallCheck(this, Assets);
 	
-			// static values
 			var _this3 = _possibleConstructorReturn(this, (Assets.__proto__ || Object.getPrototypeOf(Assets)).call(this, props));
 	
 			_this3.state = {
@@ -50895,7 +50894,7 @@
 				wallet: { pubKey: localStorage.getItem("pubKey") },
 				own_assets: [],
 				controlled_assets: [{ asset_id: 161718, asset_name: 'Parents House' }, { asset_id: 192021, asset_name: 'My Car' }],
-				delegated_assets: [{}],
+				delegated_assets: [],
 				active_asset: {},
 				show_only: []
 			};
@@ -50907,12 +50906,13 @@
 			return _this3;
 		}
 	
+		//*******************************************************************************
+		//get all assets, OWNED, CONTROLLED, DELEGATAED:
+	
+	
 		_createClass(Assets, [{
 			key: 'componentWillMount',
 			value: function componentWillMount() {
-	
-				//get all assets, OWNED, CONTROLLED, DELEGATAED:        
-	
 				// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
 				// -> -> -> START get OWNED assets -> -> ->
 				$.ajax({
@@ -50950,8 +50950,6 @@
 										//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
 										var theArray = this.state.own_assets;
 	
-										//var localStorage_owned = this.state.own_assets
-	
 										console.log("length is: " + theArray.length);
 										console.log(theArray);
 										//TODO: RENAME asset_name TO ASSET DETAILS
@@ -50959,7 +50957,6 @@
 											asset_id: dataResult.assetID,
 											asset_details: dataResult
 										};
-	
 										this.setState({ own_assets: theArray });
 	
 										assetData[assetData.length] = {
@@ -50971,22 +50968,17 @@
 											asset_owners: dataResult.ownerIdList,
 											asset_controllers: dataResult.controlIdList
 										};
-	
-										//console.log("assetData " + JSON.stringify(assetData))
 										localStorage.setItem("owned_assets", JSON.stringify(assetData));
-										console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets));
+										//console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets))
 									}.bind(this),
 									complete: function complete() {}
 								});
-							}
-						}
-					}.bind(this),
-					complete: function complete() {}
+							} //end for
+						} //end if (data > 0)
+					}.bind(this)
 				});
 				// <- <- <- END get OWNED assets <- <- <-
 				// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
-	
-	
 				// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
 				// -> -> -> START get CONTROLLED assets -> -> ->
 				$.ajax({
@@ -50999,11 +50991,9 @@
 							data = JSON.parseJSON(result);
 						}
 	
-						//get the array:
 						data = data.data;
-	
-						//debugging:
 						console.log("Get Controlled Assets result: " + data);
+						var assetData = [];
 	
 						if (data.length > 0) {
 							//loop through OWNED assets
@@ -51018,25 +51008,27 @@
 										if ($.type(result) != "object") {
 											dataResult = JSON.parseJSON(result);
 										}
-	
-										//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
 										this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
+	
+										// assetData[assetData.length] = {
+										// 	asset_id: dataResult.assetID,
+										// 	asset_uniqueId: dataResult.uniqueId,
+										// 	asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
+										// 	asset_coidAddr: dataResult.coidAddr,
+										// 	asset_gatekeeperAddr: dataResult.gatekeeperAddr,
+										// 	asset_owners: dataResult.ownerIdList,
+										// 	asset_controllers: dataResult.controlIdList
+										// }
+										// localStorage.setItem("owned_assets", JSON.stringify(assetData))
 									}.bind(this),
-									complete: function complete() {
-										// do something
-									}
+									complete: function complete() {}
 								});
-							}
+							} //end for
 						}
-					}.bind(this),
-					complete: function complete() {
-						// do something
-					}
+					}.bind(this)
 				});
 				// <- <- <- END get CONTROLLED assets <- <- <-
 				// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
-	
-	
 				// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
 				// -> -> -> START get DELEGATED assets -> -> ->
 				$.ajax({
@@ -51049,10 +51041,7 @@
 							data = JSON.parseJSON(result);
 						}
 	
-						//get the array:
 						data = data.data;
-	
-						//debugging:
 						console.log("Get Delegated Assets result: " + data);
 	
 						if (data.length > 0) {
@@ -51070,22 +51059,22 @@
 										}
 	
 										//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-										this.setState({ delegated_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
+										var theArray = this.state.delegated_assets;
+	
+										theArray[theArray.length] = {
+											asset_id: dataResult.assetID,
+											asset_details: dataResult
+										};
+										this.setState({ delegated_assets: theArray });
 									}.bind(this),
-									complete: function complete() {
-										// do something
-									}
+									complete: function complete() {}
 								});
-							}
+							} //end for
 						}
-					}.bind(this),
-					complete: function complete() {
-						// do something
-					}
+					}.bind(this)
 				});
 				// <- <- <- END get DELEGATED assets <- <- <-
 				// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
-	
 			}
 		}, {
 			key: 'assetHandler',
@@ -51141,7 +51130,19 @@
 								'h3',
 								{ className: 'margin0px' },
 								'Manage Assets'
-							)
+							),
+							_react2.default.createElement('hr', null),
+							_react2.default.createElement(
+								'p',
+								null,
+								_react2.default.createElement(
+									'b',
+									null,
+									'Public Key: '
+								),
+								this.state.wallet.pubKey
+							),
+							_react2.default.createElement('hr', null)
 						),
 						_react2.default.createElement(
 							'div',
@@ -51166,35 +51167,7 @@
 							)
 						)
 					),
-					_react2.default.createElement(
-						'div',
-						{ id: 'my-accounts' },
-						_react2.default.createElement(
-							'h4',
-							null,
-							'My Wallet'
-						),
-						' ',
-						_react2.default.createElement('hr', null),
-						_react2.default.createElement(
-							'div',
-							{ className: 'all-accounts' },
-							_react2.default.createElement(
-								'div',
-								{ className: 'row accounts' },
-								_react2.default.createElement(
-									'p',
-									null,
-									_react2.default.createElement(
-										'b',
-										null,
-										'Public Key: '
-									),
-									this.state.wallet.pubKey
-								)
-							)
-						)
-					),
+					_react2.default.createElement('br', null),
 					_react2.default.createElement(
 						'div',
 						{ id: 'own-assets' },
@@ -51203,7 +51176,6 @@
 							null,
 							'My Owned Assets'
 						),
-						' ',
 						_react2.default.createElement('hr', null),
 						_react2.default.createElement(
 							'div',
@@ -51230,6 +51202,7 @@
 							)
 						)
 					),
+					_react2.default.createElement('br', null),
 					_react2.default.createElement(
 						'div',
 						{ id: 'controlled-assets' },
@@ -51238,7 +51211,6 @@
 							null,
 							'My Controlled Assets'
 						),
-						' ',
 						_react2.default.createElement('hr', null),
 						_react2.default.createElement(
 							'div',
@@ -51261,6 +51233,38 @@
 							})
 						)
 					),
+					_react2.default.createElement('br', null),
+					_react2.default.createElement(
+						'div',
+						{ id: 'delegated-assets' },
+						_react2.default.createElement(
+							'h4',
+							null,
+							'My Delegated Assets'
+						),
+						_react2.default.createElement('hr', null),
+						_react2.default.createElement(
+							'div',
+							{ className: 'row assets' },
+							this.state.delegated_assets.map(function (asset) {
+								var cssClass = "btn btn-info";
+								if (_this4.state.show_only.length > 0) {
+									if (_this4.state.show_only.toString().indexOf(asset.asset_id.toString()) >= 0) {
+										cssClass += " show";
+									} else cssClass += " hidden";
+								}
+								return _react2.default.createElement(
+									'button',
+									{ type: 'button', key: asset.asset_id, className: cssClass, onClick: function onClick() {
+											return _this4.assetHandler(asset);
+										} },
+									_react2.default.createElement('span', { className: 'glyphicon glyphicon-piggy-bank' }),
+									asset.asset_name
+								);
+							})
+						)
+					),
+					_react2.default.createElement('br', null),
 					this.state.showDetails ? _react2.default.createElement(Modal, { hideHandler: this.hideHandler, asset: this.state.active_asset }) : null
 				);
 			}
@@ -53614,6 +53618,8 @@
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	var _react = __webpack_require__(/*! react */ 1);
@@ -53776,7 +53782,8 @@
 	            //dimension_data: {},
 	            selected: false,
 	            docs: {}, //takes same form as it does in Documents.jsx and CoreIdentity.jsx/MyGatekeeper.jsx
-	            pubkey: localStorage.getItem("pubKey")
+	            pubkey: localStorage.getItem("pubKey"),
+	            delegations: ['input-0']
 	        };
 	        return _this4;
 	    }
@@ -53789,15 +53796,12 @@
 	        value: function submitHandler(e) {
 	            var _this5 = this;
 	
-	            var dimension = this.state.dimension.dimension;
-	            //*********************************************/
-	
 	            e.preventDefault();
 	            var ele = $(e.target);
-	
-	            var typeInput = dimension.dimensionName;
-	
 	            var button_val = parseInt(ele.attr("data-val"));
+	            //*********************************************/
+	            var dimension = this.state.dimension.dimension;
+	            var typeInput = dimension.dimensionName;
 	
 	            var json = {
 	                "publicKey": localStorage.getItem("pubKey"),
@@ -53818,7 +53822,6 @@
 	                        descriptor = value;
 	                    }
 	                });
-	
 	                //descriptor, ex: 'financial history 1/2017'
 	                json.descriptor = descriptor;
 	
@@ -53869,27 +53872,30 @@
 	
 	                    json.accessCategories = json.accessCategories.substring(0, json.accessCategories.length - 1);
 	
-	                    var delegatee = $("input[name^='delegatee_addr']").val();
-	                    if (delegatee) json.delegatee = delegatee;
-	                    var tokenQuantity = $("input[name^='tokenQuantity']").val();
-	                    if (tokenQuantity) json.tokenQuantity = tokenQuantity;
+	                    json.delegations = _this5.prepareDelegationDistribution(function (err) {
+	                        if (err) {
+	                            console.log("ERROR DELEGATIONS: " + err);
+	                        }
+	                    });
 	
 	                    json.owner = _this5.state.dimension.owner;
 	
 	                    json.coidAddr = _this5.state.dimension.coidAddr;
 	                    json.dimensionCtrlAddr = _this5.state.dimension.dimensionCtrlAddr;
 	
+	                    json.dimension = _this5.state.dimension.dimensionName;
+	
 	                    console.log("\n JSON body: " + JSON.stringify(json));
-	                    $.ajax({
-	                        url: twinUrl + 'dimensions/addDelegation',
-	                        type: 'POST',
-	                        data: json,
-	                        success: function success(res) {
-	                            if (res.status == "Ok" && res.msg == "true") {
-	                                //var i_dimension = this.state.dimension.ID
-	                            }
-	                        }
-	                    });
+	                    // $.ajax({
+	                    //     url: twinUrl + 'dimensions/addDelegation',
+	                    //     type: 'POST',
+	                    //     data: json,
+	                    //     success: function (res) {
+	                    //         if (res.status == "Ok" && res.msg == "true") {
+	                    //             //var i_dimension = this.state.dimension.ID
+	                    //         }
+	                    //     }
+	                    // });
 	                })();
 	            }
 	            //*********************************************************************
@@ -53900,33 +53906,104 @@
 	    }, {
 	        key: 'componentWillMount',
 	        value: function componentWillMount() {
+	
+	            $('#accessCategories').show();
+	
 	            if ($("#allAttrs").is(":checked")) {
 	                this.state.selected = true;
 	            }
 	            if (this.state.selected = true) {
 	                $('#accessCategories').hide();
-	            } else $('#accessCategories').show();
+	            }
 	        }
 	    }, {
 	        key: 'componentDidMount',
 	        value: function componentDidMount() {
 	
-	            // this.setState({
-	            //     dimension_data: this.props.dimension
-	            // });
+	            // this.setState({dimension_data: this.props.dimension});
 	            $("#dimension_Details").modal('show');
 	            $("#dimension_Details").on('hidden.bs.modal', this.props.hideHandler);
 	
-	            $.ajax({
-	                url: twinUrl + "ipfs/alldocs/" + this.state.pubKey,
-	                dataType: 'json',
-	                cache: false,
-	                success: function (resp) {
-	                    //console.log("Response Data in Documents (parent) component: ", JSON.stringify(resp.data.documents))
-	                    this.setState({ docs: resp.data.documents });
-	                }.bind(this)
-	            });
+	            // $.ajax({
+	            //     url: twinUrl + "ipfs/alldocs/" + this.state.pubKey,
+	            //     dataType: 'json',
+	            //     cache: false,
+	            //     success: function (resp) {
+	            //         this.setState({ docs: resp.data.documents });
+	            //     }.bind(this),
+	            //     error: function (xhr, status, err) {
+	            //         console.error(this.props.url, status, err.toString());
+	            //     }.bind(this)
+	            // });
 	        }
+	
+	        /*****************************************************************************
+	        * SAME PROCESS TO ADD DELEGATIONS
+	        * 1) define getDelegationInputValues
+	        * 2) getDelegationInputValues inside prepareDelegationDistribution
+	        *****************************************************************************/
+	
+	    }, {
+	        key: 'getDelegationInputValues',
+	        value: function getDelegationInputValues() {
+	            var labelVals = [];
+	            var _this = this;
+	            //in DimensionForm
+	            $.each($("input[name^='delegatee-']"), function (obj) {
+	                var value = $.trim($(this).val());
+	                if (value.length > 0) {
+	                    labelVals.push(_defineProperty({}, $(this).attr('name').replace("label-", ""), value));
+	                }
+	            });
+	            return labelVals;
+	            //returns an object array: [{"delegatee-input1-0":"pubkey"},{"delegatee-input1-0":"2"}
+	        }
+	        //*****************************************************************************
+	        //prepare the delegations object array
+	
+	    }, {
+	        key: 'prepareDelegationDistribution',
+	        value: function prepareDelegationDistribution() {
+	            var labels = this.getDelegationInputValues();
+	            console.log("labels: " + JSON.stringify(labels));
+	            var delegatee = [];
+	            var delegatee_token_quantity = [];
+	            for (var i = 0; i < labels.length; i += 2) {
+	                for (var key in labels[i]) {
+	                    delegatee.push(labels[i][key]);
+	                    delegatee_token_quantity.push(labels[i + 1][key]);
+	                }
+	            }
+	            var delegationsArray = [];
+	            //{ owner: "", delegatee: "", amount: "", dimension: "", expiration: "", accessCategories: "" },
+	            if (delegatee.length == delegatee_token_quantity.length) {
+	                for (var i = 0; i < delegatee.length; i++) {
+	                    var delegationObj = {};
+	                    delegationObj.owner = "COID_OWNER"; // EDIT!!!!!!!!!!
+	                    delegationObj.delegatee = delegatee[i];
+	                    delegationObj.amount = delegatee_token_quantity[i];
+	                    delegationObj.accessCategories = "";
+	                    delegationsArray.push(delegationObj);
+	                }
+	                console.log("delegationObj: " + JSON.stringify(delegationsArray));
+	            }
+	            return delegationsArray;
+	        }
+	        //*****************************************************************************
+	
+	    }, {
+	        key: 'appendDelegation',
+	        value: function appendDelegation() {
+	            var inputLen = this.state.delegations.length;
+	            console.log("dimensionForm delegations length: " + inputLen);
+	            if (inputLen < 10) {
+	                var newInput1 = 'input1-' + inputLen;
+	                this.setState({ delegations: this.state.delegations.concat([newInput1]) });
+	            }
+	        }
+	        //*****************************************************************************
+	        //*****************************************************************************
+	
 	    }, {
 	        key: 'render',
 	        value: function render() {
@@ -53934,7 +54011,6 @@
 	
 	            console.log("state in DimensionForm\n" + JSON.stringify(this.state));
 	            var dims = this.state.dimension;
-	            //console.log("dims: " + JSON.stringify(dims))
 	
 	            var dataArray = [];
 	            var arrayOfArrays = [];
@@ -54104,7 +54180,7 @@
 	                                                var ipfs_url = "http://10.101.114.231:8080/ipfs/";
 	                                                if (arrayOfArrays.length > 0) {
 	                                                    return arrayOfArrays.map(function (attrs, i) {
-	                                                        console.log("attrs[0]: " + attrs[0] + ", attrs[1]:" + attrs[1] + ", attrs[2]: " + attrs[2] + ", attrs[3]: " + attrs[3]);
+	                                                        //console.log("attrs[0]: " + attrs[0] + ", attrs[1]:" + attrs[1] + ", attrs[2]: " + attrs[2] + ", attrs[3]: " + attrs[3])
 	                                                        if (attrs[1] && attrs[1].charAt(0) == "Q") {
 	                                                            return _react2.default.createElement(
 	                                                                'tr',
@@ -54278,8 +54354,7 @@
 	                                                _react2.default.createElement(
 	                                                    'th',
 	                                                    null,
-	                                                    'Tokens delegated for this dimension: ',
-	                                                    0
+	                                                    'Tokens delegated for this dimension: 0'
 	                                                )
 	                                            )
 	                                        ),
@@ -54291,31 +54366,30 @@
 	                                                'tr',
 	                                                null,
 	                                                _react2.default.createElement(
-	                                                    'th',
+	                                                    'td',
 	                                                    null,
 	                                                    _react2.default.createElement(
-	                                                        'b',
-	                                                        null,
-	                                                        'Delegate tokens'
+	                                                        'label',
+	                                                        { htmlFor: 'control_dist' },
+	                                                        'Enter Delegations and their delegated control token(s).'
+	                                                    ),
+	                                                    this.state.delegations.map(function (input) {
+	                                                        return _react2.default.createElement(DimensionDelegationForm, { max: '10', key: input, labelref: input });
+	                                                    })
+	                                                )
+	                                            ),
+	                                            _react2.default.createElement(
+	                                                'tr',
+	                                                null,
+	                                                _react2.default.createElement(
+	                                                    'td',
+	                                                    null,
+	                                                    _react2.default.createElement(
+	                                                        'button',
+	                                                        { type: 'button', className: 'btn btn-info pull-right', style: syle, onClick: this.appendDelegation.bind(this) },
+	                                                        _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
+	                                                        'Add More'
 	                                                    )
-	                                                )
-	                                            ),
-	                                            _react2.default.createElement(
-	                                                'tr',
-	                                                null,
-	                                                _react2.default.createElement(
-	                                                    'td',
-	                                                    null,
-	                                                    _react2.default.createElement('input', { name: 'delegatee_addr', className: 'form-control col-md-4', type: 'text', placeholder: 'Delegatee Address' })
-	                                                )
-	                                            ),
-	                                            _react2.default.createElement(
-	                                                'tr',
-	                                                null,
-	                                                _react2.default.createElement(
-	                                                    'td',
-	                                                    null,
-	                                                    _react2.default.createElement('input', { name: 'tokenQuantity', className: 'form-control col-md-4', type: 'text', placeholder: 'Token Quantity' })
 	                                                )
 	                                            ),
 	                                            _react2.default.createElement(
@@ -54419,6 +54493,7 @@
 	
 	            //Dimensions pulled from DT
 	            iDimensions: [],
+	            ctrlDimensions: [],
 	            //prop dataHandler passes activeDimension to DimensionForm
 	            activeDimension: {},
 	
@@ -54629,22 +54704,29 @@
 	    }, {
 	        key: 'prepareAttributes',
 	        value: function prepareAttributes() {
-	            var newArr = [],
-	                labels = this.getLabelValues();
-	            console.log("labelVals: " + JSON.stringify(labels));
+	            var attrs = [];
+	            var labels = this.getLabelValues();
 	            //labelVals: [{"input-0":"mydocument"},{"input-1":"seconddocument"}]
 	            for (var i = 0; i < labels.length; i++) {
 	                var tmpArr = [];
 	                for (var key in labels[i]) {
 	                    tmpArr.push(labels[i][key]);
 	                    var ipfsHash = this.state.file_attrs[i][key].split("|");
-	                    ipfsHash = ipfsHash[0]; //not sending sha hash
+	                    ipfsHash = ipfsHash[0]; //not sending sha3 hash
 	                    tmpArr.push(ipfsHash);
-	                    //console.log("tmpArray: " + tmpArr)
 	                }
-	                newArr.push(tmpArr);
+	                attrs.push(tmpArr);
 	            }
-	            return newArr;
+	            var objArray = [];
+	            for (var i = 0; i < attrs.length; i++) {
+	                var obj = {};
+	                obj.descriptor = attrs[i][0];
+	                //console.log("obj.descriptor: " + obj.descriptor + ", type: " + typeof(obj.descriptor))
+	                obj.attribute = attrs[i][1];
+	                obj.flag = 0;
+	                objArray.push(obj);
+	            }
+	            return objArray;
 	        }
 	        //*****************************************************************************
 	        //when we click Add More, a new value is pushed into this.state.inputs,
@@ -54687,7 +54769,10 @@
 	
 	    }, {
 	        key: 'prepareDelegationDistribution',
-	        value: function prepareDelegationDistribution() {
+	        value: function prepareDelegationDistribution(dimension) {
+	            var dimensionName = dimension;
+	
+	            console.log("preparedelegation dimensionName: " + dimensionName);
 	            var labels = this.getDelegationInputValues();
 	            var delegatee = [];
 	            var delegatee_token_quantity = [];
@@ -54702,10 +54787,12 @@
 	            if (delegatee.length == delegatee_token_quantity.length) {
 	                for (var i = 0; i < delegatee.length; i++) {
 	                    var delegationObj = {};
+	                    delegationObj.dimension = dimensionName;
 	                    delegationObj.owner = "COID_OWNER"; // EDIT!!!!!!!!!!
 	                    delegationObj.delegatee = delegatee[i];
 	                    delegationObj.amount = delegatee_token_quantity[i];
 	                    delegationObj.accessCategories = "";
+	                    delegationObj.timeFrame = "1111";
 	                    delegationsArray.push(delegationObj);
 	                }
 	                //console.log("delegationObj: " + JSON.stringify(delegationsArray))
@@ -54734,14 +54821,9 @@
 	        value: function createDimension(e) {
 	            e.preventDefault();
 	
-	            //let delegatee = $("input[name^='delegatee_addr']").val()
-	
-	            var dimensionName = $("input[name^='dimensionName']").val();
-	
-	            var attributes = this.prepareAttributes();
-	            console.log("attributes: " + attributes);
-	
 	            var json = {};
+	            //**************************************************************
+	            var dimensionName = $("input[name^='dimensionName']").val();
 	            if (dimensionName) {
 	                json.dimensionName = dimensionName;
 	            }
@@ -54749,25 +54831,25 @@
 	            json.address = "";
 	            json.flag = 0;
 	            json.ID = 0;
-	
+	            //**************************************************************
+	            // GET PROPER DATA FROM SELECTED ASSET
 	            var selected_asset = $("#assetSelect option:selected").text();
 	            this.state.own_assets.forEach(function (asset, index) {
 	                if (selected_asset == asset.asset_id) {
 	                    json.coidAddr = asset.asset_coidAddr, json.dimensionCtrlAddr = asset.asset_dimCtrlAddr, json.uniqueId = asset.asset_uniqueId, json.owners = asset.asset_owners, json.controllers = asset.asset_controllers;
 	                }
 	            });
+	            //**************************************************************
+	            var delegations = this.prepareDelegationDistribution(dimensionName);
+	            json.delegations = JSON.stringify(delegations);
+	            //**************************************************************
+	            var attributes = this.prepareAttributes();
 	
-	            json.delegations = this.prepareDelegationDistribution();
+	            console.log("attributes: " + attributes + ", type: " + (typeof attributes === 'undefined' ? 'undefined' : _typeof(attributes)));
 	
-	            var objArray = [];
-	            for (var i = 0; i < attributes.length; i++) {
-	                var obj = {};
-	                obj.descriptor = attributes[i][0];
-	                obj.attribute = attributes[i][1];
-	                obj.flag = 0;
-	                objArray.push(obj);
-	            }
-	            json.data = objArray;
+	            json.data = attributes;
+	            json.data = JSON.stringify(json.data);
+	            console.log("tostring: " + json.data);
 	
 	            console.log("JSON: " + JSON.stringify(json));
 	
@@ -54776,20 +54858,22 @@
 	                url: twinUrl + 'dimensions/CreateDimension',
 	                data: json,
 	                success: function (result) {
+	                    //returns (bool success, bytes32 callerHash, address test)
 	                    var data = result;
 	                    if ($.type(result) != "object") {
 	                        data = JSON.parseJSON(result);
 	                    }
-	
 	                    console.log("response createDimenson: " + JSON.stringify(data));
 	
+	                    data = data.Result;
 	                    console.log("data.Result: " + data.Result);
 	
-	                    var dimensionAddr = data.Result[2];
-	                    console.log("created dimension address: " + dimensionAddr);
+	                    data = data.split(",");
+	                    console.log("DATA: " + data);
 	
-	                    //returns (bool success, bytes32 callerHash, address test)
-	                    //response createDimenson: {"Status":null,"Result":"true,8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,C48883966A3B2B8672CC4392C0E03758F7705C36"}
+	                    //var dimensionAddr = data.Result[2]
+	                    //console.log("created dimension address: " + dimensionAddr)
+	
 	                    //get the array:
 	                    //data = data.data;
 	                }.bind(this),
@@ -54807,8 +54891,6 @@
 	            var _this8 = this,
 	                _React$createElement,
 	                _React$createElement2;
-	
-	            console.log("this.state.own_Assets: " + JSON.stringify(this.state.own_assets));
 	
 	            var _that = this;
 	
@@ -54845,7 +54927,7 @@
 	                            _react2.default.createElement(
 	                                'a',
 	                                { href: '#dimensions', role: 'tab', 'data-toggle': 'tab' },
-	                                'Identity Dimensions'
+	                                'Dimensions'
 	                            )
 	                        ),
 	                        _react2.default.createElement(
@@ -54870,47 +54952,120 @@
 	                            (_React$createElement = { className: 'tabpanel', role: 'tabpanel' }, _defineProperty(_React$createElement, 'className', 'tab-pane active'), _defineProperty(_React$createElement, 'id', 'dimensions'), _React$createElement),
 	                            _react2.default.createElement('br', null),
 	                            _react2.default.createElement(
-	                                'table',
-	                                { style: table, className: 'table table-striped center' },
+	                                'div',
+	                                { id: 'ownedDimensions' },
 	                                _react2.default.createElement(
-	                                    'tbody',
+	                                    'h5',
 	                                    null,
-	                                    function () {
-	                                        if ($.isArray(_this8.state.iDimensions) && _this8.state.iDimensions.length > 0) {
-	                                            return _this8.state.iDimensions.map(function (el, i) {
+	                                    _react2.default.createElement(
+	                                        'b',
+	                                        null,
+	                                        'My Owned Dimensions'
+	                                    )
+	                                ),
+	                                ' ',
+	                                _react2.default.createElement('hr', null),
+	                                _react2.default.createElement(
+	                                    'table',
+	                                    { style: table, className: 'table table-striped center' },
+	                                    _react2.default.createElement(
+	                                        'tbody',
+	                                        null,
+	                                        function () {
+	                                            if ($.isArray(_this8.state.iDimensions) && _this8.state.iDimensions.length > 0) {
+	                                                return _this8.state.iDimensions.map(function (el, i) {
+	                                                    return _react2.default.createElement(
+	                                                        'tr',
+	                                                        { key: i },
+	                                                        _react2.default.createElement(
+	                                                            'td',
+	                                                            null,
+	                                                            _react2.default.createElement(
+	                                                                'a',
+	                                                                { 'data-item': el.dimension, 'data-index': i, onClick: _that.showDimensionHandler },
+	                                                                el.dimension.dimensionName
+	                                                            )
+	                                                        )
+	                                                    );
+	                                                });
+	                                            } else {
 	                                                return _react2.default.createElement(
 	                                                    'tr',
-	                                                    { key: i },
+	                                                    null,
 	                                                    _react2.default.createElement(
 	                                                        'td',
 	                                                        null,
 	                                                        _react2.default.createElement(
-	                                                            'a',
-	                                                            { 'data-item': el.dimension, 'data-index': i, onClick: _that.showDimensionHandler },
-	                                                            el.dimension.dimensionName
+	                                                            'p',
+	                                                            null,
+	                                                            'No owned identity dimensions.'
 	                                                        )
 	                                                    )
 	                                                );
-	                                            });
-	                                        } else {
-	                                            return _react2.default.createElement(
-	                                                'tr',
-	                                                null,
-	                                                _react2.default.createElement(
-	                                                    'td',
+	                                            }
+	                                        }(this)
+	                                    )
+	                                ),
+	                                this.state.showDetails ? _react2.default.createElement(DimensionForm, { hideHandler: this.hideHandler.bind(this), dataHandler: this.state.activeDimension }) : null
+	                            ),
+	                            _react2.default.createElement('br', null),
+	                            _react2.default.createElement(
+	                                'div',
+	                                { id: 'controlledDimensions' },
+	                                _react2.default.createElement(
+	                                    'h5',
+	                                    null,
+	                                    _react2.default.createElement(
+	                                        'b',
+	                                        null,
+	                                        'My Controlled Dimensions'
+	                                    )
+	                                ),
+	                                ' ',
+	                                _react2.default.createElement('hr', null),
+	                                _react2.default.createElement(
+	                                    'table',
+	                                    { style: table, className: 'table table-striped center' },
+	                                    _react2.default.createElement(
+	                                        'tbody',
+	                                        null,
+	                                        function () {
+	                                            if ($.isArray(_this8.state.ctrlDimensions) && _this8.state.ctrlDimensions.length > 0) {
+	                                                return _this8.state.ctrlDimensions.map(function (el, i) {
+	                                                    return _react2.default.createElement(
+	                                                        'tr',
+	                                                        { key: i },
+	                                                        _react2.default.createElement(
+	                                                            'td',
+	                                                            null,
+	                                                            _react2.default.createElement(
+	                                                                'a',
+	                                                                { 'data-item': el.dimension, 'data-index': i, onClick: _that.showDimensionHandler },
+	                                                                el.dimension.dimensionName
+	                                                            )
+	                                                        )
+	                                                    );
+	                                                });
+	                                            } else {
+	                                                return _react2.default.createElement(
+	                                                    'tr',
 	                                                    null,
 	                                                    _react2.default.createElement(
-	                                                        'p',
+	                                                        'td',
 	                                                        null,
-	                                                        'No identity dimensions'
+	                                                        _react2.default.createElement(
+	                                                            'p',
+	                                                            null,
+	                                                            'No controlled identity dimensions.'
+	                                                        )
 	                                                    )
-	                                                )
-	                                            );
-	                                        }
-	                                    }(this)
-	                                )
-	                            ),
-	                            this.state.showDetails ? _react2.default.createElement(DimensionForm, { hideHandler: this.hideHandler.bind(this), dataHandler: this.state.activeDimension }) : null
+	                                                );
+	                                            }
+	                                        }(this)
+	                                    )
+	                                ),
+	                                this.state.showDetails ? _react2.default.createElement(DimensionForm, { hideHandler: this.hideHandler.bind(this), dataHandler: this.state.activeDimension }) : null
+	                            )
 	                        ),
 	                        _react2.default.createElement(
 	                            'div',
@@ -55037,7 +55192,6 @@
 	                                        _react2.default.createElement(
 	                                            'div',
 	                                            { className: 'col-md-offset-6 col-md-6 ' },
-	                                            _react2.default.createElement('p', null),
 	                                            _react2.default.createElement(
 	                                                'button',
 	                                                { type: 'button', className: 'btn btn-info pull-right', style: syle, onClick: this.appendDelegation.bind(this) },
@@ -55090,6 +55244,21 @@
 	
 	//<IdentityDimensions dimensions={dimensions} onDelete={this.handleDeleteDimension.bind(this) } key={dimensions.ID} onClick={this.showHandler.bind(this)}/>
 	//handleShowModal={this.handleShowModal.bind(this)}
+	
+	// let delegatee = $("input[name^='delegatee_addr']").val()
+	// if (delegatee) json.delegatee = delegatee
+	// let tokenQuantity = $("input[name^='tokenQuantity']").val()
+	// if (tokenQuantity) json.tokenQuantity = tokenQuantity
+	
+	// <tr>
+	//     <th><b>Delegate tokens</b></th>
+	// </tr>
+	// <tr>
+	//     <td><input name="delegatee_addr" className="form-control col-md-4" type="text" placeholder="Delegatee Address" /></td>
+	// </tr>
+	// <tr>
+	//     <td><input name="tokenQuantity" className="form-control col-md-4" type="text" placeholder="Token Quantity" /></td>
+	// </tr>
 
 /***/ },
 /* 347 */

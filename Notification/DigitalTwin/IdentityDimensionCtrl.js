@@ -18,9 +18,10 @@ flagMap[2] = DelegateDirectory;
 //Makes the user's directories in case they don't exist NEEDS FIXING
 var directoryManager = function (pubKey) {
     var sync = true;
+    console.log("inside directoryManager...pubkey is " + pubKey)
 
     //uer's folder path:
-    var currentPath = PATH + "/" + keccak_256(pubKey).toUpperCase()
+    var currentPath = PATH + "/" + pubKey.toUpperCase()
 
     //make the user's folder:
     fs.existsSync(currentPath) || fs.mkdirSync(currentPath);
@@ -162,7 +163,7 @@ var DimensionCtrl = {
         var fileName = req.body.fileName;
 
         //get the directory
-        var directory = PATH + "/" + keccak_256(pubKey).toUpperCase() + "/";
+        var directory = PATH + "/" + pubKey.toUpperCase() + "/";
         if (flag == 0) {
             directory = directory + OwnershipDirectory + "/" + fileName;
         }
@@ -221,14 +222,14 @@ var DimensionCtrl = {
         var updateFlag = req.body.updateFlag;
 
         //debugging functions
-        console.log("setAsset endpoint hit");
+        console.log("\nsetDimension endpoint hit");
         console.log("pubKey is: " + pubKey);
-        console.log("flag is: " + flag);
+        console.log("flag is: " + flag + " \n 1=owned,2=control,3=delegated");
         console.log("filename is: " + fileName);
-        console.log("updateFlag is: " + updateFlag);
+        console.log("updateFlag is: " + updateFlag + "\n");
 
         //get the directory
-        var directory = PATH + "/" + keccak_256(pubKey).toUpperCase() + "/";
+        var directory = PATH + "/" + pubKey.toUpperCase() + "/";
         if (flag == 0) {
             directory = directory + OwnershipDirectory + "/" + fileName;
         }
@@ -278,11 +279,12 @@ var DimensionCtrl = {
             var cryptoData = cryptoEncr.encrypt(JSON.stringify(data));
             fs.writeFile(fileName, cryptoData, (err) => {
                 if (err) {
-                    res.status(400).json({ "Error": "Unable to write message in " + fileName }); console.log("This is a CREATION command AFTER ERR");
+                    res.status(400).json({ "Error": "Unable to write message in " + fileName });
+                    console.log("This is a CREATION command AFTER ERR, " + err);
                 }
                 else {
-                    console.log("This is a CREATION command RES.JSON");
-                    res.json({ Msg: 'Proposal updated successfully' }); console.log("This is a CREATION command AFTER RES");
+                    res.json({ Msg: 'Proposal updated successfully' });
+                    console.log("This is a CREATION command AFTER RES");
                 }
             });
         }
@@ -304,7 +306,7 @@ var DimensionCtrl = {
         var fileName = req.body.fileName;
 
         //get the directory
-        var directory = PATH + "/" + keccak_256(pubKey).toUpperCase() + "/";
+        var directory = PATH + "/" + pubKey.toUpperCase() + "/";
         if (flag == 0) {
             directory = directory + OwnershipDirectory + "/" + fileName;
         }

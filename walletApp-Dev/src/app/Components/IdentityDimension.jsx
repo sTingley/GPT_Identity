@@ -703,7 +703,8 @@ class IdentityDimensions extends Component {
             obj.flag = 0
             objArray.push(obj)
         }
-        return objArray
+        //needed to stringify this obj Array for backend
+        return JSON.stringify(objArray)
     }
     //*****************************************************************************
     //when we click Add More, a new value is pushed into this.state.inputs,
@@ -740,8 +741,10 @@ class IdentityDimensions extends Component {
     }
     //*****************************************************************************
     //prepare the delegations object array
-    prepareDelegationDistribution(dimension) {
+    prepareDelegationDistribution(dimension, owners) {
         var dimensionName = dimension
+        let owner = owners
+        console.log("got owners for delegations: " + owner)
 
         console.log("preparedelegation dimensionName: " + dimensionName)
         var labels = this.getDelegationInputValues();
@@ -759,7 +762,7 @@ class IdentityDimensions extends Component {
             for (var i = 0; i < delegatee.length; i++) {
                 var delegationObj = {}
                 delegationObj.dimension = dimensionName
-                delegationObj.owner = "COID_OWNER"// EDIT!!!!!!!!!!
+                delegationObj.owner = owner// EDIT!!!!!!!!!!
                 delegationObj.delegatee = delegatee[i]
                 delegationObj.amount = delegatee_token_quantity[i]
                 delegationObj.accessCategories = ""
@@ -768,7 +771,7 @@ class IdentityDimensions extends Component {
             }
             //console.log("delegationObj: " + JSON.stringify(delegationsArray))
         }
-        return delegationsArray
+        return JSON.stringify(delegationsArray)
     }
     //*****************************************************************************
     appendDelegation() {
@@ -787,16 +790,16 @@ class IdentityDimensions extends Component {
         e.preventDefault();
 
         var json = {};
-        //**************************************************************
+        //*************************************************************************
         let dimensionName = $("input[name^='dimensionName']").val();
         if (dimensionName) { json.dimensionName = dimensionName }
-        json.pubKey = localStorage.getItem("pubKey")
-        json.address = ""
-        json.flag = 0
-        json.ID = 0
-        //**************************************************************
+        json.pubKey = localStorage.getItem("pubKey");
+        json.address = "";
+        json.flag = 0;
+        json.ID = 0;
+        //*************************************************************************
         // GET PROPER DATA FROM SELECTED ASSET
-        let selected_asset = $("#assetSelect option:selected").text()
+        let selected_asset = $("#assetSelect option:selected").text();
         this.state.own_assets.forEach(function (asset, index) {
             if (selected_asset == asset.asset_id) {
                 json.coidAddr = asset.asset_coidAddr,
@@ -806,17 +809,12 @@ class IdentityDimensions extends Component {
                     json.controllers = asset.asset_controllers
             }
         })
-        //**************************************************************
-        let delegations = this.prepareDelegationDistribution(dimensionName)
-        json.delegations = JSON.stringify(delegations)
-        //**************************************************************
+        //*************************************************************************
+        let delegations = this.prepareDelegationDistribution(dimensionName, json.owners);
+        json.delegations = delegations
         let attributes = this.prepareAttributes();
-
-        console.log("attributes: " + attributes + ", type: " + typeof (attributes));
-
         json.data = attributes;
-        json.data = JSON.stringify(json.data);
-        console.log("tostring: " + json.data);
+        //*************************************************************************
 
         console.log("JSON: " + JSON.stringify(json));
 

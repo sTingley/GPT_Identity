@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import TagsInput from 'react-tagsinput';
 import UploadIpfsFile from './UploadIpfsFile.jsx'
+var keccak_256 = require('js-sha3').keccak_256;
 
 class DimensionDelegationForm extends React.Component {
 
@@ -144,9 +145,12 @@ class DimensionForm extends Component {
 
             json.accessCategories = json.accessCategories.substring(0, json.accessCategories.length - 1)
 
-            json.delegations = this.prepareDelegationDistribution(function (err) {
-                if (err) { console.log("ERROR DELEGATIONS: " + err) }
-            })
+            // json.delegations = this.prepareDelegationDistribution(function (err) {
+            //     if (err) { console.log("ERROR DELEGATIONS: " + err) }
+            // })
+
+            let delegations = this.prepareDelegationDistribution(dimensionName, json.owners);
+            json.delegations = delegations;
 
             json.owner = this.state.dimension.owner
 
@@ -228,9 +232,13 @@ class DimensionForm extends Component {
     }
     //*****************************************************************************
     //prepare the delegations object array
-    prepareDelegationDistribution() {
+    prepareDelegationDistribution(dimension, owners) {
+        var dimensionName = dimension
+        let owner = owners
+        console.log("got owners for delegations: " + owner)
+
+        console.log("preparedelegation dimensionName: " + dimensionName)
         var labels = this.getDelegationInputValues();
-        console.log("labels: " + JSON.stringify(labels))
         let delegatee = []
         let delegatee_token_quantity = []
         for (var i = 0; i < labels.length; i += 2) {
@@ -240,19 +248,21 @@ class DimensionForm extends Component {
             }
         }
         let delegationsArray = []
-        //{ owner: "", delegatee: "", amount: "", dimension: "", expiration: "", accessCategories: "" },
+        let date = new Date()
         if (delegatee.length == delegatee_token_quantity.length) {
+            //{ owner: "", delegatee: "", amount: "", dimension: "", expiration: "", accessCategories: "" }
             for (var i = 0; i < delegatee.length; i++) {
-                var delegationObj = {}
-                delegationObj.owner = "COID_OWNER"// EDIT!!!!!!!!!!
-                delegationObj.delegatee = delegatee[i]
-                delegationObj.amount = delegatee_token_quantity[i]
-                delegationObj.accessCategories = ""
-                delegationsArray.push(delegationObj)
+                var delegationObj = {};
+                delegationObj.dimension = dimensionName;
+                delegationObj.owner = owner;// EDIT!!!!!!!!!!
+                delegationObj.delegatee = keccak_256(delegatee[i]);
+                delegationObj.amount = delegatee_token_quantity[i];
+                delegationObj.accessCategories = "";
+                delegationObj.timeFrame = date.getTime();
+                delegationsArray.push(delegationObj);
             }
-            console.log("delegationObj: " + JSON.stringify(delegationsArray))
         }
-        return delegationsArray
+        return JSON.stringify(delegationsArray)
     }
     //*****************************************************************************
     appendDelegation() {
@@ -757,19 +767,19 @@ class IdentityDimensions extends Component {
             }
         }
         let delegationsArray = []
-        //{ owner: "", delegatee: "", amount: "", dimension: "", expiration: "", accessCategories: "" },
+        let date = new Date()
         if (delegatee.length == delegatee_token_quantity.length) {
+            //{ owner: "", delegatee: "", amount: "", dimension: "", expiration: "", accessCategories: "" }
             for (var i = 0; i < delegatee.length; i++) {
-                var delegationObj = {}
-                delegationObj.dimension = dimensionName
-                delegationObj.owner = owner// EDIT!!!!!!!!!!
-                delegationObj.delegatee = delegatee[i]
-                delegationObj.amount = delegatee_token_quantity[i]
-                delegationObj.accessCategories = ""
-                delegationObj.timeFrame = "1111"
-                delegationsArray.push(delegationObj)
+                var delegationObj = {};
+                delegationObj.dimension = dimensionName;
+                delegationObj.owner = owner;// EDIT!!!!!!!!!!
+                delegationObj.delegatee = keccak_256(delegatee[i]);
+                delegationObj.amount = delegatee_token_quantity[i];
+                delegationObj.accessCategories = "";
+                delegationObj.timeFrame = date.getTime();
+                delegationsArray.push(delegationObj);
             }
-            //console.log("delegationObj: " + JSON.stringify(delegationsArray))
         }
         return JSON.stringify(delegationsArray)
     }
@@ -784,7 +794,6 @@ class IdentityDimensions extends Component {
     }
     //*****************************************************************************
     //*****************************************************************************
-
     //called onClick of 'Create Dimension' button
     createDimension(e) {
         e.preventDefault();
@@ -798,7 +807,7 @@ class IdentityDimensions extends Component {
         json.flag = 0;
         json.ID = 0;
         //*************************************************************************
-        // GET PROPER DATA FROM SELECTED ASSET
+        // GET PROPER DATA FROM SELECTED ASSET (we will pass owners to prepareDelegations)
         let selected_asset = $("#assetSelect option:selected").text();
         this.state.own_assets.forEach(function (asset, index) {
             if (selected_asset == asset.asset_id) {
@@ -871,7 +880,9 @@ class IdentityDimensions extends Component {
         return (
             <div id="IDENTITYDIMENSIONS_MODAL">
 
-                <h1>IDENTITY DIMENSIONS</h1><hr />
+                <h1>IDENTITY DIMENSIONS</h1>
+                <h5><i>Personal Data Repositories</i></h5>
+                <hr />
                 <div className="modal-header">
                     <ul className="nav nav-tabs" role="tablist">
                         <li role="presentation" className="active"><a href="#dimensions" role="tab" data-toggle="tab">Dimensions</a></li>

@@ -117,41 +117,6 @@ class Modal extends Component {
 		this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
 	}
 
-	handleDimensionSubmit(e) {
-		e.preventDefault();
-		//var json = my data
-
-		console.log("handleDimensionSubmit")
-
-		// $.ajax({
-		// 	url: twinUrl + 'requestIdentityDimension',
-		// 	type: 'POST',
-		// 	data: json,
-		// 	success: function(res){
-		//         console.log(JSON.stringify(json))
-		//         var sendMe = {};
-		//         sendMe.flag = 0; //owned core identity
-		//         sendMe.fileName = "MyCOID.json" //
-		//         sendMe.updateFlag = 0; //new identity
-		//         //sendMe.data = json;
-		//         sendMe.pubKey = localStorage.getItem("pubKey");
-
-		// 		$.ajax({
-		// 			url: twinUrl + 'setDimension',
-		// 			type: 'POST',
-		// 			data: sendMe,
-		//             success: function(res)
-		//             {
-		//                 console.log("response from setDimension: " + res)
-		//             }
-		// 		})
-		// 	},
-		// 	complete: function(){
-		// 		// do something
-		// 	}
-		// });
-
-	}
 
 	render() {
 
@@ -236,6 +201,18 @@ class Modal extends Component {
 											<tr>
 												<td>Gatekeeper Contract address</td>
 												<td><p><b> {prop.gatekeeperAddr} </b></p></td>
+											</tr>
+											<tr>
+												<td>Dimension Control address</td>
+												<td><p><b> {prop.dimensionCtrlAddr} </b></p></td>
+											</tr>
+											<tr>
+												<td>BigchainDB Transaction ID</td>
+												<td><p> {prop.bigchainID} </p></td>
+											</tr>
+											<tr>
+												<td>BigchainDB Transaction Hash</td>
+												<td><p> {prop.bigchainHash} </p></td>
 											</tr>
 											<tr>
 												<td colSpan="2"><b>Official IDs</b></td>
@@ -324,14 +301,6 @@ class Modal extends Component {
 												<td>Recovery Condition</td>
 												<td> <p> {prop.recoveryCondition}</p></td>
 											</tr>
-											<tr>
-												<td>BigchainDB Transaction ID</td>
-												<td><p> {prop.bigchainID} </p></td>
-											</tr>
-											<tr>
-												<td>BigchainDB Transaction Hash</td>
-												<td><p> {prop.bigchainHash} </p></td>
-											</tr>
 										</tbody>
 									</table>
 								</div>
@@ -339,45 +308,7 @@ class Modal extends Component {
 								<div role="tabpanel" className="tab-pane center-block" id="qrcode" style={qrStyle}>
 									<QRCode value={qrConfig} size={200} />
 								</div>
-								{/*
-								<div role="tabpanel" className="tab-pane" id="dimension">
-									<label className="custom-file">
-										<input type="file" id="file" className="custom-file-input"></input>
-										<span className="custom-file-control"></span>
-									</label>
 
-
-
-									<form className="form-horizontal">
-										<div className="form-group">
-											<label for="inputEmail" className="control-label col-xs-2">Email</label>
-											<div className="col-xs-10">
-												<input type="email" className="form-control" id="inputEmail" placeholder="Email" />
-											</div>
-										</div>
-										<div className="form-group">
-											<label for="inputPassword" className="control-label col-xs-2">Password</label>
-											<div className="col-xs-10">
-												<input type="password" className="form-control" id="inputPassword" placeholder="Password" />
-											</div>
-										</div>
-										<div className="form-group">
-											<div className="col-xs-offset-2 col-xs-10">
-												<div className="checkbox">
-													<label><input type="checkbox" /> Remember me</label>
-												</div>
-											</div>
-										</div>
-										<div className="form-group">
-											<div className="col-xs-offset-2 col-xs-10">
-												<button type="submit" className="btn btn-primary">Login</button>
-											</div>
-										</div>
-									</form>
-
-
-								</div>
-*/}
 							</div>
 						</div>
 
@@ -392,6 +323,282 @@ Modal.propTypes = {
 	hideHandler: React.PropTypes.func.isRequired	// hideHandler method must exists in parent component
 };
 
+//**************************************************************************************************************** */
+
+class Dims extends Component {
+
+	constructor(props) {
+		super(props);
+		this.pubKey = localStorage.getItem("pubKey");
+		this.privKey = localStorage.getItem("privKey");
+		this.tags = new AssetTags(this.pubKey, props.dimension.dimension_id);
+		this.state = {
+
+			//added for identityDimension tab-pane
+			inputs: ['input-0'],
+
+			dimension: props.dimension || {},
+			asset_class: this.tags.getAssetData("classes"),
+			asset_subclass: this.tags.getAssetData("subclasses"),
+
+			//used for identitydimension file upload
+			docs: {}
+
+		};
+		this.handleClassChange = this.handleClassChange.bind(this);;
+		this.maxUniqAttr = 10;
+	}
+
+	componentDidMount() {
+		$("#assetDetails").modal('show');
+		$("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
+
+		var prop = this.props.dimension.dimension_details;
+	}
+
+	handleClassChange(tags) {
+		this.setState({ asset_class: tags });
+		this.tags.updateClasses(tags, this.props.dimension.dimension_id, "classes");
+	}
+
+	handleSubClassChange(tags) {
+		this.setState({ asset_subclass: tags });
+		this.tags.updateClasses(tags, this.props.dimension.dimension_id, "subclasses");
+	}
+
+	appendInput() {
+		console.log("hit append Input")
+		var inputLen = this.state.inputs.length;
+		if (inputLen < this.maxUniqAttr) {
+			var newInput = `input-${inputLen}`;
+			this.setState({ inputs: this.state.inputs.concat([newInput]) });
+		}
+	}
+
+	getLabelValues() {
+		console.log("hit getLabelValues")
+		var labelVals = []
+		var _this = this;
+		$.each($("input[name^='label-']"), function (obj) {
+			var value = $.trim($(this).val());
+			if (value.length > 0) {
+				labelVals.push({
+					//replace the 'label' with the entered unique attribute descriptor, for example 'Name' or 'US SSN'
+					[$(this).attr('name').replace("label-", "")]: value
+				});
+			}
+		});
+		return labelVals;
+	}
+
+	handleHideModal() {
+		this.setState({ showModal: false });
+	}
+
+	handleShowModal(e) {
+		this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
+	}
+
+	//**********************************************************************************
+	showAttrs(e) {
+		var _this = this
+		e.preventDefault();
+		var ele = $(e.target);
+		var value = parseInt(ele.attr("data-val"))
+		console.log("got value.. " + value)
+
+		var prop = this.props.dimension
+
+		var json = {};
+		let dimensionName = prop.dimension_details.dimensionName;
+		let ID = "";
+		let descriptor = prop.dimension_details.data[0].descriptor;
+		console.log("descriptor: " + JSON.stringify(descriptor))
+
+		let pubKey = keccak_256(localStorage.getItem("pubKey"))
+		json.pubKey = pubKey
+		json.dimensionName = dimensionName;
+		json.dimensionCtrlAddr = prop.dimension_details.dimensionCtrlAddr
+		json.ID = ID;
+		json.descriptor = descriptor;
+
+		console.log("JSON: " + JSON.stringify(json))
+
+		$.ajax({
+			type: "POST",
+			url: twinUrl + 'dimensions/readEntry',
+			data: json,
+			success: function (result) {
+				var data = result;
+				if ($.type(result) != "object") {
+					data = JSON.parseJSON(result)
+				}
+
+				console.log("repsonse readEntry: " + JSON.stringify(data))
+				//var abc = true
+			}
+		})
+
+		$('#mytabs a[href="#show_descriptors"]').tab('show');
+
+
+	}
+
+	render() {
+
+		var prop = this.props.dimension
+		console.log("dimension(prop): " + JSON.stringify(prop))
+
+		//console.log("prop.data: "+JSON.stringify(prop.dimension_details.data))
+
+		//console.log("prop.data[0]: "+ JSON.stringify(prop.dimension_details.data[0]))
+
+		var dataArray = []
+		var arrayOfArrays = []
+		var data = prop.dimension_details.data
+
+		Object.keys(data).forEach(key => {
+			dataArray.push(data[key].descriptor)
+			dataArray.push(data[key].attribute)
+			dataArray.push(data[key].flag)
+			dataArray.push(data[key].ID)
+		})
+
+		//data.length will equal the number of dimensions
+		for (var i = 0; i < data.length; i++) {
+			var element = [dataArray[4 * i + 0], dataArray[4 * i + 1], dataArray[4 * i + 2], dataArray[4 * i + 3]]
+			arrayOfArrays.push(element)
+		}
+
+		console.log("DataArray: " + dataArray)
+		console.log("arrayOfArrays[0][0]: " + arrayOfArrays[0][0])
+		console.log("arrayOfArrays[1][1]: " + arrayOfArrays[1][1])
+
+
+		var style = {
+			fontSize: '12.5px'
+		}
+
+		var classInput = {
+			addKeys: [13, 188],	// Enter and comma
+			value: this.state.asset_class,
+			onChange: this.handleClassChange,
+			inputProps: { placeholder: "" }
+		};
+		var subClassInput = {
+			addKeys: [13, 188],	// Enter and comma
+			value: this.state.asset_subclass,
+			onChange: this.handleSubClassChange.bind(this),
+			inputProps: { placeholder: "" }
+		};
+
+
+		var qrStyle = {
+			maxWidth: "100%",
+			textAlign: "center"
+		};
+
+		var syle = {
+			marginRight: '15px'
+		}
+
+		return (
+			<div className="modal fade" id="assetDetails" key={this.props.dimension.dimension_id} tabIndex="-1" role="dialog" aria-labelledby="asset">
+				<div className="modal-dialog modal-lg" role="document">
+					<div className="modal-content">
+
+						<div className="modal-header">
+							<button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times; </span></button>
+							<ul id="mytabs" className="nav nav-pills" role="tablist">
+								<li role="presentation" className="active"><a href="#asset_details" role="tab" data-toggle="tab">Dimension Details</a></li>
+								<li role="presentation"><a href="#show_descriptors" role="tab" data-toggle="tab"></a></li>
+							</ul>
+						</div>
+
+						<div className="modal-body">
+							<div className="tab-content">
+
+								<div role="tabpanel" className="tab-pane active" id="asset_details">
+									<table className="table table-striped table-hover" style={style}>
+										<tbody>
+											<tr>
+												<td>Dimension Name</td>
+												<td>{prop.dimension_id}</td>
+											</tr>
+											<tr>
+												<td>Dimension Class<p className="text-info">Use comma/enter to add class </p></td>
+												<td><TagsInput {...classInput} /></td>
+											</tr>
+											<tr>
+												<td>Dimension SubClass<p className="text-info">Use comma/enter to add sub class </p></td>
+												<td><TagsInput {...subClassInput} /></td>
+											</tr>
+											<tr>
+												<td>Dimension Contract address</td>
+												<td><p><b> {prop.dimension_details.address} </b></p></td>
+											</tr>
+										</tbody>
+									</table>
+									<div className="modal-footer">
+										<button type="button" className="btn btn-primary" data-val="1" onClick={this.showAttrs.bind(this)}>Show Descriptors</button>
+									</div>
+
+									<form action="http://google.com">
+										<input type="submit" value="Go to Google" />
+									</form>
+								</div>
+
+								<div title="tabs" role="tabpanel" className="tab-pane center-block" id="show_descriptors">
+
+									<table className="table table-striped table-hover" style={style}>
+										<tbody>
+											<tr>
+												<td colSpan="2"><b>Descriptors</b></td>
+											</tr>
+											{(() => {
+												var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+												if (arrayOfArrays.length > 0) {
+													return arrayOfArrays.map((attrs, i) => {
+														//console.log("attrs[0]: " + attrs[0] + ", attrs[1]:" + attrs[1] + ", attrs[2]: " + attrs[2] + ", attrs[3]: " + attrs[3])
+														if (attrs[1] && attrs[1].charAt(0) == "Q") {
+															return (
+																<tr key={i}>
+																	<td>{attrs[0]}</td>
+																	<td><p><a target="_blank" href={ipfs_url + "/" + attrs[1]}>{attrs[1]}</a></p></td>
+																</tr>
+															)
+														}
+														else
+															return (
+																<tr key={i}>
+																	<td>{attrs[0]}</td>
+																	<td><a>{attrs[1]}></a></td>
+																</tr>
+															)
+													});
+												}
+												else { return <tr><td colSpan="2">No descriptors found.</td></tr> }
+											})(this)}
+										</tbody>
+									</table>
+								</div>{/*tab-panel descriptors*/}
+
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		);
+	}
+}
+
+Dims.propTypes = {
+	hideHandler: React.PropTypes.func.isRequired	// hideHandler method must exists in parent component
+};
+
+
+
 class Assets extends Component {
 
 	constructor(props) {
@@ -399,16 +606,19 @@ class Assets extends Component {
 
 		this.state = {
 			showDetails: false,
+			showDetails1: false,
 			wallet: { pubKey: localStorage.getItem("pubKey") },
 			own_assets: [],
 			controlled_assets: [{ asset_id: 161718, asset_name: 'Parents House' }, { asset_id: 192021, asset_name: 'My Car' }],
 			delegated_assets: [],
+			delegated_dims: [],
 			active_asset: {},
 			show_only: []
 		};
 
 		// event handlers must attached with current scope
 		this.assetHandler = this.assetHandler.bind(this);
+		this.dimensionHandler = this.dimensionHandler.bind(this);
 		this.hideHandler = this.hideHandler.bind(this);
 		this.searchHandler = this.searchHandler.bind(this);
 	}
@@ -535,9 +745,52 @@ class Assets extends Component {
 		// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
 		// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
 		// -> -> -> START get DELEGATED assets -> -> ->
+		// $.ajax({
+		// 	type: "POST",
+		// 	url: twinUrl + 'getDelegatedAssets',
+		// 	data: { "pubKey": localStorage.getItem("pubKey") },
+		// 	success: function (result) {
+		// 		var data = result;
+		// 		if ($.type(result) != "object") {
+		// 			data = JSON.parseJSON(result)
+		// 		}
+
+		// 		data = data.data;
+		// 		console.log("Get Delegated Assets result: " + data)
+
+		// 		if (data.length > 0) {
+		// 			//loop through OWNED assets
+		// 			for (let i = 0; i < data.length; i++) {
+		// 				//AJAX each asset:
+		// 				$.ajax({
+		// 					type: "POST",
+		// 					url: twinUrl + 'getAsset',
+		// 					data: { "pubKey": localStorage.getItem("pubKey"), "flag": 2, "fileName": data[i] },
+		// 					success: function (result) {
+		// 						var dataResult = result;
+		// 						if ($.type(result) != "object") {
+		// 							dataResult = JSON.parseJSON(result)
+		// 						}
+
+		// 						//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
+		// 						var theArray1 = this.state.delegated_assets;
+
+		// 						theArray1[theArray1.length] = {
+		// 							asset_id: dataResult.assetID,
+		// 							asset_details: dataResult
+		// 						}
+		// 						this.setState({ delegated_assets: theArray1 });
+
+		// 					}.bind(this),
+		// 					complete: function () { },
+		// 				})
+		// 			}//end for
+		// 		}
+		// 	}.bind(this)
+		// })
 		$.ajax({
 			type: "POST",
-			url: twinUrl + 'getDelegatedAssets',
+			url: twinUrl + 'getDelegatedDimensions',
 			data: { "pubKey": localStorage.getItem("pubKey") },
 			success: function (result) {
 				var data = result;
@@ -546,30 +799,42 @@ class Assets extends Component {
 				}
 
 				data = data.data;
-				console.log("Get Delegated Assets result: " + data)
+				console.log("getDelegatedDimensions: " + data);
+
+				var PUBKEY = keccak_256(localStorage.getItem("pubKey"));
+
+				//var delegatedDims = []
 
 				if (data.length > 0) {
 					//loop through OWNED assets
 					for (let i = 0; i < data.length; i++) {
+						console.log("grabbing.. " + data[i])
 						//AJAX each asset:
 						$.ajax({
 							type: "POST",
-							url: twinUrl + 'getAsset',
-							data: { "pubKey": localStorage.getItem("pubKey"), "flag": 2, "fileName": data[i] },
+							url: twinUrl + 'getDimension',
+							data: { "pubKey": PUBKEY, "flag": 2, "fileName": data[i] },
 							success: function (result) {
 								var dataResult = result;
 								if ($.type(result) != "object") {
+									console.log("result != object");
 									dataResult = JSON.parseJSON(result)
 								}
 
-								//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-								var theArray1 = this.state.delegated_assets;
+								var delegatedDims = this.state.delegated_dims;
 
-								theArray1[theArray1.length] = {
-									asset_id: dataResult.assetID,
-									asset_details: dataResult
+								delegatedDims[delegatedDims.length] = {
+									dimension_id: dataResult.dimension.dimensionName,
+									dimension_details: dataResult.dimension
 								}
-								this.setState({ delegated_assets: theArray1 });
+								this.setState({ delegated_dims: delegatedDims });
+
+
+
+
+								//this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
+								console.log("dataResult get Dimension: \n " + JSON.stringify(dataResult))
+								console.log("dataResult dimensionName: " + dataResult.dimension.dimensionName)
 
 							}.bind(this),
 							complete: function () { },
@@ -589,6 +854,16 @@ class Assets extends Component {
 		var assetID = asset.asset_id;
 		if (assetID) {
 			this.setState({ showDetails: true, active_asset: asset });
+		}
+	}
+
+	dimensionHandler(dimension) {
+		alert('if you click on a attribute, you will spend a token to read an entry')
+		console.log("dimension handler.. " + dimension)
+		var dimensionID = dimension.dimension_id
+		if (dimensionID) {
+			console.log("dimensionID: " + dimensionID)
+			this.setState({ showDetails1: true, active_dimension: dimension });
 		}
 	}
 
@@ -682,20 +957,20 @@ class Assets extends Component {
 				</div><br />
 
 				<div id="delegated-assets">
-					<h4>My Delegated Assets</h4><hr />
+					<h4>My Delegated Data</h4><hr />
 					<div className="delegated-assets">
 						<div className="row assets">
-							{this.state.delegated_assets.map((asset, i) => {
+							{this.state.delegated_dims.map((dimension, i) => {
 								var cssClass = "btn btn-danger";
 								if (this.state.show_only.length > 0) {
-									if (this.state.show_only.toString().indexOf(asset.asset_id.toString()) >= 0) {
+									if (this.state.show_only.toString().indexOf(dimension.dimension_id.toString()) >= 0) {
 										cssClass += " show";
 									} else cssClass += " hidden";
 								}
 								return (
-									<button type="button" key={i} className={cssClass} onClick={() => this.assetHandler(asset)}>
+									<button type="button" key={i} className={cssClass} onClick={() => this.dimensionHandler(dimension)}>
 										<span className="glyphicon glyphicon-piggy-bank"></span>
-										{asset.asset_id}
+										{dimension.dimension_id}
 									</button>
 								);
 							})}
@@ -704,6 +979,7 @@ class Assets extends Component {
 				</div><br />
 
 				{this.state.showDetails ? <Modal hideHandler={this.hideHandler} asset={this.state.active_asset} /> : null}
+				{this.state.showDetails1 ? <Dims hideHandler={this.hideHandler} dimension={this.state.active_dimension} /> : null}
 			</div>
 		);
 	}

@@ -173,7 +173,7 @@ class UniqueIDAttributesForm extends React.Component {
 		return(
 			<div className="form-group col-md-12">
 				<div className="col-md-10">
-				<label htmlFor="unique_id_attrs"> Official IDs e.g. SSN, Passport, Drivers License, Digital retinal scans and/or digital fingerprints </label>
+				<label htmlFor="unique_id_attrs"> Unique Identfiers e.g. Serial Numbers, MAC Addresses, Vehicle Identitfication Numbers</label>
 					<input name={'label-'+this.props.labelref} className="form-control col-md-4" type="text" placeholder="Label"  />
 				</div>
 				<div className="col-md-2">
@@ -317,16 +317,22 @@ class MyGatekeeper extends React.Component {
 	
 	componentDidMount() {
         //TODO********** add fileName.json********put in localstorage!
+
+		let publicKey = localStorage.getItem("pubKey");
+
 		$.ajax({
 			type: "POST",
 			url: twinUrl + 'getAsset',
-			data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": "MyCOID.json"},
+			data: { "pubKey": publicKey, "flag": 0, "fileName": "MyCOID.json"},
 			success: function (result) {
 				var data = result;
 				if ($.type(result) != "object") {
 					data = JSON.parseJSON(result)
 				}
-				localStorage.setItem("gatekeeperAddr", result.gatekeeperAddr) 
+
+				//var gatekeeperAddr = "gatekeeperAddr_" + publicKey 
+				//console.log("gkaddr:  " + gatekeeperAddr)
+				localStorage.setItem("gatekeeperAddr", result.gatekeeperAddr)
 				localStorage.setItem("coidAddr", result.coidAddr)
 				localStorage.setItem("dimensionCtrlAddr", result.dimensionCtrlAddr)
 

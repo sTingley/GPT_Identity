@@ -237,7 +237,7 @@ var DimensionCtrl = {
             directory = directory + ControlDirectory + "/" + fileName;
         }
         if (flag == 2) {
-            directory = directory + DelegateDirectory + + "/" + fileName;
+            directory = directory + DelegateDirectory + "/" + fileName;
         }
 
         var cryptoEncr = new Crypto({ pubKey: pubKey });

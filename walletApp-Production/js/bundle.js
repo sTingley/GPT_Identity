@@ -50273,42 +50273,6 @@
 				this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
 			}
 		}, {
-			key: 'handleDimensionSubmit',
-			value: function handleDimensionSubmit(e) {
-				e.preventDefault();
-				//var json = my data
-	
-				console.log("handleDimensionSubmit");
-	
-				// $.ajax({
-				// 	url: twinUrl + 'requestIdentityDimension',
-				// 	type: 'POST',
-				// 	data: json,
-				// 	success: function(res){
-				//         console.log(JSON.stringify(json))
-				//         var sendMe = {};
-				//         sendMe.flag = 0; //owned core identity
-				//         sendMe.fileName = "MyCOID.json" //
-				//         sendMe.updateFlag = 0; //new identity
-				//         //sendMe.data = json;
-				//         sendMe.pubKey = localStorage.getItem("pubKey");
-	
-				// 		$.ajax({
-				// 			url: twinUrl + 'setDimension',
-				// 			type: 'POST',
-				// 			data: sendMe,
-				//             success: function(res)
-				//             {
-				//                 console.log("response from setDimension: " + res)
-				//             }
-				// 		})
-				// 	},
-				// 	complete: function(){
-				// 		// do something
-				// 	}
-				// });
-			}
-		}, {
 			key: 'render',
 			value: function render() {
 	
@@ -50510,6 +50474,70 @@
 																prop.gatekeeperAddr,
 																' '
 															)
+														)
+													)
+												),
+												_react2.default.createElement(
+													'tr',
+													null,
+													_react2.default.createElement(
+														'td',
+														null,
+														'Dimension Control address'
+													),
+													_react2.default.createElement(
+														'td',
+														null,
+														_react2.default.createElement(
+															'p',
+															null,
+															_react2.default.createElement(
+																'b',
+																null,
+																' ',
+																prop.dimensionCtrlAddr,
+																' '
+															)
+														)
+													)
+												),
+												_react2.default.createElement(
+													'tr',
+													null,
+													_react2.default.createElement(
+														'td',
+														null,
+														'BigchainDB Transaction ID'
+													),
+													_react2.default.createElement(
+														'td',
+														null,
+														_react2.default.createElement(
+															'p',
+															null,
+															' ',
+															prop.bigchainID,
+															' '
+														)
+													)
+												),
+												_react2.default.createElement(
+													'tr',
+													null,
+													_react2.default.createElement(
+														'td',
+														null,
+														'BigchainDB Transaction Hash'
+													),
+													_react2.default.createElement(
+														'td',
+														null,
+														_react2.default.createElement(
+															'p',
+															null,
+															' ',
+															prop.bigchainHash,
+															' '
 														)
 													)
 												),
@@ -50817,46 +50845,6 @@
 															prop.recoveryCondition
 														)
 													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'BigchainDB Transaction ID'
-													),
-													_react2.default.createElement(
-														'td',
-														null,
-														_react2.default.createElement(
-															'p',
-															null,
-															' ',
-															prop.bigchainID,
-															' '
-														)
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'BigchainDB Transaction Hash'
-													),
-													_react2.default.createElement(
-														'td',
-														null,
-														_react2.default.createElement(
-															'p',
-															null,
-															' ',
-															prop.bigchainHash,
-															' '
-														)
-													)
 												)
 											)
 										)
@@ -50881,29 +50869,469 @@
 		hideHandler: _react2.default.PropTypes.func.isRequired // hideHandler method must exists in parent component
 	};
 	
-	var Assets = function (_Component2) {
-		_inherits(Assets, _Component2);
+	//**************************************************************************************************************** */
+	
+	var Dims = function (_Component2) {
+		_inherits(Dims, _Component2);
+	
+		function Dims(props) {
+			_classCallCheck(this, Dims);
+	
+			var _this3 = _possibleConstructorReturn(this, (Dims.__proto__ || Object.getPrototypeOf(Dims)).call(this, props));
+	
+			_this3.pubKey = localStorage.getItem("pubKey");
+			_this3.privKey = localStorage.getItem("privKey");
+			_this3.tags = new _classAndSubClass2.default(_this3.pubKey, props.dimension.dimension_id);
+			_this3.state = {
+	
+				//added for identityDimension tab-pane
+				inputs: ['input-0'],
+	
+				dimension: props.dimension || {},
+				asset_class: _this3.tags.getAssetData("classes"),
+				asset_subclass: _this3.tags.getAssetData("subclasses"),
+	
+				//used for identitydimension file upload
+				docs: {}
+	
+			};
+			_this3.handleClassChange = _this3.handleClassChange.bind(_this3);;
+			_this3.maxUniqAttr = 10;
+			return _this3;
+		}
+	
+		_createClass(Dims, [{
+			key: 'componentDidMount',
+			value: function componentDidMount() {
+				$("#assetDetails").modal('show');
+				$("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
+	
+				var prop = this.props.dimension.dimension_details;
+			}
+		}, {
+			key: 'handleClassChange',
+			value: function handleClassChange(tags) {
+				this.setState({ asset_class: tags });
+				this.tags.updateClasses(tags, this.props.dimension.dimension_id, "classes");
+			}
+		}, {
+			key: 'handleSubClassChange',
+			value: function handleSubClassChange(tags) {
+				this.setState({ asset_subclass: tags });
+				this.tags.updateClasses(tags, this.props.dimension.dimension_id, "subclasses");
+			}
+		}, {
+			key: 'appendInput',
+			value: function appendInput() {
+				console.log("hit append Input");
+				var inputLen = this.state.inputs.length;
+				if (inputLen < this.maxUniqAttr) {
+					var newInput = 'input-' + inputLen;
+					this.setState({ inputs: this.state.inputs.concat([newInput]) });
+				}
+			}
+		}, {
+			key: 'getLabelValues',
+			value: function getLabelValues() {
+				console.log("hit getLabelValues");
+				var labelVals = [];
+				var _this = this;
+				$.each($("input[name^='label-']"), function (obj) {
+					var value = $.trim($(this).val());
+					if (value.length > 0) {
+						labelVals.push(_defineProperty({}, $(this).attr('name').replace("label-", ""), value));
+					}
+				});
+				return labelVals;
+			}
+		}, {
+			key: 'handleHideModal',
+			value: function handleHideModal() {
+				this.setState({ showModal: false });
+			}
+		}, {
+			key: 'handleShowModal',
+			value: function handleShowModal(e) {
+				this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
+			}
+	
+			//**********************************************************************************
+	
+		}, {
+			key: 'showAttrs',
+			value: function showAttrs(e) {
+				var _this = this;
+				e.preventDefault();
+				var ele = $(e.target);
+				var value = parseInt(ele.attr("data-val"));
+				console.log("got value.. " + value);
+	
+				var prop = this.props.dimension;
+	
+				var json = {};
+				var dimensionName = prop.dimension_details.dimensionName;
+				var ID = "";
+				var descriptor = prop.dimension_details.data[0].descriptor;
+				console.log("descriptor: " + JSON.stringify(descriptor));
+	
+				var pubKey = keccak_256(localStorage.getItem("pubKey"));
+				json.pubKey = pubKey;
+				json.dimensionName = dimensionName;
+				json.dimensionCtrlAddr = prop.dimension_details.dimensionCtrlAddr;
+				json.ID = ID;
+				json.descriptor = descriptor;
+	
+				console.log("JSON: " + JSON.stringify(json));
+	
+				$.ajax({
+					type: "POST",
+					url: twinUrl + 'dimensions/readEntry',
+					data: json,
+					success: function success(result) {
+						var data = result;
+						if ($.type(result) != "object") {
+							data = JSON.parseJSON(result);
+						}
+	
+						console.log("repsonse readEntry: " + JSON.stringify(data));
+						//var abc = true
+					}
+				});
+	
+				$('#mytabs a[href="#show_descriptors"]').tab('show');
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+	
+				var prop = this.props.dimension;
+				console.log("dimension(prop): " + JSON.stringify(prop));
+	
+				//console.log("prop.data: "+JSON.stringify(prop.dimension_details.data))
+	
+				//console.log("prop.data[0]: "+ JSON.stringify(prop.dimension_details.data[0]))
+	
+				var dataArray = [];
+				var arrayOfArrays = [];
+				var data = prop.dimension_details.data;
+	
+				Object.keys(data).forEach(function (key) {
+					dataArray.push(data[key].descriptor);
+					dataArray.push(data[key].attribute);
+					dataArray.push(data[key].flag);
+					dataArray.push(data[key].ID);
+				});
+	
+				//data.length will equal the number of dimensions
+				for (var i = 0; i < data.length; i++) {
+					var element = [dataArray[4 * i + 0], dataArray[4 * i + 1], dataArray[4 * i + 2], dataArray[4 * i + 3]];
+					arrayOfArrays.push(element);
+				}
+	
+				console.log("DataArray: " + dataArray);
+				console.log("arrayOfArrays[0][0]: " + arrayOfArrays[0][0]);
+				console.log("arrayOfArrays[1][1]: " + arrayOfArrays[1][1]);
+	
+				var style = {
+					fontSize: '12.5px'
+				};
+	
+				var classInput = {
+					addKeys: [13, 188], // Enter and comma
+					value: this.state.asset_class,
+					onChange: this.handleClassChange,
+					inputProps: { placeholder: "" }
+				};
+				var subClassInput = {
+					addKeys: [13, 188], // Enter and comma
+					value: this.state.asset_subclass,
+					onChange: this.handleSubClassChange.bind(this),
+					inputProps: { placeholder: "" }
+				};
+	
+				var qrStyle = {
+					maxWidth: "100%",
+					textAlign: "center"
+				};
+	
+				var syle = {
+					marginRight: '15px'
+				};
+	
+				return _react2.default.createElement(
+					'div',
+					{ className: 'modal fade', id: 'assetDetails', key: this.props.dimension.dimension_id, tabIndex: '-1', role: 'dialog', 'aria-labelledby': 'asset' },
+					_react2.default.createElement(
+						'div',
+						{ className: 'modal-dialog modal-lg', role: 'document' },
+						_react2.default.createElement(
+							'div',
+							{ className: 'modal-content' },
+							_react2.default.createElement(
+								'div',
+								{ className: 'modal-header' },
+								_react2.default.createElement(
+									'button',
+									{ type: 'button', className: 'close', 'data-dismiss': 'modal', 'aria-label': 'Close' },
+									_react2.default.createElement(
+										'span',
+										{ 'aria-hidden': 'true' },
+										'× '
+									)
+								),
+								_react2.default.createElement(
+									'ul',
+									{ id: 'mytabs', className: 'nav nav-pills', role: 'tablist' },
+									_react2.default.createElement(
+										'li',
+										{ role: 'presentation', className: 'active' },
+										_react2.default.createElement(
+											'a',
+											{ href: '#asset_details', role: 'tab', 'data-toggle': 'tab' },
+											'Dimension Details'
+										)
+									),
+									_react2.default.createElement(
+										'li',
+										{ role: 'presentation' },
+										_react2.default.createElement('a', { href: '#show_descriptors', role: 'tab', 'data-toggle': 'tab' })
+									)
+								)
+							),
+							_react2.default.createElement(
+								'div',
+								{ className: 'modal-body' },
+								_react2.default.createElement(
+									'div',
+									{ className: 'tab-content' },
+									_react2.default.createElement(
+										'div',
+										{ role: 'tabpanel', className: 'tab-pane active', id: 'asset_details' },
+										_react2.default.createElement(
+											'table',
+											{ className: 'table table-striped table-hover', style: style },
+											_react2.default.createElement(
+												'tbody',
+												null,
+												_react2.default.createElement(
+													'tr',
+													null,
+													_react2.default.createElement(
+														'td',
+														null,
+														'Dimension Name'
+													),
+													_react2.default.createElement(
+														'td',
+														null,
+														prop.dimension_id
+													)
+												),
+												_react2.default.createElement(
+													'tr',
+													null,
+													_react2.default.createElement(
+														'td',
+														null,
+														'Dimension Class',
+														_react2.default.createElement(
+															'p',
+															{ className: 'text-info' },
+															'Use comma/enter to add class '
+														)
+													),
+													_react2.default.createElement(
+														'td',
+														null,
+														_react2.default.createElement(_reactTagsinput2.default, classInput)
+													)
+												),
+												_react2.default.createElement(
+													'tr',
+													null,
+													_react2.default.createElement(
+														'td',
+														null,
+														'Dimension SubClass',
+														_react2.default.createElement(
+															'p',
+															{ className: 'text-info' },
+															'Use comma/enter to add sub class '
+														)
+													),
+													_react2.default.createElement(
+														'td',
+														null,
+														_react2.default.createElement(_reactTagsinput2.default, subClassInput)
+													)
+												),
+												_react2.default.createElement(
+													'tr',
+													null,
+													_react2.default.createElement(
+														'td',
+														null,
+														'Dimension Contract address'
+													),
+													_react2.default.createElement(
+														'td',
+														null,
+														_react2.default.createElement(
+															'p',
+															null,
+															_react2.default.createElement(
+																'b',
+																null,
+																' ',
+																prop.dimension_details.address,
+																' '
+															)
+														)
+													)
+												)
+											)
+										),
+										_react2.default.createElement(
+											'div',
+											{ className: 'modal-footer' },
+											_react2.default.createElement(
+												'button',
+												{ type: 'button', className: 'btn btn-primary', 'data-val': '1', onClick: this.showAttrs.bind(this) },
+												'Show Descriptors'
+											)
+										),
+										_react2.default.createElement(
+											'form',
+											{ action: 'http://google.com' },
+											_react2.default.createElement('input', { type: 'submit', value: 'Go to Google' })
+										)
+									),
+									_react2.default.createElement(
+										'div',
+										{ title: 'tabs', role: 'tabpanel', className: 'tab-pane center-block', id: 'show_descriptors' },
+										_react2.default.createElement(
+											'table',
+											{ className: 'table table-striped table-hover', style: style },
+											_react2.default.createElement(
+												'tbody',
+												null,
+												_react2.default.createElement(
+													'tr',
+													null,
+													_react2.default.createElement(
+														'td',
+														{ colSpan: '2' },
+														_react2.default.createElement(
+															'b',
+															null,
+															'Descriptors'
+														)
+													)
+												),
+												function () {
+													var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+													if (arrayOfArrays.length > 0) {
+														return arrayOfArrays.map(function (attrs, i) {
+															//console.log("attrs[0]: " + attrs[0] + ", attrs[1]:" + attrs[1] + ", attrs[2]: " + attrs[2] + ", attrs[3]: " + attrs[3])
+															if (attrs[1] && attrs[1].charAt(0) == "Q") {
+																return _react2.default.createElement(
+																	'tr',
+																	{ key: i },
+																	_react2.default.createElement(
+																		'td',
+																		null,
+																		attrs[0]
+																	),
+																	_react2.default.createElement(
+																		'td',
+																		null,
+																		_react2.default.createElement(
+																			'p',
+																			null,
+																			_react2.default.createElement(
+																				'a',
+																				{ target: '_blank', href: ipfs_url + "/" + attrs[1] },
+																				attrs[1]
+																			)
+																		)
+																	)
+																);
+															} else return _react2.default.createElement(
+																'tr',
+																{ key: i },
+																_react2.default.createElement(
+																	'td',
+																	null,
+																	attrs[0]
+																),
+																_react2.default.createElement(
+																	'td',
+																	null,
+																	_react2.default.createElement(
+																		'a',
+																		null,
+																		attrs[1],
+																		'>'
+																	)
+																)
+															);
+														});
+													} else {
+														return _react2.default.createElement(
+															'tr',
+															null,
+															_react2.default.createElement(
+																'td',
+																{ colSpan: '2' },
+																'No descriptors found.'
+															)
+														);
+													}
+												}(this)
+											)
+										)
+									)
+								)
+							)
+						)
+					)
+				);
+			}
+		}]);
+	
+		return Dims;
+	}(_react.Component);
+	
+	Dims.propTypes = {
+		hideHandler: _react2.default.PropTypes.func.isRequired // hideHandler method must exists in parent component
+	};
+	
+	var Assets = function (_Component3) {
+		_inherits(Assets, _Component3);
 	
 		function Assets(props) {
 			_classCallCheck(this, Assets);
 	
-			var _this3 = _possibleConstructorReturn(this, (Assets.__proto__ || Object.getPrototypeOf(Assets)).call(this, props));
+			var _this4 = _possibleConstructorReturn(this, (Assets.__proto__ || Object.getPrototypeOf(Assets)).call(this, props));
 	
-			_this3.state = {
+			_this4.state = {
 				showDetails: false,
+				showDetails1: false,
 				wallet: { pubKey: localStorage.getItem("pubKey") },
 				own_assets: [],
 				controlled_assets: [{ asset_id: 161718, asset_name: 'Parents House' }, { asset_id: 192021, asset_name: 'My Car' }],
 				delegated_assets: [],
+				delegated_dims: [],
 				active_asset: {},
 				show_only: []
 			};
 	
 			// event handlers must attached with current scope
-			_this3.assetHandler = _this3.assetHandler.bind(_this3);
-			_this3.hideHandler = _this3.hideHandler.bind(_this3);
-			_this3.searchHandler = _this3.searchHandler.bind(_this3);
-			return _this3;
+			_this4.assetHandler = _this4.assetHandler.bind(_this4);
+			_this4.dimensionHandler = _this4.dimensionHandler.bind(_this4);
+			_this4.hideHandler = _this4.hideHandler.bind(_this4);
+			_this4.searchHandler = _this4.searchHandler.bind(_this4);
+			return _this4;
 		}
 	
 		//*******************************************************************************
@@ -51031,9 +51459,52 @@
 				// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
 				// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
 				// -> -> -> START get DELEGATED assets -> -> ->
+				// $.ajax({
+				// 	type: "POST",
+				// 	url: twinUrl + 'getDelegatedAssets',
+				// 	data: { "pubKey": localStorage.getItem("pubKey") },
+				// 	success: function (result) {
+				// 		var data = result;
+				// 		if ($.type(result) != "object") {
+				// 			data = JSON.parseJSON(result)
+				// 		}
+	
+				// 		data = data.data;
+				// 		console.log("Get Delegated Assets result: " + data)
+	
+				// 		if (data.length > 0) {
+				// 			//loop through OWNED assets
+				// 			for (let i = 0; i < data.length; i++) {
+				// 				//AJAX each asset:
+				// 				$.ajax({
+				// 					type: "POST",
+				// 					url: twinUrl + 'getAsset',
+				// 					data: { "pubKey": localStorage.getItem("pubKey"), "flag": 2, "fileName": data[i] },
+				// 					success: function (result) {
+				// 						var dataResult = result;
+				// 						if ($.type(result) != "object") {
+				// 							dataResult = JSON.parseJSON(result)
+				// 						}
+	
+				// 						//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
+				// 						var theArray1 = this.state.delegated_assets;
+	
+				// 						theArray1[theArray1.length] = {
+				// 							asset_id: dataResult.assetID,
+				// 							asset_details: dataResult
+				// 						}
+				// 						this.setState({ delegated_assets: theArray1 });
+	
+				// 					}.bind(this),
+				// 					complete: function () { },
+				// 				})
+				// 			}//end for
+				// 		}
+				// 	}.bind(this)
+				// })
 				$.ajax({
 					type: "POST",
-					url: twinUrl + 'getDelegatedAssets',
+					url: twinUrl + 'getDelegatedDimensions',
 					data: { "pubKey": localStorage.getItem("pubKey") },
 					success: function (result) {
 						var data = result;
@@ -51042,30 +51513,39 @@
 						}
 	
 						data = data.data;
-						console.log("Get Delegated Assets result: " + data);
+						console.log("getDelegatedDimensions: " + data);
+	
+						var PUBKEY = keccak_256(localStorage.getItem("pubKey"));
+	
+						//var delegatedDims = []
 	
 						if (data.length > 0) {
 							//loop through OWNED assets
 							for (var i = 0; i < data.length; i++) {
+								console.log("grabbing.. " + data[i]);
 								//AJAX each asset:
 								$.ajax({
 									type: "POST",
-									url: twinUrl + 'getAsset',
-									data: { "pubKey": localStorage.getItem("pubKey"), "flag": 2, "fileName": data[i] },
+									url: twinUrl + 'getDimension',
+									data: { "pubKey": PUBKEY, "flag": 2, "fileName": data[i] },
 									success: function (result) {
 										var dataResult = result;
 										if ($.type(result) != "object") {
+											console.log("result != object");
 											dataResult = JSON.parseJSON(result);
 										}
 	
-										//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-										var theArray = this.state.delegated_assets;
+										var delegatedDims = this.state.delegated_dims;
 	
-										theArray[theArray.length] = {
-											asset_id: dataResult.assetID,
-											asset_details: dataResult
+										delegatedDims[delegatedDims.length] = {
+											dimension_id: dataResult.dimension.dimensionName,
+											dimension_details: dataResult.dimension
 										};
-										this.setState({ delegated_assets: theArray });
+										this.setState({ delegated_dims: delegatedDims });
+	
+										//this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
+										console.log("dataResult get Dimension: \n " + JSON.stringify(dataResult));
+										console.log("dataResult dimensionName: " + dataResult.dimension.dimensionName);
 									}.bind(this),
 									complete: function complete() {}
 								});
@@ -51082,6 +51562,17 @@
 				var assetID = asset.asset_id;
 				if (assetID) {
 					this.setState({ showDetails: true, active_asset: asset });
+				}
+			}
+		}, {
+			key: 'dimensionHandler',
+			value: function dimensionHandler(dimension) {
+				alert('if you click on a attribute, you will spend a token to read an entry');
+				console.log("dimension handler.. " + dimension);
+				var dimensionID = dimension.dimension_id;
+				if (dimensionID) {
+					console.log("dimensionID: " + dimensionID);
+					this.setState({ showDetails1: true, active_dimension: dimension });
 				}
 			}
 	
@@ -51115,7 +51606,7 @@
 		}, {
 			key: 'render',
 			value: function render() {
-				var _this4 = this;
+				var _this5 = this;
 	
 				return _react2.default.createElement(
 					'div',
@@ -51179,21 +51670,21 @@
 						_react2.default.createElement('hr', null),
 						_react2.default.createElement(
 							'div',
-							{ className: 'own-assets' },
+							{ className: 'owned-assets' },
 							_react2.default.createElement(
 								'div',
 								{ className: 'row assets' },
 								this.state.own_assets.map(function (asset, i) {
 									var cssClass = "btn btn-success";
-									if (_this4.state.show_only.length > 0) {
-										if (_this4.state.show_only.toString().indexOf(asset.asset_id.toString()) == -1) {
+									if (_this5.state.show_only.length > 0) {
+										if (_this5.state.show_only.toString().indexOf(asset.asset_id.toString()) == -1) {
 											cssClass += " hidden";
 										} else cssClass.replace("hidden", "");
 									}
 									return _react2.default.createElement(
 										'button',
 										{ type: 'button', key: i, className: cssClass, onClick: function onClick() {
-												return _this4.assetHandler(asset);
+												return _this5.assetHandler(asset);
 											} },
 										_react2.default.createElement('span', { className: 'glyphicon glyphicon-ok-circle' }),
 										asset.asset_id
@@ -51214,23 +51705,27 @@
 						_react2.default.createElement('hr', null),
 						_react2.default.createElement(
 							'div',
-							{ className: 'row assets' },
-							this.state.controlled_assets.map(function (asset) {
-								var cssClass = "btn btn-info";
-								if (_this4.state.show_only.length > 0) {
-									if (_this4.state.show_only.toString().indexOf(asset.asset_id.toString()) >= 0) {
-										cssClass += " show";
-									} else cssClass += " hidden";
-								}
-								return _react2.default.createElement(
-									'button',
-									{ type: 'button', key: asset.asset_id, className: cssClass, onClick: function onClick() {
-											return _this4.assetHandler(asset);
-										} },
-									_react2.default.createElement('span', { className: 'glyphicon glyphicon-link' }),
-									asset.asset_name
-								);
-							})
+							{ className: 'controlled-assets' },
+							_react2.default.createElement(
+								'div',
+								{ className: 'row assets' },
+								this.state.controlled_assets.map(function (asset) {
+									var cssClass = "btn btn-info";
+									if (_this5.state.show_only.length > 0) {
+										if (_this5.state.show_only.toString().indexOf(asset.asset_id.toString()) >= 0) {
+											cssClass += " show";
+										} else cssClass += " hidden";
+									}
+									return _react2.default.createElement(
+										'button',
+										{ type: 'button', key: asset.asset_id, className: cssClass, onClick: function onClick() {
+												return _this5.assetHandler(asset);
+											} },
+										_react2.default.createElement('span', { className: 'glyphicon glyphicon-link' }),
+										asset.asset_name
+									);
+								})
+							)
 						)
 					),
 					_react2.default.createElement('br', null),
@@ -51240,32 +51735,37 @@
 						_react2.default.createElement(
 							'h4',
 							null,
-							'My Delegated Assets'
+							'My Delegated Data'
 						),
 						_react2.default.createElement('hr', null),
 						_react2.default.createElement(
 							'div',
-							{ className: 'row assets' },
-							this.state.delegated_assets.map(function (asset) {
-								var cssClass = "btn btn-info";
-								if (_this4.state.show_only.length > 0) {
-									if (_this4.state.show_only.toString().indexOf(asset.asset_id.toString()) >= 0) {
-										cssClass += " show";
-									} else cssClass += " hidden";
-								}
-								return _react2.default.createElement(
-									'button',
-									{ type: 'button', key: asset.asset_id, className: cssClass, onClick: function onClick() {
-											return _this4.assetHandler(asset);
-										} },
-									_react2.default.createElement('span', { className: 'glyphicon glyphicon-piggy-bank' }),
-									asset.asset_name
-								);
-							})
+							{ className: 'delegated-assets' },
+							_react2.default.createElement(
+								'div',
+								{ className: 'row assets' },
+								this.state.delegated_dims.map(function (dimension, i) {
+									var cssClass = "btn btn-danger";
+									if (_this5.state.show_only.length > 0) {
+										if (_this5.state.show_only.toString().indexOf(dimension.dimension_id.toString()) >= 0) {
+											cssClass += " show";
+										} else cssClass += " hidden";
+									}
+									return _react2.default.createElement(
+										'button',
+										{ type: 'button', key: i, className: cssClass, onClick: function onClick() {
+												return _this5.dimensionHandler(dimension);
+											} },
+										_react2.default.createElement('span', { className: 'glyphicon glyphicon-piggy-bank' }),
+										dimension.dimension_id
+									);
+								})
+							)
 						)
 					),
 					_react2.default.createElement('br', null),
-					this.state.showDetails ? _react2.default.createElement(Modal, { hideHandler: this.hideHandler, asset: this.state.active_asset }) : null
+					this.state.showDetails ? _react2.default.createElement(Modal, { hideHandler: this.hideHandler, asset: this.state.active_asset }) : null,
+					this.state.showDetails1 ? _react2.default.createElement(Dims, { hideHandler: this.hideHandler, dimension: this.state.active_dimension }) : null
 				);
 			}
 		}]);
@@ -53618,8 +54118,6 @@
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	var _react = __webpack_require__(/*! react */ 1);
@@ -53643,6 +54141,8 @@
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var keccak_256 = __webpack_require__(/*! js-sha3 */ 325).keccak_256;
 	
 	var DimensionDelegationForm = function (_React$Component) {
 	    _inherits(DimensionDelegationForm, _React$Component);
@@ -53872,11 +54372,12 @@
 	
 	                    json.accessCategories = json.accessCategories.substring(0, json.accessCategories.length - 1);
 	
-	                    json.delegations = _this5.prepareDelegationDistribution(function (err) {
-	                        if (err) {
-	                            console.log("ERROR DELEGATIONS: " + err);
-	                        }
-	                    });
+	                    // json.delegations = this.prepareDelegationDistribution(function (err) {
+	                    //     if (err) { console.log("ERROR DELEGATIONS: " + err) }
+	                    // })
+	
+	                    var delegations = _this5.prepareDelegationDistribution(dimensionName, json.owners);
+	                    json.delegations = delegations;
 	
 	                    json.owner = _this5.state.dimension.owner;
 	
@@ -53963,9 +54464,13 @@
 	
 	    }, {
 	        key: 'prepareDelegationDistribution',
-	        value: function prepareDelegationDistribution() {
+	        value: function prepareDelegationDistribution(dimension, owners) {
+	            var dimensionName = dimension;
+	            var owner = owners;
+	            console.log("got owners for delegations: " + owner);
+	
+	            console.log("preparedelegation dimensionName: " + dimensionName);
 	            var labels = this.getDelegationInputValues();
-	            console.log("labels: " + JSON.stringify(labels));
 	            var delegatee = [];
 	            var delegatee_token_quantity = [];
 	            for (var i = 0; i < labels.length; i += 2) {
@@ -53975,19 +54480,21 @@
 	                }
 	            }
 	            var delegationsArray = [];
-	            //{ owner: "", delegatee: "", amount: "", dimension: "", expiration: "", accessCategories: "" },
+	            var date = new Date();
 	            if (delegatee.length == delegatee_token_quantity.length) {
+	                //{ owner: "", delegatee: "", amount: "", dimension: "", expiration: "", accessCategories: "" }
 	                for (var i = 0; i < delegatee.length; i++) {
 	                    var delegationObj = {};
-	                    delegationObj.owner = "COID_OWNER"; // EDIT!!!!!!!!!!
-	                    delegationObj.delegatee = delegatee[i];
+	                    delegationObj.dimension = dimensionName;
+	                    delegationObj.owner = owner; // EDIT!!!!!!!!!!
+	                    delegationObj.delegatee = keccak_256(delegatee[i]);
 	                    delegationObj.amount = delegatee_token_quantity[i];
 	                    delegationObj.accessCategories = "";
+	                    delegationObj.timeFrame = date.getTime();
 	                    delegationsArray.push(delegationObj);
 	                }
-	                console.log("delegationObj: " + JSON.stringify(delegationsArray));
 	            }
-	            return delegationsArray;
+	            return JSON.stringify(delegationsArray);
 	        }
 	        //*****************************************************************************
 	
@@ -54726,7 +55233,8 @@
 	                obj.flag = 0;
 	                objArray.push(obj);
 	            }
-	            return objArray;
+	            //needed to stringify this obj Array for backend
+	            return JSON.stringify(objArray);
 	        }
 	        //*****************************************************************************
 	        //when we click Add More, a new value is pushed into this.state.inputs,
@@ -54769,8 +55277,10 @@
 	
 	    }, {
 	        key: 'prepareDelegationDistribution',
-	        value: function prepareDelegationDistribution(dimension) {
+	        value: function prepareDelegationDistribution(dimension, owners) {
 	            var dimensionName = dimension;
+	            var owner = owners;
+	            console.log("got owners for delegations: " + owner);
 	
 	            console.log("preparedelegation dimensionName: " + dimensionName);
 	            var labels = this.getDelegationInputValues();
@@ -54783,21 +55293,21 @@
 	                }
 	            }
 	            var delegationsArray = [];
-	            //{ owner: "", delegatee: "", amount: "", dimension: "", expiration: "", accessCategories: "" },
+	            var date = new Date();
 	            if (delegatee.length == delegatee_token_quantity.length) {
+	                //{ owner: "", delegatee: "", amount: "", dimension: "", expiration: "", accessCategories: "" }
 	                for (var i = 0; i < delegatee.length; i++) {
 	                    var delegationObj = {};
 	                    delegationObj.dimension = dimensionName;
-	                    delegationObj.owner = "COID_OWNER"; // EDIT!!!!!!!!!!
-	                    delegationObj.delegatee = delegatee[i];
+	                    delegationObj.owner = owner; // EDIT!!!!!!!!!!
+	                    delegationObj.delegatee = keccak_256(delegatee[i]);
 	                    delegationObj.amount = delegatee_token_quantity[i];
 	                    delegationObj.accessCategories = "";
-	                    delegationObj.timeFrame = "1111";
+	                    delegationObj.timeFrame = date.getTime();
 	                    delegationsArray.push(delegationObj);
 	                }
-	                //console.log("delegationObj: " + JSON.stringify(delegationsArray))
 	            }
-	            return delegationsArray;
+	            return JSON.stringify(delegationsArray);
 	        }
 	        //*****************************************************************************
 	
@@ -54813,7 +55323,6 @@
 	        }
 	        //*****************************************************************************
 	        //*****************************************************************************
-	
 	        //called onClick of 'Create Dimension' button
 	
 	    }, {
@@ -54822,7 +55331,7 @@
 	            e.preventDefault();
 	
 	            var json = {};
-	            //**************************************************************
+	            //*************************************************************************
 	            var dimensionName = $("input[name^='dimensionName']").val();
 	            if (dimensionName) {
 	                json.dimensionName = dimensionName;
@@ -54831,25 +55340,20 @@
 	            json.address = "";
 	            json.flag = 0;
 	            json.ID = 0;
-	            //**************************************************************
-	            // GET PROPER DATA FROM SELECTED ASSET
+	            //*************************************************************************
+	            // GET PROPER DATA FROM SELECTED ASSET (we will pass owners to prepareDelegations)
 	            var selected_asset = $("#assetSelect option:selected").text();
 	            this.state.own_assets.forEach(function (asset, index) {
 	                if (selected_asset == asset.asset_id) {
 	                    json.coidAddr = asset.asset_coidAddr, json.dimensionCtrlAddr = asset.asset_dimCtrlAddr, json.uniqueId = asset.asset_uniqueId, json.owners = asset.asset_owners, json.controllers = asset.asset_controllers;
 	                }
 	            });
-	            //**************************************************************
-	            var delegations = this.prepareDelegationDistribution(dimensionName);
-	            json.delegations = JSON.stringify(delegations);
-	            //**************************************************************
+	            //*************************************************************************
+	            var delegations = this.prepareDelegationDistribution(dimensionName, json.owners);
+	            json.delegations = delegations;
 	            var attributes = this.prepareAttributes();
-	
-	            console.log("attributes: " + attributes + ", type: " + (typeof attributes === 'undefined' ? 'undefined' : _typeof(attributes)));
-	
 	            json.data = attributes;
-	            json.data = JSON.stringify(json.data);
-	            console.log("tostring: " + json.data);
+	            //*************************************************************************
 	
 	            console.log("JSON: " + JSON.stringify(json));
 	
@@ -54913,6 +55417,15 @@
 	                    'h1',
 	                    null,
 	                    'IDENTITY DIMENSIONS'
+	                ),
+	                _react2.default.createElement(
+	                    'h5',
+	                    null,
+	                    _react2.default.createElement(
+	                        'i',
+	                        null,
+	                        'Personal Data Repositories'
+	                    )
 	                ),
 	                _react2.default.createElement('hr', null),
 	                _react2.default.createElement(
@@ -55972,7 +56485,7 @@
 						_react2.default.createElement(
 							'label',
 							{ htmlFor: 'unique_id_attrs' },
-							' Official IDs e.g. SSN, Passport, Drivers License, Digital retinal scans and/or digital fingerprints '
+							' Unique Identfiers e.g. Serial Numbers, MAC Addresses, Vehicle Identitfication Numbers'
 						),
 						_react2.default.createElement('input', { name: 'label-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: 'Label' })
 					),
@@ -56234,15 +56747,21 @@
 			key: 'componentDidMount',
 			value: function componentDidMount() {
 				//TODO********** add fileName.json********put in localstorage!
+	
+				var publicKey = localStorage.getItem("pubKey");
+	
 				$.ajax({
 					type: "POST",
 					url: twinUrl + 'getAsset',
-					data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": "MyCOID.json" },
+					data: { "pubKey": publicKey, "flag": 0, "fileName": "MyCOID.json" },
 					success: function (result) {
 						var data = result;
 						if ($.type(result) != "object") {
 							data = JSON.parseJSON(result);
 						}
+	
+						//var gatekeeperAddr = "gatekeeperAddr_" + publicKey 
+						//console.log("gkaddr:  " + gatekeeperAddr)
 						localStorage.setItem("gatekeeperAddr", result.gatekeeperAddr);
 						localStorage.setItem("coidAddr", result.coidAddr);
 						localStorage.setItem("dimensionCtrlAddr", result.dimensionCtrlAddr);

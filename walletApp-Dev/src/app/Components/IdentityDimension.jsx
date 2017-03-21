@@ -279,10 +279,12 @@ class DimensionForm extends Component {
     render() {
         console.log("state in DimensionForm\n" + JSON.stringify(this.state))
         var dims = this.state.dimension
+        console.log("dims: " + JSON.stringify(dims))
 
         var dataArray = []
         var arrayOfArrays = []
-        let data = dims.dimension.data //data comes from _dimension.json object structure
+        let data = dims.dimension_details.data //data comes from _dimension.json object structure
+        console.log("data: " + JSON.stringify(data))
 
         Object.keys(data).forEach(key => {
             dataArray.push(data[key].descriptor)
@@ -301,7 +303,7 @@ class DimensionForm extends Component {
         // console.log("arrayOfArrays[0][0]: " + arrayOfArrays[0][0])
         // console.log("arrayOfArrays[1][1]: " + arrayOfArrays[1][1])
 
-        var controllers = dims.dimension.controllers
+        var controllers = dims.dimension_details.controllers
 
         var syle = {
             marginRight: '15px'
@@ -336,7 +338,7 @@ class DimensionForm extends Component {
                                             </tr>
                                             <tr>
                                                 <td>Dimension Type</td>
-                                                <td>{dims.dimension.dimensionName}</td>
+                                                <td>{dims.dimension_details.dimensionName}</td>
                                             </tr>
                                             <tr>
                                                 <td>Controller List</td>
@@ -427,7 +429,7 @@ class DimensionForm extends Component {
                                     <table className="table table-striped table-hover" style={syle}>
                                         <thead>
                                             <tr>
-                                                <th>Tokens delegated for this dimension: 0</th>
+                                                <th>Tokens delegated for this dimension: 1</th>
                                             </tr>
                                         </thead>
                                         <hr />
@@ -578,51 +580,104 @@ class IdentityDimensions extends Component {
     // Get DT Dimension Data. Call this in componentWillMount
     getDimensions() {
 
+        	$.ajax({
+			type: "POST",
+			url: twinUrl + 'getOwnedDimensions',
+			data: { "pubKey": localStorage.getItem("pubKey") },
+			success: function (result) {
+				var data = result;
+				if ($.type(result) != "object") {
+					data = JSON.parseJSON(result)
+				}
+
+				data = data.data;
+				console.log("getOwnedDimensions: " + data);
+
+				var PUBKEY = keccak_256(localStorage.getItem("pubKey"));
+
+				//var delegatedDims = []
+
+				if (data.length > 0) {
+					//loop through OWNED assets
+					for (let i = 0; i < data.length; i++) {
+						console.log("grabbing.. " + data[i])
+						//AJAX each asset:
+						$.ajax({
+							type: "POST",
+							url: twinUrl + 'getDimension',
+							data: { "pubKey": PUBKEY, "flag": 0, "fileName": data[i] },
+							success: function (result) {
+								var dataResult = result;
+								if ($.type(result) != "object") {
+									console.log("result != object");
+									dataResult = JSON.parseJSON(result)
+								}
+
+								var ownedDims = this.state.iDimensions
+
+								ownedDims[ownedDims.length] = {
+									//dimension_id: dataResult.dimension.dimensionName,
+									dimension_details: dataResult.dimension
+								}
+								this.setState({ iDimensions: ownedDims });
+
+								//this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
+								console.log("dataResult get Dimension: \n " + JSON.stringify(dataResult))
+								console.log("dataResult dimensionName: " + dataResult.dimension.dimensionName)
+
+							}.bind(this),
+							complete: function () { },
+						})
+					}//end for
+				}
+			}.bind(this)
+		})
+
         //MyCOID.json
-        let dimension1 = {}
-        dimension1.dimension = {
-            "dimensionName": "FINANCES",
-            "pubkey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
-            "coidAddr": "7924DBF02BE23923790C5D82F8A39925F516CA0F",
-            "dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
-            "ID": 3432423423,
-            "address": "HEXSTRING_address",
-            "owner": [],
-            "controllers": ["c1", "c2"],
-            "delegations": [
-                { owner: "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055", delegatee: "d1", amount: "2", dimension: "", expiration: "thursday", accessCategories: "" },
-                { owner: "A1", delegatee: "D1", amount: "2", dimension: "", expiration: "friday", accessCategories: "" }
-            ],
-            "data": [
-                { "descriptor": "financial_FEB", "attribute": "QMfgsddfsdffsdfsdsdfsdf", flag: "0", ID: "4465" },
-                { "descriptor": "financial_MARCH", "attribute": "Qmsdfsdfsdfsdfsdfsdfsdfsdf", flag: "0", ID: "3433" },
-            ]
-        }
-        //HOME.json
-        let dimension2 = {}
-        dimension2.dimension = {
-            "dimensionName": "EDUCATION",
-            "pubkey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
-            "coidAddr": "872EDE47AEBC33CAD4AF1B8DA861E78D8E99BC56",
-            "dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
-            "ID": 69696969,
-            "address": "HEXSTRING_address",
-            "owner": [],
-            "controllers": ["c1", "c2"],
-            "delegations": [
-                { owner: "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055", delegatee: "D1", amount: "2", dimension: "", expiration: "thursday", accessCategories: "" },
-            ],
-            "data": [
-                { "descriptor": "education_highschool", "attribute": "QMfgsddfsdffsdfsdsdfsdf", flag: "0", ID: "4465" },
-                { "descriptor": "education_college", "attribute": "Qmsdfsdfsdfsdfsdfsdfsdfsdf", flag: "0", ID: "3433" },
-            ]
-        }
+        // let dimension1 = {}
+        // dimension1.dimension = {
+        //     "dimensionName": "EDUCATION",
+        //     "pubkey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+        //     "coidAddr": "7924DBF02BE23923790C5D82F8A39925F516CA0F",
+        //     "dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
+        //     "ID": 3432423423,
+        //     "address": "HEXSTRING_address",
+        //     "owner": [],
+        //     "controllers": ["c1", "c2"],
+        //     "delegations": [
+        //         { owner: "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055", delegatee: "d1", amount: "2", dimension: "", expiration: "thursday", accessCategories: "" },
+        //         { owner: "A1", delegatee: "D1", amount: "2", dimension: "", expiration: "friday", accessCategories: "" }
+        //     ],
+        //     "data": [
+        //         { "descriptor": "financial_FEB", "attribute": "QMfgsddfsdffsdfsdsdfsdf", flag: "0", ID: "4465" },
+        //         { "descriptor": "financial_MARCH", "attribute": "Qmsdfsdfsdfsdfsdfsdfsdfsdf", flag: "0", ID: "3433" },
+        //     ]
+        // }
+        // //HOME.json
+        // let dimension2 = {}
+        // dimension2.dimension = {
+        //     "dimensionName": "EDUCATION",
+        //     "pubkey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+        //     "coidAddr": "872EDE47AEBC33CAD4AF1B8DA861E78D8E99BC56",
+        //     "dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
+        //     "ID": 69696969,
+        //     "address": "HEXSTRING_address",
+        //     "owner": [],
+        //     "controllers": ["c1", "c2"],
+        //     "delegations": [
+        //         { owner: "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055", delegatee: "D1", amount: "2", dimension: "", expiration: "thursday", accessCategories: "" },
+        //     ],
+        //     "data": [
+        //         { "descriptor": "education_highschool", "attribute": "QMfgsddfsdffsdfsdsdfsdf", flag: "0", ID: "4465" },
+        //         { "descriptor": "education_college", "attribute": "Qmsdfsdfsdfsdfsdfsdfsdfsdf", flag: "0", ID: "3433" },
+        //     ]
+        // }
 
-        var arry = []
-        arry.push(dimension1)
-        arry.push(dimension2)
+        // var arry = []
+        // arry.push(dimension1)
+        // arry.push(dimension2)
 
-        this.setState({ iDimensions: arry })
+        // this.setState({ iDimensions: arry })
 
     }//end getDimensions
 
@@ -863,6 +918,8 @@ class IdentityDimensions extends Component {
     //*****************************************************************************
     render() {
 
+        console.log("this.state.idims: " + JSON.stringify(this.state.iDimensions))
+
         var _that = this
 
         var syle = { marginRight: '15px' }
@@ -906,7 +963,7 @@ class IdentityDimensions extends Component {
                                                     return (
                                                         <tr key={i}>
                                                             <td>
-                                                                <a data-item={el.dimension} data-index={i} onClick={_that.showDimensionHandler} >{el.dimension.dimensionName}</a>
+                                                                <a data-item={el.dimension_details} data-index={i} onClick={_that.showDimensionHandler} >{el.dimension_details.dimensionName}</a>
                                                             </td>
                                                         </tr>
                                                     );

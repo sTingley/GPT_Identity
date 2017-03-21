@@ -401,6 +401,7 @@ class Dims extends Component {
 
 	//**********************************************************************************
 	showAttrs(e) {
+		alert('If you continue, you will spend a token to read entries.')
 		var _this = this
 		e.preventDefault();
 		var ele = $(e.target);
@@ -418,28 +419,34 @@ class Dims extends Component {
 		let pubKey = keccak_256(localStorage.getItem("pubKey"))
 		json.pubKey = pubKey
 		json.dimensionName = dimensionName;
-		json.dimensionCtrlAddr = prop.dimension_details.dimensionCtrlAddr
+		json.dimensionCtrlAddr = prop.dimension_details.dimensionCtrlAddr;
 		json.ID = ID;
 		json.descriptor = descriptor;
 
 		console.log("JSON: " + JSON.stringify(json))
 
-		$.ajax({
-			type: "POST",
-			url: twinUrl + 'dimensions/readEntry',
-			data: json,
-			success: function (result) {
-				var data = result;
-				if ($.type(result) != "object") {
-					data = JSON.parseJSON(result)
-				}
+		// $.ajax({
+		// 	type: "POST",
+		// 	url: twinUrl + 'dimensions/readEntry',
+		// 	data: json,
+		// 	success: function (result) {
+		// 		var data = result;
+		// 		if ($.type(result) != "object") {
+		// 			data = JSON.parseJSON(result)
+		// 		}
 
-				console.log("repsonse readEntry: " + JSON.stringify(data))
-				//var abc = true
-			}
-		})
+		// 		console.log("repsonse readEntry: " + JSON.stringify(data))
+		// 		//var abc = true
+		// 	}
+		// })
 
-		$('#mytabs a[href="#show_descriptors"]').tab('show');
+		setTimeout(function(){
+
+			$('#mytabs a[href="#show_descriptors"]').tab('show');
+
+		}, 4000)
+
+		
 
 
 	}
@@ -470,9 +477,9 @@ class Dims extends Component {
 			arrayOfArrays.push(element)
 		}
 
-		console.log("DataArray: " + dataArray)
-		console.log("arrayOfArrays[0][0]: " + arrayOfArrays[0][0])
-		console.log("arrayOfArrays[1][1]: " + arrayOfArrays[1][1])
+		//console.log("DataArray: " + dataArray)
+		//console.log("arrayOfArrays[0][0]: " + arrayOfArrays[0][0])
+		//console.log("arrayOfArrays[1][1]: " + arrayOfArrays[1][1])
 
 
 		var style = {
@@ -543,9 +550,6 @@ class Dims extends Component {
 										<button type="button" className="btn btn-primary" data-val="1" onClick={this.showAttrs.bind(this)}>Show Descriptors</button>
 									</div>
 
-									<form action="http://google.com">
-										<input type="submit" value="Go to Google" />
-									</form>
 								</div>
 
 								<div title="tabs" role="tabpanel" className="tab-pane center-block" id="show_descriptors">
@@ -858,7 +862,6 @@ class Assets extends Component {
 	}
 
 	dimensionHandler(dimension) {
-		alert('if you click on a attribute, you will spend a token to read an entry')
 		console.log("dimension handler.. " + dimension)
 		var dimensionID = dimension.dimension_id
 		if (dimensionID) {
@@ -987,3 +990,7 @@ class Assets extends Component {
 
 export default Assets;
 
+
+// <form action="http://google.com">
+// <input type="submit" value="Go to Google" />
+// </form>

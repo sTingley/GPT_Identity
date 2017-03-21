@@ -1002,3 +1002,4 @@ for (let endpoint in IdentityConfig) {
 app.listen(8001, function () {
     console.log("Connected to contract http://10.101.114.231:1337/rpc");
     console.log("Listening on port 8001");
+})

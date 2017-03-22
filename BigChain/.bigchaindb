@@ -1,0 +1,24 @@
+{
+    "api_endpoint": "http://uscinc1b6s6.noam.tcs.com:9984/api/v1",
+    "keyring": [],
+    "statsd": {
+        "rate": 0.01,
+        "port": 8125,
+        "host": "uscinc1b6s6.noam.tcs.com"
+    },
+    "server": {
+        "bind": "uscinc1b6s6.noam.tcs.com:9984",
+        "workers": null,
+        "threads": null
+    },
+    "backlog_reassign_delay": 30,
+    "keypair": {
+        "public": "EVLuqsoihLYF2LGon6yqScsUvmyiySd6NsvFq55sMAL9",
+        "private": "7jnLgKkfcWoCZpn2eUWjWaHV2DzVb9mwzXdqB1N6X5ry"
+    },
+    "database": {
+        "host": "uscinc1b6s6.noam.tcs.com",
+        "port": 28015,
+        "name": "bigchain"
+    }
+}

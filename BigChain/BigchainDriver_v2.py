@@ -93,8 +93,8 @@ def erisfyIt(pubKey):
         if flag == -1:
             #make the user in bigchain
             alice = generate_keypair()
-            priv1 = alice.signing_key;
-            pub1 = alice.verifying_key;
+            priv1 = alice.private_key;
+            pub1 = alice.public_key;
             print("test private: " + priv1)
             print("test public: " + pub1)
             priv1 = encrypt_val(priv1)
@@ -231,8 +231,10 @@ def createFile(ErisPubKey,BigchainPubKey,BigchainPrivKey):
 @app.route('/getKeys', methods=['GET'])
 def get_keys():
         alice = generate_keypair()
-        pub1 = alice.verifying_key;
-        priv1 = alice.signing_key;
+        #pub1 = alice.verifying_key;
+        #priv1 = alice.signing_key;
+        pub1 = alice.public_key;
+        priv1 = alice.private_key;
         return jsonify({'publickey': pub1, 'privatekey': priv1})
 
 

@@ -1,3 +1,5 @@
+//THIS FILE WAS THE OLD DIGITAL TWIN BEFORE WE ADDED TWINCONFIG.json
+
 'use strict';
 var app = require('express')(),
     config = require('./config.json'),

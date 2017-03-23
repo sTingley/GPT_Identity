@@ -21,7 +21,7 @@ import cryptoconditions as cc
 
 #bigchain functionality
 from bigchaindb_driver import BigchainDB
-bdb = BigchainDB('http://10.100.99.175:9984/api/v1')
+bdb = BigchainDB('http://uscinc1b6s6.noam.tcs.com:9984/api/v1')
 from bigchaindb_driver.crypto import generate_keypair
 
 #for file writing and reading
@@ -296,6 +296,7 @@ def add_data_2(pub1,flag):
         tx = bdb.transactions.create(verifying_key=pub,
                                      signing_key=priv,
                                      asset=digital_asset_payload)
+        print('addData endpoint hit');
         return flask.jsonify(**tx)
 
 

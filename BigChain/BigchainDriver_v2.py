@@ -1,5 +1,5 @@
 #BIGCHAIN IS INSTALLED IN 10.101.114.230 (10.100.98.217)
-
+#
 
 #Flask is the library that allows one to make a RESTful service in Python
 import flask
@@ -14,10 +14,9 @@ from flask import request
 #libraries for bigchain functionality
 from bigchaindb import Bigchain
 #from bigchaindb import crypto
-from bigchaindb import util
+#from bigchaindb import util
 import cryptoconditions as cc
 #^Which of the above are not needed???
-
 
 #bigchain functionality
 from bigchaindb_driver import BigchainDB
@@ -35,12 +34,8 @@ from Crypto.Cipher import AES
 import base64
 
 
-
 #app declaration
 app = Flask(__name__)
-
-
-
 
 
 ErisPubKeys = [];
@@ -75,11 +70,9 @@ def decrypt_val(cipher_text):
     clear_val = raw_decrypted.decode('UTF-8').rstrip("\0")
     return clear_val
 
-
 encrypted1 = encrypt_val('hi')
 print(encrypted1)
 print(decrypt_val(encrypted1))
-
 
 
 #This function takes in an Eris Public Key (UNHASHED)
@@ -121,7 +114,6 @@ def erisfyIt(pubKey):
         return pubNDpriv
 
 
-
 #This function takes in a public key (UNHASHED), and returns an associated Bigchain public key
 #FLAG 1 means this is an eris key
 #FLAG 0 means this is a bigchaindb key
@@ -140,7 +132,6 @@ def privKeyPointerManagement(pubkey,flag):
         if(flag == 1):
             returnThisKey = erisfyIt(pubkey)[1]
         return returnThisKey
-
 
 #This function takes in an UNHASHED public key (or list of public keys), and returns an associated Bigchain public key or list of Bigchain public keys
 #1 means this is a bigchain key
@@ -205,7 +196,6 @@ def getBigchainKeys(ErisPubKey):
         return [pubKey,privKey];
 
 
-
 #The eris public key IS the file name
 def createFile(ErisPubKey,BigchainPubKey,BigchainPrivKey):
         #name of directory
@@ -234,9 +224,6 @@ def createFile(ErisPubKey,BigchainPubKey,BigchainPrivKey):
 #print("pubkey " + getPubKeyBigchain(hashIt("ErisPubkey")))
 #print("privkey "+ getPrivKeyBigchain(hashIt("ErisPubkey")))
 #erisfyIt("ErisPubkey")
-
-
-
 
 
 #GET: public and private key of a new user to be generated
@@ -278,12 +265,6 @@ def transaction():
         return flask.jsonify(**tx_transfer)
 
 
-
-
-
-
-
-
 #POST: Add a transaction
 #User Input: A digital asset payload, public key
 #The digital asset payload is the post request data in json format;
@@ -293,12 +274,18 @@ def add_data_2(pub1,flag):
         pub = keyPointerManagement(pub1,int(flag))
         priv = getPrivKeyBigchain(hashIt(pub1))
         digital_asset_payload = request.get_json(force=True)
-        tx = bdb.transactions.create(verifying_key=pub,
-                                     signing_key=priv,
-                                     asset=digital_asset_payload)
-        print('addData endpoint hit');
-        return flask.jsonify(**tx)
 
+        tx = bdb.transactions.prepare(
+                operation='CREATE',
+                signers=pub,
+                asset=digital_asset_payload
+        )
+
+        fulfilled_creation_tx = bdb.transactions.fulfill(
+                tx, private_keys=priv)
+        
+        print('addData endpoint hit with POST rq');
+        return flask.jsonify(**fulfilled_creation_tx)
 
 
 #POST: Implement a Threshold Condition Transaction
@@ -354,16 +341,12 @@ def threshold_it_2():
                 subfulfillments[i].sign(threshold_tx_fulfillment_message, crypto.SigningKey(privKeys[i]))
                 threshold_fulfillment.add_subfulfillment(subfulfillments[i])
 
-
-
-
         # Add remaining (unfulfilled) fulfillment as a condition
         for i in range(len(pubKeys)-N):
                 threshold_fulfillment.add_subcondition(subfulfillments[i+N].condition)
 
         # Update the fulfillment
         threshold_tx_transfer['transaction']['fulfillments'][0]['fulfillment'] = threshold_fulfillment.serialize_uri()
-
 
 #       b.write_transaction(threshold_tx_transfer)
 
@@ -433,7 +416,6 @@ def threshold_it():
         return flask.jsonify(**threshold_tx_signed)
 
 
-
 #GET: Get Transaction
 #User Input: Transaction ID into the URL
 @app.route('/getTransaction/<tx_ID>', methods=['GET'])
@@ -444,8 +426,6 @@ def get_transaction(tx_ID):
 
 #GET: Most recent transaction
 #GET: Get Transactions by user
-
-
 
 
 #run app

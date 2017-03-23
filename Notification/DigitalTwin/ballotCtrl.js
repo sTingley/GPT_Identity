@@ -1,9 +1,9 @@
 var fs = require('fs');
 var Crypto = require('./cryptoCtr.js'),
 	keccak_256 = require('js-sha3').keccak_256,
-	config = require('./config.json');
+	config = require('./TwinConfig.json');
 
-var PATH = config.env.notification_folder_path;
+var PATH = config.notification_folder_path;
 var notify_suffix = config.suffix.notifications_file;
 var coid_suffix = config.suffix.coid_file;
 
@@ -30,7 +30,6 @@ var ballotCtrl = {
 		var timestamp = Number(new Date());
 		var cryptoEncr = new Crypto({ pubKey: params.pubKey });
 
-
 		var fileName = PATH + keccak_256(pubKey).toUpperCase() + "_myGK" + ".json";
 
 		if (fs.existsSync(fileName)) {
@@ -47,7 +46,6 @@ var ballotCtrl = {
 			fileContent.bigchainHash = txnHash;
 			fileContent.bigchainID = txnID;
 
-
 			console.log("To be wrriten: " + JSON.stringify(fileContent))
 			fs.writeFileSync(fileName, cryptoEncr.encrypt(JSON.stringify(fileContent)));
 		}
@@ -56,7 +54,6 @@ var ballotCtrl = {
 		}
 	},
 
-	//comes from idf_gatekeeper (gatekeeper_v7.js)
 	coidCreation: function (req, res) {
 
 		console.log("hi");
@@ -85,9 +82,9 @@ var ballotCtrl = {
 			console.log("...." + fs.readFileSync(fileName, 'utf8'))
 			fileContent = cryptoEncr.decrypt(fs.readFileSync(fileName, 'utf8'));
 			console.log("file content is: " + fileContent)
+			console.log(fileContent)
 
 			fileContent = JSON.parse(fileContent);
-
 			fileContent.coidAddr = coidAddr;
 			fileContent.gatekeeperAddr = gkAddr;
 			fileContent.bigchainHash = txnHash;
@@ -101,10 +98,7 @@ var ballotCtrl = {
 		}
 	},
 
-
-
 	// Just write notification (right after writes into bigchain)
-	// In index.js, url is '/ballot/writeNotify'
 	writeNotification: function (req, res) {
 		console.log("you have reached writeNotification");
 		var params = req.body;
@@ -178,8 +172,6 @@ var ballotCtrl = {
 		}
 	},
 
-	// Called by index.js when user logs in (upload.jsx) and also when user clicks vote tab (ToVote.jsx)
-	// In index.js, the url is '/ballot/readNotify/:pubKey'
 	fetchNotification: function (req, res) {
 		var param = req.params;
 		console.log('pubKey: ' + param.pubKey)
@@ -217,8 +209,6 @@ var ballotCtrl = {
 		var timestamp = Number(new Date());
 		var cryptoEncr = new Crypto({ pubKey: params.pubKey });
 
-		console.log("params: ")
-		console.log(params)
 
 		//TODO: Test Update functionality
 		//TODO: coidCreation can just call as an update
@@ -291,10 +281,8 @@ var ballotCtrl = {
 			for (var i = 0; i < keys.length; i++) {
 				var name = keys[i];
 				var val = values[i];
-
 				fileContent[name] = val;
 			}
-
 
 			fs.writeFileSync(fileName, cryptoEncr.encrypt(JSON.stringify(fileContent)));
 		} else {
@@ -318,8 +306,6 @@ var ballotCtrl = {
 
 		var pubKey = req.body.pubKey;
 		console.log(pubKey)
-
-
 		var fileName = PATH + keccak_256(pubKey).toUpperCase() + coid_suffix + ".json";
 
 		var cryptoEncr = new Crypto({ pubKey: pubKey });
@@ -351,6 +337,6 @@ var ballotCtrl = {
 			res.json({ 'data': 'Notifications unavailable' });
 		}
 	}
-} //end ballotCtrl
+}
 module.exports = ballotCtrl;
 

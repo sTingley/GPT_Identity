@@ -5,6 +5,7 @@
 		5051,
 		5052
 	],
+	"notification_folder_path": "/home/demoadmin/DigitalTwin/notifications/",
 	"suffix": {
 		"ipfs_file": "_files",
 		"coid_file": "_coid",
@@ -12,7 +13,6 @@
 	},
 	"IPFS_CONFIG": {
 		"ipfs_file_tmp_path": "/home/demoadmin/DigitalTwin/tmp/",
-		"notification_folder_path": "/home/demoadmin/DigitalTwin/notifications/",
 		"ipfs_file_read_url": "http://10.100.98.218:8000/"
 	},
 	"GK_CONFIG": {

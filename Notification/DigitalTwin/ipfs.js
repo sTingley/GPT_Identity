@@ -1,21 +1,21 @@
 'use strict';
 var spawn = require('child_process').spawn,
-	config = require('./config.json'),
+	config = require('./TwinConfig.json'),
 	cryptoCtr = require('./cryptoCtr.js'),
 	crypto = require('crypto'),
 	fs = require('fs'),
 	http = require('http');
 
 //DigitalTwin/tmp
-var tmpPath = config.env.ipfs_file_tmp_path;
+var tmpPath = config.IPFS_CONFIG.ipfs_file_tmp_path;
 
 //"/home/demoadmin/DigitalTwin/notifications/"
-var JSONPath = config.env.notification_folder_path;
+var JSONPath = config.IPFS_CONFIG.notification_folder_path;
 
 //for eris service it was "ipfs_file_read_url": "http://192.168.99.101:8080/ipfs/",
 // ...
 //now it is "ipfs_file_read_url": "http://10.100.98.218:8080/"
-var IPFS_baseUrl = config.env.ipfs_file_read_url;
+var IPFS_baseUrl = config.IPFS_CONFIG.ipfs_file_read_url;
 
 var suffix = config.suffix.ipfs_file;
 

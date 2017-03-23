@@ -5,6 +5,16 @@
 		5051,
 		5052
 	],
+	"suffix": {
+		"ipfs_file": "_files",
+		"coid_file": "_coid",
+		"notifications_file": "_notify"
+	},
+	"IPFS_CONFIG": {
+		"ipfs_file_tmp_path": "/home/demoadmin/DigitalTwin/tmp/",
+		"notification_folder_path": "/home/demoadmin/DigitalTwin/notifications/",
+		"ipfs_file_read_url": "http://10.100.98.218:8000/"
+	},
 	"GK_CONFIG": {
 		"TARGET": "http://10.100.99.207:3000/",
 		"ENDPOINT": "/gatekeeper"
@@ -72,7 +82,8 @@
 			"removeController": "/dimensions/removeController",
 			"spendTokens": "/dimensions/spendTokens",
 			"delegateeAmount": "/dimensions/delegateeAmount",
-			"addController": "/dimensions/addController"
+			"addController": "/dimensions/addController",
+			"readEntry": "/dimensions/readEntry"
 		},
 		"NEW_ENDPOINTS": {
 			"CreateDimension": "/CreateDimension",
@@ -87,7 +98,8 @@
 			"removeController": "/removeController",
 			"spendTokens": "/spendTokens",
 			"delegateeAmount": "/delegateeAmount",
-			"addController": "/addController"
+			"addController": "/addController",
+			"readEntry": "/readEntry"
 		}
 	}
 }

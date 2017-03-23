@@ -6,6 +6,9 @@ import AssetTags from './classAndSubClass.js';
 //import DimensionCreationForm from './DimensionCreationForm.jsx'
 import { Router, Route, IndexRedirect, hashHistory } from 'react-router';
 
+var Web3 = require('web3')
+var web3 = new Web3();
+
 //import wallet from './wallet.js';
 
 var crypto = require('crypto');
@@ -426,20 +429,23 @@ class Dims extends Component {
 
 		console.log("JSON: " + JSON.stringify(json))
 
-		// $.ajax({
-		// 	type: "POST",
-		// 	url: twinUrl + 'dimensions/readEntry',
-		// 	data: json,
-		// 	success: function (result) {
-		// 		var data = result;
-		// 		if ($.type(result) != "object") {
-		// 			data = JSON.parseJSON(result)
-		// 		}
+		var attribute 
+		$.ajax({
+			type: "POST",
+			url: twinUrl + 'dimensions/readEntry',
+			data: json,
+			success: function (result) {
+				var data = result;
+				if ($.type(result) != "object") {
+					console.log("not object")
+					data = JSON.parseJSON(result)
+				}
 
-		// 		console.log("repsonse readEntry: " + JSON.stringify(data))
-		// 		//var abc = true
-		// 	}
-		// })
+				console.log("repsonse readEntry: " + JSON.stringify(data))
+				console.log("data.Result: " + data.Result);
+			}
+		})
+		
 
 		setTimeout(function(){
 

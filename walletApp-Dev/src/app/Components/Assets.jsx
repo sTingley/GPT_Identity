@@ -400,6 +400,7 @@ class Dims extends Component {
 	}
 
 	//**********************************************************************************
+	//OnClick of showAttrs button
 	showAttrs(e) {
 		alert('If you continue, you will spend a token to read entries.')
 		var _this = this
@@ -445,10 +446,6 @@ class Dims extends Component {
 			$('#mytabs a[href="#show_descriptors"]').tab('show');
 
 		}, 4000)
-
-		
-
-
 	}
 
 	render() {

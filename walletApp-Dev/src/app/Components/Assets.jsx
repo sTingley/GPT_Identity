@@ -38,8 +38,19 @@ class Modal extends Component {
 			docs: {}
 
 		};
-		this.handleClassChange = this.handleClassChange.bind(this);;
+		this.handleClassChange = this.handleClassChange.bind(this);
+		this.handleSubClassChange = this.handleSubClassChange.bind(this);
 		this.maxUniqAttr = 10;
+	}
+
+	handleClassChange(tags) {
+		this.setState({ asset_class: tags });
+		this.tags.updateClasses(tags, this.props.asset.asset_id, "classes");
+	}
+
+	handleSubClassChange(tags) {
+		this.setState({ asset_subclass: tags });
+		this.tags.updateClasses(tags, this.props.asset.asset_id, "subclasses");
 	}
 
 	componentDidMount() {
@@ -47,7 +58,6 @@ class Modal extends Component {
 		$("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
 
 		var prop = this.props.asset.asset_details;
-
 
 		var theTime = (new Date()).toString()
 
@@ -75,16 +85,6 @@ class Modal extends Component {
 		signature = signature.toString("hex")
 
 		this.setState({ qrCode_signature: { "msgHash": qrCode_Object_hash, "signature": signature, "timestamp": theTime } })
-	}
-
-	handleClassChange(tags) {
-		this.setState({ asset_class: tags });
-		this.tags.updateClasses(tags, this.props.asset.asset_id, "classes");
-	}
-
-	handleSubClassChange(tags) {
-		this.setState({ asset_subclass: tags });
-		this.tags.updateClasses(tags, this.props.asset.asset_id, "subclasses");
 	}
 
 	appendInput() {
@@ -337,26 +337,19 @@ class Dims extends Component {
 		this.tags = new AssetTags(this.pubKey, props.dimension.dimension_id);
 		this.state = {
 
-			//added for identityDimension tab-pane
-			inputs: ['input-0'],
-
-			dimension: props.dimension || {},
 			asset_class: this.tags.getAssetData("classes"),
 			asset_subclass: this.tags.getAssetData("subclasses"),
 
-			//used for identitydimension file upload
-			docs: {}
+			inputs: ['input-0'],
+
+			dimension: props.dimension || {},
+
+			dimensionDataArray: []
 
 		};
-		this.handleClassChange = this.handleClassChange.bind(this);;
+		this.handleClassChange = this.handleClassChange.bind(this);
+		this.handleSubClassChange = this.handleSubClassChange.bind(this);
 		this.maxUniqAttr = 10;
-	}
-
-	componentDidMount() {
-		$("#assetDetails").modal('show');
-		$("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
-
-		var prop = this.props.dimension.dimension_details;
 	}
 
 	handleClassChange(tags) {
@@ -367,6 +360,32 @@ class Dims extends Component {
 	handleSubClassChange(tags) {
 		this.setState({ asset_subclass: tags });
 		this.tags.updateClasses(tags, this.props.dimension.dimension_id, "subclasses");
+	}
+
+	//get the data object array and putting it in one array (so we can use map function)
+	componentWillMount() {
+		var dataArray = []
+		var data = this.props.dimension.dimension_details.data
+		//{"descriptor":"jan_history","attribute":"QmTok8Hgi4CCYS3fkxS83XpRjHjfegQZNszU6ekSFFq65s","flag":0}
+		Object.keys(data).forEach(key => {
+			dataArray.push(data[key].descriptor)
+			dataArray.push(data[key].attribute)
+			dataArray.push(data[key].flag)
+		})
+		var arrayOfArrays = []
+		for (var i = 0; i < data.length; i++) {
+			var element = [dataArray[3 * i + 0], dataArray[3 * i + 1], dataArray[3 * i + 2]] /*, dataArray[4 * i + 3]*/
+			arrayOfArrays.push(element)
+		}
+		this.setState({ dimensionDataArray: arrayOfArrays })
+	}
+
+	componentDidMount() {
+		$("#assetDetails").modal('show');
+		$("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
+
+		var prop = this.props.dimension.dimension_details;
+
 	}
 
 	appendInput() {
@@ -402,22 +421,26 @@ class Dims extends Component {
 		this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
 	}
 
+
 	//**********************************************************************************
-	//OnClick of showAttrs button
-	showAttrs(e) {
+	setDescriptors(e) {
+		//need to set chosen descriptors in the state
+		//then call this function in showAttrs
+	}
+
+	//**********************************************************************************
+	showAttrs2(e) {
 		alert('If you continue, you will spend a token to read entries.')
-		var _this = this
 		e.preventDefault();
 		var ele = $(e.target);
-		var value = parseInt(ele.attr("data-val"))
+		let value = parseInt(ele.attr("data-val"))
 		console.log("got value.. " + value)
-
 		var prop = this.props.dimension
 
 		var json = {};
 		let dimensionName = prop.dimension_details.dimensionName;
 		let ID = "";
-		let descriptor = prop.dimension_details.data[0].descriptor;
+		let descriptor = prop.dimension_details.data[value].descriptor;
 		console.log("descriptor: " + JSON.stringify(descriptor))
 
 		let pubKey = keccak_256(localStorage.getItem("pubKey"))
@@ -429,60 +452,42 @@ class Dims extends Component {
 
 		console.log("JSON: " + JSON.stringify(json))
 
-		var attribute 
-		$.ajax({
-			type: "POST",
-			url: twinUrl + 'dimensions/readEntry',
-			data: json,
-			success: function (result) {
-				var data = result;
-				if ($.type(result) != "object") {
-					console.log("not object")
-					data = JSON.parseJSON(result)
-				}
+		var ipfs_url = "http://10.101.114.231:8080/ipfs/";
 
-				console.log("repsonse readEntry: " + JSON.stringify(data))
-				console.log("data.Result: " + data.Result);
-			}
-		})
-		
+		//window.open('http://www.google.com/','_blank');
 
-		setTimeout(function(){
+		let delegations = prop.dimension_details.delegations
+		console.log("delegations... " + JSON.stringify(delegations))
+		console.log(delegations[0].amount)
 
-			$('#mytabs a[href="#show_descriptors"]').tab('show');
+		// $.ajax({
+		// 	type: "POST",
+		// 	url: twinUrl + 'dimensions/readEntry',
+		// 	data: json,
+		// 	success: function (result) {
+		// 		var data = result;
+		// 		if ($.type(result) != "object") {
+		// 			console.log("not object")
+		// 			data = JSON.parseJSON(result)
+		// 		}
 
-		}, 4000)
+		// 		console.log("repsonse readEntry: " + JSON.stringify(data))
+		// 		console.log("data.Result: " + data.Result);
+		// 	}
+		// })
+
 	}
+
 
 	render() {
 
 		var prop = this.props.dimension
+
 		console.log("dimension(prop): " + JSON.stringify(prop))
 
-		//console.log("prop.data: "+JSON.stringify(prop.dimension_details.data))
+		var dataArray = this.state.dimensionDataArray;
 
-		//console.log("prop.data[0]: "+ JSON.stringify(prop.dimension_details.data[0]))
-
-		var dataArray = []
-		var arrayOfArrays = []
-		var data = prop.dimension_details.data
-
-		Object.keys(data).forEach(key => {
-			dataArray.push(data[key].descriptor)
-			dataArray.push(data[key].attribute)
-			dataArray.push(data[key].flag)
-			dataArray.push(data[key].ID)
-		})
-
-		//data.length will equal the number of dimensions
-		for (var i = 0; i < data.length; i++) {
-			var element = [dataArray[4 * i + 0], dataArray[4 * i + 1], dataArray[4 * i + 2], dataArray[4 * i + 3]]
-			arrayOfArrays.push(element)
-		}
-
-		//console.log("DataArray: " + dataArray)
-		//console.log("arrayOfArrays[0][0]: " + arrayOfArrays[0][0])
-		//console.log("arrayOfArrays[1][1]: " + arrayOfArrays[1][1])
+		console.log("this.state... \n" + JSON.stringify(this.state))
 
 
 		var style = {
@@ -521,7 +526,7 @@ class Dims extends Component {
 							<button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times; </span></button>
 							<ul id="mytabs" className="nav nav-pills" role="tablist">
 								<li role="presentation" className="active"><a href="#asset_details" role="tab" data-toggle="tab">Dimension Details</a></li>
-								<li role="presentation"><a href="#show_descriptors" role="tab" data-toggle="tab"></a></li>
+								<li role="presentation"><a href="#show_descriptors" role="tab" data-toggle="tab">Descriptors</a></li>
 							</ul>
 						</div>
 
@@ -549,10 +554,6 @@ class Dims extends Component {
 											</tr>
 										</tbody>
 									</table>
-									<div className="modal-footer">
-										<button type="button" className="btn btn-primary" data-val="1" onClick={this.showAttrs.bind(this)}>Show Descriptors</button>
-									</div>
-
 								</div>
 
 								<div title="tabs" role="tabpanel" className="tab-pane center-block" id="show_descriptors">
@@ -560,26 +561,17 @@ class Dims extends Component {
 									<table className="table table-striped table-hover" style={style}>
 										<tbody>
 											<tr>
-												<td colSpan="2"><b>Descriptors</b></td>
+												<td colSpan="3"><b>Descriptors</b></td>
 											</tr>
 											{(() => {
-												var ipfs_url = "http://10.101.114.231:8080/ipfs/";
-												if (arrayOfArrays.length > 0) {
-													return arrayOfArrays.map((attrs, i) => {
-														//console.log("attrs[0]: " + attrs[0] + ", attrs[1]:" + attrs[1] + ", attrs[2]: " + attrs[2] + ", attrs[3]: " + attrs[3])
-														if (attrs[1] && attrs[1].charAt(0) == "Q") {
+												if (dataArray.length > 0) {
+													return dataArray.map((attrs, i) => {
+														//console.log("attrs[0]: " + attrs[0] + ", attrs[1]:" + attrs[1] + ", attrs[2]: " + attrs[2])
 															return (
 																<tr key={i}>
 																	<td>{attrs[0]}</td>
-																	<td><p><a target="_blank" href={ipfs_url + "/" + attrs[1]}>{attrs[1]}</a></p></td>
-																</tr>
-															)
-														}
-														else
-															return (
-																<tr key={i}>
-																	<td>{attrs[0]}</td>
-																	<td><a>{attrs[1]}></a></td>
+																	<td>Token Amount: 1</td>
+																	<td><button type="button" className="btn btn-primary btn-sm" data-val={i} onClick={this.showAttrs2.bind(this)}>Spend Token</button></td>
 																</tr>
 															)
 													});

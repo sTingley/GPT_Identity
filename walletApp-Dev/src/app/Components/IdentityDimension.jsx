@@ -767,6 +767,7 @@ class IdentityDimensions extends Component {
             obj.attribute = attrs[i][1]
             obj.flag = 0
             objArray.push(obj)
+            console.log("objArray: " + JSON.stringify(objArray))
         }
         //needed to stringify this obj Array for backend
         return JSON.stringify(objArray)

@@ -1,0 +1,98 @@
+{
+  "asset": {
+    "data": {
+      "Coid_Data": {
+        "Type": "non_cash",
+        "assetID": "MyCOID",
+        "bigchainHash": "",
+        "bigchainID": "",
+        "coidAddr": "",
+        "controlId": "aae858de3899d2ff096ddb5384365c6a86ce7964f1c4f1f22878944d39bd943a",
+        "controlIdList": "aae858de3899d2ff096ddb5384365c6a86ce7964f1c4f1f22878944d39bd943a",
+        "controlTokenAttributes": "mytoken",
+        "controlTokenId": "289d3c526086b3832f4fd1338e5b0f437e7c84d6d7c556f53ef7d2eaf4e316a4",
+        "controlTokenQuantity": "0",
+        "dimensions": "",
+        "gatekeeperAddr": "",
+        "identityRecoveryIdList": "aae858de3899d2ff096ddb5384365c6a86ce7964f1c4f1f22878944d39bd943a",
+        "isHuman": "true",
+        "msg": "e98cfaa4317c583cd87fb1d538bb64eafea1f516adf02b193fe224d2a60610f6",
+        "ownerIdList": "8b44edd090224a5c2350c1b2f3f57ee2d3443744462bb7c3c970c337e570eac4",
+        "ownershipId": "8b44edd090224a5c2350c1b2f3f57ee2d3443744462bb7c3c970c337e570eac4",
+        "ownershipTokenAttributes": "mytoken",
+        "ownershipTokenId": "289d3c526086b3832f4fd1338e5b0f437e7c84d6d7c556f53ef7d2eaf4e316a4",
+        "ownershipTokenQuantity": "0",
+        "pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+        "recoveryCondition": "2",
+        "sig": "4fb1eaab7042e093ed6ca3251af91dca3ec417ef579fe5ea8f079125bd1e6e3c35472aa559fbc6023f2c7c438c1b038b5bc58269b59e3651a65aa3524b22b621",
+        "timestamp": "",
+        "txn_id": "requestCOID",
+        "uniqueId": "01547929f9184f362e1ab0126a15013087f4d1ab25d11ea971e8ffb159546d94",
+        "uniqueIdAttributes": "spencertingley,557d1294ba620922e1655aa9b5c9be5f2c5dad876740dd2a9a22934b79ee164d,QmWbbhSo7GzZi6zyi7MpJyAfiqzPRcSfV1oHFRyCgT54iG",
+        "yesVotesRequiredToPass": "2"
+      },
+      "Description": "Core Identity",
+      "GateKeeper_signature": {
+        "hashGK": "68d028d824a6383cceee7a2c92a85a1c6d482c7414044aafa409758fe196e3f8",
+        "pubkeyGK": "5F1BFB2E4DE393EFA349BC9599D0DFAE717CF5D01BC342F3465AEDC018287465",
+        "signature": "7ab5c7936580929ad0d869753be9281b69c578fbc22cb1e49efbecfe62a5ba7ad7c30aeb6728f2a6e994fa5a24680ae3bf6bb330543ae3e3a4ed1069c2cec60e"
+      },
+      "blockHash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "blockNumber": "0",
+      "blockchainID": "6B8E3D7C55887BB06CEB1D5CFBA66AAFA2D3ACD287002EFD62298018E4B1DA0B",
+      "blockchain_timestamp": "1490300913",
+      "coidGK_Address": "5EAE734FA5A2AF7952A7F529FC2BF6F5B0DA9ADE",
+      "coid_Address": "034446D6B757C60B77160AE9D491A34428D8B75E",
+      "dimensionCtrlAddr": "9727FF7ECFE69AA7C610139C3B02E8A248A40393",
+      "proposalID": "8CEE71674FE6E94E7EA852B42A613898BE1FDF1DD2A23BEB121D94AA509CD453",
+      "validator_signatures": [
+        [
+          "66e792772a8096cf5caf7c2ca70c8286202baafc38922403409d063743351dd9",
+          "de85ce33ed2e2361175aabbc588fd57fff95881e1d2f46b5b79e4201ea6371c76f8e3303665f75c16a31ef84f65c5d9aae423a4ec6baf039ab9ac67e151624f4",
+          "03683536757fdb821c10810b51caa51a84fc1dfab5c17edbf5246f9713ffe31adf"
+        ],
+        [
+          "66e792772a8096cf5caf7c2ca70c8286202baafc38922403409d063743351dd9",
+          "6206889cc527d85c7182924843a6244fd3ba61ffa5046b1d9e3b71bf7dd6a0d862b99b71eea1e7c642670072fb1f928f1b922491fc7e82ae1e4a821774daa2c7",
+          "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055"
+        ],
+        [
+          "",
+          "",
+          ""
+        ]
+      ]
+    }
+  },
+  "id": "df30aad4d1a6270790a6e15a7d1515b3ac677cc6d233a8ed9df6a1821de3277b",
+  "inputs": [
+    {
+      "fulfillment": "cf:4:1jos12bAVztHnTuj4OOdSgLUApikL4JRbsSq2X61zZKh9lzHVqXjLAKFjwQvbZ4BMxU1E6OnIE4bIKvZmTjqzcVantofWpSMb0in4knNzO3yv0W_AoxhPOif65XVgCIA",
+      "fulfills": null,
+      "owners_before": [
+        "FRFhUAH7n4p9vWw38VQ8CCPrPaZeXYtUEgoHo9JrWYqX"
+      ]
+    }
+  ],
+  "metadata": null,
+  "operation": "CREATE",
+  "outputs": [
+    {
+      "amount": 1,
+      "condition": {
+        "details": {
+          "bitmask": 32,
+          "public_key": "FRFhUAH7n4p9vWw38VQ8CCPrPaZeXYtUEgoHo9JrWYqX",
+          "signature": null,
+          "type": "fulfillment",
+          "type_id": 4
+        },
+        "uri": "cc:4:20:1jos12bAVztHnTuj4OOdSgLUApikL4JRbsSq2X61zZI:96"
+      },
+      "public_keys": [
+        "FRFhUAH7n4p9vWw38VQ8CCPrPaZeXYtUEgoHo9JrWYqX"
+      ]
+    }
+  ],
+  "version": "0.9"
+}

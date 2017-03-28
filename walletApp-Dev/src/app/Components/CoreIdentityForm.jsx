@@ -189,10 +189,11 @@ class CoreIdentity extends React.Component {
 	//2)CONTROLLERS need to be able to upload documents---LATER
 
 	prepareJsonToSubmit() {
-		console.log();
+		console.log("prepareJSONToSubmit..");
 		this.prepareControlTokenDistribution();
 
-		console.log("before we call createHashAttribute on this.state.file_attrs..\n" + JSON.stringify(this.state.file_attrs))
+		console.log("before we call createHashAttribute on this.state.file_attrs..\n" + JSON.stringify(this.state.file_attrs));
+		console.log("we will call createHashAttribute, to get uniqueId: " + this.createHashAttribute(this.state.file_attrs));
 
 		var inputObj = {
 			"pubKey": this.refs.pubKey.value,
@@ -237,6 +238,7 @@ class CoreIdentity extends React.Component {
 			"dimensions": ""
 
 		};
+		console.log("uniqueIDAttrs after prepare f'n: " + inputObj.uniqueIdAttributes)
 		return inputObj;
 	}
 

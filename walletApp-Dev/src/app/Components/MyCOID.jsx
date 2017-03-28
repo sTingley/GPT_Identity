@@ -52,14 +52,14 @@ class TokenDistributionForm extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            token_quantity: [],
-            token_list: [],
+            // token_quantity: [],
+            // token_list: [],
 
-            showModal: false
+            // showModal: false
         };
-        this.maxUniqAttr = 10;
-        //this.onFieldChange = this.onFieldChange.bind(this);
-        //this.handleHideModal = this.handleHideModal.bind(this);
+        // this.maxUniqAttr = 10;
+        // //this.onFieldChange = this.onFieldChange.bind(this);
+        // //this.handleHideModal = this.handleHideModal.bind(this);
     }
 
     render() {
@@ -92,6 +92,7 @@ class Asset extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
+
             asset: props.asset || {},
 
             file_attrs: [],
@@ -133,7 +134,6 @@ class Asset extends React.Component {
         this.setState({ showModal: false });
     }
     //*****************************************************************************
-
     //takes in a msg and returns a signature (needed for requests)
     getSignature(msg) {
         var privKey = localStorage.getItem("privKey")
@@ -148,7 +148,8 @@ class Asset extends React.Component {
         signature = signature.toString("hex");
         return signature
     }
-
+    //**********************************************************************
+    //unique_id_attrs
     appendInput() {
         var inputLen = this.state.inputs.length;
         if (inputLen < 10) {
@@ -187,7 +188,7 @@ class Asset extends React.Component {
         }
         return newArr;
     }
-    /******************************************************************************
+    /***********************************************************************
     if this.state.showModal is true UploadIpfsFile component is rendered,
         and passed the prop dataHandler={this.getFileDetails.bind(this)}*/
     getFileDetails(filedata) {
@@ -203,9 +204,8 @@ class Asset extends React.Component {
         var inputLen = this.state.inputs_controllers.length;
         if (inputLen < 10) {
             var newInput1 = `input1-${inputLen}`;
-            this.setState({
-                inputs_controllers: this.state.inputs_controllers.concat([newInput1])
-            });
+            this.setState({inputs_controllers:
+                this.state.inputs_controllers.concat([newInput1])});
         }
     }
     getTokenLabelValues() {
@@ -222,7 +222,7 @@ class Asset extends React.Component {
         console.log("label vals: " + JSON.stringify(labelVals1))
         return labelVals1;
     }
-
+    //**********************************************************************
     prepareControlTokenDistribution() {
         var labels = this.getTokenLabelValues();
         for (var i = 0; i < labels.length; i += 2) {
@@ -232,62 +232,32 @@ class Asset extends React.Component {
             }
         }
     }
-
-    getControllerValues() {
-        let controller
-        let controller_tokens
-        var _this = this;
-        $.each($("input[name^='pubkey_controller']"), function (obj) {
-            var value = $.trim($(this).val())
-            if (value.length > 0) {
-                controller = value
-            }
-        })
-        console.log("controller: " + controller)
-        $.each($("input[name^='token_quantity']"), function (obj) {
-            var value = $.trim($(this).val())
-            if (value.length > 0) {
-                controller_tokens = value
-            }
-        })
-        console.log("tokens: " + controller_tokens)
-
-        var arr = []
-        arr.push(controller)
-        arr.push(controller_tokens)
-
-        return arr
-    }
-
+    //**********************************************************************
     requestUpdateController(e) {
         e.preventDefault()
-        //FORMAT of control_dist = [pubkey, quantity]
-        var control_dist = this.getControllerValues()
-        console.log("control_dist: " + control_dist)
 
         this.prepareControlTokenDistribution();
-        console.log("this.state.. \n" + JSON.stringify(this.state))
+
+        let asset = this.state.asset.asset_name
 
         var json = {}
-
         json.pubKey = localStorage.getItem("pubKey")
         json.address = localStorage.getItem("coidAddr")
-        json.controller = control_dist[0]
-        json.token_quantity = control_dist[1]
-
         var signature = this.getSignature(json)
-
         console.log("sig: " + signature)
         console.log(typeof (signature))
-
         //UNCOMMENT THESE LATER!!!!!!!!!!
         // json.sig = signature;
         // json.msg = msg_hash_buffer.toString("hex");
 
         json.sig = ""
         json.msg = ""
+        //*********************************************
+        //*********************************************
+        json.controllers = this.state.control_id;
+        json.token_quantity = this.state.control_token_quantity;
 
-        console.log("JSON!! " + JSON.stringify(json))
+        console.log("JSON!! \n" + JSON.stringify(json))
 
         $.ajax({
             type: "POST",
@@ -298,10 +268,11 @@ class Asset extends React.Component {
                 if ($.type(result) != "object") {
                     data = JSON.parseJSON(result)
                 }
+                console.log("result: " + JSON.stringify(data))
                 //get the array:
-                data = data.Result;
+                //data = data.Result;
                 //DEBUGGING:
-                console.log("addController result: " + JSON.stringify(data));
+                //console.log("addController result: " + JSON.stringify(data));
                 //data is: MYCOID.json
 
             }.bind(this),
@@ -335,6 +306,14 @@ class Asset extends React.Component {
     }
     requestUpdateOwners(e) {
         e.preventDefault()
+        
+        let asset = this.state.asset.asset_name
+
+        var json = {}
+
+        json.ownerIdList = asset.ownerIdList;
+        json.controlIdList = asset.controlIdList;
+        
         console.log("got request updateOwners..")
         var owners = this.prepareOwnerTokenDistribution();
         console.log("prepare owners.. " + owners)
@@ -346,17 +325,10 @@ class Asset extends React.Component {
     // START RECOVERY UPDATE FUNCTIONS:
 
     getRecoveryParams() {
-        let recoveryID
-        let recoveryCondition
-        var _this = this;
 
-        $.each($("input[name^='recoveryID']"), function (obj) {
-            var value = $.trim($(this).val())
-            if (value.length > 0) {
-                recoveryID = value
-            }
-            console.log("got recoveryID: " + recoveryID)
-        })
+        let recoveryID = this.state.recovery_list
+        let recoveryCondition
+
         $.each($("input[name^='recoveryCondition']"), function (obj) {
             var value = $.trim($(this).val())
             if (value.length > 0) {
@@ -372,9 +344,8 @@ class Asset extends React.Component {
     }
 
     requestUpdateRecovery(e) {
-        e.preventDefault()
 
-        console.log("state.recovery_list.. " + this.state.recovery_list)
+        e.preventDefault()
 
         var json = {}
         json.pubKey = localStorage.getItem("pubKey")
@@ -418,6 +389,14 @@ class Asset extends React.Component {
 
     requestUpdateOfficalIDs(e) {
         e.preventDefault()
+        
+        let asset = this.state.asset.asset_name
+
+        var json = {}
+
+        json.ownerIdList = asset.ownerIdList;
+        json.controlIdList = asset.controlIdList;
+
         console.log("this.state.fileAttrs.. " + JSON.stringify(this.state.file_attrs))
         console.log("this.state.tmpfile.. " + this.state.tmpFile)
         console.log("this.state.inputs.. " + this.state.inputs)
@@ -427,7 +406,6 @@ class Asset extends React.Component {
         console.log("asset: " + this.props.asset.asset_id)
         console.log("coidAddr: " + this.props.asset.asset_name.coidAddr)
 
-        var json = {}
 
     }
 
@@ -441,6 +419,8 @@ class Asset extends React.Component {
     }
 
     render() {
+
+        console.log("asset: " + JSON.stringify(this.state.asset))
 
         console.log("file_Attrs.. " + JSON.stringify(this.state.file_attrs))
 

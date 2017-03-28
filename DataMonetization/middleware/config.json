@@ -1,0 +1,68 @@
+{
+  "chain": "dmchain",
+  "eris_db_url": "http://192.168.99.100:1337/rpc",
+  "abi_file_path": "../contracts/abi/",
+  "epm_file_path": "../contracts/jobs_output.json",
+  "accounts_file_path": "../contracts/accounts.json",
+  "bigchaindb_driver_url":"http://localhost:5000",
+  "digital_twin_url": "http://localhost:5050/",
+  "env": {
+    "allowed_orgins": "*",
+    "broker_url": "http://localhost:5051",
+    "ports": [5050],
+    "notifications_path": "./notifications/",
+    "assets_path": "./assets/"
+  },
+  "suffix": {
+		"ipfs_file": "_files",
+		"coid_file": "_coid",
+		"notifications_file": "_notify"
+	},
+  "proposalStatus" : {
+    "0" : "created",
+    "1" : "accepted",
+    "2" : "denied",
+    "3" : "countered",
+    "4" : "updated",
+    "5" : "paid",
+    "6" : "transferCompleted"
+  },
+  "proposalStatusToCode" : {
+    "created": 0,
+    "accepted" : 1,
+    "denied" : 2,
+    "countered" : 3,
+    "updated" : 4,
+    "paid" : 5,
+    "transferCompleted" : 6
+  },
+  "notification_types" : {
+    "requestsByYou" : "requestsByYou",
+    "requestsForYou" : "requestsForYou"
+  },
+  "endpoints": {
+    "dataRequest": {
+      "path": "/dataRequestProposal"
+    },
+    "requesterResponse": {
+      "path": "/requesterResponse"
+    },
+    "ownerResponse": {
+      "path": "/ownerResponse"
+    },
+    "retriveAssets": {
+      "path": "/getAssets"
+    }
+  },
+  "twinEndpoints" : {
+    "requestsByYou" : "notify/requestsByYou",
+    "requestsForYou" : "notify/requestsForYou",
+    "asset":"addData",
+    "assetTransfer":"transfer",
+    "storeAsset": "storeAsset",
+    "obtainedData": "obtainedData",
+    "ownerResponse" : "ownerResponse",
+    "requesterResponse" : "requesterResponse",
+    "retriveAssets": "retriveAssets"
+  }
+}

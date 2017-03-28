@@ -1,0 +1,23 @@
+{
+  "name": "databroker",
+  "version": "0.0.0",
+  "description": "",
+  "main": "DataBroker.js",
+  "scripts": {
+    "start": ""
+  },
+  "author": "Arun Kumar Sekar",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "body-parser": "~1.15.2",
+    "deasync": "^0.1.9",
+    "eris-contracts": "^0.15.9",
+    "eris-db": "^0.15.10",
+    "express": "~4.14.0",
+    "http-proxy-middleware": "^0.17.3",
+    "js-sha3": "^0.5.7",
+    "secp256k1": "^3.2.5",
+    "solidity-sha3": "^0.4.1",
+    "superagent": "^3.3.1"
+  }
+}

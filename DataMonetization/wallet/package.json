@@ -1,0 +1,30 @@
+{
+  "name": "digitalwallet",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack -d --watch",
+    "build": "webpack -p"
+  },
+  "author": "Arun Kumar Sekar",
+  "license": "ISC",
+  "dependencies": {
+    "babel-core": "^6.0.0",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-react": "^6.11.1",
+    "js-sha3": "~0.5.5",
+    "react": "^15.3.0",
+    "react-animated-number": "^0.4.2",
+    "react-bootstrap-typeahead": "^1.2.0",
+    "react-dom": "^15.3.0",
+    "react-router": "^2.6.1",
+    "secp256k1": "^3.1.0",
+    "webpack": "^1.13.1"
+  },
+  "devDependencies": {
+    "json-loader": "^0.5.4"
+  }
+}

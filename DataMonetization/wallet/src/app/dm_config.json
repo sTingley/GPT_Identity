@@ -1,0 +1,130 @@
+{
+  "mongodb_url" : "http://172.16.217.212:5000/",
+  "proposalStatus" : {
+    "0" : "created",
+    "1" : "accepted",
+    "2" : "denied",
+    "3" : "countered",
+    "4" : "updated",
+    "5" : "paid",
+    "6" : "transferCompleted"
+  },
+  "proposalStatusToCode" : {
+    "created": 0,
+    "accepted" : 1,
+    "denied" : 2,
+    "countered" : 3,
+    "updated" : 4,
+    "paid" : 5,
+    "transferCompleted" : 6
+  },
+  "proposalStatusToShow" : {
+    "created" : "Requester Identity Validated",
+    "accepted" : "Data Request Accepted",
+    "denied" : "Data Request Denied",
+    "countered" : "Data Request Countered",
+    "updated" : "Data Request Updated",
+    "paid" : "Payment Completed By Requester",
+    "transferCompleted" : "Data Retrieval Completed"
+  },
+  "dataDimensionCategories" : {
+    "basic_info": "Basic Information",
+    "detailed_info": "Detailed Information",
+    "social_profile": "Social Profile",
+    "personal_contact": "Personal Contact"
+  },
+  "roles" : {
+    "owner" : "owner",
+    "requester" : "requester"
+  },
+  "workflow" : {
+    "1":"Data Request Submission",
+    "2":"Requester Identity Verification",
+    "3":"Data Owner(s) Approval",
+    "4":"Payment Completion",
+    "5":"Data Transfer Completion"
+  },
+  "proposalActions" : {
+    "created" : {
+      "actor" : "owner",
+      "modalName" : "ProposalModal",
+      "workflowCompleted" : ["1","2"],
+      "workflowActive" : ["3"],
+      "actions" : [
+        {
+          "actionName" : "Accept Proposal",
+          "nextStatus" : "accepted"
+        },
+        {
+          "actionName" : "Deny Proposal",
+          "nextStatus" : "denied"
+        }
+      ]
+    },
+    "updated" : {
+      "actor" : "owner",
+      "modalName" : "ProposalModal",
+      "actions" : [
+        {
+          "actionName" : "Accept Proposal",
+          "nextStatus" : "accepted"
+        },
+        {
+          "actionName" : "Deny Proposal",
+          "nextStatus" : "denied"
+        }
+      ]
+    },
+    "countered" : {
+      "actor" : "requester",
+      "modalName" : "ProposalModal",
+      "actions" : [
+        {
+          "actionName" : "Update Proposal",
+          "nextStatus" : "updated"
+        }
+      ]
+    },
+    "accepted" : {
+      "actor" : "requester",
+      "modalName" : "PaymentModal",
+      "workflowCompleted" : ["1","2","3"],
+      "workflowActive" : ["4"],
+      "actions" : [
+        {
+          "actionName" : "Pay from your Bitcoin Wallet",
+          "nextStatus" : "paid"
+        }
+      ]
+    },
+    "paid" : {
+      "actor" : "requester",
+      "modalName" : "AssetRetrievalModal",
+      "workflowCompleted" : ["1","2","3","4"],
+      "workflowActive" : ["5"],
+      "actions" : [
+        {
+          "actionName" : "Retrieve Data",
+          "nextStatus" : "transferCompleted"
+        }
+      ]
+    },
+    "transferCompleted" : {
+      "actor" : "requester",
+      "workflowCompleted" : ["1","2","3","4","5"],
+      "workflowActive" : [],
+      "actions" : []
+    }
+  },
+  "endpoints" : {
+    "requestsByYou" : "notify/requestsByYou",
+    "requestsForYou" : "notify/requestsForYou",
+    "asset":"addData",
+    "assetTransfer":"transfer",
+    "storeAsset": "storeAsset",
+    "obtainedData": "obtainedData",
+    "ownerResponse" : "ownerResponse",
+    "requesterResponse" : "requesterResponse",
+    "retriveAssets": "retriveAssets"
+  }
+}

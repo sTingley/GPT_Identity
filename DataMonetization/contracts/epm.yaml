@@ -1,0 +1,19 @@
+jobs:
+
+- name: deployStorageK
+  job:
+    deploy:
+      contract: Verification.sol
+      wait: true
+
+- name: daoContract
+  job:
+    deploy:
+      contract: Dao.sol
+      wait: true
+
+- name: Broker
+  job:
+    deploy:
+      contract: Broker.sol
+      wait: true

@@ -15,7 +15,7 @@ class UniqueIDAttributesForm extends React.Component {
 		super(props);
 		this.state = {
 			file_attrs: [],
-			inputs: ['input-0'],
+			//inputs: ['input-0'],
 			tmpFile: '',
 			showModal: false,
 			pubKey: localStorage.getItem("pubKey")
@@ -191,6 +191,9 @@ class CoreIdentity extends React.Component {
 	prepareJsonToSubmit() {
 		console.log();
 		this.prepareControlTokenDistribution();
+
+		console.log("before we call createHashAttribute on this.state.file_attrs..\n" + JSON.stringify(this.state.file_attrs))
+
 		var inputObj = {
 			"pubKey": this.refs.pubKey.value,
 			//"sig": this.refs.signature.value,

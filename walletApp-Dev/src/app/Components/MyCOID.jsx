@@ -442,6 +442,8 @@ class Asset extends React.Component {
 
     render() {
 
+        console.log("file_Attrs.. " + JSON.stringify(this.state.file_attrs))
+
         var syle = {
             marginRight: '15px'
         }

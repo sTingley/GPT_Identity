@@ -114,7 +114,6 @@ class Asset extends React.Component {
 
         this.handleHideModal = this.handleHideModal.bind(this);
         this.onFieldChange = this.onFieldChange.bind(this);
-
     }
     //*****************************************************************************
     //watch for inputs on recovery_list
@@ -235,29 +234,27 @@ class Asset extends React.Component {
     //**********************************************************************
     requestUpdateController(e) {
         e.preventDefault()
+        
+        var json = {};
 
         this.prepareControlTokenDistribution();
 
-        let asset = this.state.asset.asset_name
-
-        var json = {}
-        json.pubKey = localStorage.getItem("pubKey")
-        json.address = localStorage.getItem("coidAddr")
-        var signature = this.getSignature(json)
-        console.log("sig: " + signature)
-        console.log(typeof (signature))
-        //UNCOMMENT THESE LATER!!!!!!!!!!
+        let filename = this.state.asset.asset_id + ".json"
+        json.filename = filename
+        json.pubKey = localStorage.getItem("pubKey");
+        json.address = localStorage.getItem("coidAddr");
+        //*********************************************
+        var signature = this.getSignature(json);
+        console.log("sig: " + signature);
+        console.log(typeof (signature));
         // json.sig = signature;
         // json.msg = msg_hash_buffer.toString("hex");
-
-        json.sig = ""
-        json.msg = ""
         //*********************************************
-        //*********************************************
+        //NEW CONTROLLERS AND THEIR TOKENS
         json.controllers = this.state.control_id;
         json.token_quantity = this.state.control_token_quantity;
 
-        console.log("JSON!! \n" + JSON.stringify(json))
+        console.log("JSON!! \n" + JSON.stringify(json));
 
         $.ajax({
             type: "POST",
@@ -323,44 +320,23 @@ class Asset extends React.Component {
 
     //**********************************************************************
     // START RECOVERY UPDATE FUNCTIONS:
-
-    getRecoveryParams() {
-
-        let recoveryID = this.state.recovery_list
-        let recoveryCondition
-
-        $.each($("input[name^='recoveryCondition']"), function (obj) {
-            var value = $.trim($(this).val())
-            if (value.length > 0) {
-                recoveryCondition = value
-            }
-            console.log("got recoveryCondition: " + recoveryCondition)
-        })
-
-        var arr = []
-        arr.push(recoveryID)
-        if (recoveryCondition) { arr.push(recoveryCondition) }
-        return arr
-    }
-
     requestUpdateRecovery(e) {
 
-        e.preventDefault()
+        e.preventDefault();
 
-        var json = {}
-        json.pubKey = localStorage.getItem("pubKey")
-        json.address = localStorage.getItem("coidAddr")
+        var json = {};
+        
+        let filename = this.state.asset.asset_id + ".json";
+        json.filename = filename;
+        json.pubKey = localStorage.getItem("pubKey");
+        json.address = localStorage.getItem("coidAddr");
+        //*********************************************
+        let recoveryCondition = $("input[name^='recoveryCondition']").val();
+        if(recoveryCondition){json.recoveryCondition = recoveryCondition;}
+        //*********************************************
+        json.recoveryID = this.state.recovery_list;
 
-        var recoveryParams = this.getRecoveryParams()
-        console.log("recovery arr: " + recoveryParams)
-
-        if (recoveryParams.length > 1) {
-            json.recoveryCondition = recoveryParams[1]
-        }
-
-        json.recoveryID = recoveryParams[0]
-
-        var signature = this.getSignature(json)
+        var signature = this.getSignature(json);
 
         $.ajax({
             type: "POST",
@@ -389,10 +365,11 @@ class Asset extends React.Component {
 
     requestUpdateOfficalIDs(e) {
         e.preventDefault()
-        
-        let asset = this.state.asset.asset_name
 
         var json = {}
+        
+        let filename = this.state.asset.asset_id + ".json"
+        json.filename = filename
 
         json.ownerIdList = asset.ownerIdList;
         json.controlIdList = asset.controlIdList;

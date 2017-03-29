@@ -169,7 +169,7 @@ var AssetCtrl =
                 directory = directory + DelegateDirectory + "/" + fileName;
             }
 
-            var cryptoEncr = new Crypto({ pubKey: pubKey });
+            var cryptoEncr = new Crypto({ pubKey: keccak_256(pubKey) });
 
             //debugging
             var fileName = directory;

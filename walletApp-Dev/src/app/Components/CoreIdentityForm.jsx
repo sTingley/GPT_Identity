@@ -368,7 +368,7 @@ class CoreIdentity extends React.Component {
 				sendMe.fileName = "MyCOID.json" //
 				sendMe.updateFlag = 0; //new identity
 				sendMe.data = json;
-				sendMe.pubKey = localStorage.getItem("pubKey");
+				sendMe.pubKey = keccak_256(localStorage.getItem("pubKey"));
 
 				$.ajax({
 					url: twinUrl + 'setAsset',

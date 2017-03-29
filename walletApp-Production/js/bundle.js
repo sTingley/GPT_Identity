@@ -47668,10 +47668,11 @@
 		}, {
 			key: 'prepareJsonToSubmit',
 			value: function prepareJsonToSubmit() {
-				console.log();
+				console.log("prepareJSONToSubmit..");
 				this.prepareControlTokenDistribution();
 	
 				console.log("before we call createHashAttribute on this.state.file_attrs..\n" + JSON.stringify(this.state.file_attrs));
+				console.log("we will call createHashAttribute, to get uniqueId: " + this.createHashAttribute(this.state.file_attrs));
 	
 				var inputObj = {
 					"pubKey": this.refs.pubKey.value,
@@ -47716,6 +47717,7 @@
 					"dimensions": ""
 	
 				};
+				console.log("uniqueIDAttrs after prepare f'n: " + inputObj.uniqueIdAttributes);
 				return inputObj;
 			}
 		}, {
@@ -47867,7 +47869,7 @@
 						sendMe.fileName = "MyCOID.json"; //
 						sendMe.updateFlag = 0; //new identity
 						sendMe.data = json;
-						sendMe.pubKey = localStorage.getItem("pubKey");
+						sendMe.pubKey = (0, _jsSha.keccak_256)(localStorage.getItem("pubKey"));
 	
 						$.ajax({
 							url: twinUrl + 'setAsset',
@@ -70041,6 +70043,8 @@
 	var crypto = __webpack_require__(/*! crypto */ 243);
 	var secp256k1 = __webpack_require__(/*! secp256k1 */ 261);
 	var keccak_256 = __webpack_require__(/*! js-sha3 */ 325).keccak_256;
+	//********************************************************
+	//********************************************************
 	
 	var AttributeForm = function (_React$Component) {
 	    _inherits(AttributeForm, _React$Component);
@@ -70071,6 +70075,7 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
+	            console.log("attribute form props: " + JSON.stringify(this.props));
 	
 	            var style = {
 	                fontSize: '12.5px'
@@ -70106,6 +70111,8 @@
 	}(_react2.default.Component);
 	
 	;
+	//********************************************************
+	//********************************************************
 	
 	var TokenDistributionForm = function (_React$Component2) {
 	    _inherits(TokenDistributionForm, _React$Component2);
@@ -70113,18 +70120,7 @@
 	    function TokenDistributionForm(props) {
 	        _classCallCheck(this, TokenDistributionForm);
 	
-	        var _this3 = _possibleConstructorReturn(this, (TokenDistributionForm.__proto__ || Object.getPrototypeOf(TokenDistributionForm)).call(this, props));
-	
-	        _this3.state = {
-	            token_quantity: [],
-	            token_list: [],
-	
-	            showModal: false
-	        };
-	        _this3.maxUniqAttr = 10;
-	        //this.onFieldChange = this.onFieldChange.bind(this);
-	        //this.handleHideModal = this.handleHideModal.bind(this);
-	        return _this3;
+	        return _possibleConstructorReturn(this, (TokenDistributionForm.__proto__ || Object.getPrototypeOf(TokenDistributionForm)).call(this, props));
 	    }
 	
 	    _createClass(TokenDistributionForm, [{
@@ -70192,6 +70188,8 @@
 	}(_react2.default.Component);
 	
 	;
+	//********************************************************
+	//********************************************************
 	
 	var Asset = function (_React$Component3) {
 	    _inherits(Asset, _React$Component3);
@@ -70202,6 +70200,7 @@
 	        var _this4 = _possibleConstructorReturn(this, (Asset.__proto__ || Object.getPrototypeOf(Asset)).call(this, props));
 	
 	        _this4.state = {
+	
 	            asset: props.asset || {},
 	
 	            file_attrs: [],
@@ -70223,7 +70222,6 @@
 	
 	        _this4.handleHideModal = _this4.handleHideModal.bind(_this4);
 	        _this4.onFieldChange = _this4.onFieldChange.bind(_this4);
-	
 	        return _this4;
 	    }
 	    //*****************************************************************************
@@ -70236,6 +70234,22 @@
 	            var multipleValues = {};
 	            multipleValues[inputField] = e;
 	            this.setState(multipleValues);
+	        }
+	        //*****************************************************************************
+	        //if the asset in scope is 'MyCOID', we cannot add additional owners
+	
+	    }, {
+	        key: 'MyCOID_check',
+	        value: function MyCOID_check() {
+	            var asset_id = this.props.asset.asset_id;
+	            console.log("assetID.. " + asset_id);
+	            var e = document.getElementById("OWNERSHIP");
+	            if (asset_id == "MyCOID") {
+	                e.style.display = 'none';
+	            }
+	            if (asset_id != "MyCOID") {
+	                e.style.display = 'block';
+	            }
 	        }
 	        //*****************************************************************************
 	        //Passed as a prop to DimensionAttributeForm
@@ -70254,7 +70268,6 @@
 	            this.setState({ showModal: false });
 	        }
 	        //*****************************************************************************
-	
 	        //takes in a msg and returns a signature (needed for requests)
 	
 	    }, {
@@ -70272,6 +70285,9 @@
 	            signature = signature.toString("hex");
 	            return signature;
 	        }
+	        //**********************************************************************
+	        //unique_id_attrs
+	
 	    }, {
 	        key: 'appendInput',
 	        value: function appendInput() {
@@ -70321,7 +70337,7 @@
 	            }
 	            return newArr;
 	        }
-	        /******************************************************************************
+	        /***********************************************************************
 	        if this.state.showModal is true UploadIpfsFile component is rendered,
 	            and passed the prop dataHandler={this.getFileDetails.bind(this)}*/
 	
@@ -70361,6 +70377,8 @@
 	            console.log("label vals: " + JSON.stringify(labelVals1));
 	            return labelVals1;
 	        }
+	        //**********************************************************************
+	
 	    }, {
 	        key: 'prepareControlTokenDistribution',
 	        value: function prepareControlTokenDistribution() {
@@ -70372,64 +70390,33 @@
 	                }
 	            }
 	        }
-	    }, {
-	        key: 'getControllerValues',
-	        value: function getControllerValues() {
-	            var controller = void 0;
-	            var controller_tokens = void 0;
-	            var _this = this;
-	            $.each($("input[name^='pubkey_controller']"), function (obj) {
-	                var value = $.trim($(this).val());
-	                if (value.length > 0) {
-	                    controller = value;
-	                }
-	            });
-	            console.log("controller: " + controller);
-	            $.each($("input[name^='token_quantity']"), function (obj) {
-	                var value = $.trim($(this).val());
-	                if (value.length > 0) {
-	                    controller_tokens = value;
-	                }
-	            });
-	            console.log("tokens: " + controller_tokens);
+	        //**********************************************************************
 	
-	            var arr = [];
-	            arr.push(controller);
-	            arr.push(controller_tokens);
-	
-	            return arr;
-	        }
 	    }, {
 	        key: 'requestUpdateController',
 	        value: function requestUpdateController(e) {
 	            e.preventDefault();
-	            //FORMAT of control_dist = [pubkey, quantity]
-	            var control_dist = this.getControllerValues();
-	            console.log("control_dist: " + control_dist);
-	
-	            this.prepareControlTokenDistribution();
-	            console.log("this.state.. \n" + JSON.stringify(this.state));
 	
 	            var json = {};
 	
+	            this.prepareControlTokenDistribution();
+	
+	            var filename = this.state.asset.asset_id + ".json";
+	            json.filename = filename;
 	            json.pubKey = localStorage.getItem("pubKey");
 	            json.address = localStorage.getItem("coidAddr");
-	            json.controller = control_dist[0];
-	            json.token_quantity = control_dist[1];
-	
+	            //*********************************************
 	            var signature = this.getSignature(json);
-	
 	            console.log("sig: " + signature);
 	            console.log(typeof signature === 'undefined' ? 'undefined' : _typeof(signature));
-	
-	            //UNCOMMENT THESE LATER!!!!!!!!!!
 	            // json.sig = signature;
 	            // json.msg = msg_hash_buffer.toString("hex");
+	            //*********************************************
+	            //NEW CONTROLLERS AND THEIR TOKENS
+	            json.controllers = this.state.control_id;
+	            json.token_quantity = this.state.control_token_quantity;
 	
-	            json.sig = "";
-	            json.msg = "";
-	
-	            console.log("JSON!! " + JSON.stringify(json));
+	            console.log("JSON!! \n" + JSON.stringify(json));
 	
 	            $.ajax({
 	                type: "POST",
@@ -70440,17 +70427,17 @@
 	                    if ($.type(result) != "object") {
 	                        data = JSON.parseJSON(result);
 	                    }
+	                    console.log("result: " + JSON.stringify(data));
 	                    //get the array:
-	                    data = data.Result;
+	                    //data = data.Result;
 	                    //DEBUGGING:
-	                    console.log("addController result: " + JSON.stringify(data));
+	                    //console.log("addController result: " + JSON.stringify(data));
 	                    //data is: MYCOID.json
 	                }.bind(this)
 	            });
 	        }
 	        // END CONTROLLER UPDATE FUNCTIONS:
 	        //**********************************************************************
-	
 	        //**********************************************************************
 	        // START OWNERSHIP UPDATE FUNCTIONS:
 	
@@ -70483,64 +70470,42 @@
 	        key: 'requestUpdateOwners',
 	        value: function requestUpdateOwners(e) {
 	            e.preventDefault();
+	
+	            var asset = this.state.asset.asset_name;
+	
+	            var json = {};
+	
+	            json.ownerIdList = asset.ownerIdList;
+	            json.controlIdList = asset.controlIdList;
+	
 	            console.log("got request updateOwners..");
 	            var owners = this.prepareOwnerTokenDistribution();
 	            console.log("prepare owners.. " + owners);
 	        }
 	        // END OWNER UPDATE FUNCTIONS:
 	        //**********************************************************************
-	
 	        //**********************************************************************
 	        // START RECOVERY UPDATE FUNCTIONS:
 	
 	    }, {
-	        key: 'getRecoveryParams',
-	        value: function getRecoveryParams() {
-	            var recoveryID = void 0;
-	            var recoveryCondition = void 0;
-	            var _this = this;
-	
-	            $.each($("input[name^='recoveryID']"), function (obj) {
-	                var value = $.trim($(this).val());
-	                if (value.length > 0) {
-	                    recoveryID = value;
-	                }
-	                console.log("got recoveryID: " + recoveryID);
-	            });
-	            $.each($("input[name^='recoveryCondition']"), function (obj) {
-	                var value = $.trim($(this).val());
-	                if (value.length > 0) {
-	                    recoveryCondition = value;
-	                }
-	                console.log("got recoveryCondition: " + recoveryCondition);
-	            });
-	
-	            var arr = [];
-	            arr.push(recoveryID);
-	            if (recoveryCondition) {
-	                arr.push(recoveryCondition);
-	            }
-	            return arr;
-	        }
-	    }, {
 	        key: 'requestUpdateRecovery',
 	        value: function requestUpdateRecovery(e) {
+	
 	            e.preventDefault();
 	
-	            console.log("state.recovery_list.. " + this.state.recovery_list);
-	
 	            var json = {};
+	
+	            var filename = this.state.asset.asset_id + ".json";
+	            json.filename = filename;
 	            json.pubKey = localStorage.getItem("pubKey");
 	            json.address = localStorage.getItem("coidAddr");
-	
-	            var recoveryParams = this.getRecoveryParams();
-	            console.log("recovery arr: " + recoveryParams);
-	
-	            if (recoveryParams.length > 1) {
-	                json.recoveryCondition = recoveryParams[1];
+	            //*********************************************
+	            var recoveryCondition = $("input[name^='recoveryCondition']").val();
+	            if (recoveryCondition) {
+	                json.recoveryCondition = recoveryCondition;
 	            }
-	
-	            json.recoveryID = recoveryParams[0];
+	            //*********************************************
+	            json.recoveryID = this.state.recovery_list;
 	
 	            var signature = this.getSignature(json);
 	
@@ -70571,6 +70536,15 @@
 	        key: 'requestUpdateOfficalIDs',
 	        value: function requestUpdateOfficalIDs(e) {
 	            e.preventDefault();
+	
+	            var json = {};
+	
+	            var filename = this.state.asset.asset_id + ".json";
+	            json.filename = filename;
+	
+	            json.ownerIdList = asset.ownerIdList;
+	            json.controlIdList = asset.controlIdList;
+	
 	            console.log("this.state.fileAttrs.. " + JSON.stringify(this.state.file_attrs));
 	            console.log("this.state.tmpfile.. " + this.state.tmpFile);
 	            console.log("this.state.inputs.. " + this.state.inputs);
@@ -70579,13 +70553,11 @@
 	            console.log("prepared attrs.. " + attrsArray);
 	            console.log("asset: " + this.props.asset.asset_id);
 	            console.log("coidAddr: " + this.props.asset.asset_name.coidAddr);
-	
-	            var json = {};
 	        }
 	
 	        // END OFFICIAL ID FUNCTIONS:
 	        //**********************************************************************
-	
+	        //**********************************************************************
 	
 	    }, {
 	        key: 'componentDidMount',
@@ -70598,11 +70570,10 @@
 	        value: function render() {
 	            var _this5 = this;
 	
+	            console.log("asset: " + JSON.stringify(this.state.asset));
+	
 	            console.log("file_Attrs.. " + JSON.stringify(this.state.file_attrs));
 	
-	            var syle = {
-	                marginRight: '15px'
-	            };
 	            var style = {
 	                fontSize: '12.5px'
 	            };
@@ -70617,6 +70588,9 @@
 	
 	            var prop = this.props.asset.asset_name;
 	
+	            // if (this.props.asset.asset_id != "MyCOID") {
+	            //     document.getElementById('OWNERSHIP').display = 'block';
+	            // }
 	            //console.log("asset form state: " + JSON.stringify(this.state))
 	            //console.log("asset form props: " + JSON.stringify(this.props))
 	            return _react2.default.createElement(
@@ -70648,7 +70622,7 @@
 	                            { role: 'presentation' },
 	                            _react2.default.createElement(
 	                                'a',
-	                                { href: '#owners', role: 'tab', 'data-toggle': 'tab' },
+	                                { href: '#owners', onClick: this.MyCOID_check.bind(this), role: 'tab', 'data-toggle': 'tab' },
 	                                'Ownership'
 	                            )
 	                        ),
@@ -70823,34 +70797,38 @@
 	                            ),
 	                            _react2.default.createElement(
 	                                'div',
-	                                { className: 'form-group' },
+	                                { id: 'OWNERSHIP' },
 	                                _react2.default.createElement(
-	                                    'label',
-	                                    { htmlFor: 'control_dist' },
-	                                    'Enter Owners and their ownership token(s).'
+	                                    'div',
+	                                    { className: 'form-group' },
+	                                    _react2.default.createElement(
+	                                        'label',
+	                                        { htmlFor: 'control_dist' },
+	                                        'Enter Owners and their ownership token(s).'
+	                                    ),
+	                                    this.state.inputs_owners.map(function (input) {
+	                                        return _react2.default.createElement(TokenDistributionForm, { handleShowModal: _this5.handleShowModal.bind(_this5), min: _this5.state.subform_cont, max: '10', key: input, labelref: input });
+	                                    })
 	                                ),
-	                                this.state.inputs_owners.map(function (input) {
-	                                    return _react2.default.createElement(TokenDistributionForm, { handleShowModal: _this5.handleShowModal.bind(_this5), min: _this5.state.subform_cont, max: '10', key: input, labelref: input });
-	                                })
-	                            ),
-	                            _react2.default.createElement(
-	                                'div',
-	                                { className: 'col-md-offset-6 col-md-6 ' },
 	                                _react2.default.createElement(
-	                                    'button',
-	                                    { type: 'button', className: 'btn btn-info pull-right', style: style, onClick: this.appendOwners.bind(this) },
-	                                    _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
-	                                    'Add More'
-	                                )
-	                            ),
-	                            _react2.default.createElement(
-	                                'div',
-	                                { className: 'form-group' },
+	                                    'div',
+	                                    { className: 'col-md-offset-6 col-md-6 ' },
+	                                    _react2.default.createElement(
+	                                        'button',
+	                                        { type: 'button', className: 'btn btn-info pull-right', style: style, onClick: this.appendOwners.bind(this) },
+	                                        _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
+	                                        'Add More'
+	                                    )
+	                                ),
 	                                _react2.default.createElement(
-	                                    'button',
-	                                    { style: style, type: 'button', className: 'btn btn-primary', onClick: this.requestUpdateOwners.bind(this) },
-	                                    _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
-	                                    'Update Ownership'
+	                                    'div',
+	                                    { className: 'form-group' },
+	                                    _react2.default.createElement(
+	                                        'button',
+	                                        { style: style, type: 'button', className: 'btn btn-primary', onClick: this.requestUpdateOwners.bind(this) },
+	                                        _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
+	                                        'Update Ownership'
+	                                    )
 	                                )
 	                            )
 	                        ),
@@ -71023,19 +71001,24 @@
 	                    this.state.showModal ? _react2.default.createElement(_UploadIpfsFile2.default, { pubKey: this.state.pubKey, dataHandler: this.getFileDetails.bind(this), handleHideModal: this.handleHideModal }) : null
 	                )
 	            );
-	        }
+	        } //render
+	
 	    }]);
 	
 	    return Asset;
-	}(_react2.default.Component);
+	}(_react2.default.Component); //Asset
+	//********************************************************
+	//********************************************************
+	
 	
 	Asset.propTypes = {
-	    hideHandler: _react2.default.PropTypes.func.isRequired // hideHandler method must exists
+	    //hideHandler method must exists
+	    hideHandler: _react2.default.PropTypes.func.isRequired
 	};
 	
 	/**************************************************************************
 	 * This class is the PARENT Component
-	 * componentWillMount method will populated nav bar tabs with DT assets
+	 * componentWillMount method will populate nav bar tabs with DT assets
 	/*************************************************************************/
 	
 	var Identities = function (_React$Component4) {
@@ -71047,16 +71030,14 @@
 	        var _this6 = _possibleConstructorReturn(this, (Identities.__proto__ || Object.getPrototypeOf(Identities)).call(this, props));
 	
 	        _this6.state = {
-	            pubKey: localStorage.getItem("pubKey"),
 	            own_assets: [], //populated from DT
 	            controlled_assets: [], //[populated from DT
-	
 	            showDetails: false, //will be set true when user selects asset
 	            active_asset: {} };
 	
 	        //handleSelectAsset will be called anytime we select from the nav bar
 	        _this6.handleSelectAsset = _this6.handleSelectAsset.bind(_this6);
-	        //if this.state.showDetials is true, handleHideAsset is passed as a prop (hideHandler) to Asset class
+	        //if this.state.showDetails is true, handleHideAsset is passed as a prop (hideHandler) to Asset class
 	        _this6.handleHideAsset = _this6.handleHideAsset.bind(_this6);
 	        return _this6;
 	    }
@@ -71066,16 +71047,14 @@
 	        value: function handleHideAsset() {
 	            this.setState({ showDetails: false, active_asset: {} });
 	        }
-	
-	        //handle choice from asset navigation bar
+	        //handle choice from asset navigation bar. Ex: asset.asset_id="MyCOID"
 	
 	    }, {
 	        key: 'handleSelectAsset',
 	        value: function handleSelectAsset(asset) {
-	            var _this = this;
 	            var assetID = asset.asset_id;
 	            if (assetID) {
-	                _this.setState({ showDetails: true, active_asset: asset });
+	                this.setState({ showDetails: true, active_asset: asset });
 	            }
 	        }
 	
@@ -71122,12 +71101,11 @@
 	                                    console.log(JSON.stringify(theArray));
 	                                    theArray[theArray.length] = { asset_id: dataResult.assetID, asset_name: dataResult };
 	                                    if (dataResult.assetID = "MyCOID") this.setState({ own_assets: theArray });
-	                                }.bind(this),
-	                                complete: function complete() {}
+	                                }.bind(this)
 	                            });
 	                        } //end for loop
 	                    }
-	                }.bind(this)
+	                }.bind(this) //success
 	            });
 	            // <- <- <- END get OWNED assets <- <- <-
 	
@@ -71161,10 +71139,9 @@
 	                                    }
 	                                    //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
 	                                    this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_name: dataResult }] });
-	                                }.bind(this),
-	                                complete: function complete() {}
+	                                }.bind(this)
 	                            });
-	                        } //end of for loop
+	                        } //end for loop
 	                    }
 	                }.bind(this)
 	            });
@@ -71186,21 +71163,9 @@
 	        value: function render() {
 	            var _this7 = this;
 	
-	            var inputAttrs = {
-	                addKeys: [13, 188], // Enter and comma
-	                inputProps: {
-	                    placeholder: "use comma(,) to add multiple values",
-	                    style: { width: '30%' }
-	                }
-	            };
-	            var syle = {
-	                marginRight: '10px'
-	            };
-	            var style = {
-	                fontSize: '12.5px'
-	            };
-	            //replace with owned assets
-	            var controlled = ["iPad", "BMW"];
+	            var style = { fontSize: '12.5px' };
+	            //TODO: replace with DT controlled assets
+	            var controlled = ["iPad", "Shane's Car"];
 	
 	            return _react2.default.createElement(
 	                'div',
@@ -71316,10 +71281,14 @@
 	    }]);
 	
 	    return Identities;
-	}(_react2.default.Component); //class Identities
+	}(_react2.default.Component);
+	//********************************************************
+	//********************************************************
 	
 	
 	exports.default = Identities;
+	//********************************************************
+	//********************************************************
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/buffer/index.js */ 239).Buffer))
 
 /***/ },
@@ -74347,7 +74316,7 @@
 						var sendMe = {};
 						sendMe.flag = 0; //owned asset
 						sendMe.fileName = json.assetID[0] + ".json";
-						sendMe.pubKey = localStorage.getItem("pubKey");
+						sendMe.pubKey = (0, _jsSha.keccak_256)(localStorage.getItem("pubKey"));
 						sendMe.data = json;
 						sendMe.updateFlag = 0;
 						$.ajax({

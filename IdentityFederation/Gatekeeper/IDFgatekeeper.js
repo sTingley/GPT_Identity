@@ -57,7 +57,7 @@ var notifier = function () {
     this.notifyCoidCreation = function (pubKey, txnID, txnHash, gkAddr, coidAddr, dimensionCtrlAddr) {
         superAgent.post(this.twinUrl + "/setAsset")
             .send({
-                "pubKey": pubKey,
+                "pubKey": keccak_256(pubKey),
                 "flag": 0,
                 "fileName": "MyCOID.json",
                 "updateFlag": 1,

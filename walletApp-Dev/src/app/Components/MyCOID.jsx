@@ -5,8 +5,8 @@ import UploadIpfsFile from './UploadIpfsFile.jsx'
 var crypto = require('crypto');
 var secp256k1 = require('secp256k1');
 var keccak_256 = require('js-sha3').keccak_256;
-
-
+//********************************************************
+//********************************************************
 class AttributeForm extends React.Component {
 
     constructor(props) {
@@ -27,6 +27,7 @@ class AttributeForm extends React.Component {
     }
 
     render() {
+        console.log("attribute form props: " + JSON.stringify(this.props))
 
         var style = {
             fontSize: '12.5px'
@@ -46,20 +47,12 @@ class AttributeForm extends React.Component {
         );
     }
 };
-
+//********************************************************
+//********************************************************
 class TokenDistributionForm extends React.Component {
 
     constructor(props) {
         super(props)
-        this.state = {
-            // token_quantity: [],
-            // token_list: [],
-
-            // showModal: false
-        };
-        // this.maxUniqAttr = 10;
-        // //this.onFieldChange = this.onFieldChange.bind(this);
-        // //this.handleHideModal = this.handleHideModal.bind(this);
     }
 
     render() {
@@ -87,7 +80,8 @@ class TokenDistributionForm extends React.Component {
         );
     }
 };
-
+//********************************************************
+//********************************************************
 class Asset extends React.Component {
     constructor(props) {
         super(props)
@@ -121,6 +115,17 @@ class Asset extends React.Component {
         var multipleValues = {};
         multipleValues[inputField] = e;
         this.setState(multipleValues);
+    }
+    //*****************************************************************************
+    //if the asset in scope is 'MyCOID', we cannot add additional owners
+    MyCOID_check() {
+        let asset_id = this.props.asset.asset_id
+        console.log("assetID.. " + asset_id)
+        let e = document.getElementById("OWNERSHIP");
+        if (asset_id == "MyCOID")
+        { e.style.display = 'none'; }
+        if (asset_id != "MyCOID")
+        { e.style.display = 'block'; }
     }
     //*****************************************************************************
     //Passed as a prop to DimensionAttributeForm
@@ -203,8 +208,10 @@ class Asset extends React.Component {
         var inputLen = this.state.inputs_controllers.length;
         if (inputLen < 10) {
             var newInput1 = `input1-${inputLen}`;
-            this.setState({inputs_controllers:
-                this.state.inputs_controllers.concat([newInput1])});
+            this.setState({
+                inputs_controllers:
+                this.state.inputs_controllers.concat([newInput1])
+            });
         }
     }
     getTokenLabelValues() {
@@ -234,7 +241,7 @@ class Asset extends React.Component {
     //**********************************************************************
     requestUpdateController(e) {
         e.preventDefault()
-        
+
         var json = {};
 
         this.prepareControlTokenDistribution();
@@ -277,7 +284,6 @@ class Asset extends React.Component {
     }
     // END CONTROLLER UPDATE FUNCTIONS:
     //**********************************************************************
-
     //**********************************************************************
     // START OWNERSHIP UPDATE FUNCTIONS:
 
@@ -303,36 +309,36 @@ class Asset extends React.Component {
     }
     requestUpdateOwners(e) {
         e.preventDefault()
-        
+
         let asset = this.state.asset.asset_name
 
         var json = {}
 
         json.ownerIdList = asset.ownerIdList;
         json.controlIdList = asset.controlIdList;
-        
+
         console.log("got request updateOwners..")
         var owners = this.prepareOwnerTokenDistribution();
         console.log("prepare owners.. " + owners)
     }
     // END OWNER UPDATE FUNCTIONS:
     //**********************************************************************
-
     //**********************************************************************
     // START RECOVERY UPDATE FUNCTIONS:
+
     requestUpdateRecovery(e) {
 
         e.preventDefault();
 
         var json = {};
-        
+
         let filename = this.state.asset.asset_id + ".json";
         json.filename = filename;
         json.pubKey = localStorage.getItem("pubKey");
         json.address = localStorage.getItem("coidAddr");
         //*********************************************
         let recoveryCondition = $("input[name^='recoveryCondition']").val();
-        if(recoveryCondition){json.recoveryCondition = recoveryCondition;}
+        if (recoveryCondition) { json.recoveryCondition = recoveryCondition; }
         //*********************************************
         json.recoveryID = this.state.recovery_list;
 
@@ -367,7 +373,7 @@ class Asset extends React.Component {
         e.preventDefault()
 
         var json = {}
-        
+
         let filename = this.state.asset.asset_id + ".json"
         json.filename = filename
 
@@ -388,12 +394,13 @@ class Asset extends React.Component {
 
     // END OFFICIAL ID FUNCTIONS:
     //**********************************************************************
-
+    //**********************************************************************
 
     componentDidMount() {
         // $("#assetDetails").modal('show');
         // $("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
     }
+
 
     render() {
 
@@ -401,9 +408,6 @@ class Asset extends React.Component {
 
         console.log("file_Attrs.. " + JSON.stringify(this.state.file_attrs))
 
-        var syle = {
-            marginRight: '15px'
-        }
         var style = {
             fontSize: '12.5px'
         }
@@ -418,6 +422,10 @@ class Asset extends React.Component {
 
         var prop = this.props.asset.asset_name;
 
+
+        // if (this.props.asset.asset_id != "MyCOID") {
+        //     document.getElementById('OWNERSHIP').display = 'block';
+        // }
         //console.log("asset form state: " + JSON.stringify(this.state))
         //console.log("asset form props: " + JSON.stringify(this.props))
         return (
@@ -427,7 +435,7 @@ class Asset extends React.Component {
                 <div className="modal-header">
                     <ul className="nav nav-pills" role="tablist">
                         <li role="presentation" className="active"><a href="#officalID" role="tab" data-toggle="tab">Official IDs</a></li>
-                        <li role="presentation"><a href="#owners" role="tab" data-toggle="tab">Ownership</a></li>
+                        <li role="presentation"><a href="#owners" onClick={this.MyCOID_check.bind(this)} role="tab" data-toggle="tab">Ownership</a></li>
                         <li role="presentation"><a href="#controllers" role="tab" data-toggle="tab">Control</a></li>
                         <li role="presentation"><a href="#recovery" role="tab" data-toggle="tab">Recovery</a></li>
                     </ul>
@@ -494,21 +502,22 @@ class Asset extends React.Component {
                                     </tr>
                                 </tbody>
                             </table>
-                            <div className="form-group">
-                                <label htmlFor="control_dist">Enter Owners and their ownership token(s).</label>
-                                {this.state.inputs_owners.map(input => <TokenDistributionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
-                            </div>
-                            <div className="col-md-offset-6 col-md-6 ">
-                                <button type="button" className="btn btn-info pull-right" style={style} onClick={this.appendOwners.bind(this)}>
-                                    <span className="glyphicon glyphicon-plus"></span>Add More
+                            <div id="OWNERSHIP">
+                                <div className="form-group">
+                                    <label htmlFor="control_dist">Enter Owners and their ownership token(s).</label>
+                                    {this.state.inputs_owners.map(input => <TokenDistributionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+                                </div>
+                                <div className="col-md-offset-6 col-md-6 ">
+                                    <button type="button" className="btn btn-info pull-right" style={style} onClick={this.appendOwners.bind(this)}>
+                                        <span className="glyphicon glyphicon-plus"></span>Add More
 							    </button>
-                            </div>
-                            <div className="form-group">
-                                <button style={style} type="button" className="btn btn-primary" onClick={this.requestUpdateOwners.bind(this)}>
-                                    <span className="glyphicon glyphicon-plus"></span>Update Ownership
+                                </div>
+                                <div className="form-group">
+                                    <button style={style} type="button" className="btn btn-primary" onClick={this.requestUpdateOwners.bind(this)}>
+                                        <span className="glyphicon glyphicon-plus"></span>Update Ownership
                                 </button>
+                                </div>
                             </div>
-
 
                         </div>{/*tab-pane controllers*/}
 
@@ -545,8 +554,6 @@ class Asset extends React.Component {
                                 </button>
                             </div>
                         </div>{/*tab-pane controllers*/}
-
-
 
                         <div role="tabpanel" className="tab-pane" id="recovery">
                             <table className="table table-striped table-hover" style={style}>
@@ -585,27 +592,27 @@ class Asset extends React.Component {
 
                         </div>{/*tab-pane recovery*/}
 
-
                     </div>{/*tab-content*/}
                     {this.state.showModal ? <UploadIpfsFile pubKey={this.state.pubKey} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}
 
                 </div>{/*modal-body*/}
 
             </div>
-
         )
-    }
 
-}
+    }//render
 
+} //Asset
+//********************************************************
+//********************************************************
 Asset.propTypes = {
-    hideHandler: React.PropTypes.func.isRequired	// hideHandler method must exists
+    //hideHandler method must exists
+    hideHandler: React.PropTypes.func.isRequired
 };
-
 
 /**************************************************************************
  * This class is the PARENT Component
- * componentWillMount method will populated nav bar tabs with DT assets
+ * componentWillMount method will populate nav bar tabs with DT assets
 /*************************************************************************/
 class Identities extends React.Component {
 
@@ -613,30 +620,26 @@ class Identities extends React.Component {
         super(props);
         this.state =
             {
-                pubKey: localStorage.getItem("pubKey"),
                 own_assets: [], //populated from DT
                 controlled_assets: [], //[populated from DT
-
                 showDetails: false, //will be set true when user selects asset
                 active_asset: {}, //passes active asset as prop to Asset class
             };
 
         //handleSelectAsset will be called anytime we select from the nav bar
         this.handleSelectAsset = this.handleSelectAsset.bind(this);
-        //if this.state.showDetials is true, handleHideAsset is passed as a prop (hideHandler) to Asset class
+        //if this.state.showDetails is true, handleHideAsset is passed as a prop (hideHandler) to Asset class
         this.handleHideAsset = this.handleHideAsset.bind(this);
     }
 
     handleHideAsset() {
         this.setState({ showDetails: false, active_asset: {} });
     }
-
-    //handle choice from asset navigation bar
+    //handle choice from asset navigation bar. Ex: asset.asset_id="MyCOID"
     handleSelectAsset(asset) {
-        var _this = this
         let assetID = asset.asset_id
         if (assetID) {
-            _this.setState({ showDetails: true, active_asset: asset })
+            this.setState({ showDetails: true, active_asset: asset })
         }
     }
 
@@ -682,14 +685,11 @@ class Identities extends React.Component {
                                 if (dataResult.assetID = "MyCOID")
                                     this.setState({ own_assets: theArray });
 
-                            }.bind(this),
-                            complete: function () {
-                            },
-                            //console.log(result)
+                            }.bind(this)
                         })
                     }//end for loop
                 }
-            }.bind(this),
+            }.bind(this) //success
         })
         // <- <- <- END get OWNED assets <- <- <-
 
@@ -724,17 +724,13 @@ class Identities extends React.Component {
                                 //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
                                 this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_name: dataResult }] });
 
-                            }.bind(this),
-                            complete: function () {
-                            },
-                            //console.log(result)
+                            }.bind(this)
                         })
-                    }//end of for loop
+                    }//end for loop
                 }
             }.bind(this)
         })
         // <- <- <- END get CONTROLLED assets <- <- <-
-
     }//componentWillMount()
 
     //************************************************************************
@@ -746,21 +742,10 @@ class Identities extends React.Component {
     }
 
     render() {
-        var inputAttrs = {
-            addKeys: [13, 188],	// Enter and comma
-            inputProps: {
-                placeholder: "use comma(,) to add multiple values",
-                style: { width: '30%' }
-            }
-        };
-        var syle = {
-            marginRight: '10px'
-        }
-        var style = {
-            fontSize: '12.5px'
-        }
-        //replace with owned assets
-        var controlled = ["iPad", "BMW"]
+
+        var style = { fontSize: '12.5px' }
+        //TODO: replace with DT controlled assets
+        var controlled = ["iPad", "Shane's Car"]
 
         return (
             <div id="MyCOIDContainer">
@@ -769,8 +754,6 @@ class Identities extends React.Component {
 
                 <div className="modal-header" role="navigation">
                     <ul className="nav nav-tabs">
-                        {/*<li role="presentation" className="active"><a onClick={this.HandleOwnedAsset(own)}>My COID</a></li>*/}
-
                         <li role="presentation" className="dropdown active">
                             <a className="dropdown-toggle" data-toggle="dropdown" role="button">
                                 Owned <span className="caret"></span></a>
@@ -804,21 +787,18 @@ class Identities extends React.Component {
 
                         <li role="presentation"><a href="#/identityDimension">Identity Dimensions</a></li>
                     </ul>{/*nav nav-tabs*/}
-
                 </div><br />{/*END MODAL-HEADER*/}
-
 
                 <div className="modal-body">
                     {this.state.showDetails ? <Asset hideHandler={this.handleHideAsset} asset={this.state.active_asset} /> : null}
                 </div>{/*END MODAL-BODY*/}
 
-
             </div>
         );
-
     }//render
-
-}//class Identities
-
-
+}
+//********************************************************
+//********************************************************
 export default Identities;
+//********************************************************
+//********************************************************

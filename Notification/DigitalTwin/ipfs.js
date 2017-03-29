@@ -10,7 +10,7 @@ var spawn = require('child_process').spawn,
 var tmpPath = config.IPFS_CONFIG.ipfs_file_tmp_path;
 
 //"/home/demoadmin/DigitalTwin/notifications/"
-var JSONPath = config.IPFS_CONFIG.notification_folder_path;
+var JSONPath = config.notification_folder_path;
 
 //for eris service it was "ipfs_file_read_url": "http://192.168.99.101:8080/ipfs/",
 // ...

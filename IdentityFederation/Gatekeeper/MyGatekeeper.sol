@@ -5,6 +5,8 @@ import "Dao.sol";
 import "coidGateKeeper.sol";
 import "IdentityDimensionControl.sol"
 
+//TODO: CHANGE THE CHAIRPERSON--- currently has to be entered manually when a new chain is created/the old chain dies
+
 contract MyGateKeeper
 {
 
@@ -117,7 +119,7 @@ contract MyGateKeeper
 
     mapping(bytes32 => bool) calledBefore;
 
-    address chairperson = 0x35D5D5325FDFE125E01D05C4C7FBEBB080234B1C;
+    address chairperson = 0x96392FA83239D150C427C822E4794A690F7A019D;
 
     //This sets the Eris account that deployed the gatekeeper contract as the chairperson of a proposal
     function MyGateKeeper() {

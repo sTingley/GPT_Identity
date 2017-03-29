@@ -612,7 +612,7 @@ class MyGatekeeper extends React.Component {
                 var sendMe = {};
                 sendMe.flag = 0; //owned asset
                 sendMe.fileName = json.assetID[0] + ".json"; 
-                sendMe.pubKey = localStorage.getItem("pubKey");
+                sendMe.pubKey = keccak_256(localStorage.getItem("pubKey"));
                 sendMe.data = json;
                 sendMe.updateFlag = 0;
 				$.ajax({

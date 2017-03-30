@@ -580,104 +580,58 @@ class IdentityDimensions extends Component {
     // Get DT Dimension Data. Call this in componentWillMount
     getDimensions() {
 
-        	$.ajax({
-			type: "POST",
-			url: twinUrl + 'getOwnedDimensions',
-			data: { "pubKey": localStorage.getItem("pubKey") },
-			success: function (result) {
-				var data = result;
-				if ($.type(result) != "object") {
-					data = JSON.parseJSON(result)
-				}
+        $.ajax({
+            type: "POST",
+            url: twinUrl + 'getOwnedDimensions',
+            data: { "pubKey": localStorage.getItem("pubKey") },
+            success: function (result) {
+                var data = result;
+                if ($.type(result) != "object") {
+                    data = JSON.parseJSON(result)
+                }
 
-				data = data.data;
-				console.log("getOwnedDimensions: " + data);
+                data = data.data;
+                console.log("getOwnedDimensions: " + data);
 
-				var PUBKEY = keccak_256(localStorage.getItem("pubKey"));
+                var PUBKEY = keccak_256(localStorage.getItem("pubKey"));
 
-				//var delegatedDims = []
+                //var delegatedDims = []
 
-				if (data.length > 0) {
-					//loop through OWNED assets
-					for (let i = 0; i < data.length; i++) {
-						console.log("grabbing.. " + data[i])
-						//AJAX each asset:
-						$.ajax({
-							type: "POST",
-							url: twinUrl + 'getDimension',
-							data: { "pubKey": PUBKEY, "flag": 0, "fileName": data[i] },
-							success: function (result) {
-								var dataResult = result;
-								if ($.type(result) != "object") {
-									console.log("result != object");
-									dataResult = JSON.parseJSON(result)
-								}
+                if (data.length > 0) {
+                    //loop through OWNED assets
+                    for (let i = 0; i < data.length; i++) {
+                        console.log("grabbing.. " + data[i])
+                        //AJAX each asset:
+                        $.ajax({
+                            type: "POST",
+                            url: twinUrl + 'getDimension',
+                            data: { "pubKey": PUBKEY, "flag": 0, "fileName": data[i] },
+                            success: function (result) {
+                                var dataResult = result;
+                                if ($.type(result) != "object") {
+                                    console.log("result != object");
+                                    dataResult = JSON.parseJSON(result)
+                                }
 
-								var ownedDims = this.state.iDimensions
+                                var ownedDims = this.state.iDimensions
 
-								ownedDims[ownedDims.length] = {
-									//dimension_id: dataResult.dimension.dimensionName,
-									dimension_details: dataResult.dimension
-								}
-								this.setState({ iDimensions: ownedDims });
+                                ownedDims[ownedDims.length] = {
+                                    //dimension_id: dataResult.dimension.dimensionName,
+                                    dimension_details: dataResult.dimension
+                                }
+                                this.setState({ iDimensions: ownedDims });
 
-								//this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
-								console.log("dataResult get Dimension: \n " + JSON.stringify(dataResult))
-								console.log("dataResult dimensionName: " + dataResult.dimension.dimensionName)
+                                //this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
+                                console.log("dataResult get Dimension: \n " + JSON.stringify(dataResult))
+                                console.log("dataResult dimensionName: " + dataResult.dimension.dimensionName)
 
-							}.bind(this),
-							complete: function () { },
-						})
-					}//end for
-				}
-			}.bind(this)
-		})
-
-        //MyCOID.json
-        // let dimension1 = {}
-        // dimension1.dimension = {
-        //     "dimensionName": "EDUCATION",
-        //     "pubkey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
-        //     "coidAddr": "7924DBF02BE23923790C5D82F8A39925F516CA0F",
-        //     "dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
-        //     "ID": 3432423423,
-        //     "address": "HEXSTRING_address",
-        //     "owner": [],
-        //     "controllers": ["c1", "c2"],
-        //     "delegations": [
-        //         { owner: "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055", delegatee: "d1", amount: "2", dimension: "", expiration: "thursday", accessCategories: "" },
-        //         { owner: "A1", delegatee: "D1", amount: "2", dimension: "", expiration: "friday", accessCategories: "" }
-        //     ],
-        //     "data": [
-        //         { "descriptor": "financial_FEB", "attribute": "QMfgsddfsdffsdfsdsdfsdf", flag: "0", ID: "4465" },
-        //         { "descriptor": "financial_MARCH", "attribute": "Qmsdfsdfsdfsdfsdfsdfsdfsdf", flag: "0", ID: "3433" },
-        //     ]
-        // }
-        // //HOME.json
-        // let dimension2 = {}
-        // dimension2.dimension = {
-        //     "dimensionName": "EDUCATION",
-        //     "pubkey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
-        //     "coidAddr": "872EDE47AEBC33CAD4AF1B8DA861E78D8E99BC56",
-        //     "dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
-        //     "ID": 69696969,
-        //     "address": "HEXSTRING_address",
-        //     "owner": [],
-        //     "controllers": ["c1", "c2"],
-        //     "delegations": [
-        //         { owner: "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055", delegatee: "D1", amount: "2", dimension: "", expiration: "thursday", accessCategories: "" },
-        //     ],
-        //     "data": [
-        //         { "descriptor": "education_highschool", "attribute": "QMfgsddfsdffsdfsdsdfsdf", flag: "0", ID: "4465" },
-        //         { "descriptor": "education_college", "attribute": "Qmsdfsdfsdfsdfsdfsdfsdfsdf", flag: "0", ID: "3433" },
-        //     ]
-        // }
-
-        // var arry = []
-        // arry.push(dimension1)
-        // arry.push(dimension2)
-
-        // this.setState({ iDimensions: arry })
+                            }.bind(this),
+                            complete: function () { },
+                        })
+                    }//end for
+                }
+            }.bind(this)
+        })
 
     }//end getDimensions
 
@@ -706,8 +660,9 @@ class IdentityDimensions extends Component {
             let controlled_labels = []//set this.state.controlled_assets_label
             let control_assets = []
 
-            let controlled = localStorage.getItem("controlled_asets")
+            let controlled = localStorage.getItem("controlled_assets")
             controlled = JSON.parse(controlled)
+            console.log("controlled... " + controlled)
 
             for (var i = 0; i < controlled.length; i++) {
                 controlled_labels.push(controlled[i].asset_id)
@@ -1059,8 +1014,8 @@ class IdentityDimensions extends Component {
                                         </div>
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="control_dist">Enter Controller(s).</label>
-                                        <TagsInput {...inputAttrs} value={this.state.control_list} onChange={(e) => { this.onFieldChange("control_list", e) } } />
+                                        <label htmlFor="control_dist">Enter dimension controllers. These controllers are not COID controllers.</label>
+                                        <TagsInput {...inputAttrs} value={this.state.control_list} onChange={(e) => { this.onFieldChange("control_list", e) }} />
                                     </div>
 
                                     <div className="form-group">

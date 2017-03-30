@@ -785,7 +785,7 @@ var eventListener = function (MyGKAddr) {
         };//end json struct
 
 
-        bigchainInput = JSON.stringify({ "data": bigchainInput })
+        bigchainInput = JSON.stringify({ "data": bigchainInput, "metadata": "null" })
         console.log("In function bigchainIt, the input to be sent to bigchain is: " + bigchainInput)
 
         var bigchainEndpoint = 'addData/' + thePubkey + '/1'

@@ -138,8 +138,9 @@ class Asset extends React.Component {
         this.setState({ showModal: false });
     }
     //*****************************************************************************
-    //takes in a msg and returns a signature (needed for requests)
+    //takes in a msg/json and returns a signature (needed for requests)
     getSignature(msg) {
+        console.log("creating signature, signing msg: \n" + JSON.stringify(msg))
         var privKey = localStorage.getItem("privKey")
         var privKey1 = new Buffer(privKey, "hex");
         var msg_hash = keccak_256(JSON.stringify(msg));
@@ -240,16 +241,19 @@ class Asset extends React.Component {
     }
     //**********************************************************************
     requestUpdateController(e) {
-        e.preventDefault()
+
+        e.preventDefault();
+
+        let asset = this.state.asset
 
         var json = {};
 
         this.prepareControlTokenDistribution();
 
-        let filename = this.state.asset.asset_id + ".json"
-        json.filename = filename
+        let filename = asset.asset_id + ".json";
+        json.filename = filename;
         json.pubKey = localStorage.getItem("pubKey");
-        json.address = localStorage.getItem("coidAddr");
+        json.address = asset.asset_name.coidAddr
         //*********************************************
         var signature = this.getSignature(json);
         console.log("sig: " + signature);
@@ -310,16 +314,33 @@ class Asset extends React.Component {
     requestUpdateOwners(e) {
         e.preventDefault()
 
-        let asset = this.state.asset.asset_name
+        let asset = this.state.asset
 
         var json = {}
 
-        json.ownerIdList = asset.ownerIdList;
-        json.controlIdList = asset.controlIdList;
+        this.prepareOwnerTokenDistribution();
 
-        console.log("got request updateOwners..")
-        var owners = this.prepareOwnerTokenDistribution();
-        console.log("prepare owners.. " + owners)
+        let filename = asset.asset_id + ".json";
+        json.filename = filename;
+        json.pubKey = localStorage.getItem("pubKey");
+        json.address = asset.asset_name.coidAddr
+
+        json.owners = this.state.owner_id;
+        json.token_quantity = this.state.owner_token_quantity;
+
+        $.ajax({
+            type: "POST",
+            url: twinUrl + 'MyCOID/addOwner',
+            data: json,
+            success: function (result) {
+                var data = result;
+                if ($.type(result) != "object") {
+                    data = JSON.parseJSON(result)
+                }
+                console.log("result: " + JSON.stringify(data))
+
+            }.bind(this),
+        })
     }
     // END OWNER UPDATE FUNCTIONS:
     //**********************************************************************
@@ -328,14 +349,16 @@ class Asset extends React.Component {
 
     requestUpdateRecovery(e) {
 
+        let asset = this.state.asset
+
         e.preventDefault();
 
         var json = {};
 
-        let filename = this.state.asset.asset_id + ".json";
+        let filename = asset.asset_id + ".json";
         json.filename = filename;
         json.pubKey = localStorage.getItem("pubKey");
-        json.address = localStorage.getItem("coidAddr");
+        json.address = asset.asset_name.coidAddr;
         //*********************************************
         let recoveryCondition = $("input[name^='recoveryCondition']").val();
         if (recoveryCondition) { json.recoveryCondition = recoveryCondition; }
@@ -354,7 +377,7 @@ class Asset extends React.Component {
                     data = JSON.parseJSON(result)
                 }
                 //get the array:
-                data = data.Result;
+                //data = data.Result;
                 //DEBUGGING:
                 console.log("addRecovery result: " + JSON.stringify(data));
                 //data is: MYCOID.json
@@ -372,13 +395,15 @@ class Asset extends React.Component {
     requestUpdateOfficalIDs(e) {
         e.preventDefault()
 
+        let asset = this.state.asset;
+
         var json = {}
 
-        let filename = this.state.asset.asset_id + ".json"
+        let filename = asset.asset_id + ".json"
         json.filename = filename
 
-        json.ownerIdList = asset.ownerIdList;
-        json.controlIdList = asset.controlIdList;
+        json.ownerIdList = asset.asset_name.ownerIdList;
+        json.controlIdList = asset.asset_name.controlIdList;
 
         console.log("this.state.fileAttrs.. " + JSON.stringify(this.state.file_attrs))
         console.log("this.state.tmpfile.. " + this.state.tmpFile)
@@ -679,8 +704,6 @@ class Identities extends React.Component {
                                 //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
                                 var theArray = this.state.own_assets;
 
-                                console.log("length is: " + theArray.length) //get total number of owned assets
-                                console.log(JSON.stringify(theArray))
                                 theArray[theArray.length] = { asset_id: dataResult.assetID, asset_name: dataResult }
                                 if (dataResult.assetID = "MyCOID")
                                     this.setState({ own_assets: theArray });

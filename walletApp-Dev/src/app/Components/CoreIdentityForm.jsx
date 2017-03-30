@@ -14,11 +14,8 @@ class UniqueIDAttributesForm extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			file_attrs: [],
-			//inputs: ['input-0'],
 			tmpFile: '',
-			showModal: false,
-			pubKey: localStorage.getItem("pubKey")
+			showModal: false
 		};
 
 	}
@@ -52,23 +49,13 @@ class TokenDistributionForm extends React.Component {
 
 	constructor(props) {
 		super(props)
-		this.state = {
-			controltoken_quantity: [],
-			controltoken_list: [],
-
-			showModal: false
-		};
-		this.maxUniqAttr = 10;
-		//this.onFieldChange = this.onFieldChange.bind(this);
-		//this.handleHideModal = this.handleHideModal.bind(this);
+		// this.state = {
+		// 	controltoken_quantity: [],
+		// 	controltoken_list: [],
+		// 	showModal: false
+		// };
 	}
-	// handleShowModal(e){
-	//     this.setState({showModal: true, tmpFile: $(e.target).attr('data-id')});
-	// }
 
-	// handleHideModal(){
-	//     this.setState({showModal: false});
-	// }
 	render() {
 		var style = {
 			fontSize: '12.5px'
@@ -107,7 +94,7 @@ class CoreIdentity extends React.Component {
 			owner_id: [],
 			control_id: [],
 			recovery_id: [],
-			recoveryCondition: [],
+			//recoveryCondition: [],
 			isHuman: [],
 			owner_token_id: [],
 			owner_token_desc: [],
@@ -189,7 +176,8 @@ class CoreIdentity extends React.Component {
 	//2)CONTROLLERS need to be able to upload documents---LATER
 
 	prepareJsonToSubmit() {
-		console.log("prepareJSONToSubmit..");
+
+		console.log("inside prepareJSONToSubmit..");
 		this.prepareControlTokenDistribution();
 
 		console.log("before we call createHashAttribute on this.state.file_attrs..\n" + JSON.stringify(this.state.file_attrs));
@@ -198,9 +186,7 @@ class CoreIdentity extends React.Component {
 		var inputObj = {
 			"pubKey": this.refs.pubKey.value,
 			//"sig": this.refs.signature.value,
-
 			//"msg": this.refs.message.value,
-			//"name": this.refs.nameReg.value,		no longer standalone part of JSON object (it is part of unique attributes)
 
 			"uniqueId": this.createHashAttribute(this.state.file_attrs),
 			"uniqueIdAttributes": this.prepareUniqueIdAttrs(),
@@ -224,7 +210,7 @@ class CoreIdentity extends React.Component {
 
 			//pubkeys used for recovery in the event COID is lost or stolen			
 			"identityRecoveryIdList": this.valueIntoHash(this.state.recovery_id),
-			"recoveryCondition": this.state.recoveryCondition,
+			"recoveryCondition": $("input[name^='recoveryCondition']").val(),
 			"yesVotesRequiredToPass": 2,	//needs to be taken out and hardcoded in app
 
 			"isHuman": true,
@@ -356,7 +342,10 @@ class CoreIdentity extends React.Component {
 		json.sig = signature1;
 		json.msg = msg_hash_buffer.toString("hex");
 
-		console.log(json)
+		let COID_controllers = this.state.control_id
+		console.log("coid controllers... " + COID_controllers + "\n length: " + COID_controllers.length)
+
+		console.log("requestCOID json: " + JSON.stringify(json))
 		$.ajax({
 			url: twinUrl + 'requestCOID',
 			type: 'POST',
@@ -365,10 +354,10 @@ class CoreIdentity extends React.Component {
 				console.log(JSON.stringify(json))
 				var sendMe = {};
 				sendMe.flag = 0; //owned core identity
-				sendMe.fileName = "MyCOID.json" //
+				sendMe.fileName = "MyCOID.json"
+				sendMe.pubKey = keccak_256(localStorage.getItem("pubKey"));
 				sendMe.updateFlag = 0; //new identity
 				sendMe.data = json;
-				sendMe.pubKey = keccak_256(localStorage.getItem("pubKey"));
 
 				$.ajax({
 					url: twinUrl + 'setAsset',
@@ -376,12 +365,28 @@ class CoreIdentity extends React.Component {
 					data: sendMe,
 					success: function (res) {
 						console.log("response from setAsset: " + res)
-					}
+					}.bind(this)
 				})
-			},
+			}.bind(this),
 			complete: function () {
-				// do something
-			}
+				var sendMe = {};
+				sendMe.flag = 1; //controlled core identity
+				sendMe.fileName = "MyCOID.json" //
+				sendMe.updateFlag = 0; //new identity
+				sendMe.data = json;
+				for (let i = 0; i < COID_controllers.length; i++) {
+					console.log("setting asset for controller, " + COID_controllers[i])
+					sendMe.pubKey = keccak_256(COID_controllers[i])
+					$.ajax({
+						url: twinUrl + 'setAsset',
+						type: 'POST',
+						data: sendMe,
+						success: function (res) {
+							console.log("response from setAsset: " + res)
+						}
+					})
+				}
+			}.bind(this)
 		});
 	}
 
@@ -466,12 +471,12 @@ class CoreIdentity extends React.Component {
 						</div>
 					</div>
 					<div className="form-group">
-						<label htmlFor="recovery_id">Recovery IDs (public keys of individuals who will attest to lost/stolen identity)</label>
+						<label>Recovery IDs (public keys of individuals who will attest to lost/stolen identity)</label>
 						<TagsInput {...inputAttrs} value={this.state.recovery_id} onChange={(e) => { this.onFieldChange("recovery_id", e) }} />
 					</div>
 					<div className="form-group">
-						<label htmlFor="recovery_id">Recovery Condition (# of digital signatures of recovery ID owners needed to recover identity)</label>
-						<TagsInput {...inputAttrs} value={this.state.recoveryCondition} onChange={(e) => { this.onFieldChange("recoveryCondition", e) }} />
+						<label>Recovery Condition (# of digital signatures of recovery ID owners needed to recover identity)</label>
+						<input name="recoveryCondition" className="form-control col-md-4" type="text" placeholder="Label" />/>
 					</div>
 					<div className="form-group">
 						<div className="col-sm-6">

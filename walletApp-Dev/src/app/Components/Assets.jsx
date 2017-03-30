@@ -567,13 +567,13 @@ class Dims extends Component {
 												if (dataArray.length > 0) {
 													return dataArray.map((attrs, i) => {
 														//console.log("attrs[0]: " + attrs[0] + ", attrs[1]:" + attrs[1] + ", attrs[2]: " + attrs[2])
-															return (
-																<tr key={i}>
-																	<td>{attrs[0]}</td>
-																	<td>Token Amount: 1</td>
-																	<td><button type="button" className="btn btn-primary btn-sm" data-val={i} onClick={this.showAttrs2.bind(this)}>Spend Token</button></td>
-																</tr>
-															)
+														return (
+															<tr key={i}>
+																<td>{attrs[0]}</td>
+																<td>Token Amount: 1</td>
+																<td><button type="button" className="btn btn-primary btn-sm" data-val={i} onClick={this.showAttrs2.bind(this)}>Spend Token</button></td>
+															</tr>
+														)
 													});
 												}
 												else { return <tr><td colSpan="2">No descriptors found.</td></tr> }
@@ -608,7 +608,7 @@ class Assets extends Component {
 			showDetails1: false,
 			wallet: { pubKey: localStorage.getItem("pubKey") },
 			own_assets: [],
-			controlled_assets: [{ asset_id: 161718, asset_name: 'Parents House' }, { asset_id: 192021, asset_name: 'My Car' }],
+			controlled_assets: [],
 			delegated_assets: [],
 			delegated_dims: [],
 			active_asset: {},
@@ -722,16 +722,16 @@ class Assets extends Component {
 								}
 								this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
 
-								// assetData[assetData.length] = {
-								// 	asset_id: dataResult.assetID,
-								// 	asset_uniqueId: dataResult.uniqueId,
-								// 	asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
-								// 	asset_coidAddr: dataResult.coidAddr,
-								// 	asset_gatekeeperAddr: dataResult.gatekeeperAddr,
-								// 	asset_owners: dataResult.ownerIdList,
-								// 	asset_controllers: dataResult.controlIdList
-								// }
-								// localStorage.setItem("owned_assets", JSON.stringify(assetData))
+								assetData[assetData.length] = {
+									asset_id: dataResult.assetID,
+									asset_uniqueId: dataResult.uniqueId,
+									asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
+									asset_coidAddr: dataResult.coidAddr,
+									asset_gatekeeperAddr: dataResult.gatekeeperAddr,
+									asset_owners: dataResult.ownerIdList,
+									asset_controllers: dataResult.controlIdList
+								}
+								localStorage.setItem("controlled_assets", JSON.stringify(assetData))
 
 							}.bind(this),
 							complete: function () { },
@@ -828,10 +828,6 @@ class Assets extends Component {
 								}
 								this.setState({ delegated_dims: delegatedDims });
 
-
-
-
-								//this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
 								console.log("dataResult get Dimension: \n " + JSON.stringify(dataResult))
 								console.log("dataResult dimensionName: " + dataResult.dimension.dimensionName)
 
@@ -946,7 +942,7 @@ class Assets extends Component {
 								return (
 									<button type="button" key={asset.asset_id} className={cssClass} onClick={() => this.assetHandler(asset)}>
 										<span className="glyphicon glyphicon-link"></span>
-										{asset.asset_name}
+										{asset.asset_id}
 									</button>
 								);
 							})}

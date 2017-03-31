@@ -190,7 +190,7 @@ var MyCOID = function (contractAddress) {
         pubKey = new Buffer(pubKey, "hex");
 
         var verified = secp256k1.verify(msg, signature, pubKey)
-        console.log("\n\n\n\n\n\n\n\n\n\n\n" + verified+"\n\n\n\n\n\n\n\n\n\n");
+        console.log("\n\n\n\n\n\n\n\n\n\n\n" + verified + "\n\n\n\n\n\n\n\n\n\n");
         return verified;
     }
 
@@ -240,12 +240,12 @@ var MyCOID = function (contractAddress) {
             _this.bigchain_contract.CallbackReady(function (error, result) {
                 theEvent = result;
                 console.log("callback ready");
-console.log("callback result: " +JSON.stringify( result))
-if(error){console.log("error: " + error)}
+                console.log("callback result: " + JSON.stringify(result))
+                if (error) { console.log("error: " + error) }
             },
                 function (error, result) {
-if(error){console.log("error2: " + error)}
-                        console.log("callback ready 2");
+                    if (error) { console.log("error2: " + error) }
+                    console.log("callback ready 2");
                     if (thePubkey == result.args.addr) {
 
                         _this.bigchain_contract.myCallback(function (error, result) {
@@ -534,46 +534,47 @@ if(error){console.log("error2: " + error)}
         console.log("CONTROLLERS :" + controller);
         console.log("AMOUNTS :" + amount);
 
-        if(verified){console.log("\n-----VERIFIED-----\n");
-        theNotifier.GetAsset(pubKey, fileName, flag, function (results) {
-            for (var i = 0; i < controller.length; i++) {
+        if (verified) {
+            console.log("\n-----VERIFIED-----\n");
+            theNotifier.GetAsset(pubKey, fileName, flag, function (results) {
+                for (var i = 0; i < controller.length; i++) {
 
-                console.log("lenght: " + controller.length);
-                var controllerHash = keccak_256(controller[i]).toUpperCase();
-                console.log("get complete : " + controllerHash);
-                //var amount = formdata.amount[i];
-                self.contract.addController(controllerHash, function (error, result) {
-                    console.log("contract complete");
-                    if (result) {
+                    console.log("lenght: " + controller.length);
+                    var controllerHash = keccak_256(controller[i]).toUpperCase();
+                    console.log("get complete : " + controllerHash);
+                    //var amount = formdata.amount[i];
+                    self.contract.addController(controllerHash, function (error, result) {
+                        console.log("contract complete");
+                        if (result) {
 
-                        results.controlIdList.push(controllerHash);
-                        results.controlTokenQuantity.push(amount[k]);
-                        console.log("data added: " + controllerHash + " " + amount[k])
-                        k++;
-                        console.log("result: " + result)
-                        if (k == (controller.length)) {
-                            console.log("addController write");
-                            self.bigchainIt(results, function (res, bigchainID, bigchainHash) {
-                                results.bigchainID = bigchainID;
-                                results.bigchainHash = bigchainHash;
-                                self.writeAll(results, function () { callback(error, result) })
-                            });
-                            //self.writeAll(results,function () {callback(error, result)});
+                            results.controlIdList.push(controllerHash);
+                            results.controlTokenQuantity.push(amount[k]);
+                            console.log("data added: " + controllerHash + " " + amount[k])
+                            k++;
+                            console.log("result: " + result)
+                            if (k == (controller.length)) {
+                                console.log("addController write");
+                                self.bigchainIt(results, function (res, bigchainID, bigchainHash) {
+                                    results.bigchainID = bigchainID;
+                                    results.bigchainHash = bigchainHash;
+                                    self.writeAll(results, function () { callback(error, result) })
+                                });
+                                //self.writeAll(results,function () {callback(error, result)});
+                            }
                         }
-                    }
-                    else {
-                        console.log("error: " + error)
-                        callback(error, result);
-                        i = controller.length;
-                        //k = formdata.data.length;
-                        console.log("Error occurred while adding entry " + error);
-                    }
-                })// end contract call
-            }// end for loop
-        })// end getasset
+                        else {
+                            console.log("error: " + error)
+                            callback(error, result);
+                            i = controller.length;
+                            //k = formdata.data.length;
+                            console.log("Error occurred while adding entry " + error);
+                        }
+                    })// end contract call
+                }// end for loop
+            })// end getasset
         }// end verified
-        else{
-            result="Verification Failed";
+        else {
+            result = "Verification Failed";
             callback(error, result)
         }
     }// end addcontroller
@@ -591,29 +592,30 @@ if(error){console.log("error2: " + error)}
 
         //TODO:
         var controllerHash = keccak_256(controller).toUpperCase()
-        if(verified){console.log("\n-----VERIFIED-----\n");
-        theNotifier.GetAsset(pubKey, fileName, flag, function (results) {
-            self.contract.removeController(controllerHash, function (error, result) {
-                if (result) {
-                    for (var j = 0; j < results.control_id.length; j++) {
-                        if (results.control_id[j] == controllerHash) {
-                            results.control_id.splice(j, 1);
-                            results.control_token_quantity.splice(j, 1);
-                            self.bigchainIt(results, function (res, bigchainID, bigchainHash) {
-                                results.bigchainID = bigchainID;
-                                results.bigchainHash = bigchainHash;
-                                self.writeAll(results, function () { callback(error, result) })
-                            });
+        if (verified) {
+            console.log("\n-----VERIFIED-----\n");
+            theNotifier.GetAsset(pubKey, fileName, flag, function (results) {
+                self.contract.removeController(controllerHash, function (error, result) {
+                    if (result) {
+                        for (var j = 0; j < results.control_id.length; j++) {
+                            if (results.control_id[j] == controllerHash) {
+                                results.control_id.splice(j, 1);
+                                results.control_token_quantity.splice(j, 1);
+                                self.bigchainIt(results, function (res, bigchainID, bigchainHash) {
+                                    results.bigchainID = bigchainID;
+                                    results.bigchainHash = bigchainHash;
+                                    self.writeAll(results, function () { callback(error, result) })
+                                });
+                            }
                         }
                     }
-                }
-                else {
-                    console.log("Error while removeing controller" + error);
-                    callback(error, result)
-                }
+                    else {
+                        console.log("Error while removeing controller" + error);
+                        callback(error, result)
+                    }
 
+                })
             })
-        })
         }
     }
     //
@@ -658,39 +660,40 @@ if(error){console.log("error2: " + error)}
         var owner = formdata.owners.split(",");
         var amount = formdata.token_quantity.split(",");
         var verified = self.verify(msg, sig, pubKey);
-//console.log("INFO: "+owner[0] + "\n"+amount[0]);
+        //console.log("INFO: "+owner[0] + "\n"+amount[0]);
         //TODO:
         //newOwner = keccak_256(newOwner).toUpperCase()
-        if(verified){console.log("\n-----VERIFIED-----\n");
-        theNotifier.GetAsset(pubKey, fileName, flag, function (results) {
-            for (var i = 0; i < owner.length; i++) {
-                console.log("INFO: "+owner[0] + "\n"+amount[0]);
-                var newOwner = keccak_256(owner[i]).toUpperCase();
-                self.contract.addOwner(newOwner, amount[i], function (error, result) {
-                    if (result) {
-                        results.ownerIdList.push(owner[k]);
-                        results.ownershipTokenQuantity.push(amount[k]);
-                        k++;
-                        console.log("res: " + result)
-                        if (k == (owner.length)) {
-                            console.log("addOwner write");
-                            self.bigchainIt(results, function (res, bigchainID, bigchainHash) {
-                                results.bigchainID = bigchainID;
-                                results.bigchainHash = bigchainHash;
-                                self.writeAll(results, function () { callback(error, result) })
-                            });
+        if (verified) {
+            console.log("\n-----VERIFIED-----\n");
+            theNotifier.GetAsset(pubKey, fileName, flag, function (results) {
+                for (var i = 0; i < owner.length; i++) {
+                    console.log("INFO: " + owner[0] + "\n" + amount[0]);
+                    var newOwner = keccak_256(owner[i]).toUpperCase();
+                    self.contract.addOwner(newOwner, amount[i], function (error, result) {
+                        if (result) {
+                            results.ownerIdList.push(owner[k]);
+                            results.ownershipTokenQuantity.push(amount[k]);
+                            k++;
+                            console.log("res: " + result)
+                            if (k == (owner.length)) {
+                                console.log("addOwner write");
+                                self.bigchainIt(results, function (res, bigchainID, bigchainHash) {
+                                    results.bigchainID = bigchainID;
+                                    results.bigchainHash = bigchainHash;
+                                    self.writeAll(results, function () { callback(error, result) })
+                                });
+                            }
                         }
-                    }
-                    else {
-                        console.log("error: " + error)
-                        callback(error, result);
-                        i = owner.length;
-                        //k = formdata.data.length;
-                        console.log("Error occurred while adding entry " + error);
-                    }
-                })
-            }
-        })
+                        else {
+                            console.log("error: " + error)
+                            callback(error, result);
+                            i = owner.length;
+                            //k = formdata.data.length;
+                            console.log("Error occurred while adding entry " + error);
+                        }
+                    })
+                }
+            })
         }
     }
 
@@ -706,28 +709,29 @@ if(error){console.log("error2: " + error)}
 
         //TODO:
         owner = keccak_256(owner).toUpperCase()
-        if(verified){console.log("\n-----VERIFIED-----\n");
-        theNotifier.GetAsset(pubKey, fileName, flag, function (result) {
-            self.contract.removeOwner(owner, function (error, result) {
-                if (result) {
-                    for (var j = 0; j < results.ownerIdList.length; j++) {
-                        if (results.ownerIdList[j] == owner) {
-                            results.ownerIdList.splice(j, 1);
-                            results.ownershipTokenQuantity.splice(j, 1);
-                            self.bigchainIt(results, function (res, bigchainID, bigchainHash) {
-                                results.bigchainID = bigchainID;
-                                results.bigchainHash = bigchainHash;
-                                self.writeAll(results, function () { callback(error, result) })
-                            });
+        if (verified) {
+            console.log("\n-----VERIFIED-----\n");
+            theNotifier.GetAsset(pubKey, fileName, flag, function (result) {
+                self.contract.removeOwner(owner, function (error, result) {
+                    if (result) {
+                        for (var j = 0; j < results.ownerIdList.length; j++) {
+                            if (results.ownerIdList[j] == owner) {
+                                results.ownerIdList.splice(j, 1);
+                                results.ownershipTokenQuantity.splice(j, 1);
+                                self.bigchainIt(results, function (res, bigchainID, bigchainHash) {
+                                    results.bigchainID = bigchainID;
+                                    results.bigchainHash = bigchainHash;
+                                    self.writeAll(results, function () { callback(error, result) })
+                                });
+                            }
                         }
                     }
-                }
-                else {
-                    console.log("Error while removing owner " + error);
-                    callback(error, result)
-                }
+                    else {
+                        console.log("Error while removing owner " + error);
+                        callback(error, result)
+                    }
+                })
             })
-        })
         }
     }
 
@@ -792,53 +796,54 @@ if(error){console.log("error2: " + error)}
         var k = 0;
         var verified = self.verify(msg, sig, pubKey);
 
-        if(verified){console.log("\n-----VERIFIED-----\n");
-        //1. Get Current Recovery keys
-        theNotifier.GetAsset(pubKey, fileName, flag, function (results) {
+        if (verified) {
+            console.log("\n-----VERIFIED-----\n");
+            //1. Get Current Recovery keys
+            theNotifier.GetAsset(pubKey, fileName, flag, function (results) {
 
-            var obj = results;
-            for (var i = 0; i < recoveryID.length; i++) {
-                self.contract.addRecovery(recoveryID[i], recoveryCondition, function (error, result) {
-                    //callback(error, result)
-                    var recoveryIDHash = keccak_256(recoveryID[k])
-                    if (error) { callback(error, result) }
-                    // var condition = obj.recoveryCondition
-                    // if (condition != null) { }
-                    else {
-                        /*console.log("INSIDE ADD RECOVERY ID: " + JSON.stringify(obj))
-                        var recovery_list = obj.identityRecoveryIdList;
+                var obj = results;
+                for (var i = 0; i < recoveryID.length; i++) {
+                    self.contract.addRecovery(recoveryID[i], recoveryCondition, function (error, result) {
+                        //callback(error, result)
+                        var recoveryIDHash = keccak_256(recoveryID[k])
+                        if (error) { callback(error, result) }
+                        // var condition = obj.recoveryCondition
+                        // if (condition != null) { }
+                        else {
+                            /*console.log("INSIDE ADD RECOVERY ID: " + JSON.stringify(obj))
+                            var recovery_list = obj.identityRecoveryIdList;
+    
+                            console.log("RECOVERY KEYS: " + recovery_list);
+    
+                            //2. Modify Array
+                            recovery_list.push(recoveryIDHash)
+                            console.log("WITH ADDED RECOVERY ID HASH: " + recovery_list);
+                            var keys = ["identityRecoveryIdList"]
+                            var values = []
+                            values.push(recovery_list);
+                            console.log("Array of arrays: " + values)*/
 
-                        console.log("RECOVERY KEYS: " + recovery_list);
 
-                        //2. Modify Array
-                        recovery_list.push(recoveryIDHash)
-                        console.log("WITH ADDED RECOVERY ID HASH: " + recovery_list);
-                        var keys = ["identityRecoveryIdList"]
-                        var values = []
-                        values.push(recovery_list);
-                        console.log("Array of arrays: " + values)*/
+                            obj.identityRecoveryIdList.push(recoveryIDHash);
+                            if (recoveryCondition != "") {
+                                obj.recoveryCondition = recoveryCondition;
+                            }
+                            k++;
 
-
-                        obj.identityRecoveryIdList.push(recoveryIDHash);
-                        if (recoveryCondition != "") {
-                            obj.recoveryCondition = recoveryCondition;
+                            //3. Update
+                            //theNotifier.UpdateAsset(pubKey, fileName, flag, "", keys, values)
+                            if (k == recoveryID.length) {
+                                self.bigchainIt(obj, function (res, bigchainID, bigchainHash) {
+                                    obj.bigchainID = bigchainID;
+                                    obj.bigchainHash = bigchainHash;
+                                    self.writeAll(obj, function () { callback(error, result) })
+                                });
+                            }
                         }
-                        k++;
 
-                        //3. Update
-                        //theNotifier.UpdateAsset(pubKey, fileName, flag, "", keys, values)
-                        if (k == recoveryID.length) {
-                            self.bigchainIt(obj, function (res, bigchainID, bigchainHash) {
-                                obj.bigchainID = bigchainID;
-                                obj.bigchainHash = bigchainHash;
-                                self.writeAll(obj, function () { callback(error, result) })
-                            });
-                        }
-                    }
-
-                })
-            }
-        })
+                    })
+                }
+            })
         }
 
     }
@@ -859,24 +864,25 @@ if(error){console.log("error2: " + error)}
         var flag = 0;
         var verified = self.verify(msg, sig, pubKey);
 
-        if(verified){console.log("\n-----VERIFIED-----\n");
-        //1. Get Current Recovery keys
-        theNotifier.GetAsset(pubKey, fileName, flag, function (results) {
-            self.contract.removeRecovery(recoveryID, recoveryCondition, function (error, result) {
-                if(result){
-                for (var j = 0; j < 10; j++) {
-                    if (results.identityRecoveryIdList[j] == recoveryID) {
-                        results.identityRecoveryIdList.splice(j, 1);
-                        self.bigchainIt(results, function (res, bigchainID, bigchainHash) {
-                            results.bigchainID = bigchainID;
-                            results.bigchainHash = bigchainHash;
-                            self.writeAll(results, function () { callback(error, result) })
-                        });
+        if (verified) {
+            console.log("\n-----VERIFIED-----\n");
+            //1. Get Current Recovery keys
+            theNotifier.GetAsset(pubKey, fileName, flag, function (results) {
+                self.contract.removeRecovery(recoveryID, recoveryCondition, function (error, result) {
+                    if (result) {
+                        for (var j = 0; j < 10; j++) {
+                            if (results.identityRecoveryIdList[j] == recoveryID) {
+                                results.identityRecoveryIdList.splice(j, 1);
+                                self.bigchainIt(results, function (res, bigchainID, bigchainHash) {
+                                    results.bigchainID = bigchainID;
+                                    results.bigchainHash = bigchainHash;
+                                    self.writeAll(results, function () { callback(error, result) })
+                                });
+                            }
+                        }
                     }
-                }
-                }
+                })
             })
-        })
         }
     }
 
@@ -924,7 +930,6 @@ if(error){console.log("error2: " + error)}
     }
 
 
-
     // this.changeRecoveryCondition(function (formdata, callback) {
 
     // })
@@ -937,7 +942,6 @@ if(error){console.log("error2: " + error)}
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
 
 //This does all the endpoint listening:
 //The variable endpoint references all keys in the json object.
@@ -979,7 +983,6 @@ for (let endpoint in MyCoidConfig) {
         eval(toExecute);
     })
 }
-
 
 app.listen(3012)
 console.log("running at port 3012")

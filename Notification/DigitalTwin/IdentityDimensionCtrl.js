@@ -40,7 +40,6 @@ var directoryManager = function (pubKey) {
 
 //****************************************************************************************************
 
-
 var DimensionCtrl = {
 
     //returns all your files in your owned folder
@@ -171,7 +170,7 @@ var DimensionCtrl = {
             directory = directory + ControlDirectory + "/" + fileName;
         }
         if (flag == 2) {
-            directory = directory + DelegateDirectory + + "/" + fileName;
+            directory = directory + DelegateDirectory + "/" + fileName;
         }
 
         var cryptoEncr = new Crypto({ pubKey: pubKey });

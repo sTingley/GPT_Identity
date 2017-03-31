@@ -15,7 +15,6 @@ contract CoreIdentity
     //(5) Call StartCoid. IMPORTANT: Only call this after (1-4) have been called!
 
 
-
     struct UniqueId
     {
         bytes32 uniqueID;
@@ -80,6 +79,15 @@ contract CoreIdentity
 
        testIt = 1;
     }
+
+    function getUniqueID() returns (bytes32 theUniqueID, bytes32[10] theUniqueIDAttributes, bool isHumanValue)
+    {
+       //set uniqueID struct here
+       theUniqueID = uniqueIdStruct.uniqueID;
+       theUniqueIDAttributes = uniqueIdStruct.uniqueIDAttributes;
+       isHumanValue = isHuman;
+    }
+
     function setOwnership(bytes32[10] theOwnerIDList, uint[10] theOwnershipStakes)
     {
         //set ownership struct here
@@ -105,6 +113,53 @@ contract CoreIdentity
         testIt = 4;
     }
 
+    function addRecovery(bytes32 theIdentityRecoveryList, uint theRecoveryCondition) returns (bool complete)
+    {
+        complete = false;
+        if(identityRecoveryIdListStruct.identityRecoveryIdList[9] == 0x0 || identityRecoveryIdListStruct.identityRecoveryIdList[9] == 0){
+            //set recovery struct here
+	    for(var i=0;i<10;i++){
+            if(theIdentityRecoveryList != 0x0 && theIdentityRecoveryList != 0 && identityRecoveryIdListStruct.identityRecoveryIdList[i] == 0x0){
+                identityRecoveryIdListStruct.identityRecoveryIdList[i] = theIdentityRecoveryList;
+                complete = true;
+            }
+	    }
+        }
+        if(theRecoveryCondition != 0x0){
+            identityRecoveryIdListStruct.recoveryCondition = theRecoveryCondition; 
+            complete = true;
+        }
+        testIt = 5;
+    }
+
+    function removeRecovery(bytes32 theIdentityRecoveryList, uint theRecoveryCondition) returns (bool complete)
+    {
+        //set recovery struct here
+        complete = false;
+        bool finding = true;
+        uint j=10;
+        for(uint i=0;i<10;i++){
+            if(identityRecoveryIdListStruct.identityRecoveryIdList[i] == theIdentityRecoveryList){
+                delete identityRecoveryIdListStruct.identityRecoveryIdList[i];
+                while(finding){
+                    if(j<=0){finding=false;}
+                    if(identityRecoveryIdListStruct.identityRecoveryIdList[j]!= 0x0 && identityRecoveryIdListStruct.identityRecoveryIdList[j] != 0){
+                        finding=false;
+                        complete = true;
+                        identityRecoveryIdListStruct.identityRecoveryIdList[i] = identityRecoveryIdListStruct.identityRecoveryIdList[j];
+                    }
+                    j--;
+                }
+            }
+        }
+        if(theRecoveryCondition != 0x0){
+            identityRecoveryIdListStruct.recoveryCondition = theRecoveryCondition; 
+            complete = true;
+        }
+        testIt = 6;
+    }
+
+
 
    //END CONSTRUCTOR
    //START CONSTRUCTOR HELPER FUNCTION
@@ -115,9 +170,12 @@ contract CoreIdentity
         myUtils = new Utils();
         (ownershipStruct.ownerIDList, controlStruct.controlIDList) = myUtils.AtoSubsetOfB(owners, controllers);
 
+	//TODO: REMOVE AND UNCOMMENT BELOW
+	ownershipStruct.ownershipID = 0x0;
+	controlStruct.controlTokenID = 0x0;
 
-        ownershipStruct.ownershipID = calculateOwnershipID(ownershipStruct.ownerIDList,uniqueIdStruct.uniqueID);
-        controlStruct.controlTokenID = calculateControlID(controlStruct.controlIDList,uniqueIdStruct.uniqueID);
+       // ownershipStruct.ownershipID = calculateOwnershipID(ownershipStruct.ownerIDList,uniqueIdStruct.uniqueID);
+      //  controlStruct.controlTokenID = calculateControlID(controlStruct.controlIDList,uniqueIdStruct.uniqueID);
         testIt = 15;
         //instantiate ownership token:
         OT = new OwnershipToken(isHuman,ownershipStruct.ownershipID);
@@ -134,7 +192,36 @@ contract CoreIdentity
    //END CONSTRUCTOR HELPER FUNCTION
 
 
-
+   function isOwner(bytes32 ownerHash) returns (bool result)
+   {
+	result = false;
+	for(uint i = 0; i < ownershipStruct.ownerIDList.length; i++)
+	{
+		if(ownershipStruct.ownerIDList[i] == ownerHash)
+		{
+			result = true;
+		}
+	}
+   }
+   function isController(bytes32 controllerHash) returns (bool result)
+   {
+	result = false;
+	for(uint i = 0; i < controlStruct.controlIDList.length; i++)
+	{
+		if(controlStruct.controlIDList[i] == controllerHash)
+		{	
+			result = true;
+		}
+	}
+   }
+   function getOwners() returns (bytes32[10] result)
+   {
+	result = ownershipStruct.ownerIDList;
+   }
+   function getControllers() returns (bytes32[10] result)
+   {
+	result = controlStruct.controlIDList;
+   }
 
    //for debugging
    function findIndex(bytes32 hashC) returns (uint indexC,bool  wasFoundC)
@@ -143,12 +230,11 @@ contract CoreIdentity
    }
 
 
-
+   //get controller values
    function getList() returns (uint[10] vals)
    {
         vals = CT.getControllerVal();
    }
-
 
 
    //START CONTROL FUNCTIONS
@@ -156,9 +242,9 @@ contract CoreIdentity
    {
        success = CT.revokeDelegation(controllerHash,delegateeHash,amount);
    }
-   function spendMyTokens(bytes32 delegateeHash, uint amount)
+   function spendMyTokens(bytes32 delegateeHash, uint amount) returns (bool result)
    {
-       CT.spendMyTokens(delegateeHash,amount);
+       result = CT.spendMyTokens(delegateeHash,amount);
    }
    function myAmount(bytes32 delegateeHash) returns (uint amount)
    {
@@ -185,6 +271,7 @@ contract CoreIdentity
    }
    function addController(bytes32 controllerHash) returns (bytes32[10] listo)
    {
+	
         bool success = false;
        //TODO: make sure the person ADDING controllerHash is in ownersList!!
         //The oraclizer will have to verify this
@@ -202,7 +289,7 @@ contract CoreIdentity
         controlStruct.controlIDList = CT.getControllersList();
         listo = CT.getControllersList();
         //TODO: recompute controlID
-        controlStruct.controlTokenID = calculateControlID(controlStruct.controlIDList,uniqueIdStruct.uniqueID);
+        //controlStruct.controlTokenID = calculateControlID(controlStruct.controlIDList,uniqueIdStruct.uniqueID);
        }
    }
    function removeController(bytes32 controllerHash) returns (bool success, uint minInd)
@@ -238,7 +325,7 @@ contract CoreIdentity
         ownershipStruct.ownershipStakes = OT.getOwnersVal();
 
         //TODO: Recalculate OwnershipTokenID
-        ownershipStruct.ownershipID = calculateOwnershipID(ownershipStruct.ownerIDList,uniqueIdStruct.uniqueID);
+        //ownershipStruct.ownershipID = calculateOwnershipID(ownershipStruct.ownerIDList,uniqueIdStruct.uniqueID);
        }
    }
    function removeOwner(bytes32 addr) returns (bool success)
@@ -251,7 +338,7 @@ contract CoreIdentity
         ownershipStruct.ownershipStakes = OT.getOwnersVal();
 
        //TODO: Recalculate OwnershipTokenID
-            ownershipStruct.ownershipID = calculateOwnershipID(ownershipStruct.ownerIDList,uniqueIdStruct.uniqueID);
+            //ownershipStruct.ownershipID = calculateOwnershipID(ownershipStruct.ownerIDList,uniqueIdStruct.uniqueID);
        }
    }
    function myTokenAmount(bytes32 ownershipHash) returns (uint val)
@@ -334,19 +421,22 @@ contract CoreIdentity
             bytes32 myVal;
             uint j = 0;
 
-            for(uint i = 1; i < hashMe.length; i++)
-            {
-                myVal = hashMe[i];
+	    if(hashMe.length > 1)
+	    {
+            	for(uint i = 1; i < hashMe.length; i++)
+            	{
+                	myVal = hashMe[i];
 
-                j = i -1;
-                while(j >= 0 && hashMe[j] > myVal)
-                {
-                        hashMe[j+1] = hashMe[j];
-                        j = j -1;
-                }
+                	j = i -1;
+                	while(j >= 0 && hashMe[j] > myVal)
+                	{
+                        	hashMe[j+1] = hashMe[j];
+                        	j = j -1;
+                	}
 
-                hashMe[j+1] = myVal;
-            }
+                	hashMe[j+1] = myVal;
+            	}
+	    }
 
             ownershipID = sha3(uniqueID,hashMe);
    }
@@ -367,20 +457,23 @@ contract CoreIdentity
 
             bytes32 myVal;
             uint j = 0;
+	    
+	    if(hashMe.length > 1)
+	    {
+            	for(uint i = 1; i < hashMe.length; i++)
+            	{
+                	myVal = hashMe[i];
 
-            for(uint i = 1; i < hashMe.length; i++)
-            {
-                myVal = hashMe[i];
+               		j = i -1;
+                	while(j >= 0 && hashMe[j] > myVal)
+                	{
+                        	hashMe[j+1] = hashMe[j];
+                        	j = j -1;
+                	}
 
-                j = i -1;
-                while(j >= 0 && hashMe[j] > myVal)
-                {
-                        hashMe[j+1] = hashMe[j];
-                        j = j -1;
-                }
-
-                hashMe[j+1] = myVal;
-            }
+                	hashMe[j+1] = myVal;
+            	}
+	    }
 
             controlID = sha3(uniqueID,hashMe);
 

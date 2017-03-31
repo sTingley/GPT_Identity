@@ -22,7 +22,7 @@ var directoryManager = function (pubKey) {
     var sync = true;
 
     //uer's folder path:
-    var currentPath = PATH + "/" + keccak_256(pubKey).toUpperCase();
+    var currentPath = PATH + "/" + pubKey.toUpperCase();
 
     //make the user's folder:
     fs.existsSync(currentPath) || fs.mkdirSync(currentPath);
@@ -48,7 +48,7 @@ var AssetCtrl =
             var pubKey = req.body.pubKey;
 
             //call in case their folders have not been created:
-            var manager = new directoryManager(pubKey);
+            var manager = new directoryManager(keccak_256(pubKey));
 
             //debugging
             console.log("INPUT, pubKey: " + pubKey)
@@ -81,7 +81,7 @@ var AssetCtrl =
             var pubKey = req.body.pubKey;
 
             //call in case their folders have not been created:
-            var manager = new directoryManager(pubKey);
+            var manager = new directoryManager(keccak_256(pubKey));
 
             //debugging
             console.log("INPUT, pubKey: " + pubKey)
@@ -114,7 +114,7 @@ var AssetCtrl =
             var pubKey = req.body.pubKey;
 
             //call in case their folders have not been created:
-            var manager = new directoryManager(pubKey);
+            var manager = new directoryManager(keccak_256(pubKey));
 
             //debugging
             console.log("INPUT, pubKey: " + pubKey)
@@ -149,7 +149,7 @@ var AssetCtrl =
             var pubKey = req.body.pubKey;
 
             //call in case their folders have not been created:
-            var manager = new directoryManager(pubKey);
+            var manager = new directoryManager(keccak_256(pubKey));
 
             //get flag
             var flag = req.body.flag;
@@ -224,7 +224,7 @@ var AssetCtrl =
             console.log("updateFlag is: " + updateFlag);
 
             //get the directory
-            var directory = PATH + "/" + keccak_256(pubKey).toUpperCase() + "/";
+            var directory = PATH + "/" + pubKey.toUpperCase() + "/";
             if (flag == 0) {
                 directory = directory + OwnershipDirectory + "/" + fileName;
             }
@@ -232,7 +232,7 @@ var AssetCtrl =
                 directory = directory + ControlDirectory + "/" + fileName;
             }
             if (flag == 2) {
-                directory = directory + DelegateDirectory + + "/" + fileName;
+                directory = directory + DelegateDirectory + "/" + fileName;
             }
 
             var cryptoEncr = new Crypto({ pubKey: pubKey });
@@ -241,12 +241,17 @@ var AssetCtrl =
             var fileName = directory;
             console.log("FILE NAME: " + directory)
 
+            console.log("***********: " + fs.existsSync(fileName))
+
             //this is an update
             if (fs.existsSync(fileName) && updateFlag == 1) {
 
                 //file exists, so this is an update
                 var keys = req.body.keys;
+                console.log("KEYS: " + keys);
+
                 var values = req.body.values;
+                console.log("VALUES: " + values);
 
                 //debugging
                 console.log("File exists: " + fs.existsSync(fileName))
@@ -275,7 +280,9 @@ var AssetCtrl =
                     if (err) {
                         res.status(400).json({ "Error": "Unable to write message in " + fileName });
                     }
-                    res.json({ "Msg": "Proposal updated successfully" });
+                    else {
+                        res.json({ "Msg": "Proposal updated successfully" });
+                    }
                 });
             }
 

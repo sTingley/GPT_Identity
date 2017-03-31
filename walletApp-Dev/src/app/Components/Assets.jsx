@@ -443,6 +443,9 @@ class Dims extends Component {
 		let descriptor = prop.dimension_details.data[value].descriptor;
 		console.log("descriptor: " + JSON.stringify(descriptor))
 
+		let owners = prop.dimension_details.owners;
+		json.owners = owners;
+
 		let pubKey = keccak_256(localStorage.getItem("pubKey"))
 		json.pubKey = pubKey
 		json.dimensionName = dimensionName;
@@ -454,27 +457,26 @@ class Dims extends Component {
 
 		var ipfs_url = "http://10.101.114.231:8080/ipfs/";
 
-		//window.open('http://www.google.com/','_blank');
-
 		let delegations = prop.dimension_details.delegations
 		console.log("delegations... " + JSON.stringify(delegations))
 		console.log(delegations[0].amount)
 
-		// $.ajax({
-		// 	type: "POST",
-		// 	url: twinUrl + 'dimensions/readEntry',
-		// 	data: json,
-		// 	success: function (result) {
-		// 		var data = result;
-		// 		if ($.type(result) != "object") {
-		// 			console.log("not object")
-		// 			data = JSON.parseJSON(result)
-		// 		}
+		$.ajax({
+			type: "POST",
+			url: twinUrl + 'dimensions/readEntry',
+			data: json,
+			success: function (result) {
+				var data = result;
+				if ($.type(result) != "object") {
+					console.log("not object")
+					data = JSON.parseJSON(result)
+				}
 
-		// 		console.log("repsonse readEntry: " + JSON.stringify(data))
-		// 		console.log("data.Result: " + data.Result);
-		// 	}
-		// })
+				console.log("repsonse readEntry: " + JSON.stringify(data))
+				console.log("data.Result: " + data.Result);
+				window.open(ipfs_url + data.Result, '_blank');
+			}
+		})
 
 	}
 
@@ -829,7 +831,7 @@ class Assets extends Component {
 								this.setState({ delegated_dims: delegatedDims });
 
 								console.log("dataResult get Dimension: \n " + JSON.stringify(dataResult))
-								console.log("dataResult dimensionName: " + dataResult.dimension.dimensionName)
+								console.log("dimensionName: " + dataResult.dimension.dimensionName)
 
 							}.bind(this),
 							complete: function () { },

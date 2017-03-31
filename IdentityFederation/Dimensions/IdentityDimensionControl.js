@@ -12,7 +12,9 @@ var IdentityConfig = require('./IdentityDimensionConfig.json')
 var superAgent = require("superagent");
 //required library for accessing the contract
 var erisC = require('eris-contracts');
-
+//for secp256k1 verification
+var secp256k1 = require('secp256k1')
+//for hex conversion
 var Web3 = require('web3')
 var web3 = new Web3();
 
@@ -138,9 +140,93 @@ var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
         })
     }
     //***********************************************************************************************
+
+
+    this.verify = function SECPVerify(msg, signature, pubKey) {
+        msg = new Buffer(msg, "hex");
+        signature = new Buffer(signature, "hex");
+        pubKey = new Buffer(pubKey, "hex");
+
+        var verified = secp256k1.verify(msg, signature, pubKey)
+        return verified;
+    }
+
+    this.writeAll = function (formdata, callback) {
+        var max = Math.max(formdata.dimension.controllers.length, formdata.dimension.owners.length);
+        max = Math.max(formdata.dimension.delegations.length, max);
+        console.log("\n*****THE MIGHTY WRITEALL*****\n");
+        console.log(JSON.stringify(formdata));
+        console.log("MAX :" + max);
+        var k = 0;
+        var o = 0;
+        var c = 0;
+        var d = 0;
+        var delegateeLog;
+        var total = formdata.dimension.controllers.length + formdata.dimension.owners.length + formdata.dimension.delegations.length;
+        console.log("total calls: "+ total);
+        for (var i = 0; i < max; i++) {
+            if (typeof (formdata.dimension.owners[i]) != 'undefined' && typeof (formdata.dimension.owners[i]) != 'null' && formdata.dimension.owners != "") {
+                connector.SetDimension(String(formdata.dimension.owners[i]), String(formdata.dimension.dimensionName) + ".json", 0, 0, formdata, "", "", function () {
+                    k++;
+                    console.log("Writing to Owner: " + formdata.dimension.owners[o] + " K: " + k);
+                    o++;
+                    if (k == total) { console.log("owner callback ");callback() }
+                })
+            }
+            if (typeof (formdata.dimension.controllers[i]) != 'undefined' && typeof (formdata.dimension.controllers[i]) != 'null' && formdata.dimension.controllers != "") {
+                connector.SetDimension(String(formdata.dimension.controllers[i]), String(formdata.dimension.dimensionName) + ".json", 1, 0, formdata, "", "", function () {
+                    k++;
+                    console.log("Writing to Controller: " + formdata.dimension.controllers[c] + " K: " + k);
+                    c++;
+                    if (k == total) { console.log("controller callback");callback() }
+                })
+            }
+            if (typeof (formdata.dimension.delegations[i]) != 'undefined' && typeof (formdata.dimension.delegations[i]) != 'null' && formdata.dimension.delegations[i] != "" && formdata.dimension.delegations[i].owner != "") {
+                var delegatee = formdata.dimension.delegations[i].delegatee;
+                var accessCategories = formdata.dimension.delegations[i].accessCategories;
+                delegateeLog = formdata;
+                delegateeLog.dimension.pubKey = "";
+                delegateeLog.dimension.coidAddr = "";
+                delegateeLog.dimension.uniqueId = "";
+                delegateeLog.dimension.uniqueID = "";
+                // delegateeLog.dimension.data=[""];
+
+                for (var n = 0; n < delegateeLog.dimension.delegations.length; n++) {
+                    if (delegateeLog.dimension.delegations[n].delegatee != delegatee) {
+                        delegateeLog.dimension.delegations.splice(n, 1);
+                    }
+                }
+                //for(var j=0;j<results.dimension.delegations.length;j++){
+                if (accessCategories == "") {
+                    console.log("setting categories");
+                    delegateeLog.dimension.data = formdata.dimension.data;
+                    // break;
+                }
+                else {
+                    var keys = accessCategories.split(",");
+                    delegateeLog.dimension.data = [""];
+                    for (var j = 0; j < formdata.dimension.data.length; j++) {
+                        if (keys.indexOf(formdata.dimension.data[j].descriptor)) {
+                            delegateeLog.dimension.data.push(formdata.dimension.data[j]);
+                        }
+                    }
+                }
+
+                connector.SetDimension(String(formdata.dimension.delegations[i].delegatee), String(formdata.dimension.dimensionName) + ".json", 2, 0, delegateeLog, "", "", function () {
+                    k++;
+                    console.log("Writing to Delegatee: " + formdata.dimension.delegations[d].delegatee + " K: " + k);
+                    d++;
+                    if (k == total) { callback() }
+                })
+            }
+        }//end for loop
+    }//end writeAll
+
+
+
     //Contract returns, (bool success, bytes32 callerHash, address test)
     this.CreateDimension = function (formdata, callback) {
-
+console.log(formdata)
         //create a json
         var log = {
                 "dimension": {
@@ -154,15 +240,7 @@ var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
                     "uniqueId": "",
                     "owners": [""],
                     "controllers": [""],
-                    "delegations": [
-                        {
-                            "owner": "",
-                            "delegatee": "",
-                            "amount": "",
-                            "dimension":"",
-                            "accessCategories": ""
-                        }
-                    ],
+                    "delegations": [],
                     "data": []
                 }
         }
@@ -209,11 +287,11 @@ console.log("DATA :" + JSON.stringify(data));
 //console.log("DATA WORK PLEASE"+JSON.stringify(d));
 //console.log("length"+d.length);
 //console.log("print 1st entry"+JSON.stringify(d[0]));
+        var msg = formdata.msg;
+        var sig = formdata.sig;
+        var verified = self.verify(msg, sig, formdata.pubKey);
 
-
-//console.log("NOTDATA: " + JSON.stringify(formdata.notDATA))
-
-
+        if(verified){console.log("\n-----VERIFIED-----\n");
         self.contract.CreateDimension(pubKey, uniqueID, typeInput, flag, function (error, result) {
             if (result[0]) {
                 console.log("made it create");
@@ -310,6 +388,7 @@ callback(error, result)
             //callback(error, result);
 
         })//end createDimension
+        }
     }
     //***********************************************************************************************
 
@@ -319,13 +398,16 @@ callback(error, result)
         var caller = formdata.caller;
         var descriptor = formdata.descriptor;
         var ID = formdata.ID;
+        var verified = self.verify(msg, sig, pubKey);
 
+        if(verified){console.log("\n-----VERIFIED-----\n");
         self.contract.RemoveDimension(caller, descriptor, ID, function (error, result) {
             if (result) {
                 connector.deleteDimension(formdata.caller, formdata.descriptor + ".json", 0, function (results) { callback(error, result) })
             }
             else { callback(error, result); }
         })
+        }
     }
 
     //result is boolean success from the contract
@@ -343,7 +425,7 @@ callback(error, result)
         console.log("oldDESCRIPTOR :" + oldDescriptor);
         console.log("newDESCRIPTOR :" + newDescriptor);
 
-        self.contract.changeDescriptor(pubKey, type, ID, oldDescriptor, newDescriptor, function (error, result) {
+        self.contract.changeDescriptor(pubKey, web3.toHex(type), web3.toHex(ID), web3.toHex(oldDescriptor), web3.toHex(newDescriptor), function (error, result) {
             if (result) {
                 connector.GetDimension(formdata.pubKey, formdata.type + ".json", 0, function (results) {
                     for (var i = 0; i < results.dimension.data.length; i++) {
@@ -353,7 +435,8 @@ callback(error, result)
                         }
                     }
                     //send json
-                    connector.SetDimension(formdata.pubKey, formdata.type + ".json", 0, 0, results, "", "", function () { callback(error, result) });
+                    //connector.SetDimension(formdata.pubKey, formdata.type + ".json", 0, 0, results, "", "", function () { callback(error, result) });
+                    self.writeAll(results,function () {callback(error, result)});
                 })
             }
             else { callback(error, result); }
@@ -375,7 +458,7 @@ this.addEntry = function (formdata, callback) {
 
                    console.log("ADD ENTRY ********************  " + JSON.stringify(formdata));
 
-                   var attribute = formdata.data[i].attribute;
+                   var attribute = web3.toHex(formdata.data[i].attribute);
                    var descriptor = formdata.data[i].descriptor;
                    var flag = formdata.data[i].flag;
                    console.log("----------ADD ENTRY--------------");
@@ -391,7 +474,14 @@ this.addEntry = function (formdata, callback) {
                                "flag": flag
                    }*/
 
-                   self.contract.addEntry(pubKey, web3.toHex(type), web3.toHex(ID), web3.toHex(descriptor), web3.fromAscii(attribute, 32), flag, function (error, result) {
+                   var attribute3 = attribute.substr(132) || 0x0;
+                   var attribute2 = attribute.substr(66,66) || 0x0;
+                   var attribute = attribute.substr(0,66);
+                console.log("ATTRIBUTE :" + attribute);
+console.log("ATTRIBUTE2 :" + attribute2);
+console.log("ATTRIBUTE3 :" + attribute3);
+
+                   self.contract.addEntry(pubKey, web3.toHex(type), web3.toHex(ID), web3.toHex(descriptor), attribute, attribute2, attribute3, flag, function (error, result) {
                        if (result) {
                                console.log("\n\nBefore ADD ENTRY LOG: " + JSON.stringify(results) + "\n\n");
                                 var entry = {
@@ -406,14 +496,15 @@ this.addEntry = function (formdata, callback) {
                                //add counter to ensure all entries succeeded b4 write
                                if (k == (formdata.data.length)) {
                                    console.log("AddData Write");
-                                   connector.SetDimension(pubKey, type + ".json", 0, 0, results, "", "", function () { callback(error, result) });
+                                   //connector.SetDimension(pubKey, type + ".json", 0, 0, results, "", "", function () { callback(error, result) });
+                                   self.writeAll(results, function () { callback(error, result) });
                                }
                        }
                        else {
                            callback(error, result);
                            i = formdata.length;
                            //k = formdata.data.length;
-                           console.log("Error occurred while adding entry");
+                           console.log("Error occurred while adding entry " +error);
                        }
                    })//end contract call
                }//end for loop
@@ -436,7 +527,7 @@ this.addEntry = function (formdata, callback) {
         console.log("ID :" + ID);
         console.log("DESCRIPTOR :" + descriptor);
 
-        self.contract.removeEntry(pubKey, type, ID, descriptor, function (error, result) {
+        self.contract.removeEntry(pubKey, web3.toHex(type), web3.toHex(ID), web3.toHex(descriptor), function (error, result) {
             if (result) {
                 connector.GetDimension(formdata.pubKey, formadata.type + ".json", 0, function (results) {
                     console.log("ENTERED RE GDJ" + results);
@@ -444,7 +535,8 @@ this.addEntry = function (formdata, callback) {
                         for (var i = 0; i < results.dimension.data.length; i++) {
                             if (results.dimension.data[i].descriptor == descriptor) {
                                 results.dimension.data.splice(i, 1);
-                                connector.SetDimension(formdata.pubKey, formdata.type + ".json", 0, 0, results, "", "", function () { callback(error, result) });
+                                //connector.SetDimension(formdata.pubKey, formdata.type + ".json", 0, 0, results, "", "", function () { callback(error, result) });
+                                self.writeAll(results,function () {callback(error, result)});
                                 console.log("\n\nLOG: " + JSON.stringify(results) + "\n\n");
                                 break;
                             }
@@ -464,7 +556,7 @@ this.addEntry = function (formdata, callback) {
         var type = formdata.type;
         var ID = formdata.ID;
         var descriptor = formdata.descriptor;
-        var attribute = formdata.attribute;
+        var attribute = web3.toHex(formdata.attribute);
         var flag = formdata.flag;
         console.log("----------UPDATE ENTRY--------------");
         console.log("PUBKEY :" + pubKey);
@@ -472,16 +564,20 @@ this.addEntry = function (formdata, callback) {
         console.log("ID :" + ID);
         console.log("DESCRIPTOR :" + descriptor);
         console.log("ATTRIBUTE :" + attribute);
+        var attribute3 = attribute.substr(132);
+        var attribute2 = attribute.substr(66,66);
+        var attribute = attribute.substr(0,66);
 
-        self.contract.updateEntry(pubKey, type, ID, descriptor, attribute, flag, function (error, result) {
+        self.contract.updateEntry(pubKey, web3.toHex(type), web3.toHex(ID), web3.toHex(descriptor), attribute, attribute2, attribute3 , flag, function (error, result) {
             if (result) {
                 connector.GetDimension(formdata.pubKey, String(formdata.type) + ".json", 0, function (results) {
                     for (var i = 0; i < results.dimension.data.length; i++) {
                         if (results.dimension.data[i].descriptor == descriptor) {
-                            results.dimension.data[i].attribute = attribute;
+                            results.dimension.data[i].attribute = formdata.attribute;
                             if (flag == 2 || flag == "2") { }
                             else { results.dimension.data[i].flag = flag; }
-                            connector.SetDimension(formdata.pubKey, String(formdata.type) + ".json", 0, 0, results, "", "", function () { callback(error, result) });
+                            //connector.SetDimension(pubKey, type + ".json", 0, 0, results, "", "", function () { callback(error, result) });
+                            self.writeAll(results,function () {callback(error, result)});
                             console.log("\n\nUPDATE LOG: " + JSON.stringify(results) + "\n\n");
                             break;
                         }
@@ -496,38 +592,66 @@ this.addEntry = function (formdata, callback) {
     this.readEntry = function (formdata, callback) {
 
         var pubKey = formdata.pubKey;
+        var owners = [""];
         var type = web3.toHex(formdata.dimensionName);
         var ID = web3.toHex(formdata.ID);
         var descriptor = web3.toHex(formdata.descriptor);
+        var msg = formdata.msg;
+        var sig = formdata.sig;
+        //var verified = self.verify(msg, sig, pubKey);
+        if(typeof(formdata.owners)=="string"){
+            owners[0]=formdata.owners;
+        }
+        else{
+            owners = formdata.owners;
+        }
 
+
+        //if(verified){console.log("\n-----VERIFIED-----\n");
         self.contract.readEntry(pubKey, type, ID, descriptor, function (error, result) {
             if (result) {
+                var attribute=result[0]+result[1]+result[2];
+                attribute = web3.toAscii(attribute.replace("/0/g","")).replace(/\u0000/g, '');
+                console.log("\nATTRIBUTE\n" + attribute + " "+ attribute.length);
+                result=[];
+                result=attribute;
                 //consider adding a bool return to readEntry in contract
-                callback(error, result);
-                /*connector.GetDimension(formdata.pubKey, String(formdata.type) + ".json", 0, function (results) {
-                    for(var i=0;i<results.dimension.data.length;i++){
-                        if(results.dimension.data[i].descriptor == formadata.descriptor && results.dimension.data[i].flag == 1){
-                            if(results.dimension.delegations[i].amount == 1){
-                                results.dimension.delegations.splice(i, 1);
-                            }
-                            else{
-                                results.dimension.delegations[i].amount = results.dimension.delegations[i].amount - 1;
-                            }
-                            delegateeLog=results;
-                            delegateeLog.dimension.pubKey="";
-                            delegateeLog.dimension.coidAddr="";
-                            delegateeLog.dimension.uniqueId="";
-                            connector.SetDimension(formdata[i].delegatee, formdata[i].dimension + ".json", 2, 0, delegateeLog, "", "", "");
-                            connector.SetDimension(formdata.pubKey, String(formdata.type) + ".json", 0, 0, results, "", "", function () { callback(error, result) });
+                                connector.GetDimension(owners[0], String(formdata.dimensionName) + ".json", 0, function (results) {
+                    var index = 0;
+                    var keepGoing = true;
+                    for (var i = 0; i < results.dimension.data.length; i++) {
+                        console.log("here1");
+                        if (results.dimension.data[i].descriptor == formdata.descriptor && results.dimension.data[i].flag == 1 && results.dimension.delegations.length > 0 && results.dimension.delegations[0].owner != "") {
+                            console.log("here2");
+                            while (keepGoing) {
+                                console.log("here3");
+                                for (var k = 0; k < results.dimension.delegations.length; k++) {
+                                    var keys = results.dimension.delegations[k].accessCategories.split(",");
+                                    if (results.dimension.delegations[k].expiration <= results.dimension.delegations[index].expiration && results.dimension.delegations[k].delegateee == pubKey && (keys.includes(formadata.descriptor) || results.dimension.delegations.accessCategories == "")) {
+                                        index = k; console.log("here4");
+                                    }
+                                }
+                                if (results.dimension.delegations[index].amount == 0) {
+                                    results.dimension.delegations.splice(index, 1); console.log("here5");
+                                }
+                                else {
+                                    //just subtract remaining amount from the current delegation amount
+                                    results.dimension.delegations[index].amount = results.dimension.delegations[index].amount - 1;
+                                    keepGoing = false; console.log("here6");
+                                    console.log("RW ALL");
+                                    self.writeAll(results, function () { callback(error, result) });
+                                }
+                            }//end while
                         }
-                        callback(error, result);
-                    }
-                })*/
+                    }//end for
+                    callback(error, result)
+                })
             }
             else{
                 callback(error, result);
             }
         })
+        //}
     }
 
     //QUESTION******** SHOULD THIS BE PUBLIC
@@ -545,8 +669,8 @@ this.addEntry = function (formdata, callback) {
     //result is bytes32[100] of public descriptors -- TODO: MUST CONVERT TO STRING!
     this.getPublicDescriptors = function (formdata, callback) {
 
-        var type = formdata.type;
-        var ID = formdata.ID;
+        var type = web3.toHex(formdata.type);
+        var ID = web3.toHex(formdata.ID);
 
         self.contract.getPublicDescriptors(type, ID, function (error, result) {
             callback(error, result);
@@ -555,8 +679,8 @@ this.addEntry = function (formdata, callback) {
     //result is bytes32[100] of private descriptors -- TODO: MUST CONVERT TO STRING!
     this.getPrivateDescriptors = function (formdata, callback) {
 
-        var type = formdata.type;
-        var ID = formdata.ID;
+        var type = web3.toHex(formdata.type);
+        var ID = web3.toHex(formdata.ID);
 
         self.contract.getPrivateDescriptors(type, ID, function (error, result) {
             callback(error, result);
@@ -564,74 +688,6 @@ this.addEntry = function (formdata, callback) {
     }
 
     //result is the bool success
-/*    this.delegate = function (formdata, callback) {
-        console.log("hit delegate")
-        console.log("formdata: \n" + JSON.stringify(formdata))
-        //didnt want to edit the same log
-        var delegateeLog;
-
-        for (var i = 0; i < formdata.length; i++) {
-
-            var owner = formdata[0].owner[0];
-            var delegatee = formdata[i].delegatee;
-            var amount = formdata[i].amount;
-            var dimension = formdata[i].dimension;
-            var timeFrame = formdata[i].timeFrame;
-            var accessCategories = formdata[i].accessCategories;
-            var entry={"owner":owner,"delegatee":delegatee,"amount":amount,"dimension":dimension,"expiration":timeFrame,"accessCategories":accessCategories};
-            console.log("----------Delegate Tokens--------------");
-            console.log("Owner :" + owner);
-            console.log("Delegatee :" + delegatee);
-            console.log("Amount :" + amount);
-            console.log("Dimension :" + dimension);
-            console.log("Time Frame :" + timeFrame);
-            console.log("Access Categories :" + accessCategories);
-
-            self.contract.delegate(owner, delegatee, amount, dimension, timeFrame, accessCategories, function (error, result) {
-                if (result) {
-                    connector.GetDimension(formdata.owner, formdata.dimension + ".json", 0, function (results) {
-                        results.dimension.delegations.push(entry);
-                        connector.SetDimension(formdata[i].owner, formdata[i].dimension + ".json", 0, 0, results, "", "", "");
-
-                        delegateeLog=results;
-                        delegateeLog.dimension.pubKey="";
-                        delegateeLog.dimension.coidAddr="";
-                        delegateeLog.dimension.uniqueId="";
-                        delegateeLog.dimension.data=[""];
-
-                        //for(var j=0;j<results.dimension.delegations.length;j++){
-                            if(accessCategories==""){
-                                delegateeLog.dimension.data=results.dimension.data;
-                               // break;
-                            }
-                            else{
-                                var keys = split(accessCategories);
-                                for(var k=0;k<results.dimension.data.length;k++){
-                                    if(keys.indexOf(results.dimension.data[k].descriptor)){
-                                        delegateeLog.dimension.data.push(results.dimension.data[k]);
-                                    }
-                                }
-                            }
-                        //}
-
-                        connector.SetDimension(formdata[i].delegatee, formdata[i].dimension + ".json", 2, 0, delegateeLog, "", "", "");
-                        console.log("\n\nDELEGATE LOG: " + JSON.stringify(results) + "\n\n");
-
-                        if (i == (formdata.length - 1)) {
-                            callback(error, result);
-                        }
-                    })
-                }
-                else {
-                    callback(error, result);
-                    i = formdata.length;
-                    console.log("Error occurred while delegating");
-                }
-            })
-        }//end for loop
-        //callback(error, result);
-    }*/
-
     this.delegate = function (formdata, callback) {
         console.log("hit delegate")
         console.log("formdata: \n" + JSON.stringify(formdata))
@@ -677,7 +733,7 @@ console.log("FDL: "+ formdata.length);
                                 results.dimension.delegations.push(entry);
                                 //connector.SetDimension(formdata[i].owner, formdata[i].dimension + ".json", 0, 0, results, "", "", "");
                                 j++;
-                                delegateeLog=results;
+                                var delegateeLog = JSON.parse(JSON.stringify(results));//to get a copy of object, not a reference of object
                                 delegateeLog.dimension.pubKey="";
                                 delegateeLog.dimension.coidAddr="";
                                 delegateeLog.dimension.uniqueId="";
@@ -710,8 +766,8 @@ console.log("FDL: "+ formdata.length);
                                 console.log("\n\nDELEGATE LOG: " + JSON.stringify(results) + "\n\n");
 
                                 if (j == (formdata.length)) {
-
-                                        console.log("about to write JSON");
+                                    self.writeAll(results,function () {callback(error, result)});
+                                /*      console.log("about to write JSON");
                                     for(i=0;i<formdata.length;i++){
                                         connector.SetDimension(String(formdata[i].owner), formdata[i].dimension + ".json", 0, 0, results, "", "", function () {
                                             l++;
@@ -723,7 +779,7 @@ console.log("FDL: "+ formdata.length);
                                                 console.log("Delegatee "+l);
                                             if(l==formdata.length*2){console.log("Delegatee");callback(error, result)}
                                         });
-                                    }
+                                    }*/
                                 }sync = false;
 
                         }
@@ -843,12 +899,13 @@ console.log("FDL: "+ formdata.length);
                     }//end else
 
                     console.log("\n\nREVOKE LOG: " + JSON.stringify(log) + "\n\n");
-                    connector.SetDimension(formdata.controller, String(formdata.dimension) + ".json", 0, 0, log, "", "", function () { callback(error, result) });
+                    self.writeAll(results,function () {callback(error, result)});
+                   /* connector.SetDimension(formdata.controller, String(formdata.dimension) + ".json", 0, 0, log, "", "", function () { callback(error, result) });
                     delegateeLog=log;
                     delegateeLog.dimension.pubKey="";
                     delegateeLog.dimension.coidAddr="";
                     delegateeLog.dimension.uniqueId="";
-                    connector.SetDimension(formdata[i].delegatee, formdata[i].dimension + ".json", 2, 0, delegateeLog, "", "", "");
+                    connector.SetDimension(formdata[i].delegatee, formdata[i].dimension + ".json", 2, 0, delegateeLog, "", "", "");*/
                 })//end get json
             }
             else { callback(error, result); }
@@ -1002,4 +1059,4 @@ for (let endpoint in IdentityConfig) {
 app.listen(8001, function () {
     console.log("Connected to contract http://10.101.114.231:1337/rpc");
     console.log("Listening on port 8001");
-})
+});

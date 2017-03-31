@@ -122,10 +122,10 @@ class Asset extends React.Component {
         let asset_id = this.props.asset.asset_id
         console.log("assetID.. " + asset_id)
         let e = document.getElementById("OWNERSHIP");
-        if (asset_id == "MyCOID")
-        { e.style.display = 'none'; }
-        if (asset_id != "MyCOID")
-        { e.style.display = 'block'; }
+        // if (asset_id == "MyCOID")
+        // { e.style.display = 'none'; }
+        // if (asset_id != "MyCOID")
+        // { e.style.display = 'block'; }
     }
     //*****************************************************************************
     //Passed as a prop to DimensionAttributeForm
@@ -243,29 +243,27 @@ class Asset extends React.Component {
     requestUpdateController(e) {
 
         e.preventDefault();
-
         let asset = this.state.asset
-
         var json = {};
-
-        this.prepareControlTokenDistribution();
-
+        //*********************************************
         let filename = asset.asset_id + ".json";
         json.filename = filename;
         json.pubKey = localStorage.getItem("pubKey");
         json.address = asset.asset_name.coidAddr
         //*********************************************
-        var signature = this.getSignature(json);
-        console.log("sig: " + signature);
-        console.log(typeof (signature));
-        // json.sig = signature;
-        // json.msg = msg_hash_buffer.toString("hex");
-        //*********************************************
         //NEW CONTROLLERS AND THEIR TOKENS
+        this.prepareControlTokenDistribution();
         json.controllers = this.state.control_id;
         json.token_quantity = this.state.control_token_quantity;
-
-        console.log("JSON!! \n" + JSON.stringify(json));
+        //*********************************************
+        var signature = this.getSignature(json);
+        //*********************************************
+        var msg_hash = keccak_256(JSON.stringify(json));
+        var msg_hash_buffer = new Buffer(msg_hash, "hex");
+        json.msg = msg_hash_buffer.toString("hex");
+        json.sig = signature;
+        //*********************************************
+        console.log("update controller JSON!! \n" + JSON.stringify(json));
 
         $.ajax({
             type: "POST",
@@ -312,21 +310,29 @@ class Asset extends React.Component {
         }
     }
     requestUpdateOwners(e) {
+
         e.preventDefault()
-
         let asset = this.state.asset
-
         var json = {}
-
-        this.prepareOwnerTokenDistribution();
-
+        //*********************************************
         let filename = asset.asset_id + ".json";
         json.filename = filename;
         json.pubKey = localStorage.getItem("pubKey");
         json.address = asset.asset_name.coidAddr
-
+        //*********************************************
+        //NEW OWNERS AND THEIR TOKENS
+        this.prepareOwnerTokenDistribution();
         json.owners = this.state.owner_id;
         json.token_quantity = this.state.owner_token_quantity;
+        //*********************************************
+        var signature = this.getSignature(json);
+        //*********************************************
+        var msg_hash = keccak_256(JSON.stringify(json));
+        var msg_hash_buffer = new Buffer(msg_hash, "hex");
+        json.sig = signature;
+        json.msg = msg_hash_buffer.toString("hex");
+        //*********************************************
+        console.log("update owner JSON!! \n" + JSON.stringify(json));
 
         $.ajax({
             type: "POST",
@@ -349,23 +355,29 @@ class Asset extends React.Component {
 
     requestUpdateRecovery(e) {
 
-        let asset = this.state.asset
-
         e.preventDefault();
-
+        let asset = this.state.asset;
         var json = {};
-
+        //*********************************************
         let filename = asset.asset_id + ".json";
         json.filename = filename;
         json.pubKey = localStorage.getItem("pubKey");
         json.address = asset.asset_name.coidAddr;
         //*********************************************
         let recoveryCondition = $("input[name^='recoveryCondition']").val();
-        if (recoveryCondition) { json.recoveryCondition = recoveryCondition; }
-        //*********************************************
+        if (recoveryCondition) {
+            json.recoveryCondition = recoveryCondition;
+        }
         json.recoveryID = this.state.recovery_list;
-
+        //*********************************************
         var signature = this.getSignature(json);
+        //*********************************************
+        var msg_hash = keccak_256(JSON.stringify(json));
+        var msg_hash_buffer = new Buffer(msg_hash, "hex");
+        json.msg = msg_hash_buffer.toString("hex");
+        json.sig = signature;
+        //*********************************************
+        console.log("update recov JSON!! \n" + JSON.stringify(json));
 
         $.ajax({
             type: "POST",
@@ -393,18 +405,14 @@ class Asset extends React.Component {
     // START OFFICAL ID FUNCTIONS:
 
     requestUpdateOfficalIDs(e) {
+
         e.preventDefault()
-
         let asset = this.state.asset;
-
         var json = {}
-
+        //*********************************************
         let filename = asset.asset_id + ".json"
         json.filename = filename
-
-        json.ownerIdList = asset.asset_name.ownerIdList;
-        json.controlIdList = asset.asset_name.controlIdList;
-
+        //*********************************************
         console.log("this.state.fileAttrs.. " + JSON.stringify(this.state.file_attrs))
         console.log("this.state.tmpfile.. " + this.state.tmpFile)
         console.log("this.state.inputs.. " + this.state.inputs)
@@ -413,10 +421,32 @@ class Asset extends React.Component {
         console.log("prepared attrs.. " + attrsArray)
         console.log("asset: " + this.props.asset.asset_id)
         console.log("coidAddr: " + this.props.asset.asset_name.coidAddr)
+        //*********************************************
+        var signature = this.getSignature(json);
+        //*********************************************
+        var msg_hash = keccak_256(JSON.stringify(json));
+        var msg_hash_buffer = new Buffer(msg_hash, "hex");
+        json.msg = msg_hash_buffer.toString("hex");
+        json.sig = signature;
 
+        /*
+            Request needs to go to gatekeeper to submit officialID proposal
 
+        $.ajax({
+            type: "POST",
+            url: twinUrl + 'gatekeeper/addOfficialIDs',
+            data: json,
+            success: function (result) {
+                var data = result;
+                if ($.type(result) != "object") {
+                    data = JSON.parseJSON(result)
+                }
+                console.log("result: " + JSON.stringify(data))
+            }.bind(this),
+        })
+
+        */
     }
-
     // END OFFICIAL ID FUNCTIONS:
     //**********************************************************************
     //**********************************************************************
@@ -426,17 +456,13 @@ class Asset extends React.Component {
         // $("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
     }
 
-
     render() {
 
         console.log("asset: " + JSON.stringify(this.state.asset))
-
         console.log("file_Attrs.. " + JSON.stringify(this.state.file_attrs))
-
         var style = {
             fontSize: '12.5px'
         }
-
         var inputAttrs = {
             addKeys: [13, 188],	// Enter and comma
             inputProps: {
@@ -447,12 +473,6 @@ class Asset extends React.Component {
 
         var prop = this.props.asset.asset_name;
 
-
-        // if (this.props.asset.asset_id != "MyCOID") {
-        //     document.getElementById('OWNERSHIP').display = 'block';
-        // }
-        //console.log("asset form state: " + JSON.stringify(this.state))
-        //console.log("asset form props: " + JSON.stringify(this.props))
         return (
             <div id="SubmitContainer">
                 <b>{this.props.asset.asset_id}</b><br />

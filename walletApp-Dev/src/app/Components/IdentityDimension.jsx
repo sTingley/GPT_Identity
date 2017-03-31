@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import TagsInput from 'react-tagsinput';
-import UploadIpfsFile from './UploadIpfsFile.jsx'
+import UploadIpfsFile from './UploadIpfsFile.jsx';
+var secp256k1 = require('secp256k1');
 var keccak_256 = require('js-sha3').keccak_256;
 
 class DimensionDelegationForm extends React.Component {
@@ -577,6 +578,22 @@ class IdentityDimensions extends Component {
         this.setState({ showModal: false });
     }
     //*****************************************************************************
+    //takes in a msg/json and returns a signature (needed for requests)
+    getSignature(msg) {
+        console.log("creating signature, signing msg: \n" + JSON.stringify(msg))
+        var privKey = localStorage.getItem("privKey")
+        var privKey1 = new Buffer(privKey, "hex");
+        var msg_hash = keccak_256(JSON.stringify(msg));
+        var msg_hash_buffer = new Buffer(msg_hash, "hex")
+        let signature = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1))
+        signature = JSON.parse(signature).signature;
+        signature = JSON.stringify(signature);
+        signature = JSON.parse(signature).data;
+        signature = new Buffer(signature, "hex");
+        signature = signature.toString("hex");
+        return signature
+    }
+    //*****************************************************************************
     // Get DT Dimension Data. Call this in componentWillMount
     getDimensions() {
 
@@ -807,16 +824,14 @@ class IdentityDimensions extends Component {
     //*****************************************************************************
     //called onClick of 'Create Dimension' button
     createDimension(e) {
-        e.preventDefault();
 
+        e.preventDefault();
         var json = {};
         //*************************************************************************
         let dimensionName = $("input[name^='dimensionName']").val();
         if (dimensionName) { json.dimensionName = dimensionName }
         json.pubKey = localStorage.getItem("pubKey");
-        json.address = "";
-        json.flag = 0;
-        json.ID = 0;
+        json.address = "", json.flag = 0, json.ID = 0;
         //*************************************************************************
         // GET PROPER DATA FROM SELECTED ASSET (we will pass owners to prepareDelegations)
         let selected_asset = $("#assetSelect option:selected").text();
@@ -835,9 +850,13 @@ class IdentityDimensions extends Component {
         let attributes = this.prepareAttributes();
         json.data = attributes;
         //*************************************************************************
-
+        var signature = this.getSignature(json);
+        var msg_hash = keccak_256(JSON.stringify(json));
+        var msg_hash_buffer = new Buffer(msg_hash, "hex");
+        json.msg = msg_hash_buffer.toString("hex");
+        json.sig = signature;
+        //*************************************************************************
         console.log("JSON: " + JSON.stringify(json));
-
 
         $.ajax({
             type: "POST",
@@ -866,6 +885,7 @@ class IdentityDimensions extends Component {
             }.bind(this),
             complete: function () {
                 // do something
+                //ST: HERE WE COULD WRITE DIMENSIONS INTO COID JSON?
             },
         })
 

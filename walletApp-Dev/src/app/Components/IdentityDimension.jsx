@@ -20,7 +20,7 @@ class DimensionDelegationForm extends React.Component {
                     <table className="table table-striped table-hover" style={style}>
                         <tbody>
                             <tr>
-                                <th><b>Public Key of Delegatee</b></th>
+                                <th><b>Delegatee</b></th>
                                 <th><b>Control Token Quantity</b></th>
                             </tr>
                             <tr>
@@ -45,7 +45,7 @@ class DimensionAttributeForm extends React.Component {
         return (
             <div className="form-group col-md-12">
                 <div className="col-md-10">
-                    <label htmlFor="unique_id_attrs"> Dimension Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research". </label>
+                    <label htmlFor="unique_id_attrs"> Persona Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research". </label>
                     <input name={'label-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Descriptor" />
                 </div>
                 <div className="col-md-2">
@@ -913,13 +913,13 @@ class IdentityDimensions extends Component {
         return (
             <div id="IDENTITYDIMENSIONS_MODAL">
 
-                <h1>IDENTITY DIMENSIONS</h1>
+                <h1>Personas</h1>
                 <h5><i>Personal Data Repositories</i></h5>
                 <hr />
                 <div className="modal-header">
                     <ul className="nav nav-tabs" role="tablist">
-                        <li role="presentation" className="active"><a href="#dimensions" role="tab" data-toggle="tab">Dimensions</a></li>
-                        <li role="presentation"><a href="#addDimension" role="tab" data-toggle="tab">Create new dimension</a></li>
+                        <li role="presentation" className="active"><a href="#dimensions" role="tab" data-toggle="tab">Persona</a></li>
+                        <li role="presentation"><a href="#addDimension" role="tab" data-toggle="tab">Create new persona</a></li>
                     </ul>
                 </div>
 
@@ -930,7 +930,7 @@ class IdentityDimensions extends Component {
                         <div className="tabpanel" role="tabpanel" className="tab-pane active" id="dimensions"><br />
 
                             <div id="ownedDimensions">
-                                <h5><b>My Owned Dimensions</b></h5> <hr />
+                                <h5><b>My Personas</b></h5> <hr />
                                 <table style={table} className="table table-striped center">
                                     <tbody>
                                         {(() => {
@@ -944,7 +944,7 @@ class IdentityDimensions extends Component {
                                                         </tr>
                                                     );
                                                 });
-                                            } else { return (<tr><td><p>No owned identity dimensions.</p></td></tr>) }
+                                            } else { return (<tr><td><p>No owned personas.</p></td></tr>) }
                                         })(this)}
                                     </tbody>
                                 </table>
@@ -952,7 +952,7 @@ class IdentityDimensions extends Component {
                             </div><br />
 
                             <div id="controlledDimensions">
-                                <h5><b>My Controlled Dimensions</b></h5> <hr />
+                                <h5><b>My Controlled Personas</b></h5> <hr />
                                 <table style={table} className="table table-striped center">
                                     <tbody>
                                         {(() => {
@@ -966,7 +966,7 @@ class IdentityDimensions extends Component {
                                                         </tr>
                                                     );
                                                 });
-                                            } else { return (<tr><td><p>No controlled identity dimensions.</p></td></tr>) }
+                                            } else { return (<tr><td><p>No controlled personas.</p></td></tr>) }
                                         })(this)}
                                     </tbody>
                                 </table>
@@ -1008,7 +1008,7 @@ class IdentityDimensions extends Component {
                             <div id="SubmitContainer">
                                 <form method="POST" id="register" role="form">
                                     <div className="form-group">
-                                        <label htmlFor="dimensionName">Dimension name:</label>
+                                        <label htmlFor="dimensionName">Persona name:</label>
                                         <input name="dimensionName" className="form-control col-md-4" type="text" placeholder="Dimension Name" />
                                     </div>
                                     <div className="form-group">
@@ -1023,7 +1023,7 @@ class IdentityDimensions extends Component {
                                         </div>
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="control_dist">Enter Delegations and their delegated control token(s).</label>
+                                        <label htmlFor="control_dist">Enter Delegations and their delegated token(s).</label>
                                         {this.state.delegations.map(input => <DimensionDelegationForm max="10" key={input} labelref={input} />)}
                                     </div>
                                     <div className="form-group">
@@ -1034,7 +1034,7 @@ class IdentityDimensions extends Component {
                                         </div>
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="control_dist">Enter dimension controllers. These controllers are not COID controllers.</label>
+                                        <label htmlFor="control_dist">Enter Persona Controllers. These controllers can be but do not have to be your Core Identity controllers.</label>
                                         <TagsInput {...inputAttrs} value={this.state.control_list} onChange={(e) => { this.onFieldChange("control_list", e) }} />
                                     </div>
 

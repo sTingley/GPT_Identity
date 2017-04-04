@@ -215,8 +215,8 @@ class ControlTokenDistributionForm extends React.Component {
 					<table className="table table-striped table-hover" style={style}>
 						<tbody>
 							<tr>
-								<th><b>Public Key of Controller</b></th>
-								<th><b>Control Token Quantity</b></th>
+								<th><b>Controller</b></th>
+								<th><b>Token Quantity</b></th>
 							</tr>
 							<tr>
 								<td><input name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Public Key of Controller" /></td>
@@ -261,8 +261,8 @@ class OwnerTokenDistributionForm extends React.Component {
 					<table className="table table-striped table-hover" style={style}>
 						<tbody>
 							<tr>
-								<th><b>Public Key of Owner</b></th>
-								<th><b>Ownership Token Quantity</b></th>
+								<th><b>Owner</b></th>
+								<th><b>Token Quantity</b></th>
 							</tr>
 							<tr>
 								<td><input name={'label2-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Public Key of Owner" /></td>
@@ -700,7 +700,7 @@ class MyGatekeeper extends React.Component {
 		}
 		return (
 			<div id="CoreIdentityContainer">
-				<h1>Non Human Identity Submission Form</h1>
+				<h1>Create Asset or Device Identity</h1>
 				<form method="POST" id="register" role="form">
 					<div className="form-group">
 						<label htmlFor="unique_id">Enter Unique ID Attributes</label>

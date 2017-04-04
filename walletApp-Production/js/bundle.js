@@ -47414,11 +47414,8 @@
 			var _this2 = _possibleConstructorReturn(this, (UniqueIDAttributesForm.__proto__ || Object.getPrototypeOf(UniqueIDAttributesForm)).call(this, props));
 	
 			_this2.state = {
-				file_attrs: [],
-				//inputs: ['input-0'],
 				tmpFile: '',
-				showModal: false,
-				pubKey: localStorage.getItem("pubKey")
+				showModal: false
 			};
 	
 			return _this2;
@@ -47476,27 +47473,13 @@
 		function TokenDistributionForm(props) {
 			_classCallCheck(this, TokenDistributionForm);
 	
-			var _this3 = _possibleConstructorReturn(this, (TokenDistributionForm.__proto__ || Object.getPrototypeOf(TokenDistributionForm)).call(this, props));
-	
-			_this3.state = {
-				controltoken_quantity: [],
-				controltoken_list: [],
-	
-				showModal: false
-			};
-			_this3.maxUniqAttr = 10;
-			//this.onFieldChange = this.onFieldChange.bind(this);
-			//this.handleHideModal = this.handleHideModal.bind(this);
-			return _this3;
+			return _possibleConstructorReturn(this, (TokenDistributionForm.__proto__ || Object.getPrototypeOf(TokenDistributionForm)).call(this, props));
+			// this.state = {
+			// 	controltoken_quantity: [],
+			// 	controltoken_list: [],
+			// 	showModal: false
+			// };
 		}
-		// handleShowModal(e){
-		//     this.setState({showModal: true, tmpFile: $(e.target).attr('data-id')});
-		// }
-	
-		// handleHideModal(){
-		//     this.setState({showModal: false});
-		// }
-	
 	
 		_createClass(TokenDistributionForm, [{
 			key: 'render',
@@ -47580,7 +47563,7 @@
 				owner_id: [],
 				control_id: [],
 				recovery_id: [],
-				recoveryCondition: [],
+				//recoveryCondition: [],
 				isHuman: [],
 				owner_token_id: [],
 				owner_token_desc: [],
@@ -47668,7 +47651,8 @@
 		}, {
 			key: 'prepareJsonToSubmit',
 			value: function prepareJsonToSubmit() {
-				console.log("prepareJSONToSubmit..");
+	
+				console.log("inside prepareJSONToSubmit..");
 				this.prepareControlTokenDistribution();
 	
 				console.log("before we call createHashAttribute on this.state.file_attrs..\n" + JSON.stringify(this.state.file_attrs));
@@ -47677,9 +47661,7 @@
 				var inputObj = {
 					"pubKey": this.refs.pubKey.value,
 					//"sig": this.refs.signature.value,
-	
 					//"msg": this.refs.message.value,
-					//"name": this.refs.nameReg.value,		no longer standalone part of JSON object (it is part of unique attributes)
 	
 					"uniqueId": this.createHashAttribute(this.state.file_attrs),
 					"uniqueIdAttributes": this.prepareUniqueIdAttrs(),
@@ -47703,7 +47685,7 @@
 	
 					//pubkeys used for recovery in the event COID is lost or stolen			
 					"identityRecoveryIdList": this.valueIntoHash(this.state.recovery_id),
-					"recoveryCondition": this.state.recoveryCondition,
+					"recoveryCondition": $("input[name^='recoveryCondition']").val(),
 					"yesVotesRequiredToPass": 2, //needs to be taken out and hardcoded in app
 	
 					"isHuman": true,
@@ -47857,32 +47839,51 @@
 				json.sig = signature1;
 				json.msg = msg_hash_buffer.toString("hex");
 	
-				console.log(json);
+				var COID_controllers = this.state.control_id;
+				console.log("coid controllers... " + COID_controllers + "\n length: " + COID_controllers.length);
+	
+				console.log("requestCOID json: " + JSON.stringify(json));
 				$.ajax({
 					url: twinUrl + 'requestCOID',
 					type: 'POST',
 					data: json,
-					success: function success(res) {
+					success: function (res) {
 						console.log(JSON.stringify(json));
 						var sendMe = {};
 						sendMe.flag = 0; //owned core identity
-						sendMe.fileName = "MyCOID.json"; //
+						sendMe.fileName = "MyCOID.json";
+						sendMe.pubKey = (0, _jsSha.keccak_256)(localStorage.getItem("pubKey"));
 						sendMe.updateFlag = 0; //new identity
 						sendMe.data = json;
-						sendMe.pubKey = (0, _jsSha.keccak_256)(localStorage.getItem("pubKey"));
 	
 						$.ajax({
 							url: twinUrl + 'setAsset',
 							type: 'POST',
 							data: sendMe,
-							success: function success(res) {
+							success: function (res) {
 								console.log("response from setAsset: " + res);
-							}
+							}.bind(this)
 						});
-					},
-					complete: function complete() {
-						// do something
-					}
+					}.bind(this),
+					complete: function () {
+						var sendMe = {};
+						sendMe.flag = 1; //controlled core identity
+						sendMe.fileName = "MyCOID.json"; //
+						sendMe.updateFlag = 0; //new identity
+						sendMe.data = json;
+						for (var i = 0; i < COID_controllers.length; i++) {
+							console.log("setting asset for controller, " + COID_controllers[i]);
+							sendMe.pubKey = (0, _jsSha.keccak_256)(COID_controllers[i]);
+							$.ajax({
+								url: twinUrl + 'setAsset',
+								type: 'POST',
+								data: sendMe,
+								success: function success(res) {
+									console.log("response from setAsset: " + res);
+								}
+							});
+						}
+					}.bind(this)
 				});
 			}
 		}, {
@@ -48049,7 +48050,7 @@
 							{ className: 'form-group' },
 							_react2.default.createElement(
 								'label',
-								{ htmlFor: 'recovery_id' },
+								null,
 								'Recovery IDs (public keys of individuals who will attest to lost/stolen identity)'
 							),
 							_react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs, { value: this.state.recovery_id, onChange: function onChange(e) {
@@ -48061,12 +48062,11 @@
 							{ className: 'form-group' },
 							_react2.default.createElement(
 								'label',
-								{ htmlFor: 'recovery_id' },
+								null,
 								'Recovery Condition (# of digital signatures of recovery ID owners needed to recover identity)'
 							),
-							_react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs, { value: this.state.recoveryCondition, onChange: function onChange(e) {
-									_this5.onFieldChange("recoveryCondition", e);
-								} }))
+							_react2.default.createElement('input', { name: 'recoveryCondition', className: 'form-control col-md-4', type: 'text', placeholder: 'Label' }),
+							'/>'
 						),
 						_react2.default.createElement(
 							'div',
@@ -51010,6 +51010,9 @@
 				var descriptor = prop.dimension_details.data[value].descriptor;
 				console.log("descriptor: " + JSON.stringify(descriptor));
 	
+				var owners = prop.dimension_details.owners;
+				json.owners = owners;
+	
 				var pubKey = keccak_256(localStorage.getItem("pubKey"));
 				json.pubKey = pubKey;
 				json.dimensionName = dimensionName;
@@ -51021,27 +51024,26 @@
 	
 				var ipfs_url = "http://10.101.114.231:8080/ipfs/";
 	
-				//window.open('http://www.google.com/','_blank');
-	
 				var delegations = prop.dimension_details.delegations;
 				console.log("delegations... " + JSON.stringify(delegations));
 				console.log(delegations[0].amount);
 	
-				// $.ajax({
-				// 	type: "POST",
-				// 	url: twinUrl + 'dimensions/readEntry',
-				// 	data: json,
-				// 	success: function (result) {
-				// 		var data = result;
-				// 		if ($.type(result) != "object") {
-				// 			console.log("not object")
-				// 			data = JSON.parseJSON(result)
-				// 		}
+				$.ajax({
+					type: "POST",
+					url: twinUrl + 'dimensions/readEntry',
+					data: json,
+					success: function success(result) {
+						var data = result;
+						if ($.type(result) != "object") {
+							console.log("not object");
+							data = JSON.parseJSON(result);
+						}
 	
-				// 		console.log("repsonse readEntry: " + JSON.stringify(data))
-				// 		console.log("data.Result: " + data.Result);
-				// 	}
-				// })
+						console.log("repsonse readEntry: " + JSON.stringify(data));
+						console.log("data.Result: " + data.Result);
+						window.open(ipfs_url + data.Result, '_blank');
+					}
+				});
 			}
 		}, {
 			key: 'render',
@@ -51313,7 +51315,7 @@
 				showDetails1: false,
 				wallet: { pubKey: localStorage.getItem("pubKey") },
 				own_assets: [],
-				controlled_assets: [{ asset_id: 161718, asset_name: 'Parents House' }, { asset_id: 192021, asset_name: 'My Car' }],
+				controlled_assets: [],
 				delegated_assets: [],
 				delegated_dims: [],
 				active_asset: {},
@@ -51432,16 +51434,16 @@
 										}
 										this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
 	
-										// assetData[assetData.length] = {
-										// 	asset_id: dataResult.assetID,
-										// 	asset_uniqueId: dataResult.uniqueId,
-										// 	asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
-										// 	asset_coidAddr: dataResult.coidAddr,
-										// 	asset_gatekeeperAddr: dataResult.gatekeeperAddr,
-										// 	asset_owners: dataResult.ownerIdList,
-										// 	asset_controllers: dataResult.controlIdList
-										// }
-										// localStorage.setItem("owned_assets", JSON.stringify(assetData))
+										assetData[assetData.length] = {
+											asset_id: dataResult.assetID,
+											asset_uniqueId: dataResult.uniqueId,
+											asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
+											asset_coidAddr: dataResult.coidAddr,
+											asset_gatekeeperAddr: dataResult.gatekeeperAddr,
+											asset_owners: dataResult.ownerIdList,
+											asset_controllers: dataResult.controlIdList
+										};
+										localStorage.setItem("controlled_assets", JSON.stringify(assetData));
 									}.bind(this),
 									complete: function complete() {}
 								});
@@ -51537,9 +51539,8 @@
 										};
 										this.setState({ delegated_dims: delegatedDims });
 	
-										//this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
 										console.log("dataResult get Dimension: \n " + JSON.stringify(dataResult));
-										console.log("dataResult dimensionName: " + dataResult.dimension.dimensionName);
+										console.log("dimensionName: " + dataResult.dimension.dimensionName);
 									}.bind(this),
 									complete: function complete() {}
 								});
@@ -51715,7 +51716,7 @@
 												return _this6.assetHandler(asset);
 											} },
 										_react2.default.createElement('span', { className: 'glyphicon glyphicon-link' }),
-										asset.asset_name
+										asset.asset_id
 									);
 								})
 							)
@@ -70010,8 +70011,6 @@
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -70244,12 +70243,10 @@
 	            var asset_id = this.props.asset.asset_id;
 	            console.log("assetID.. " + asset_id);
 	            var e = document.getElementById("OWNERSHIP");
-	            if (asset_id == "MyCOID") {
-	                e.style.display = 'none';
-	            }
-	            if (asset_id != "MyCOID") {
-	                e.style.display = 'block';
-	            }
+	            // if (asset_id == "MyCOID")
+	            // { e.style.display = 'none'; }
+	            // if (asset_id != "MyCOID")
+	            // { e.style.display = 'block'; }
 	        }
 	        //*****************************************************************************
 	        //Passed as a prop to DimensionAttributeForm
@@ -70268,11 +70265,12 @@
 	            this.setState({ showModal: false });
 	        }
 	        //*****************************************************************************
-	        //takes in a msg and returns a signature (needed for requests)
+	        //takes in a msg/json and returns a signature (needed for requests)
 	
 	    }, {
 	        key: 'getSignature',
 	        value: function getSignature(msg) {
+	            console.log("creating signature, signing msg: \n" + JSON.stringify(msg));
 	            var privKey = localStorage.getItem("privKey");
 	            var privKey1 = new Buffer(privKey, "hex");
 	            var msg_hash = keccak_256(JSON.stringify(msg));
@@ -70395,28 +70393,29 @@
 	    }, {
 	        key: 'requestUpdateController',
 	        value: function requestUpdateController(e) {
+	
 	            e.preventDefault();
-	
+	            var asset = this.state.asset;
 	            var json = {};
-	
-	            this.prepareControlTokenDistribution();
-	
-	            var filename = this.state.asset.asset_id + ".json";
+	            //*********************************************
+	            var filename = asset.asset_id + ".json";
 	            json.filename = filename;
 	            json.pubKey = localStorage.getItem("pubKey");
-	            json.address = localStorage.getItem("coidAddr");
-	            //*********************************************
-	            var signature = this.getSignature(json);
-	            console.log("sig: " + signature);
-	            console.log(typeof signature === 'undefined' ? 'undefined' : _typeof(signature));
-	            // json.sig = signature;
-	            // json.msg = msg_hash_buffer.toString("hex");
+	            json.address = asset.asset_name.coidAddr;
 	            //*********************************************
 	            //NEW CONTROLLERS AND THEIR TOKENS
+	            this.prepareControlTokenDistribution();
 	            json.controllers = this.state.control_id;
 	            json.token_quantity = this.state.control_token_quantity;
-	
-	            console.log("JSON!! \n" + JSON.stringify(json));
+	            //*********************************************
+	            var signature = this.getSignature(json);
+	            //*********************************************
+	            var msg_hash = keccak_256(JSON.stringify(json));
+	            var msg_hash_buffer = new Buffer(msg_hash, "hex");
+	            json.msg = msg_hash_buffer.toString("hex");
+	            json.sig = signature;
+	            //*********************************************
+	            console.log("update controller JSON!! \n" + JSON.stringify(json));
 	
 	            $.ajax({
 	                type: "POST",
@@ -70469,18 +70468,42 @@
 	    }, {
 	        key: 'requestUpdateOwners',
 	        value: function requestUpdateOwners(e) {
+	
 	            e.preventDefault();
-	
-	            var asset = this.state.asset.asset_name;
-	
+	            var asset = this.state.asset;
 	            var json = {};
+	            //*********************************************
+	            var filename = asset.asset_id + ".json";
+	            json.filename = filename;
+	            json.pubKey = localStorage.getItem("pubKey");
+	            json.address = asset.asset_name.coidAddr;
+	            //*********************************************
+	            //NEW OWNERS AND THEIR TOKENS
+	            this.prepareOwnerTokenDistribution();
+	            json.owners = this.state.owner_id;
+	            json.token_quantity = this.state.owner_token_quantity;
+	            //*********************************************
+	            var signature = this.getSignature(json);
+	            //*********************************************
+	            var msg_hash = keccak_256(JSON.stringify(json));
+	            var msg_hash_buffer = new Buffer(msg_hash, "hex");
+	            json.sig = signature;
+	            json.msg = msg_hash_buffer.toString("hex");
+	            //*********************************************
+	            console.log("update owner JSON!! \n" + JSON.stringify(json));
 	
-	            json.ownerIdList = asset.ownerIdList;
-	            json.controlIdList = asset.controlIdList;
-	
-	            console.log("got request updateOwners..");
-	            var owners = this.prepareOwnerTokenDistribution();
-	            console.log("prepare owners.. " + owners);
+	            $.ajax({
+	                type: "POST",
+	                url: twinUrl + 'MyCOID/addOwner',
+	                data: json,
+	                success: function (result) {
+	                    var data = result;
+	                    if ($.type(result) != "object") {
+	                        data = JSON.parseJSON(result);
+	                    }
+	                    console.log("result: " + JSON.stringify(data));
+	                }.bind(this)
+	            });
 	        }
 	        // END OWNER UPDATE FUNCTIONS:
 	        //**********************************************************************
@@ -70492,22 +70515,28 @@
 	        value: function requestUpdateRecovery(e) {
 	
 	            e.preventDefault();
-	
+	            var asset = this.state.asset;
 	            var json = {};
-	
-	            var filename = this.state.asset.asset_id + ".json";
+	            //*********************************************
+	            var filename = asset.asset_id + ".json";
 	            json.filename = filename;
 	            json.pubKey = localStorage.getItem("pubKey");
-	            json.address = localStorage.getItem("coidAddr");
+	            json.address = asset.asset_name.coidAddr;
 	            //*********************************************
 	            var recoveryCondition = $("input[name^='recoveryCondition']").val();
 	            if (recoveryCondition) {
 	                json.recoveryCondition = recoveryCondition;
 	            }
-	            //*********************************************
 	            json.recoveryID = this.state.recovery_list;
-	
+	            //*********************************************
 	            var signature = this.getSignature(json);
+	            //*********************************************
+	            var msg_hash = keccak_256(JSON.stringify(json));
+	            var msg_hash_buffer = new Buffer(msg_hash, "hex");
+	            json.msg = msg_hash_buffer.toString("hex");
+	            json.sig = signature;
+	            //*********************************************
+	            console.log("update recov JSON!! \n" + JSON.stringify(json));
 	
 	            $.ajax({
 	                type: "POST",
@@ -70519,7 +70548,7 @@
 	                        data = JSON.parseJSON(result);
 	                    }
 	                    //get the array:
-	                    data = data.Result;
+	                    //data = data.Result;
 	                    //DEBUGGING:
 	                    console.log("addRecovery result: " + JSON.stringify(data));
 	                    //data is: MYCOID.json
@@ -70535,16 +70564,14 @@
 	    }, {
 	        key: 'requestUpdateOfficalIDs',
 	        value: function requestUpdateOfficalIDs(e) {
+	
 	            e.preventDefault();
-	
+	            var asset = this.state.asset;
 	            var json = {};
-	
-	            var filename = this.state.asset.asset_id + ".json";
+	            //*********************************************
+	            var filename = asset.asset_id + ".json";
 	            json.filename = filename;
-	
-	            json.ownerIdList = asset.ownerIdList;
-	            json.controlIdList = asset.controlIdList;
-	
+	            //*********************************************
 	            console.log("this.state.fileAttrs.. " + JSON.stringify(this.state.file_attrs));
 	            console.log("this.state.tmpfile.. " + this.state.tmpFile);
 	            console.log("this.state.inputs.. " + this.state.inputs);
@@ -70553,8 +70580,30 @@
 	            console.log("prepared attrs.. " + attrsArray);
 	            console.log("asset: " + this.props.asset.asset_id);
 	            console.log("coidAddr: " + this.props.asset.asset_name.coidAddr);
-	        }
+	            //*********************************************
+	            var signature = this.getSignature(json);
+	            //*********************************************
+	            var msg_hash = keccak_256(JSON.stringify(json));
+	            var msg_hash_buffer = new Buffer(msg_hash, "hex");
+	            json.msg = msg_hash_buffer.toString("hex");
+	            json.sig = signature;
 	
+	            /*
+	                Request needs to go to gatekeeper to submit officialID proposal
+	              $.ajax({
+	                type: "POST",
+	                url: twinUrl + 'gatekeeper/addOfficialIDs',
+	                data: json,
+	                success: function (result) {
+	                    var data = result;
+	                    if ($.type(result) != "object") {
+	                        data = JSON.parseJSON(result)
+	                    }
+	                    console.log("result: " + JSON.stringify(data))
+	                }.bind(this),
+	            })
+	              */
+	        }
 	        // END OFFICIAL ID FUNCTIONS:
 	        //**********************************************************************
 	        //**********************************************************************
@@ -70571,13 +70620,10 @@
 	            var _this5 = this;
 	
 	            console.log("asset: " + JSON.stringify(this.state.asset));
-	
 	            console.log("file_Attrs.. " + JSON.stringify(this.state.file_attrs));
-	
 	            var style = {
 	                fontSize: '12.5px'
 	            };
-	
 	            var inputAttrs = {
 	                addKeys: [13, 188], // Enter and comma
 	                inputProps: {
@@ -70588,11 +70634,6 @@
 	
 	            var prop = this.props.asset.asset_name;
 	
-	            // if (this.props.asset.asset_id != "MyCOID") {
-	            //     document.getElementById('OWNERSHIP').display = 'block';
-	            // }
-	            //console.log("asset form state: " + JSON.stringify(this.state))
-	            //console.log("asset form props: " + JSON.stringify(this.props))
 	            return _react2.default.createElement(
 	                'div',
 	                { id: 'SubmitContainer' },
@@ -71097,8 +71138,6 @@
 	                                    //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
 	                                    var theArray = this.state.own_assets;
 	
-	                                    console.log("length is: " + theArray.length); //get total number of owned assets
-	                                    console.log(JSON.stringify(theArray));
 	                                    theArray[theArray.length] = { asset_id: dataResult.assetID, asset_name: dataResult };
 	                                    if (dataResult.assetID = "MyCOID") this.setState({ own_assets: theArray });
 	                                }.bind(this)
@@ -71298,7 +71337,7 @@
   \**************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -71330,6 +71369,7 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
+	var secp256k1 = __webpack_require__(/*! secp256k1 */ 261);
 	var keccak_256 = __webpack_require__(/*! js-sha3 */ 325).keccak_256;
 	
 	var DimensionDelegationForm = function (_React$Component) {
@@ -71371,7 +71411,7 @@
 	                                    _react2.default.createElement(
 	                                        'b',
 	                                        null,
-	                                        'Public Key of Delegatee'
+	                                        'Delegatee'
 	                                    )
 	                                ),
 	                                _react2.default.createElement(
@@ -71434,7 +71474,7 @@
 	                    _react2.default.createElement(
 	                        'label',
 	                        { htmlFor: 'unique_id_attrs' },
-	                        ' Dimension Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research". '
+	                        ' Persona Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research". '
 	                    ),
 	                    _react2.default.createElement('input', { name: 'label-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: 'Descriptor' })
 	                ),
@@ -72291,6 +72331,25 @@
 	            this.setState({ showModal: false });
 	        }
 	        //*****************************************************************************
+	        //takes in a msg/json and returns a signature (needed for requests)
+	
+	    }, {
+	        key: 'getSignature',
+	        value: function getSignature(msg) {
+	            console.log("creating signature, signing msg: \n" + JSON.stringify(msg));
+	            var privKey = localStorage.getItem("privKey");
+	            var privKey1 = new Buffer(privKey, "hex");
+	            var msg_hash = keccak_256(JSON.stringify(msg));
+	            var msg_hash_buffer = new Buffer(msg_hash, "hex");
+	            var signature = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1));
+	            signature = JSON.parse(signature).signature;
+	            signature = JSON.stringify(signature);
+	            signature = JSON.parse(signature).data;
+	            signature = new Buffer(signature, "hex");
+	            signature = signature.toString("hex");
+	            return signature;
+	        }
+	        //*****************************************************************************
 	        // Get DT Dimension Data. Call this in componentWillMount
 	
 	    }, {
@@ -72348,52 +72407,6 @@
 	                    }
 	                }.bind(this)
 	            });
-	
-	            //MyCOID.json
-	            // let dimension1 = {}
-	            // dimension1.dimension = {
-	            //     "dimensionName": "EDUCATION",
-	            //     "pubkey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
-	            //     "coidAddr": "7924DBF02BE23923790C5D82F8A39925F516CA0F",
-	            //     "dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
-	            //     "ID": 3432423423,
-	            //     "address": "HEXSTRING_address",
-	            //     "owner": [],
-	            //     "controllers": ["c1", "c2"],
-	            //     "delegations": [
-	            //         { owner: "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055", delegatee: "d1", amount: "2", dimension: "", expiration: "thursday", accessCategories: "" },
-	            //         { owner: "A1", delegatee: "D1", amount: "2", dimension: "", expiration: "friday", accessCategories: "" }
-	            //     ],
-	            //     "data": [
-	            //         { "descriptor": "financial_FEB", "attribute": "QMfgsddfsdffsdfsdsdfsdf", flag: "0", ID: "4465" },
-	            //         { "descriptor": "financial_MARCH", "attribute": "Qmsdfsdfsdfsdfsdfsdfsdfsdf", flag: "0", ID: "3433" },
-	            //     ]
-	            // }
-	            // //HOME.json
-	            // let dimension2 = {}
-	            // dimension2.dimension = {
-	            //     "dimensionName": "EDUCATION",
-	            //     "pubkey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
-	            //     "coidAddr": "872EDE47AEBC33CAD4AF1B8DA861E78D8E99BC56",
-	            //     "dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
-	            //     "ID": 69696969,
-	            //     "address": "HEXSTRING_address",
-	            //     "owner": [],
-	            //     "controllers": ["c1", "c2"],
-	            //     "delegations": [
-	            //         { owner: "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055", delegatee: "D1", amount: "2", dimension: "", expiration: "thursday", accessCategories: "" },
-	            //     ],
-	            //     "data": [
-	            //         { "descriptor": "education_highschool", "attribute": "QMfgsddfsdffsdfsdsdfsdf", flag: "0", ID: "4465" },
-	            //         { "descriptor": "education_college", "attribute": "Qmsdfsdfsdfsdfsdfsdfsdfsdf", flag: "0", ID: "3433" },
-	            //     ]
-	            // }
-	
-	            // var arry = []
-	            // arry.push(dimension1)
-	            // arry.push(dimension2)
-	
-	            // this.setState({ iDimensions: arry })
 	        } //end getDimensions
 	
 	    }, {
@@ -72423,8 +72436,9 @@
 	                var controlled_labels = []; //set this.state.controlled_assets_label
 	                var control_assets = [];
 	
-	                var controlled = localStorage.getItem("controlled_asets");
+	                var controlled = localStorage.getItem("controlled_assets");
 	                controlled = JSON.parse(controlled);
+	                console.log("controlled... " + controlled);
 	
 	                for (var i = 0; i < controlled.length; i++) {
 	                    controlled_labels.push(controlled[i].asset_id);
@@ -72582,8 +72596,8 @@
 	    }, {
 	        key: 'createDimension',
 	        value: function createDimension(e) {
-	            e.preventDefault();
 	
+	            e.preventDefault();
 	            var json = {};
 	            //*************************************************************************
 	            var dimensionName = $("input[name^='dimensionName']").val();
@@ -72591,9 +72605,7 @@
 	                json.dimensionName = dimensionName;
 	            }
 	            json.pubKey = localStorage.getItem("pubKey");
-	            json.address = "";
-	            json.flag = 0;
-	            json.ID = 0;
+	            json.address = "", json.flag = 0, json.ID = 0;
 	            //*************************************************************************
 	            // GET PROPER DATA FROM SELECTED ASSET (we will pass owners to prepareDelegations)
 	            var selected_asset = $("#assetSelect option:selected").text();
@@ -72608,7 +72620,12 @@
 	            var attributes = this.prepareAttributes();
 	            json.data = attributes;
 	            //*************************************************************************
-	
+	            var signature = this.getSignature(json);
+	            var msg_hash = keccak_256(JSON.stringify(json));
+	            var msg_hash_buffer = new Buffer(msg_hash, "hex");
+	            json.msg = msg_hash_buffer.toString("hex");
+	            json.sig = signature;
+	            //*************************************************************************
 	            console.log("JSON: " + JSON.stringify(json));
 	
 	            $.ajax({
@@ -72637,6 +72654,7 @@
 	                }.bind(this),
 	                complete: function complete() {
 	                    // do something
+	                    //ST: HERE WE COULD WRITE DIMENSIONS INTO COID JSON?
 	                }
 	            });
 	        } //end creationDimension
@@ -72672,7 +72690,7 @@
 	                _react2.default.createElement(
 	                    'h1',
 	                    null,
-	                    'IDENTITY DIMENSIONS'
+	                    'Personas'
 	                ),
 	                _react2.default.createElement(
 	                    'h5',
@@ -72696,7 +72714,7 @@
 	                            _react2.default.createElement(
 	                                'a',
 	                                { href: '#dimensions', role: 'tab', 'data-toggle': 'tab' },
-	                                'Dimensions'
+	                                'Persona'
 	                            )
 	                        ),
 	                        _react2.default.createElement(
@@ -72705,7 +72723,7 @@
 	                            _react2.default.createElement(
 	                                'a',
 	                                { href: '#addDimension', role: 'tab', 'data-toggle': 'tab' },
-	                                'Create new dimension'
+	                                'Create new persona'
 	                            )
 	                        )
 	                    )
@@ -72729,7 +72747,7 @@
 	                                    _react2.default.createElement(
 	                                        'b',
 	                                        null,
-	                                        'My Owned Dimensions'
+	                                        'My Personas'
 	                                    )
 	                                ),
 	                                ' ',
@@ -72767,7 +72785,7 @@
 	                                                        _react2.default.createElement(
 	                                                            'p',
 	                                                            null,
-	                                                            'No owned identity dimensions.'
+	                                                            'No owned personas.'
 	                                                        )
 	                                                    )
 	                                                );
@@ -72787,7 +72805,7 @@
 	                                    _react2.default.createElement(
 	                                        'b',
 	                                        null,
-	                                        'My Controlled Dimensions'
+	                                        'My Controlled Personas'
 	                                    )
 	                                ),
 	                                ' ',
@@ -72825,7 +72843,7 @@
 	                                                        _react2.default.createElement(
 	                                                            'p',
 	                                                            null,
-	                                                            'No controlled identity dimensions.'
+	                                                            'No controlled personas.'
 	                                                        )
 	                                                    )
 	                                                );
@@ -72913,7 +72931,7 @@
 	                                        _react2.default.createElement(
 	                                            'label',
 	                                            { htmlFor: 'dimensionName' },
-	                                            'Dimension name:'
+	                                            'Persona name:'
 	                                        ),
 	                                        _react2.default.createElement('input', { name: 'dimensionName', className: 'form-control col-md-4', type: 'text', placeholder: 'Dimension Name' })
 	                                    ),
@@ -72949,7 +72967,7 @@
 	                                        _react2.default.createElement(
 	                                            'label',
 	                                            { htmlFor: 'control_dist' },
-	                                            'Enter Delegations and their delegated control token(s).'
+	                                            'Enter Delegations and their delegated token(s).'
 	                                        ),
 	                                        this.state.delegations.map(function (input) {
 	                                            return _react2.default.createElement(DimensionDelegationForm, { max: '10', key: input, labelref: input });
@@ -72975,7 +72993,7 @@
 	                                        _react2.default.createElement(
 	                                            'label',
 	                                            { htmlFor: 'control_dist' },
-	                                            'Enter Controller(s).'
+	                                            'Enter Persona Controllers. These controllers can be but do not have to be your Core Identity controllers.'
 	                                        ),
 	                                        _react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs, { value: this.state.control_list, onChange: function onChange(e) {
 	                                                _this8.onFieldChange("control_list", e);
@@ -73028,6 +73046,7 @@
 	// <tr>
 	//     <td><input name="tokenQuantity" className="form-control col-md-4" type="text" placeholder="Token Quantity" /></td>
 	// </tr>
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/buffer/index.js */ 239).Buffer))
 
 /***/ },
 /* 434 */
@@ -73770,31 +73789,26 @@
 		function ControlTokenDistributionForm(props) {
 			_classCallCheck(this, ControlTokenDistributionForm);
 	
-			var _this5 = _possibleConstructorReturn(this, (ControlTokenDistributionForm.__proto__ || Object.getPrototypeOf(ControlTokenDistributionForm)).call(this, props));
-	
-			_this5.state = {
-				controltoken_quantity: [],
-				controltoken_list: [],
-				showModal: false
-			};
-	
-			_this5.maxUniqAttr = 10;
+			return _possibleConstructorReturn(this, (ControlTokenDistributionForm.__proto__ || Object.getPrototypeOf(ControlTokenDistributionForm)).call(this, props));
+			// this.state = {
+			// 	controltoken_quantity: [],
+			// 	controltoken_list: [],
+			// 	showModal: false
+			// };
+			//this.maxUniqAttr = 10;
 			//this.onFieldChange = this.onFieldChange.bind(this);
-			_this5.handleHideModal = _this5.handleHideModal.bind(_this5);
-			return _this5;
+			//this.handleHideModal = this.handleHideModal.bind(this);
 		}
+		// handleShowModal(e) {
+		// 	this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
+		// }
+	
+		// handleHideModal() {
+		// 	this.setState({ showModal: false });
+		// }
+	
 	
 		_createClass(ControlTokenDistributionForm, [{
-			key: 'handleShowModal',
-			value: function handleShowModal(e) {
-				this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-			}
-		}, {
-			key: 'handleHideModal',
-			value: function handleHideModal() {
-				this.setState({ showModal: false });
-			}
-		}, {
 			key: 'render',
 			value: function render() {
 				var style = {
@@ -73821,7 +73835,7 @@
 										_react2.default.createElement(
 											'b',
 											null,
-											'Public Key of Controller'
+											'Controller'
 										)
 									),
 									_react2.default.createElement(
@@ -73830,7 +73844,7 @@
 										_react2.default.createElement(
 											'b',
 											null,
-											'Control Token Quantity'
+											'Token Quantity'
 										)
 									)
 								),
@@ -73866,31 +73880,27 @@
 		function OwnerTokenDistributionForm(props) {
 			_classCallCheck(this, OwnerTokenDistributionForm);
 	
-			var _this6 = _possibleConstructorReturn(this, (OwnerTokenDistributionForm.__proto__ || Object.getPrototypeOf(OwnerTokenDistributionForm)).call(this, props));
+			return _possibleConstructorReturn(this, (OwnerTokenDistributionForm.__proto__ || Object.getPrototypeOf(OwnerTokenDistributionForm)).call(this, props));
+			// this.state = {
+			// 	ownertoken_quantity: [],
+			// 	ownertoken_list: [],
+			// 	showModal: false
+			// };
 	
-			_this6.state = {
-				ownertoken_quantity: [],
-				ownertoken_list: [],
-				showModal: false
-			};
-	
-			_this6.maxUniqAttr = 10;
-			//this.onFieldChange = this.onFieldChange.bind(this);
-			_this6.handleHideModal = _this6.handleHideModal.bind(_this6);
-			return _this6;
+			// this.maxUniqAttr = 10;
+			// this.onFieldChange = this.onFieldChange.bind(this);
+			// this.handleHideModal = this.handleHideModal.bind(this);
 		}
+		// handleShowModal(e) {
+		// 	this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
+		// }
+	
+		// handleHideModal() {
+		// 	this.setState({ showModal: false });
+		// }
+	
 	
 		_createClass(OwnerTokenDistributionForm, [{
-			key: 'handleShowModal',
-			value: function handleShowModal(e) {
-				this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-			}
-		}, {
-			key: 'handleHideModal',
-			value: function handleHideModal() {
-				this.setState({ showModal: false });
-			}
-		}, {
 			key: 'render',
 			value: function render() {
 				var style = {
@@ -73917,7 +73927,7 @@
 										_react2.default.createElement(
 											'b',
 											null,
-											'Public Key of Owner'
+											'Owner'
 										)
 									),
 									_react2.default.createElement(
@@ -73926,7 +73936,7 @@
 										_react2.default.createElement(
 											'b',
 											null,
-											'Ownership Token Quantity'
+											'Token Quantity'
 										)
 									)
 								),
@@ -73973,7 +73983,7 @@
 				owner_id: [],
 				control_id: [],
 				recovery_id: [],
-				recoveryCondition: [],
+				//recoveryCondition: [],
 				isHuman: [],
 				owner_token_id: [],
 				owner_token_desc: [],
@@ -74019,7 +74029,7 @@
 						//var gatekeeperAddr = "gatekeeperAddr_" + publicKey 
 						//console.log("gkaddr:  " + gatekeeperAddr)
 						localStorage.setItem("gatekeeperAddr", result.gatekeeperAddr);
-						localStorage.setItem("coidAddr", result.coidAddr);
+						//localStorage.setItem("coidAddr", result.coidAddr)
 						localStorage.setItem("dimensionCtrlAddr", result.dimensionCtrlAddr);
 					}.bind(this),
 					complete: function complete() {}
@@ -74130,7 +74140,7 @@
 	
 					//pubkeys used for recovery in the event COID is lost or stolen			
 					"identityRecoveryIdList": this.valueIntoHash(this.state.recovery_id),
-					"recoveryCondition": this.state.recoveryCondition,
+					"recoveryCondition": $("input[name^='recoveryCondition']").val(),
 	
 					"yesVotesRequiredToPass": 2, //needs to be taken out and hardcoded in app
 					"validatorList": this.state.validators,
@@ -74307,31 +74317,53 @@
 				json.gatekeeperAddr = localStorage.getItem("gatekeeperAddr");
 				//this.setState({signature: signature1})
 	
+				var COID_controllers = this.state.control_id;
+				console.log("coid controllers... " + COID_controllers + "\n length: " + COID_controllers.length);
+	
 				console.log(json);
 				$.ajax({
 					url: twinUrl + 'request_new_COID',
 					type: 'POST',
 					data: json,
-					success: function success(res) {
+					success: function (res) {
 						var sendMe = {};
 						sendMe.flag = 0; //owned asset
 						sendMe.fileName = json.assetID[0] + ".json";
 						sendMe.pubKey = (0, _jsSha.keccak_256)(localStorage.getItem("pubKey"));
-						sendMe.data = json;
 						sendMe.updateFlag = 0;
+						sendMe.data = json;
+	
+						console.log("sendMe object:  " + JSON.stringify(sendMe));
 						$.ajax({
 							//****************TODO
 							url: twinUrl + 'setAsset',
 							type: 'POST',
 							data: sendMe,
-							success: function success(res) {
+							success: function (res) {
 								console.log("response from setAsset: " + res);
-							}
+							}.bind(this)
 						});
-					},
-					complete: function complete() {
+					}.bind(this),
+					complete: function () {
+						var sendMe = {};
+						sendMe.flag = 1; //controlled core identity
+						sendMe.fileName = json.assetID[0] + ".json";
+						sendMe.updateFlag = 0; //new identity
+						sendMe.data = json;
+						for (var i = 0; i < COID_controllers.length; i++) {
+							console.log("setting asset for controller, " + COID_controllers[i]);
+							sendMe.pubKey = (0, _jsSha.keccak_256)(COID_controllers[i]);
+							$.ajax({
+								url: twinUrl + 'setAsset',
+								type: 'POST',
+								data: sendMe,
+								success: function success(res) {
+									console.log("response from setAsset: " + res);
+								}
+							});
+						}
 						// do something
-					}
+					}.bind(this)
 				});
 			}
 		}, {
@@ -74396,7 +74428,7 @@
 					_react2.default.createElement(
 						'h1',
 						null,
-						'Non Human Identity Submission Form'
+						'Create Asset or Device Identity'
 					),
 					_react2.default.createElement(
 						'form',
@@ -74535,12 +74567,11 @@
 							{ className: 'form-group' },
 							_react2.default.createElement(
 								'label',
-								{ htmlFor: 'recovery_id' },
+								null,
 								'Recovery Condition (# of digital signatures of recovery ID owners needed to recover identity)'
 							),
-							_react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs, { value: this.state.recoveryCondition, onChange: function onChange(e) {
-									_this8.onFieldChange("recoveryCondition", e);
-								} }))
+							_react2.default.createElement('input', { name: 'recoveryCondition', className: 'form-control col-md-4', type: 'text', placeholder: 'Recovery Condition' }),
+							'/>'
 						),
 						_react2.default.createElement(
 							'div',

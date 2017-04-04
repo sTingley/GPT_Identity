@@ -563,7 +563,7 @@ class Dims extends Component {
 									<table className="table table-striped table-hover" style={style}>
 										<tbody>
 											<tr>
-												<td colSpan="3"><b>Descriptors</b></td>
+												<td colSpan="2"><b>Descriptors</b></td>
 											</tr>
 											{(() => {
 												if (dataArray.length > 0) {
@@ -572,7 +572,6 @@ class Dims extends Component {
 														return (
 															<tr key={i}>
 																<td>{attrs[0]}</td>
-																<td>Token Amount: 1</td>
 																<td><button type="button" className="btn btn-primary btn-sm" data-val={i} onClick={this.showAttrs2.bind(this)}>Spend Token</button></td>
 															</tr>
 														)
@@ -597,6 +596,8 @@ class Dims extends Component {
 Dims.propTypes = {
 	hideHandler: React.PropTypes.func.isRequired	// hideHandler method must exists in parent component
 };
+
+//																<td>Token Amount: 1</td>
 
 
 

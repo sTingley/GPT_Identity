@@ -51236,7 +51236,7 @@
 													null,
 													_react2.default.createElement(
 														'td',
-														{ colSpan: '3' },
+														{ colSpan: '2' },
 														_react2.default.createElement(
 															'b',
 															null,
@@ -51255,11 +51255,6 @@
 																	'td',
 																	null,
 																	attrs[0]
-																),
-																_react2.default.createElement(
-																	'td',
-																	null,
-																	'Token Amount: 1'
 																),
 																_react2.default.createElement(
 																	'td',
@@ -51301,6 +51296,9 @@
 	Dims.propTypes = {
 		hideHandler: _react2.default.PropTypes.func.isRequired // hideHandler method must exists in parent component
 	};
+	
+	//																<td>Token Amount: 1</td>
+	
 	
 	var Assets = function (_Component3) {
 		_inherits(Assets, _Component3);
@@ -73008,7 +73006,7 @@
 	                                            _react2.default.createElement(
 	                                                'button',
 	                                                { className: 'btn btn-primary', 'data-loading-text': 'Submit', name: 'submit-form', type: 'button', onClick: this.createDimension.bind(this) },
-	                                                'Create Dimension'
+	                                                'Create Persona'
 	                                            )
 	                                        )
 	                                    )

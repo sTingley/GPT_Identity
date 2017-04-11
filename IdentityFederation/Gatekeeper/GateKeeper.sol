@@ -2,9 +2,11 @@ import "CoreIdentity.sol";
 import "ballot.sol";
 import "Dao.sol";
 import "MyGatekeeper.sol";
-import "IdentityDimensionControl.sol"
+import "IdentityDimensionControl.sol";
 
 contract GateKeeper {
+
+
 
     // Global variables
 
@@ -19,6 +21,7 @@ contract GateKeeper {
     event resultReady(bytes32 proposalId, bool result, string resultMessage, address coidGKAddr, address coidAddr, address dimensionCtrlAddr, uint blockNumberVal, bytes32 blockHashVal, bytes32 blockchainIdVal, uint timestamp);
     // event COIDgatekeeper(address gkAddr);
     event proposalDeleted(string notify); // notify user if the proposal got deleted after experation
+    event resultReadyUniqueId(bytes32 proposalId, bool result, string resultMessage, address coidGKAddr, address coidAddr, address dimensionCtrlAddr, uint blockNumberVal, bytes32 blockHashVal, bytes32 blockchainIdVal, uint timestamp);
 
 
 
@@ -120,6 +123,7 @@ contract GateKeeper {
         uint numberOfVoters;
 
         bool isHuman;
+        bool forUID;
 
     }
 
@@ -164,6 +168,20 @@ contract GateKeeper {
 
 
     }
+
+    //function to determine update route
+    function setForUID(bytes32 proposalId, bool forUIDVal) returns (bool UID)
+    {
+        if (msg.sender == chairperson){
+            proposals[proposalId].forUID = forUIDVal;
+        }
+        if (forUIDVal == true){
+            UID = true;
+        }
+        else {UID = false;}
+
+    }
+
 
     // Set coid requster of the Coid proposal
     //AF: Changed types to account for updated types in structs. Added if function to ensure only chairperson calls contract
@@ -533,8 +551,8 @@ contract GateKeeper {
                  bool result;
                  address coidGKAddr;
                  address coidIdentityAddr;
-                 uint blockNumber;
                  address dimensionCtrlAddr;
+                 uint blockNumber;
 
         if (msg.sender == chairperson)  // only IDF gateKeeper has right to call this function
         {
@@ -554,12 +572,21 @@ contract GateKeeper {
 
                 proposals[proposalId].coidData.blockHash = 0x0;
 
-                resultReady(proposalId, result, "Your identity has been integrated.", coidGKAddr, coidIdentityAddr, dimensionCtrlAddr, blockNumber, proposals[proposalId].coidData.blockHash, blockchainId, now);
-
+                if(proposals[proposalId].forUID){
+                    resultReadyUniqueId(proposalId, result, "Your identity has been integrated.", coidGKAddr, coidIdentityAddr, dimensionCtrlAddr, blockNumber, proposals[proposalId].coidData.blockHash, blockchainId, now);
+                }
+                else{
+                    resultReady(proposalId, result, "Your identity has been editted.", coidGKAddr, coidIdentityAddr, dimensionCtrlAddr, blockNumber, proposals[proposalId].coidData.blockHash, blockchainId, now);
+                }
             }
             else {
-                //dont make coid
-                resultReady(proposalId, result, "Sorry, your identity was rejected.", 0x0, 0x0, 0x0, 0x0, 0x0, 0X0, now);
+                if(proposals[proposalId].forUID){
+                    //dont make coid
+                    resultReadyUniqueId(proposalId, result, "Sorry, your identity was rejected.", 0x0, 0x0, 0x0, 0x0, 0x0, 0X0, now);
+                }
+                else{
+                    resultReady(proposalId, result, "Sorry, your identity was rejected.", 0x0, 0x0, 0x0, 0x0, 0x0, 0X0, now);
+                }
 
             }
         }
@@ -601,6 +628,7 @@ contract GateKeeper {
         }
         return dimensionControl;
     }
+
 
     // Instantiate coidGateKeepr contract
     MyGateKeeper MycoidGateKeeper;

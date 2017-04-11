@@ -313,16 +313,25 @@ class ToVote extends React.Component {
 	
 	componentDidMount(){
 		$.ajax({
-			url: twinUrl + "ballot/readNotify/" + localStorage.getItem("pubKey"),
+			url: twinUrl + "ballot/readNotify/" + keccak_256(localStorage.getItem("pubKey")).toUpperCase(),
 			dataType: 'json',
 			cache: false,
 			success: function(result) {
+				console.log("result: " + JSON.stringify((result)));
 				if(typeof(result) != "object"){
-					var data = JSON.parse(result);	
-				} else 
+				//if(true){
+					var data = JSON.parse(result);
+					console.log("TOVOTE needs else brackets?"+ localStorage.getItem("pubKey"));	
+				} else{ 
 					var data = result;
-				this.setState({coid: data.data.messages});
+					var test = JSON.parse((result.data));
+					test = JSON.parse(JSON.stringify(test.messages));
+					console.log(test[0].type);
+				}
+				this.setState({coid: test});
 				console.log("ToVote state: " + JSON.stringify(this.state))
+				console.log(typeof(result));
+				console.log("result: " + JSON.stringify((result.data)));
 			}.bind(this)
 		});
 	}

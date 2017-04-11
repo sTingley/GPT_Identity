@@ -169,7 +169,7 @@ var AssetCtrl =
                 directory = directory + DelegateDirectory + "/" + fileName;
             }
 
-            var cryptoEncr = new Crypto({ pubKey: keccak_256(pubKey) });
+            var cryptoEncr = new Crypto({ pubKey: keccak_256(pubKey).toUpperCase() });
 
             //debugging
             var fileName = directory;
@@ -200,6 +200,7 @@ var AssetCtrl =
         //updateFlag (0 = new, 1 = update)
         //data -- only input for a write
         //keys,values -- only input for an update
+        //PUBKEY NEED TO BE ENCRYPTED BEFORE SENDING
         setAsset: function (req, res) {
             //get public key
             var pubKey = req.body.pubKey;
@@ -235,7 +236,7 @@ var AssetCtrl =
                 directory = directory + DelegateDirectory + "/" + fileName;
             }
 
-            var cryptoEncr = new Crypto({ pubKey: pubKey });
+            var cryptoEncr = new Crypto({ pubKey: pubKey.toUpperCase() });
 
             //debugging
             var fileName = directory;

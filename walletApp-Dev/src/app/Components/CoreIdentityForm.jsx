@@ -355,7 +355,7 @@ class CoreIdentity extends React.Component {
 				var sendMe = {};
 				sendMe.flag = 0; //owned core identity
 				sendMe.fileName = "MyCOID.json"
-				sendMe.pubKey = keccak_256(localStorage.getItem("pubKey"));
+				sendMe.pubKey = keccak_256(localStorage.getItem("pubKey")).toUpperCase();
 				sendMe.updateFlag = 0; //new identity
 				sendMe.data = json;
 
@@ -376,7 +376,7 @@ class CoreIdentity extends React.Component {
 				sendMe.data = json;
 				for (let i = 0; i < COID_controllers.length; i++) {
 					console.log("setting asset for controller, " + COID_controllers[i])
-					sendMe.pubKey = keccak_256(COID_controllers[i])
+					sendMe.pubKey = keccak_256(COID_controllers[i]).toUpperCase()
 					$.ajax({
 						url: twinUrl + 'setAsset',
 						type: 'POST',

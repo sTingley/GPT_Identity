@@ -5,8 +5,7 @@ import UploadIpfsFile from './UploadIpfsFile.jsx'
 var crypto = require('crypto');
 var secp256k1 = require('secp256k1');
 var keccak_256 = require('js-sha3').keccak_256;
-var globalAsset;
-var _this;
+
 //********************************************************
 //********************************************************
 class AttributeForm extends React.Component {
@@ -107,7 +106,7 @@ class Asset extends React.Component {
 
             recovery_list: []
         };
-_this=this;
+        var _this = this;
         this.handleHideModal = this.handleHideModal.bind(this);
         this.onFieldChange = this.onFieldChange.bind(this);
     }
@@ -167,7 +166,6 @@ _this=this;
     //used for uniqueID attributes (official IDs)
     getLabelValues() {
         var labelVals = []
-        var _this = this;
         $.each($("input[name^='label-']"), function (obj) {
             var value = $.trim($(this).val());
             if (value.length > 0) {
@@ -413,13 +411,19 @@ _this=this;
         var json = {}
         //*********************************************
         let filename = asset.asset_id + ".json"
-        json.filename = filename
+        json.filename = filename;
+        json.forUniqueId = true;
+        json.uniqueId = "2222222222222222322323";
+        json.isHuman = asset.asset_name.isHuman;
+        json.yesVotesRequiredToPass = 2;
+        json.pubKey = localStorage.getItem("pubKey");
         //*********************************************
         console.log("this.state.fileAttrs.. " + JSON.stringify(this.state.file_attrs))
         console.log("this.state.tmpfile.. " + this.state.tmpFile)
         console.log("this.state.inputs.. " + this.state.inputs)
         //[label,shaHash,ipfsHash]
         var attrsArray = this.prepareUniqueIdAttrs();
+        json.uniqueIdAttributes = attrsArray
         console.log("prepared attrs.. " + attrsArray)
         console.log("asset: " + this.props.asset.asset_id)
         console.log("coidAddr: " + this.props.asset.asset_name.coidAddr)
@@ -434,9 +438,11 @@ _this=this;
         
         //    Request needs to go to gatekeeper to submit officialID proposal
 
+        console.log("JSON: " + JSON.stringify(json))
+
         $.ajax({
             type: "POST",
-            url: twinUrl + 'gatekeeper/addOfficialIDs',
+            url: twinUrl + 'addOfficialIDs',
             data: json,
             success: function (result) {
                 var data = result;
@@ -459,7 +465,6 @@ _this=this;
     }
 
     render() {
-        //console.log("global asset: "+JSON.stringify(globalAsset));
         console.log("asset: " + JSON.stringify(this.state.asset))
         console.log("file_Attrs.. " + JSON.stringify(this.state.file_attrs))
         var style = {
@@ -686,9 +691,8 @@ class Identities extends React.Component {
     handleSelectAsset(asset) {
         let assetID = asset.asset_id
         console.log("ASSET onclick: "+JSON.stringify(asset));
-        globalAsset = asset;
         if (assetID) {
-            console.log(typeof(_this));// will tell me if this is defined
+            console.log("typeof _this" + typeof(_this));// will tell me if this is defined
             if(typeof(_this) != 'undefined'){
                 _this.state.asset = asset;
             }

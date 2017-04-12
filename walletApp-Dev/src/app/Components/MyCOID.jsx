@@ -5,6 +5,8 @@ import UploadIpfsFile from './UploadIpfsFile.jsx'
 var crypto = require('crypto');
 var secp256k1 = require('secp256k1');
 var keccak_256 = require('js-sha3').keccak_256;
+var globalAsset;
+var _this;
 //********************************************************
 //********************************************************
 class AttributeForm extends React.Component {
@@ -105,7 +107,7 @@ class Asset extends React.Component {
 
             recovery_list: []
         };
-
+_this=this;
         this.handleHideModal = this.handleHideModal.bind(this);
         this.onFieldChange = this.onFieldChange.bind(this);
     }
@@ -429,8 +431,8 @@ class Asset extends React.Component {
         json.msg = msg_hash_buffer.toString("hex");
         json.sig = signature;
 
-        /*
-            Request needs to go to gatekeeper to submit officialID proposal
+        
+        //    Request needs to go to gatekeeper to submit officialID proposal
 
         $.ajax({
             type: "POST",
@@ -445,7 +447,7 @@ class Asset extends React.Component {
             }.bind(this),
         })
 
-        */
+        
     }
     // END OFFICIAL ID FUNCTIONS:
     //**********************************************************************
@@ -457,7 +459,7 @@ class Asset extends React.Component {
     }
 
     render() {
-
+        //console.log("global asset: "+JSON.stringify(globalAsset));
         console.log("asset: " + JSON.stringify(this.state.asset))
         console.log("file_Attrs.. " + JSON.stringify(this.state.file_attrs))
         var style = {
@@ -683,8 +685,15 @@ class Identities extends React.Component {
     //handle choice from asset navigation bar. Ex: asset.asset_id="MyCOID"
     handleSelectAsset(asset) {
         let assetID = asset.asset_id
+        console.log("ASSET onclick: "+JSON.stringify(asset));
+        globalAsset = asset;
         if (assetID) {
+            console.log(typeof(_this));// will tell me if this is defined
+            if(typeof(_this) != 'undefined'){
+                _this.state.asset = asset;
+            }
             this.setState({ showDetails: true, active_asset: asset })
+            
         }
     }
 

@@ -453,6 +453,9 @@ class MyGatekeeper extends React.Component {
 			"yesVotesRequiredToPass": 2,	//needs to be taken out and hardcoded in app
 			"validatorList": this.state.validators,
 
+			"delegateeIdList": [""],
+			"delegateeTokenQuantity:": [""],
+
 			"isHuman": false,
 			"timestamp": "",
 			"assetID": this.state.assetID,

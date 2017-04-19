@@ -626,7 +626,7 @@ class Assets extends Component {
 	}
 
 	//*******************************************************************************
-	//get all assets, OWNED, CONTROLLED, DELEGATAED:
+	//get all OWNED, CONTROLLED, DELEGATED assets & DELEGATED dimensions
 	componentWillMount() {
 		// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
 		// -> -> -> START get OWNED assets -> -> ->
@@ -747,49 +747,53 @@ class Assets extends Component {
 		// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
 		// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
 		// -> -> -> START get DELEGATED assets -> -> ->
-		// $.ajax({
-		// 	type: "POST",
-		// 	url: twinUrl + 'getDelegatedAssets',
-		// 	data: { "pubKey": localStorage.getItem("pubKey") },
-		// 	success: function (result) {
-		// 		var data = result;
-		// 		if ($.type(result) != "object") {
-		// 			data = JSON.parseJSON(result)
-		// 		}
+		$.ajax({
+			type: "POST",
+			url: twinUrl + 'getDelegatedAssets',
+			data: { "pubKey": localStorage.getItem("pubKey") },
+			success: function (result) {
+				var data = result;
+				if ($.type(result) != "object") {
+					data = JSON.parseJSON(result)
+				}
 
-		// 		data = data.data;
-		// 		console.log("Get Delegated Assets result: " + data)
+				data = data.data;
+				console.log("Get Delegated Assets result: " + data)
 
-		// 		if (data.length > 0) {
-		// 			//loop through OWNED assets
-		// 			for (let i = 0; i < data.length; i++) {
-		// 				//AJAX each asset:
-		// 				$.ajax({
-		// 					type: "POST",
-		// 					url: twinUrl + 'getAsset',
-		// 					data: { "pubKey": localStorage.getItem("pubKey"), "flag": 2, "fileName": data[i] },
-		// 					success: function (result) {
-		// 						var dataResult = result;
-		// 						if ($.type(result) != "object") {
-		// 							dataResult = JSON.parseJSON(result)
-		// 						}
+				if (data.length > 0) {
+					//loop through OWNED assets
+					for (let i = 0; i < data.length; i++) {
+						//AJAX each asset:
+						$.ajax({
+							type: "POST",
+							url: twinUrl + 'getAsset',
+							data: { "pubKey": localStorage.getItem("pubKey"), "flag": 2, "fileName": data[i] },
+							success: function (result) {
+								var dataResult = result;
+								if ($.type(result) != "object") {
+									dataResult = JSON.parseJSON(result)
+								}
 
-		// 						//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-		// 						var theArray1 = this.state.delegated_assets;
+								//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
+								var theArray1 = this.state.delegated_assets;
 
-		// 						theArray1[theArray1.length] = {
-		// 							asset_id: dataResult.assetID,
-		// 							asset_details: dataResult
-		// 						}
-		// 						this.setState({ delegated_assets: theArray1 });
+								theArray1[theArray1.length] = {
+									asset_id: dataResult.assetID,
+									asset_details: dataResult
+								}
+								this.setState({ delegated_assets: theArray1 });
 
-		// 					}.bind(this),
-		// 					complete: function () { },
-		// 				})
-		// 			}//end for
-		// 		}
-		// 	}.bind(this)
-		// })
+							}.bind(this),
+							complete: function () { },
+						})
+					}//end for
+				}
+			}.bind(this)
+		})
+		// <- <- <- END get CONTROLLED assets <- <- <-
+		// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
+		// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
+		// -> -> -> START get DELEGATED dimensions -> -> ->
 		$.ajax({
 			type: "POST",
 			url: twinUrl + 'getDelegatedDimensions',

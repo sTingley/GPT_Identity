@@ -104,7 +104,11 @@ class Asset extends React.Component {
 
             showModal: false,
 
-            recovery_list: []
+            recovery_list: [],
+
+            inputs_delegatees: ['input1-0'],
+            delegatee_id: [],
+            delegatee_token_quantity: []
         };
         var _this = this;
         this.handleHideModal = this.handleHideModal.bind(this);
@@ -435,8 +439,7 @@ class Asset extends React.Component {
         json.msg = msg_hash_buffer.toString("hex");
         json.sig = signature;
 
-        
-        //    Request needs to go to gatekeeper to submit officialID proposal
+        //Request needs to go to gatekeeper to submit officialID proposal
 
         console.log("JSON: " + JSON.stringify(json))
 
@@ -452,10 +455,97 @@ class Asset extends React.Component {
                 console.log("result: " + JSON.stringify(data))
             }.bind(this),
         })
-
         
     }
     // END OFFICIAL ID FUNCTIONS:
+    //**********************************************************************
+    //**********************************************************************
+    // START DELEGATEE FUNCTIONS
+
+    //used in tokendistrubtionform
+    appendDelegatees() {
+        var inputLen = this.state.inputs_owners.length;
+        if (inputLen < 10) {
+            var newInput1 = `input1-${inputLen}`;
+            this.setState({
+                inputs_delegatees: this.state.inputs_delegatees.concat([newInput1])
+            });
+        }
+    }
+    prepareDelegateeTokenDistribution() {
+        var labels = this.getTokenLabelValues();
+        console.log("got labels... " + JSON.stringify(labels))
+        for (var i = 0; i < labels.length; i += 2) {
+            for (var key in labels[i]) {
+                this.state.delegatee_id.push(labels[i][key]);
+                this.state.delegatee_token_quantity.push(labels[i + 1][key]);
+            }
+        }
+    }
+
+    // ownerOrController(pubKey) {
+
+    //     let owners = this.state.asset.asset_name.ownerIdList;
+    //     console.log("owners.. " + owners)
+    //     let controllers = this.state.asset.asset_name.controlIdList;
+    //     console.log("controllers.. " + controllers)
+    //     let user = keccak_256(pubKey);
+
+    //     owners.forEach(function(ele) {
+    //         if(ele = user)
+    //         return 0;
+    //     })
+
+    //     controllers.forEach(function(ele) {
+    //         if(ele = user)
+    //         return 1;
+    //     })
+    // }
+
+    requestUpdateDelegatees(e) {
+
+        e.preventDefault()
+        let asset = this.state.asset
+        var json = {}
+        //*********************************************
+        let filename = asset.asset_id + ".json";
+        json.filename = filename;
+        json.pubKey = localStorage.getItem("pubKey");
+        json.address = asset.asset_name.coidAddr;
+        // let flag = this.ownerOrController(json.pubKey);
+        // console.log("flag is: " + flag)
+        //*********************************************
+        //NEW OWNERS AND THEIR TOKENS
+        this.prepareDelegateeTokenDistribution();
+        json.delegatee = this.state.delegatee_id;
+        json.amount = this.state.delegatee_token_quantity;
+        json.flag = 1;
+        //*********************************************
+        var signature = this.getSignature(json);
+        //*********************************************
+        var msg_hash = keccak_256(JSON.stringify(json));
+        var msg_hash_buffer = new Buffer(msg_hash, "hex");
+        json.sig = signature;
+        json.msg = msg_hash_buffer.toString("hex");
+        //*********************************************
+        console.log("delegatee JSON!! \n" + JSON.stringify(json));
+
+        $.ajax({
+            type: "POST",
+            url: twinUrl + 'MyCOID/delegate',
+            data: json,
+            success: function (result) {
+                var data = result;
+                if ($.type(result) != "object") {
+                    data = JSON.parseJSON(result)
+                }
+                console.log("result: " + JSON.stringify(data))
+
+            }.bind(this),
+        })
+
+    }
+    // END DELEGATEE FUNCTIONS:
     //**********************************************************************
     //**********************************************************************
 
@@ -490,6 +580,7 @@ class Asset extends React.Component {
                         <li role="presentation"><a href="#owners" onClick={this.MyCOID_check.bind(this)} role="tab" data-toggle="tab">Ownership</a></li>
                         <li role="presentation"><a href="#controllers" role="tab" data-toggle="tab">Control</a></li>
                         <li role="presentation"><a href="#recovery" role="tab" data-toggle="tab">Recovery</a></li>
+                        <li role="presentation"><a href="#delegations" role="tab" data-toggle="tab">Delegations</a></li>
                     </ul>
                 </div>{/*END MODAL-HEADER*/}
 
@@ -644,6 +735,40 @@ class Asset extends React.Component {
 
                         </div>{/*tab-pane recovery*/}
 
+                        <div role="tabpanel" className="tab-pane" id="delegations">
+                            <table className="table table-striped table-hover" style={style}>
+                                <tbody>
+                                    <tr>
+                                        <td><b>Delegations List</b></td>
+                                        <td>
+                                            {/*{(() => {
+                                                if (!$.isEmptyObject(prop)) {
+                                                    return prop.delegateeIdList.map((ids, i) => {
+                                                        return <p key={i}> {prop.delegateeIdList[i]}</p>
+                                                    })
+                                                }
+                                            })(this)}*/}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div className="form-group">
+                                <label htmlFor="delegatee_dist">Enter Delegatees and their delegated control token(s).</label>
+                                {this.state.inputs_delegatees.map(input => <TokenDistributionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+                            </div>
+                            <div className="col-md-offset-6 col-md-6 ">
+                                <button type="button" className="btn btn-info pull-right" style={style} onClick={this.appendDelegatees.bind(this)}>
+                                    <span className="glyphicon glyphicon-plus"></span>Add More
+							    </button>
+                            </div>
+                            <div className="form-group">
+                                <button style={style} type="button" className="btn btn-primary" onClick={this.requestUpdateDelegatees.bind(this)}>
+                                    <span className="glyphicon glyphicon-plus"></span>Update Delegations
+                                </button>
+                            </div>
+                        </div>{/*tab-pane delegations*/}
+
                     </div>{/*tab-content*/}
                     {this.state.showModal ? <UploadIpfsFile pubKey={this.state.pubKey} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}
 
@@ -797,6 +922,7 @@ class Identities extends React.Component {
         //ADD THE CODE SO THAT MYCOID displays on the page by default?
     }
 
+
     render() {
 
         var style = { fontSize: '12.5px' }
@@ -831,9 +957,9 @@ class Identities extends React.Component {
                             <ul className="dropdown-menu">
                                 {(() => {
                                     {/* POPULATE the controlled assets, */ }
-                                    if (controlled.length > 0) {
-                                        return controlled.map((ctrl, i) => {
-                                            return <li role="presentation" key={i}><a role="tab" data-toggle="tab" onClick={() => this.handleSelectAsset(ctrl)}>{ctrl}</a></li>
+                                    if (this.state.controlled_assets.length > 0) {
+                                        return this.state.controlled_assets.map((ctrl, i) => {
+                                            return <li role="presentation" key={i}><a role="tab" data-toggle="tab" onClick={() => this.handleSelectAsset(ctrl)}>{ctrl.asset_id}</a></li>
                                         })
                                     }
                                     else { return <li>None</li> }

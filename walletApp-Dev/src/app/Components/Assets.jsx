@@ -34,6 +34,10 @@ class Modal extends Component {
 			asset_subclass: this.tags.getAssetData("subclasses"),
 			qrCode_signature: {},
 
+			qrCode_owned_signature: {},
+
+			notCOID: true,
+
 			//used for identitydimension file upload
 			docs: {}
 
@@ -56,6 +60,14 @@ class Modal extends Component {
 	componentDidMount() {
 		$("#assetDetails").modal('show');
 		$("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
+
+		var asset_id = this.props.asset.asset_id;
+		if (asset_id == "MyCOID") {
+			this.setState({ notCOID: false })
+		}
+		if (asset_id != "MyCOID") {
+			this.setState({notCOID: true})
+		}
 
 		var prop = this.props.asset.asset_details;
 
@@ -83,8 +95,34 @@ class Modal extends Component {
 		signature = JSON.parse(signature).data;
 		signature = new Buffer(signature, "hex");
 		signature = signature.toString("hex")
+		console.log("singature: " + signature)
 
-		this.setState({ qrCode_signature: { "msgHash": qrCode_Object_hash, "signature": signature, "timestamp": theTime } })
+		//***************************************************************************
+		//***************************************************************************
+
+		var owners_sig = "348dba954726daeb583726cc1838aacbb2d69038438723987ec5a2223217dcca45bd22528f56eb8dd232ec2345de34243234bdd34124af34f454e7d6f5e7d545";
+
+		var qrCode_owned_Object = JSON.stringify({
+			uniqueId: prop.uniqueId,
+			owner: prop.ownerIdList,
+			owner_signature: owners_sig,
+			asset_signature: signature,
+			bigchainID: prop.bigchainID,
+			bigchainHash: prop.bigchainHash,
+		})
+
+		var qrCode_owned_Object_hash = keccak_256(theTime);
+
+		//***************************************************************************.
+		//***************************************************************************
+		//added second object for second qrCode
+
+		this.setState({
+			qrCode_signature: { "msgHash": qrCode_Object_hash, "signature": signature, "timestamp": theTime },
+			qrCode_owned_signature: { "msgHash": qrCode_owned_Object_hash, "owners_sig": owners_sig, "timestamp": theTime }
+		})
+
+		//this.setState({ qrCode_owned_signature: { "msgHash": qrCode_owned_Object_hash, "owners_sig": owners_sig, "timestamp": theTime } })
 	}
 
 	appendInput() {
@@ -123,6 +161,10 @@ class Modal extends Component {
 
 	render() {
 
+		console.log("******" + JSON.stringify(this.state.qrCode_owned_signature))
+
+		var _this = this;
+
 		var prop = this.props.asset.asset_details;
 		var style = {
 			fontSize: '12.5px'
@@ -156,6 +198,14 @@ class Modal extends Component {
 			endpoint: twinUrl + "validateQrCode"
 		});
 
+		var qrOwnedConfig = JSON.stringify({
+			pubKey: prop.pubkey,
+			msgHash: _this.state.qrCode_owned_signature.msgHash,
+			asset_sig: _this.state.qrCode_owned_signature.signature,
+			owners_sig: _this.state.qrCode_owned_signature.owners_sig,
+			owner: prop.ownerIdList
+		});
+
 		var qrStyle = {
 			maxWidth: "100%",
 			textAlign: "center"
@@ -175,7 +225,7 @@ class Modal extends Component {
 							<ul className="nav nav-pills" role="tablist">
 								<li role="presentation" className="active"><a href="#asset_details" role="tab" data-toggle="tab">Asset Details</a></li>
 								<li role="presentation"><a href="#qrcode" role="tab" data-toggle="tab">QR Code</a></li>
-								{/*<li role="presentation"><a href="#dimension" role="tab" data-toggle="tab">Identity Dimensions</a></li>*/}
+								<li role="presentation"><a href="#qrcode2" role="tab" data-toggle="tab">Validate ownership</a></li>
 							</ul>
 						</div>
 
@@ -310,6 +360,10 @@ class Modal extends Component {
 
 								<div role="tabpanel" className="tab-pane center-block" id="qrcode" style={qrStyle}>
 									<QRCode value={qrConfig} size={200} />
+								</div>
+
+								<div role="tabpanel" className="tab-pane center-block" id="qrcode2" style={qrStyle}>
+									{this.state.notCOID ? <QRCode value={qrOwnedConfig} size={200} /> : null}
 								</div>
 
 							</div>

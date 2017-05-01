@@ -66,7 +66,7 @@ class Modal extends Component {
 			this.setState({ notCOID: false })
 		}
 		if (asset_id != "MyCOID") {
-			this.setState({notCOID: true})
+			this.setState({ notCOID: true })
 		}
 
 		var prop = this.props.asset.asset_details;
@@ -698,7 +698,7 @@ class Assets extends Component {
 				data = data.data;
 
 				//DEBUGGING:
-				console.log("getOwnedAssets result: " + data);
+				//console.log("getOwnedAssets result: " + data);
 				var assetData = []
 
 				if (data.length > 0) {
@@ -719,8 +719,8 @@ class Assets extends Component {
 								//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
 								var theArray = this.state.own_assets;
 
-								console.log("length is: " + theArray.length)
-								console.log(theArray)
+								//console.log("length is: " + theArray.length)
+								//console.log(theArray)
 								//TODO: RENAME asset_name TO ASSET DETAILS
 								theArray[theArray.length] = {
 									asset_id: dataResult.assetID,
@@ -759,6 +759,7 @@ class Assets extends Component {
 				if ($.type(result) != "object") {
 					data = JSON.parseJSON(result)
 				}
+				console.log("got data: " + JSON.stringify(data));
 
 				data = data.data;
 				console.log("Get Controlled Assets result: " + data);
@@ -767,6 +768,7 @@ class Assets extends Component {
 				if (data.length > 0) {
 					//loop through OWNED assets
 					for (let i = 0; i < data.length; i++) {
+						//console.log("i is: " + i + " filename: " + data[i])
 						//AJAX each asset:
 						$.ajax({
 							type: "POST",
@@ -777,7 +779,17 @@ class Assets extends Component {
 								if ($.type(result) != "object") {
 									dataResult = JSON.parseJSON(result)
 								}
-								this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
+
+								var theArray = this.state.controlled_assets;
+								//console.log("length is: " + theArray.length)
+								//console.log(JSON.stringify(theArray))
+
+								theArray[theArray.length] = {
+									asset_id: dataResult.assetID,
+									asset_details: dataResult
+								}
+								this.setState({ controlled_assets: theArray });
+								//this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
 
 								assetData[assetData.length] = {
 									asset_id: dataResult.assetID,

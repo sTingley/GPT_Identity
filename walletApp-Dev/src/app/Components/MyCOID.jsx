@@ -902,8 +902,12 @@ class Identities extends React.Component {
                                 if ($.type(result) != "object") {
                                     dataResult = JSON.parseJSON(result)
                                 }
-                                //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-                                this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_name: dataResult }] });
+                                var theArray = this.state.controlled_assets;
+                                console.log("length: " + theArray.length);
+
+                                theArray[theArray.length] = { asset_id: dataResult.assetID, asset_name: dataResult }
+                                this.setState({ controlled_assets: theArray });
+                                //this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_name: dataResult }] });
 
                             }.bind(this)
                         })

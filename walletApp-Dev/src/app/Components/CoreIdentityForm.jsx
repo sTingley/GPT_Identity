@@ -1,5 +1,6 @@
 import React from 'react';
 import TagsInput from 'react-tagsinput';
+import Autosuggest from 'react-autosuggest'
 import { keccak_256 } from 'js-sha3';
 import UploadIpfsFile from './UploadIpfsFile.jsx'
 var crypto = require('crypto');
@@ -70,8 +71,8 @@ class TokenDistributionForm extends React.Component {
 								<th><b>Control Token Quantity</b></th>
 							</tr>
 							<tr>
-								<td><input name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Public Key of Controller" /></td>
-								<td><input name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Control Token Quantity" /></td>
+								<td><TagsInput name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Public Key of Controller" value={this.state.control_token_id} onChange={(e) => { this.onFieldChange("control_token_id", e) }}/></td>
+								<td><TagsInput name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Control Token Quantity" value={this.state.control_token_quantity} onChange={(e) => { this.onFieldChange("control_token_quantity", e) }}/></td>
 							</tr>
 						</tbody>
 					</table>
@@ -106,7 +107,10 @@ class CoreIdentity extends React.Component {
 			tmpFile: '',
 			pubKey: localStorage.getItem("pubKey"),
 			privKey: localStorage.getItem("privKey"),
-			signature: ''
+			signature: '',
+			names:localStorage.getItem("contactNames").split(','),
+			keys:localStorage.getItem("contactPubKeys").split(','),
+			value:["","","",""]
 		};
 
 		this.maxUniqAttr = 10;
@@ -183,6 +187,26 @@ class CoreIdentity extends React.Component {
 		console.log("before we call createHashAttribute on this.state.file_attrs..\n" + JSON.stringify(this.state.file_attrs));
 		console.log("we will call createHashAttribute, to get uniqueId: " + this.createHashAttribute(this.state.file_attrs));
 
+		//replace any values that are not pubkeys, if they are in your contacts list
+		for(var x=0;x<this.state.recovery_id.length;x++){
+			var index=this.state.names.indexOf(this.state.recovery_id[x]);
+			if(index>=0){
+				this.state.recovery_id[x] = this.state.keys[index];
+			}
+		}
+		for(var x=0;x<this.state.owner_id.length;x++){
+			var index=this.state.names.indexOf(this.state.owner_id[x]);
+			if(index>=0){
+				this.state.owner_id[x] = this.state.keys[index];
+				console.log("CHANGED: "+  this.state.owner_id[x]);
+			}
+		}
+		for(var x=0;x<this.state.control_id.length;x++){
+			var index=this.state.names.indexOf(this.state.control_id[x]);
+			if(index>=0){
+				this.state.control_id[x] = this.state.keys[index];
+			}
+		}
 		var inputObj = {
 			"pubKey": this.refs.pubKey.value,
 			//"sig": this.refs.signature.value,
@@ -415,16 +439,139 @@ class CoreIdentity extends React.Component {
 		}
 	}
 
+	onChange(event, { newValue },id) {
+		console.log("onchange");
+		var arr = this.state.value;
+		console.log("state value:  "+this.state.value)
+		arr[Number(id)] = newValue;
+    	this.setState({value: arr});
+  	};
+
+	  componentDidMount() {
+		  $('div.react-autosuggest__container').css("display","inline");
+	  }
+
 	render() {
+		var that = this;
+
+		function autocompleteRenderInput ({addTag,props}) {
+
+			var passed=JSON.stringify(arguments[0]);
+	  		console.log("passed: "+passed);
+	  		passed = JSON.parse(passed);
+
+      const handleOnChange = (e, {newValue, method}) => {
+		  console.log("handleonchange params: "+e+"   "+newValue+"   "+method+"   "+passed.id);
+        if (method === 'enter' || method === 'click') {
+			that.state.value[passed.id]="";
+          e.preventDefault()
+        } else {
+          that.onChange(e,{newValue},passed.id)
+        }
+      }
+	  const handleKeyPress = (event) => {
+		  console.log('enter press here! '+event.key)
+  if(event.key == 'Enter'){	
+          event.preventDefault()
+		  addTag(that.state.value[passed.id])
+		  that.state.value[passed.id]="";
+		  console.log('current tags: '+that.state.tags)
+  }
+}
+
+const renderInputComponent = inputProps => (
+    <input {...inputProps} />
+);
+      var inputValue = that.state.value[Number(passed.id)] || "";
+	  if(inputValue=='undefined'){inputValue="";}
+      var inputLength = inputValue.length || 0
+
+      const suggestions = that.state.names.filter((name) => {
+		  console.log("FILTER: "+name.toLowerCase().slice(0, inputLength));
+        return name.toLowerCase().slice(0, inputLength) === inputValue
+      })
+	  ///////////////////////////////////////
+
+	  
+	  
+	  var value=String(that.state.value[Number(passed.id)]) || "";
+	  if(value=='undefined'){value="";}
+	  //const suggestions = that.state.suggestions;
+	  console.log("passed ID: "+passed.id);
+	  console.log("suggestions: "+suggestions);
+	  console.log("value: "+value);
+	  const inputProps = {
+      placeholder: passed.placeholder,
+      value,
+	  style: { 
+		  width: '30%',
+		  height:'100%',
+		  display: "initial" 
+	  },
+      onChange: handleOnChange,
+	  onKeyPress: handleKeyPress,
+	  className:"react-tagsinput-input",
+	  id:passed.id
+    };
+      return (
+        <Autosuggest
+		  id={passed.id}
+          ref={passed.ref}
+          suggestions={suggestions}
+          shouldRenderSuggestions={(value) => value.length > 0}
+          getSuggestionValue={(suggestion) => suggestion}
+          renderSuggestion={(suggestion) => <span>{suggestion}</span>}
+          inputProps={inputProps}
+          onSuggestionSelected={(e, {suggestion}) => {
+            console.log("SELECTED: "+suggestion)
+			addTag(suggestion)
+          }}
+          onSuggestionsClearRequested={() => {}}
+          onSuggestionsFetchRequested={() => {}}
+		  renderInputComponent={renderInputComponent}
+        />
+      )
+    }
+
+
+
+
+		var basicAttrs = {
+			addKeys: [13, 188],	// Enter and comma
+			inputProps: {
+				placeholder: "use ENTER to add values",
+				style: { width: '30%' }
+			}
+		};
 		var inputAttrs = {
 			addKeys: [13, 188],	// Enter and comma
 			inputProps: {
-				placeholder: "use comma(,) to add multiple values",
-				style: { width: '30%' }
+				placeholder: "use ENTER to add values",
+				style: { width: '30%' },
+				id:"0"
+			}
+		};
+		var inputAttrs2 = {
+			addKeys: [13, 188],	// Enter and comma
+			inputProps: {
+				placeholder: "use ENTER to add values",
+				style: { width: '30%' },
+				id:"1"
+			}
+		};
+		var inputAttrs3 = {
+			addKeys: [13, 188],	// Enter and comma
+			inputProps: {
+				placeholder: "use ENTER to add values",
+				style: { width: '30%' },
+				id:"2"
 			}
 		};
 		var syle = {
 			marginRight: '15px'
+		}
+		var style = {
+			fontSize: '12.5px'
 		}
 		return (
 			<div id="SubmitContainer">
@@ -444,23 +591,39 @@ class CoreIdentity extends React.Component {
 					</div>
 					<div className="form-group">
 						<label htmlFor="owner_token_id">Enter Ownership Token Description. For example, 'Spencer tokens'.</label>
-						<TagsInput {...inputAttrs} value={this.state.owner_token_desc} onChange={(e) => { this.onFieldChange("owner_token_desc", e) }} />
+						<TagsInput {...basicAttrs} maxTags="1" value={this.state.owner_token_desc} onChange={(e) => { this.onFieldChange("owner_token_desc", e) }} />
 					</div>
 					<div className="form-group">
 						<label htmlFor="owner_id">Enter Owner IDs. Owner IDs are the public keys of the identity owners. Only one owner for an individual (self).</label>
-						<TagsInput {...inputAttrs} value={this.state.owner_id} onChange={(e) => { this.onFieldChange("owner_id", e) }} />
+						<TagsInput {...inputAttrs} maxTags="1" renderInput={autocompleteRenderInput} value={this.state.owner_id} onChange={(e) => { this.onFieldChange("owner_id", e) }} />
 					</div>
 					<div className="form-group">
 						<label htmlFor="owner_token_id">Enter Ownership Token Quantity. For example, 1 token for an individual.</label>
-						<TagsInput {...inputAttrs} value={this.state.owner_token_quantity} onChange={(e) => { this.onFieldChange("owner_token_quantity", e) }} />
+						<TagsInput {...basicAttrs} maxTags="1" value={this.state.owner_token_quantity} onChange={(e) => { this.onFieldChange("owner_token_quantity", e) }} />
 					</div>
 					<div className="form-group">
 						<label htmlFor="control_token_id">Control Token ID Description. For example, 'Spencer tokens'.</label>
-						<TagsInput {...inputAttrs} value={this.state.control_token_desc} onChange={(e) => { this.onFieldChange("control_token_desc", e) }} />
+						<TagsInput {...basicAttrs} maxTags="1" value={this.state.control_token_desc} onChange={(e) => { this.onFieldChange("control_token_desc", e) }} />
 					</div>
 					<div className="form-group">
 						<label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
-						{this.state.inputs_name.map(input => <TokenDistributionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+						<div className="form-group col-md-12">
+				<div className="col-md-10">
+					<table className="table table-striped table-hover" style={style}>
+						<tbody>
+							<tr>
+								<th><b>Public Key of Controller</b></th>
+								<th><b>Control Token Quantity</b></th>
+							</tr>
+							<tr>
+								<td><TagsInput {...inputAttrs3} maxTags="3" renderInput={autocompleteRenderInput} sname={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Public Key of Controller" value={this.state.control_id} onChange={(e) => { this.onFieldChange("control_id", e) }}/></td>
+								<td><TagsInput {...basicAttrs} maxTags="3" name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Control Token Quantity" value={this.state.control_token_quantity} onChange={(e) => { this.onFieldChange("control_token_quantity", e) }}/></td>
+							</tr>
+						</tbody>
+					</table>
+
+				</div>
+			</div>
 					</div>
 					<div className="form-group">
 						<div className="col-md-offset-6 col-md-6 ">
@@ -472,7 +635,7 @@ class CoreIdentity extends React.Component {
 					</div>
 					<div className="form-group">
 						<label>Recovery IDs (public keys of individuals who will attest to lost/stolen identity)</label>
-						<TagsInput {...inputAttrs} value={this.state.recovery_id} onChange={(e) => { this.onFieldChange("recovery_id", e) }} />
+						<TagsInput {...inputAttrs2} renderInput={autocompleteRenderInput} value={this.state.recovery_id} onChange={(e) => { this.onFieldChange("recovery_id", e) }} />
 					</div>
 					<div className="form-group">
 						<label>Recovery Condition (# of digital signatures of recovery ID owners needed to recover identity)</label>

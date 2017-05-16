@@ -58,10 +58,10 @@ var notifier = function () {
     //NOTE: THE DIGITAL TWIN will reject it without pubKey
     this.notifyCoidCreation = function (pubKey, assetID, txnID, txnHash, gkAddr, coidAddr, dimensionCtrlAddr) {
 
-	console.log("ASSET ID IS: " + assetID);
+        console.log("ASSET ID IS: " + assetID);
         superAgent.post(this.twinUrl + "/setAsset")
             .send({
-                "pubKey": pubKey,
+                "pubKey": keccak_256(pubKey),
                 "flag": 0,
                 "fileName": assetID + ".json",
                 "updateFlag": 1,
@@ -95,6 +95,47 @@ var notifier = function () {
                 // }
             });
     };
+
+    this.GetAsset = function (pubKey, fileName, flag, callback) {
+        superAgent.post(this.twinUrl + "/getAsset")
+            .send({
+                "pubKey": pubKey,
+                "fileName": fileName,
+                "flag": flag,
+            })
+            .set('Accept', 'application/json')
+            .end((err, res) => {
+                if (res.status == 200) {
+                    console.log("GET ASSET RETURNED: " + JSON.stringify(res.body) + "\n")
+                    var result = res.body;
+                    callback(result);
+                }
+            });
+    }
+
+    //Create an Asset in the twin folder (owned, delegated, controlled)
+    this.SetAsset = function (pubKey, fileName, flag, updateFlag, data, keys, values, callback) {
+        superAgent.post(this.twinUrl + "/setAsset")
+            .send({
+                "pubKey": pubKey,
+                "fileName": fileName,
+                "flag": flag,
+                "updateFlag": updateFlag,
+                "data": data,
+                "keys": keys,
+                "values": values
+            })
+            .set('Accept', 'application/json')
+            .end((err, res) => {
+                if (res.status == 200) {
+                    console.log("\nWRITE COMPLETE\n");
+                    callback();
+                }
+                else { console.log("\nWRITE BAD\n"); }
+                // do something
+                // }
+            });
+    }
 
 }//end of notifier
 
@@ -196,6 +237,11 @@ function CoidMaker(coidAddr, dimensionCtrlAddr, formdata) {
                                             contract.getIt(function (Error, result) {
                                                 console.log("startCoid: " + result);
 
+                                                dimCtrlContract.IdentityDimensionControlInstantiation(coidAddr, function (err, result) {
+                                                    if (err) { console.log("dimensioninstantiation error: " + err) }
+                                                    console.log("DimensionInstantiation: " + JSON.stringify(result))
+                                                })
+
                                             })//end getIT
 
                                         })//end StartCoid
@@ -217,12 +263,98 @@ function CoidMaker(coidAddr, dimensionCtrlAddr, formdata) {
         })//end setUniqueID
     }, 3000)
 
-    dimCtrlContract.IdentityDimensionControlInstantiation(coidAddr, function(err,result){
-        if(err){console.log("dimensioninstantiation error: " + err)}
-        console.log("DimensionInstantiation: " + JSON.stringify(result))
-    })
-
 }//end CoidMaker
+
+function prepareForm(formdata){
+
+    var correctForm;/* = {
+        "pubKey":"",
+        "uniqueId":"",
+        "uniqueIdAttributes":[["","",""]],
+        "ownershipId":"",
+        "ownerIdList":["",""],
+        "controlId":"",
+        "controlIdList":["",""],
+        "ownershipTokenId":"",
+        "ownershipTokenAttributes":[""],
+        "ownershipTokenQuantity":["",""],
+        "controlTokenId":"",
+        "controlTokenAttributes":[""],
+        "controlTokenQuantity":["",""],
+        "identityRecoveryIdList":[""],
+        "recoveryCondition":"",
+        "yesVotesRequiredToPass":"",
+        "validatorList":["","",""],
+        "delegateeIdList":[""],
+        "delegateeTokenQuantity":[""],
+        "isHuman":"",
+        "timestamp":"",
+        "assetID":[""],
+        "Type":"",
+        "bigchainHash":"",
+        "bigchainID":"",
+        "coidAddr":"",
+        "sig":"",
+        "msg":"",
+        "gatekeeperAddr":"",
+        "dimensionCtrlAddr":""
+    }*/
+        
+        correctForm = JSON.parse(JSON.stringify(formdata));
+        correctForm.uniqueIdAttributes=[];
+correctForm.uniqueIdAttributes.push(formdata.uniqueIdAttributes.split(","));  
+correctForm.ownerIdList=formdata.ownerIdList.split(",");
+correctForm.controlIdList=formdata.controlIdList.split(",");   
+correctForm.ownershipTokenAttributes=formdata.ownershipTokenAttributes.split(",");
+correctForm.ownershipTokenQuantity=formdata.ownershipTokenQuantity.split(",");    
+correctForm.controlTokenAttributes=formdata.controlTokenAttributes.split(",");
+correctForm.controlTokenQuantity=formdata.controlTokenQuantity.split(",");
+correctForm.identityRecoveryIdList=formdata.identityRecoveryIdList.split(",");
+correctForm.validatorList=formdata.validatorList.split(",");
+correctForm.delegateeIdList=formdata.delegateeIdList.split(",");
+correctForm.delegateeTokenQuantity=formdata.delegateeTokenQuantity.split(",");
+
+return(correctForm);
+  
+
+}
+
+function writeAll(formdata, callback) {
+
+        var owners = formdata.ownerIdList.split(",");
+        var controllers = formdata.controlIdList.split(",");
+        var max = Math.max(owners.length, controllers.length);
+        var fileName = formdata.assetID + ".json";
+        console.log("\n*****THE MIGHTY WRITEALL*****\n");
+        console.log(JSON.stringify(formdata));
+        console.log("MAX :" + max);
+        var k = 0;
+        var o = 0;
+        var c = 0;
+        var d = 0;
+        var total = owners.length + controllers.length;
+        console.log("TOTAL: " + total);
+        console.log(owners + " len " + owners.length);
+        for (var i = 0; i < max; i++) {
+            console.log("loop " + owners[i]);
+            if (typeof (owners[i]) != 'undefined' && typeof (owners[i]) != 'null' && owners != "") {
+                theNotifier.SetAsset(String(owners[i]), String(fileName), 0, 0, formdata, "", "", function () {
+                    k++;
+                    console.log("Writing to Owner: " + owners[o] + " K: " + k);
+                    o++;
+                    if (k == total) { console.log("owner callback"); callback() }
+                })
+            }
+            if (typeof (controllers[i]) != 'undefined' && typeof (controllers[i]) != 'null' && controllers != "") {
+                theNotifier.SetAsset(String(controllers[i]), String(fileName), 1, 0, formdata, "", "", function () {
+                    k++;
+                    console.log("Writing to Controller: " + controllers[c] + " K: " + k);
+                    c++;
+                    if (k == total) { console.log("controlller callback"); callback() }
+                })
+            }
+        }//end for loop
+    }//end writeAll
 
 
 //Instantiate one of these
@@ -358,10 +490,10 @@ var gatekeeper = function (MyGKaddr) {
         try {
             this.setCoidRequester(requester, proposalId, sig, msg);
             this.setmyUniqueID(requester, proposalId, myUniqueId, myUniqueIdAttributes);
-	    
-	    var this1 = this;
-	    setTimeout(function(){
-	    console.log("ISHUMAN VALUE: " + isHuman + "************************************************************************")
+
+            var this1 = this;
+            setTimeout(function(){
+            console.log("ISHUMAN VALUE: " + isHuman + "************************************************************************")
             this1.setmyOwnershipID(requester, proposalId, myOwnershipId, myOwnerIdList);
             this1.setmyControlID(requester, proposalId, myControlId, myControlIdList);
             this1.setmyOwnershipTokenID(requester, proposalId, myOwnershipTokenId, myOwnershipTokenAttributes, myOwnershipTokenQuantity);
@@ -374,7 +506,7 @@ var gatekeeper = function (MyGKaddr) {
             theNotifier.createProposalPendingNotification(requester, proposalId, isHuman, gatekeeperAddr);
 
             callback(false, res);
-	   },3000)
+           },3000)
         }
         catch (e) {
             callback(true, res);
@@ -401,7 +533,7 @@ var gatekeeper = function (MyGKaddr) {
 
             if (error) {
 
-                console.log(err);
+                console.log(error);
 
             }
             else {
@@ -432,7 +564,7 @@ var gatekeeper = function (MyGKaddr) {
 
         var sync = true;
         _this.gateKeeperContract.setCoidRequester(requester, proposalId, sig, msg, function (err, res) {
-
+            console.log("setCoidRequester..\n pubkey: " + requester + ", proposalId: " + proposalId)
             if (err) {
                 console.log("Error0");
             }
@@ -786,6 +918,8 @@ var eventListener = function (MyGKAddr) {
 
 
         bigchainInput = JSON.stringify({ "data": bigchainInput, "metadata": "null" })
+
+
         console.log("In function bigchainIt, the input to be sent to bigchain is: " + bigchainInput)
 
         var bigchainEndpoint = 'addData/' + thePubkey + '/1'
@@ -946,8 +1080,15 @@ var eventListener = function (MyGKAddr) {
                                 console.log("GK ADDR: " + coidGKAddr)
                                 console.log("COID ADDR: " + coidAddr)
                                 console.log("DIM CTRL ADDR: " + dimensionCtrlAddr)
-                                theNotifier.notifyCoidCreation(formdataArray[index].pubKey, formdataArray[index].assetID, theId, theHash, coidGKAddr, coidAddr, dimensionCtrlAddr)
-
+                                //theNotifier.notifyCoidCreation(formdataArray[index].pubKey, formdataArray[index].assetID, theId, theHash, coidGKAddr, coidAddr, dimensionCtrlAddr)
+                                var form = formdataArray[index];
+                                form.bigchainID = theId;
+                                form.bigchainHash = theHash;
+                                form.gatekeeperAddr = coidGKAddr;
+                                form.coidAddr = coidAddr;
+                                form.dimensionCtrlAddr = dimensionCtrlAddr;
+                                prepareForm(form);
+                                writeAll(form, function(){});
 
                                 //make the core identity
                                 CoidMaker(coidAddr, dimensionCtrlAddr, formdataArray[index])
@@ -1054,7 +1195,7 @@ app.post("/MyGatekeeper", function (req, res) {
     console.log('request body...' + JSON.stringify(formdata))
 
     //for testing with hardcoded data
-    /*   var formdata =
+      /* var formdata =
            {
                "pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
                "sig": "7051442bbf18bb2c86cbc8951a07e27ec6ba05ac3fa427e4c6b948e3dcf91a94046b048edf52445fb22cc776a94b87c3f55426f993458ec744f61f09fb46eeaa",
@@ -1076,8 +1217,8 @@ app.post("/MyGatekeeper", function (req, res) {
                "yesVotesRequiredToPass": 2,
                "gatekeeperAddr": "29EE74E62B739C254B4C3F9AE8E8CFF15A206B4F",
                "validatorList": "8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,AAE858DE3899D2FF096DDB5384365C6A86CE7964F1C4F1F22878944D39BD943A,46B6F98E9E34CAF4B66CFA6D2BCF3ED743C1ACCADFC3787F95DFE47ADDA7A661"
-           } */
-
+           }*/
+if(formdata.isHuman == 'false'){
     console.log(formdata.gatekeeperAddr)
     var gatekeeperApp = new gatekeeper(formdata.gatekeeperAddr);
 
@@ -1111,7 +1252,7 @@ app.post("/MyGatekeeper", function (req, res) {
     else {
         res.send("The signature is not valid....check that your public key, signature and message hash are correct.")
     }
-
+}
 });
 
 app.listen(3002, function () {

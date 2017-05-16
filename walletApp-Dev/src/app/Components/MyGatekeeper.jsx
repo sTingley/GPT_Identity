@@ -1,5 +1,6 @@
 import React from 'react';
 import TagsInput from 'react-tagsinput';
+import Autosuggest from 'react-autosuggest'
 import { keccak_256 } from 'js-sha3';
 var crypto = require('crypto');
 var secp256k1 = require('secp256k1');
@@ -305,7 +306,10 @@ class MyGatekeeper extends React.Component {
 			validators: [],
 			signature: '',
 			assetID: [],
-			dimensions: ''
+			dimensions: '',
+			names:localStorage.getItem("contactNames").split(','),
+			keys:localStorage.getItem("contactPubKeys").split(','),
+			value:["","","",""]
 
 		};
 
@@ -316,9 +320,9 @@ class MyGatekeeper extends React.Component {
 
 	componentDidMount() {
 		//TODO********** add fileName.json********put in localstorage!
-
+ $('div.react-autosuggest__container').css("display","inline");
 		let publicKey = localStorage.getItem("pubKey");
-
+console.log("compDidMountAjax");
 		$.ajax({
 			type: "POST",
 			url: twinUrl + 'getAsset',
@@ -328,7 +332,7 @@ class MyGatekeeper extends React.Component {
 				if ($.type(result) != "object") {
 					data = JSON.parseJSON(result)
 				}
-
+console.log("gkaddr file: "+result.gatekeeperAddr);
 				//var gatekeeperAddr = "gatekeeperAddr_" + publicKey 
 				//console.log("gkaddr:  " + gatekeeperAddr)
 				localStorage.setItem("gatekeeperAddr", result.gatekeeperAddr)
@@ -337,7 +341,7 @@ class MyGatekeeper extends React.Component {
 
 			}.bind(this),
 			complete: function () {
-
+//console.log("gkaddr file: "+result);
 			},
 			//console.log(result)	
 		})
@@ -419,9 +423,38 @@ class MyGatekeeper extends React.Component {
 
 	prepareJsonToSubmit() {
 		console.log();
+		
+
+		for(var x=0;x<this.state.recovery_id.length;x++){
+			var index=this.state.names.indexOf(this.state.recovery_id[x]);
+			if(index>=0){
+				this.state.recovery_id[x] = this.state.keys[index];
+			}
+		}
+		for(var x=0;x<this.state.owner_id.length;x++){
+			var index=this.state.names.indexOf(this.state.owner_id[x]);
+			if(index>=0){
+				this.state.owner_id[x] = this.state.keys[index];
+				console.log("CHANGED: "+  this.state.owner_id[x]);
+			}
+		}
+		for(var x=0;x<this.state.control_id.length;x++){
+			var index=this.state.names.indexOf(this.state.control_id[x]);
+			if(index>=0){
+				this.state.control_id[x] = this.state.keys[index];
+			}
+		}
+		for(var x=0;x<this.state.validators.length;x++){
+			var index=this.state.names.indexOf(this.state.validators[x]);
+			if(index>=0){
+				this.state.validators[x] = this.state.keys[index];
+			}
+		}
+
 		this.prepareControlTokenDistribution();
 		this.prepareOwnershipTokenDistrbution();
 		this.prepareValidators(this.state.validators)
+
 		var inputObj = {
 			"pubKey": this.refs.pubKey.value,
 			//"sig": this.refs.signature.value,	
@@ -454,7 +487,7 @@ class MyGatekeeper extends React.Component {
 			"validatorList": this.state.validators,
 
 			"delegateeIdList": [""],
-			"delegateeTokenQuantity:": [""],
+			"delegateeTokenQuantity": [""],
 
 			"isHuman": false,
 			"timestamp": "",
@@ -689,15 +722,144 @@ class MyGatekeeper extends React.Component {
 			this.setState({ inputs_ownership: this.state.inputs_ownership.concat([newInput2]) });
 		}
 	}
+	onChange(event, { newValue },id) {
+		console.log("onchange");
+		var arr = this.state.value;
+		console.log("state value:  "+this.state.value)
+		arr[Number(id)] = newValue;
+    	this.setState({value: arr});
+  	};
+
 
 	render() {
-		var inputAttrs = {
+
+		var that = this;
+
+		function autocompleteRenderInput ({addTag,props}) {
+
+			var passed=JSON.stringify(arguments[0]);
+	  		console.log("passed: "+passed);
+	  		passed = JSON.parse(passed);
+
+      const handleOnChange = (e, {newValue, method}) => {
+		  console.log("handleonchange params: "+e+"   "+newValue+"   "+method+"   "+passed.id);
+        if (method === 'enter' || method === 'click') {
+			that.state.value[passed.id]="";
+          e.preventDefault()
+        } else {
+          that.onChange(e,{newValue},passed.id)
+        }
+      }
+	  const handleKeyPress = (event) => {
+		  console.log('enter press here! '+event.key)
+  if(event.key == 'Enter'){	
+          event.preventDefault()
+		  addTag(that.state.value[passed.id])
+		  that.state.value[passed.id]="";
+		  console.log('current tags: '+that.state.tags)
+  }
+}
+
+const renderInputComponent = inputProps => (
+    <input {...inputProps} />
+);
+
+//////////////////////////////////////////////////////////////////////
+      var inputValue = that.state.value[Number(passed.id)] || "";
+	  if(inputValue=='undefined'){inputValue="";}
+      var inputLength = inputValue.length || 0
+
+      const suggestions = that.state.names.filter((name) => {
+		  console.log("FILTER: "+name.toLowerCase().slice(0, inputLength));
+        return name.toLowerCase().slice(0, inputLength) === inputValue
+      })
+ 
+	  var value=String(that.state.value[Number(passed.id)]) || "";
+	  if(value=='undefined'){value="";}
+	  //const suggestions = that.state.suggestions;
+	  console.log("passed ID: "+passed.id);
+	  console.log("suggestions: "+suggestions);
+	  console.log("value: "+value);
+	  const inputProps = {
+      placeholder: passed.placeholder,
+      value,
+	  style: { 
+		  width: '30%',
+		  height:'100%',
+		  display: "initial" 
+	  },
+      onChange: handleOnChange,
+	  onKeyPress: handleKeyPress,
+	  className:"react-tagsinput-input",
+	  id:passed.id
+    };
+      return (
+        <Autosuggest
+		  id={passed.id}
+          ref={passed.ref}
+          suggestions={suggestions}
+          shouldRenderSuggestions={(value) => value.length > 0}
+          getSuggestionValue={(suggestion) => suggestion}
+          renderSuggestion={(suggestion) => <span>{suggestion}</span>}
+          inputProps={inputProps}
+          onSuggestionSelected={(e, {suggestion}) => {
+            console.log("SELECTED: "+suggestion)
+			addTag(suggestion)
+          }}
+          onSuggestionsClearRequested={() => {}}
+          onSuggestionsFetchRequested={() => {}}
+		  renderInputComponent={renderInputComponent}
+        />
+      )
+    }
+
+		var basicAttrs = {
 			addKeys: [13, 188],	// Enter and comma
 			inputProps: {
-				placeholder: "use comma(,) to add multiple values",
+				placeholder: "use ENTER to add values",
 				style: { width: '30%' }
 			}
 		};
+		var inputAttrs = {
+			addKeys: [13, 188],	// Enter and comma
+			inputProps: {
+				placeholder: "use ENTER to add values",
+				style: { width: '30%' },
+				id:"0"
+			}
+		};
+		var inputAttrs2 = {
+			addKeys: [13, 188],	// Enter and comma
+			inputProps: {
+				placeholder: "use ENTER to add values",
+				style: { width: '30%' },
+				id:"1"
+			}
+		};
+		var inputAttrs3 = {
+			addKeys: [13, 188],	// Enter and comma
+			inputProps: {
+				placeholder: "use ENTER to add values",
+				style: { width: '30%' },
+				id:"2"
+			}
+		};
+		var inputAttrs4 = {
+			addKeys: [13, 188],	// Enter and comma
+			inputProps: {
+				placeholder: "use ENTER to add values",
+				style: { width: '30%' },
+				id:"3"
+			}
+		};
+		var syle = {
+			marginRight: '15px'
+		}
+		var style = {
+			fontSize: '12.5px'
+		}
+ 
+
 		var syle = {
 			marginRight: '15px'
 		}
@@ -719,15 +881,30 @@ class MyGatekeeper extends React.Component {
 					</div>
 					<div className="form-group">
 						<label htmlFor="assetID">Name Your Asset. For example, 'My Diploma'.</label>
-						<TagsInput {...inputAttrs} value={this.state.assetID} onChange={(e) => { this.onFieldChange("assetID", e) }} />
+						<TagsInput {...basicAttrs} value={this.state.assetID} onChange={(e) => { this.onFieldChange("assetID", e) }} />
 					</div>
 					<div className="form-group">
 						<label htmlFor="owner_token_id">Enter Ownership Token Description. For example, 'Spencer tokens'.</label>
-						<TagsInput {...inputAttrs} value={this.state.owner_token_desc} onChange={(e) => { this.onFieldChange("owner_token_desc", e) }} />
+						<TagsInput {...basicAttrs} value={this.state.owner_token_desc} onChange={(e) => { this.onFieldChange("owner_token_desc", e) }} />
 					</div>
 					<div className="form-group">
 						<label htmlFor="owner_dist">Enter Owners and their ownership token(s).</label>
-						{this.state.inputs_ownership.map(input => <OwnerTokenDistributionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+						<div className="form-group col-md-12">
+				<div className="col-md-10">
+					<table className="table table-striped table-hover" style={style}>
+						<tbody>
+							<tr>
+								<th><b>Owner</b></th>
+								<th><b>Token Quantity</b></th>
+							</tr>
+							<tr>
+								<td><TagsInput {...inputAttrs} renderInput={autocompleteRenderInput} value={this.state.owner_id} onChange={(e) => { this.onFieldChange("owner_id", e) }} name={'label2-' + this.props.labelref} className="form-control col-md-4" type="text"  /></td>
+								<td><TagsInput {...basicAttrs} value={this.state.owner_token_quantity} onChange={(e) => { this.onFieldChange("owner_token_quantity", e) }} name={'label2-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Ownership Token Quantity" /></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
 					</div>
 					<div className="form-group">
 						<div className="col-md-offset-6 col-md-6 ">
@@ -739,11 +916,26 @@ class MyGatekeeper extends React.Component {
 					</div>
 					<div className="form-group">
 						<label htmlFor="control_token_id">Enter Control Token Description. For example, 'Spencer tokens'.</label>
-						<TagsInput {...inputAttrs} value={this.state.control_token_desc} onChange={(e) => { this.onFieldChange("control_token_desc", e) }} />
+						<TagsInput {...basicAttrs} value={this.state.control_token_desc} onChange={(e) => { this.onFieldChange("control_token_desc", e) }} />
 					</div>
 					<div className="form-group">
 						<label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
-						{this.state.inputs_control.map(input => <ControlTokenDistributionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+						<div className="form-group col-md-12">
+				<div className="col-md-10">
+					<table className="table table-striped table-hover" style={style}>
+						<tbody>
+							<tr>
+								<th><b>Controller</b></th>
+								<th><b>Token Quantity</b></th>
+							</tr>
+							<tr>
+								<td><TagsInput {...inputAttrs3} renderInput={autocompleteRenderInput} sname={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Public Key of Controller" value={this.state.control_id} onChange={(e) => { this.onFieldChange("control_id", e) }}/></td>
+								<td><TagsInput {...basicAttrs} name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Control Token Quantity" value={this.state.control_token_quantity} onChange={(e) => { this.onFieldChange("control_token_quantity", e) }}/></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
 					</div>
 					<div className="form-group">
 						<div className="col-md-offset-6 col-md-6 ">
@@ -755,7 +947,7 @@ class MyGatekeeper extends React.Component {
 					</div>
 					<div className="form-group">
 						<label htmlFor="recovery_id">Recovery IDs (public keys of individuals who will attest to lost/stolen identity)</label>
-						<TagsInput {...inputAttrs} value={this.state.recovery_id} onChange={(e) => { this.onFieldChange("recovery_id", e) }} />
+						<TagsInput {...inputAttrs2} renderInput={autocompleteRenderInput} value={this.state.recovery_id} onChange={(e) => { this.onFieldChange("recovery_id", e) }} />
 					</div>
 					<div className="form-group">
 						<label>Recovery Condition (# of digital signatures of recovery ID owners needed to recover identity)</label>
@@ -764,7 +956,7 @@ class MyGatekeeper extends React.Component {
 
 					<div className="form-group">
 						<label htmlFor="validators">Validators (public keys of the accounts which will verify this identity/asset)</label>
-						<TagsInput {...inputAttrs} value={this.state.validators} onChange={(e) => { this.onFieldChange("validators", e) }} />
+						<TagsInput {...inputAttrs4} renderInput={autocompleteRenderInput} value={this.state.validators} onChange={(e) => { this.onFieldChange("validators", e) }} />
 					</div>
 					<div className="form-group">
 						<div className="col-sm-6">

@@ -272,6 +272,97 @@ function CoidMaker(coidAddr, dimensionCtrlAddr, formdata) {
 
 }//end CoidMaker
 
+function prepareForm(formdata){
+
+    var correctForm;/* = {
+        "pubKey":"",
+        "uniqueId":"",
+        "uniqueIdAttributes":[["","",""]],
+        "ownershipId":"",
+        "ownerIdList":["",""],
+        "controlId":"",
+        "controlIdList":["",""],
+        "ownershipTokenId":"",
+        "ownershipTokenAttributes":[""],
+        "ownershipTokenQuantity":["",""],
+        "controlTokenId":"",
+        "controlTokenAttributes":[""],
+        "controlTokenQuantity":["",""],
+        "identityRecoveryIdList":[""],
+        "recoveryCondition":"",
+        "yesVotesRequiredToPass":"",
+        "validatorList":["","",""],
+        "delegateeIdList":[""],
+        "delegateeTokenQuantity":[""],
+        "isHuman":"",
+        "timestamp":"",
+        "assetID":[""],
+        "Type":"",
+        "bigchainHash":"",
+        "bigchainID":"",
+        "coidAddr":"",
+        "sig":"",
+        "msg":"",
+        "gatekeeperAddr":"",
+        "dimensionCtrlAddr":""
+    }*/
+        
+        correctForm = JSON.parse(JSON.stringify(formdata));
+        correctForm.uniqueIdAttributes=[];
+correctForm.uniqueIdAttributes.push(formdata.uniqueIdAttributes.split(","));  
+correctForm.ownerIdList=formdata.ownerIdList.split(",");
+correctForm.controlIdList=formdata.controlIdList.split(",");   
+correctForm.ownershipTokenAttributes=formdata.ownershipTokenAttributes.split(",");
+correctForm.ownershipTokenQuantity=formdata.ownershipTokenQuantity.split(",");    
+correctForm.controlTokenAttributes=formdata.controlTokenAttributes.split(",");
+correctForm.controlTokenQuantity=formdata.controlTokenQuantity.split(",");
+correctForm.identityRecoveryIdList=formdata.identityRecoveryIdList.split(",");
+correctForm.validatorList=formdata.validatorList.split(",");
+correctForm.delegateeIdList=formdata.delegateeIdList.split(",");
+correctForm.delegateeTokenQuantity=formdata.delegateeTokenQuantity.split(",");
+
+return(correctForm);
+  
+
+}
+
+function writeAll(formdata, callback) {
+
+        var owners = formdata.ownerIdList.split(",");
+        var controllers = formdata.controlIdList.split(",");
+        var max = Math.max(owners.length, controllers.length);
+        var fileName = formdata.assetID + ".json";
+        console.log("\n*****THE MIGHTY WRITEALL*****\n");
+        console.log(JSON.stringify(formdata));
+        console.log("MAX :" + max);
+        var k = 0;
+        var o = 0;
+        var c = 0;
+        var d = 0;
+        var total = owners.length + controllers.length;
+        console.log("TOTAL: " + total);
+        console.log(owners + " len " + owners.length);
+        for (var i = 0; i < max; i++) {
+            console.log("loop " + owners[i]);
+            if (typeof (owners[i]) != 'undefined' && typeof (owners[i]) != 'null' && owners != "") {
+                theNotifier.SetAsset(String(owners[i]), String(fileName), 0, 0, formdata, "", "", function () {
+                    k++;
+                    console.log("Writing to Owner: " + owners[o] + " K: " + k);
+                    o++;
+                    if (k == total) { console.log("owner callback"); callback() }
+                })
+            }
+            if (typeof (controllers[i]) != 'undefined' && typeof (controllers[i]) != 'null' && controllers != "") {
+                theNotifier.SetAsset(String(controllers[i]), String(fileName), 1, 0, formdata, "", "", function () {
+                    k++;
+                    console.log("Writing to Controller: " + controllers[c] + " K: " + k);
+                    c++;
+                    if (k == total) { console.log("controlller callback"); callback() }
+                })
+            }
+        }//end for loop
+    }//end writeAll
+
 //makes a change unique attributes for a unique ID
 function UniqueAttributeChanger(coidAddr, dimensionCtrlAddr, formdata) {
 
@@ -420,7 +511,7 @@ var gatekeeper = function () {
 
             if (error) {
                 console.log("error returned from isUnique function of gatekeeper contract");
-                console.log(err);
+                console.log(error);
 
             }
             else {
@@ -1079,19 +1170,25 @@ var eventListener = function () {
             eventBallotProposalExpired = result;
         },
         function (error, result) {
-            var expiredProposalId = (result.args).expiredProposalId;
-            var isExpired = (result.args).isExpired;
+            //console.log(result + " " + typeof (result));
+            if (typeof (result) != 'object' && typeof (result.args) == 'null' && typeof (result.args) == 'undefined' && typeof (result.args.expiredProposalId) == 'null' && typeof (result.args.expiredProposalId) == 'undefined') {
+                var expiredProposalId = (result.args).expiredProposalId;
+                var isExpired = (result.args).isExpired;
 
-            //delete the proposal from gatekeeper
-            _this.gateKeeperContract.deleteProposal(expiredProposalId, function (error, result) {
-                if (error) {
-                    console.log("error from Gatekeeper Contract function deleteProposal:" + error);
-                } else {
-                    console.log("The Gatekeeper Contract function deleteProposal has been called with no error");
-                }
-            })
+                //delete the proposal from gatekeeper
+                _this.gateKeeperContract.deleteProposal(expiredProposalId, function (error, result) {
+                    if (error) {
+                        console.log("error from Gatekeeper Contract function deleteProposal:" + error);
+                    } else {
+                        console.log("The Gatekeeper Contract function deleteProposal has been called with no error");
+                    }
+                })
+            }
+            else{
+                console.log("problem with results: " + result);
+                console.log("error: "+ error);
+            }
         })
-
 
     //
     // Listening of the resultReady event in gatekeeper:
@@ -1174,7 +1271,15 @@ var eventListener = function () {
                                 console.log("COID ADDR: " + coidAddr)
                                 console.log("DIM_CTRL ADDR: " + dimensionCtrlAddr)
 
-                                theNotifier.notifyCoidCreation(formdataArray[index].pubKey, theId, theHash, coidGKAddr, coidAddr, dimensionCtrlAddr)
+                                //theNotifier.notifyCoidCreation(formdataArray[index].pubKey, theId, theHash, coidGKAddr, coidAddr, dimensionCtrlAddr)
+                                var form = formdataArray[index];
+                                form.bigchainID = theId;
+                                form.bigchainHash = theHash;
+                                form.gatekeeperAddr = coidGKAddr;
+                                form.coidAddr = coidAddr;
+                                form.dimensionCtrlAddr = dimensionCtrlAddr;
+                                prepareForm(form);
+                                writeAll(form, function(){});
 
                                 //makes the core identity
                                 CoidMaker(coidAddr, dimensionCtrlAddr, formdataArray[index])
@@ -1337,7 +1442,7 @@ var eventListener = function () {
     // Note that after the function is called in gatekeeper, it triggers the gatekeeper resultReady event
     //
     var eventBallotResultIsReady;
-    _this.ballotContract.resultIsReady
+    _this.ballotContract.resultIsReadyIDF
         (
         function (error, result) {
             eventBallotResultIsReady = result
@@ -1456,7 +1561,7 @@ app.post("/gatekeeper", function (req, res) {
   forUniqueId : 'true'
 }*/
 
-
+if(formdata.isHuman == 'true'){
     var gatekeeperApp = new gatekeeper();
     var isValid = gatekeeperApp.verifyIt(formdata);
     var isUnique = gatekeeperApp.checkUnique(formdata);
@@ -1488,7 +1593,7 @@ app.post("/gatekeeper", function (req, res) {
     else {
         res.send("The signature is not valid....check that your public key, signature and message hash are correct.")
     }
-
+}
 });
 
 
@@ -1497,4 +1602,3 @@ app.listen(3000, function () {
     console.log("Connected to contract http://10.101.114.231:1337/rpc");
     console.log("Listening on port 3000");
 });
-

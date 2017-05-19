@@ -8,7 +8,7 @@ var secp256k1 = require('secp256k1');
 
 //TODO : Namespace validation 
 
-
+var _this;
 //form where we can add addtional labels (uniqueIDAttrs)
 class UniqueIDAttributesForm extends React.Component {
 
@@ -71,8 +71,9 @@ class TokenDistributionForm extends React.Component {
 								<th><b>Control Token Quantity</b></th>
 							</tr>
 							<tr>
-								<td><TagsInput name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Public Key of Controller" value={this.state.control_token_id} onChange={(e) => { this.onFieldChange("control_token_id", e) }}/></td>
-								<td><TagsInput name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Control Token Quantity" value={this.state.control_token_quantity} onChange={(e) => { this.onFieldChange("control_token_quantity", e) }}/></td>
+								<td><TagsInput {..._this.inputAttrs3} renderInput={_this.autocompleteRenderInput} name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text"  value={_this.state.control_token_id} onChange={(e) => { this.onFieldChange("control_token_id", e)}}/>
+								</td>
+								<td><TagsInput {..._this.inputAttrs3} renderInput={_this.autocompleteRenderInput} name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text"  value={_this.state.control_token_quantity} onChange={(e) => { this.onFieldChange("control_token_quantity", e) }}/></td>
 							</tr>
 						</tbody>
 					</table>
@@ -93,7 +94,7 @@ class CoreIdentity extends React.Component {
 			inputs_name: ['input1-0'],
 			official_id: [],		//first official ID is name (see identity spec v1.3)
 			owner_id: [],
-			control_id: [],
+			control_id: [[]],
 			recovery_id: [],
 			//recoveryCondition: [],
 			isHuman: [],
@@ -102,7 +103,7 @@ class CoreIdentity extends React.Component {
 			owner_token_quantity: [],
 			control_token_id: [],
 			control_token_desc: [],
-			control_token_quantity: [],
+			control_token_quantity: [[]],
 			showModal: false,
 			tmpFile: '',
 			pubKey: localStorage.getItem("pubKey"),
@@ -110,22 +111,52 @@ class CoreIdentity extends React.Component {
 			signature: '',
 			names:localStorage.getItem("contactNames").split(','),
 			keys:localStorage.getItem("contactPubKeys").split(','),
-			value:["","","",""]
+			value:["","","","","","","","","","","","","","","",""],
+			suggest_attrs:[{
+			addKeys: [13, 188],	// Enter and comma
+			inputProps: {
+				placeholder: "use ENTER to add values",
+				style: { width: '30%' },
+				id:"3"
+			}
+		}]
 		};
-
+_this=this;
 		this.maxUniqAttr = 10;
 		this.onFieldChange = this.onFieldChange.bind(this);
+		this.onFieldChange2 = this.onFieldChange2.bind(this);
 		this.handleHideModal = this.handleHideModal.bind(this);
 	}
 
 	onFieldChange(inputField, e) {
 		var multipleValues = {};
+		//var pieces = inputField.split(",");
+		//var index = pieces[1];
+		//var variable = pieces[0];
+		//console.log("input field: "+variable+"   index: "+index);
 		if (inputField == "name" || inputField == "signature" || inputField == "message") {
 			this.setState({ [inputField]: e.target.value });
 		} else {
 			multipleValues[inputField] = e;
+			//this.state[variable][Number(index)] = e;
+			//console.log("field value :"+variable[Number(index)]);
 			this.setState(multipleValues);
+			
 		}
+	}
+
+	onFieldChange2(inputField, e) {
+		var multipleValues = {};
+		var pieces = inputField.split(",");
+		var index = pieces[1];
+		var variable = pieces[0];
+		console.log("input field: "+variable+"   index: "+index);
+		console.log("field value :"+this.state[variable][index]);
+		this.state[variable][Number(index)] = e;
+		console.log("field value :"+variable[Number(index)]);		
+		multipleValues[variable] = this.state[variable];
+		this.setState(multipleValues);
+		console.log("state value :"+this.state[variable]);
 	}
 
 	getHash(input) {
@@ -201,6 +232,18 @@ class CoreIdentity extends React.Component {
 				console.log("CHANGED: "+  this.state.owner_id[x]);
 			}
 		}
+		var tempArr = this.state.control_id.toString().split(',');
+		var tempArr2 = this.state.control_token_quantity.toString().split(',');
+		for(var x=0;x<tempArr.length;x++){
+			if(tempArr[x] == ""){
+				tempArr.splice(x,1);
+				tempArr2.splice(x,1);
+			}
+		}
+		this.state.control_id = tempArr;
+		this.state.control_token_quantity = tempArr2;
+
+		console.log("tempArr: "+tempArr);
 		for(var x=0;x<this.state.control_id.length;x++){
 			var index=this.state.names.indexOf(this.state.control_id[x]);
 			if(index>=0){
@@ -432,9 +475,24 @@ class CoreIdentity extends React.Component {
 
 	//used in tokendistrubtionform
 	appendInput2() {
+		console.log("input name: "+this.state.inputs_name);
+		this.state.control_id.push([]);
+		this.state.control_token_quantity.push([]);
+		console.log("control id: "+this.state.control_id);
 		var inputLen = this.state.inputs_name.length;
 		if (inputLen < this.maxUniqAttr) {
 			var newInput1 = `input1-${inputLen}`;
+			var theID=inputLen+4;
+			console.log("theID: "+theID);
+			var Attrs = {
+			addKeys: [13, 188],	// Enter and comma
+			inputProps: {
+				placeholder: "use ENTER to add values",
+				style: { width: '30%' },
+				id:theID.toString()
+			}
+		};
+			this.state.suggest_attrs.push(Attrs);
 			this.setState({ inputs_name: this.state.inputs_name.concat([newInput1]) });
 		}
 	}
@@ -448,16 +506,17 @@ class CoreIdentity extends React.Component {
   	};
 
 	  componentDidMount() {
-		  $('div.react-autosuggest__container').css("display","inline");
+		  
 	  }
 
 	render() {
+		$('div.react-autosuggest__container').css("display","inline");
 		var that = this;
 
 		function autocompleteRenderInput ({addTag,props}) {
 
 			var passed=JSON.stringify(arguments[0]);
-	  		console.log("passed: "+passed);
+	  		console.log("passed: "+passed + JSON.stringify(arguments[1]));
 	  		passed = JSON.parse(passed);
 
       const handleOnChange = (e, {newValue, method}) => {
@@ -573,6 +632,7 @@ const renderInputComponent = inputProps => (
 		var style = {
 			fontSize: '12.5px'
 		}
+		
 		return (
 			<div id="SubmitContainer">
 				<h1>Core Identity Submission Form</h1>
@@ -591,39 +651,43 @@ const renderInputComponent = inputProps => (
 					</div>
 					<div className="form-group">
 						<label htmlFor="owner_token_id">Enter Ownership Token Description. For example, 'Spencer tokens'.</label>
-						<TagsInput {...basicAttrs} maxTags="1" value={this.state.owner_token_desc} onChange={(e) => { this.onFieldChange("owner_token_desc", e) }} />
+						<TagsInput {...basicAttrs} maxTags={1} value={this.state.owner_token_desc} onChange={(e) => { this.onFieldChange("owner_token_desc", e) }} />
 					</div>
 					<div className="form-group">
 						<label htmlFor="owner_id">Enter Owner IDs. Owner IDs are the public keys of the identity owners. Only one owner for an individual (self).</label>
-						<TagsInput {...inputAttrs} maxTags="1" renderInput={autocompleteRenderInput} value={this.state.owner_id} onChange={(e) => { this.onFieldChange("owner_id", e) }} />
+						<TagsInput {...inputAttrs} maxTags={1} renderInput={autocompleteRenderInput} value={this.state.owner_id} onChange={(e) => { this.onFieldChange("owner_id", e) }} />
 					</div>
 					<div className="form-group">
 						<label htmlFor="owner_token_id">Enter Ownership Token Quantity. For example, 1 token for an individual.</label>
-						<TagsInput {...basicAttrs} maxTags="1" value={this.state.owner_token_quantity} onChange={(e) => { this.onFieldChange("owner_token_quantity", e) }} />
+						<TagsInput {...basicAttrs} maxTags={1} value={this.state.owner_token_quantity} onChange={(e) => { this.onFieldChange("owner_token_quantity", e) }} />
 					</div>
 					<div className="form-group">
 						<label htmlFor="control_token_id">Control Token ID Description. For example, 'Spencer tokens'.</label>
-						<TagsInput {...basicAttrs} maxTags="1" value={this.state.control_token_desc} onChange={(e) => { this.onFieldChange("control_token_desc", e) }} />
+						<TagsInput {...basicAttrs} maxTags={1} value={this.state.control_token_desc} onChange={(e) => { this.onFieldChange("control_token_desc", e) }} />
 					</div>
 					<div className="form-group">
 						<label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
-						<div className="form-group col-md-12">
-				<div className="col-md-10">
-					<table className="table table-striped table-hover" style={style}>
-						<tbody>
-							<tr>
-								<th><b>Public Key of Controller</b></th>
-								<th><b>Control Token Quantity</b></th>
-							</tr>
-							<tr>
-								<td><TagsInput {...inputAttrs3} maxTags="3" renderInput={autocompleteRenderInput} sname={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Public Key of Controller" value={this.state.control_id} onChange={(e) => { this.onFieldChange("control_id", e) }}/></td>
-								<td><TagsInput {...basicAttrs} maxTags="3" name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Control Token Quantity" value={this.state.control_token_quantity} onChange={(e) => { this.onFieldChange("control_token_quantity", e) }}/></td>
-							</tr>
-						</tbody>
-					</table>
+						{this.state.inputs_name.map((input,i) => 
+								<div className="form-group col-md-12">
+									<div className="col-md-10">
+										<table className="table table-striped table-hover" style={style}>
+											<tbody>
+												<tr>
+													<th><b>Public Key of Controller</b></th>
+													<th><b>Control Token Quantity</b></th>
+												</tr>
+												<tr>
+													<td><TagsInput {...this.state.suggest_attrs[i]} maxTags={1} renderInput={autocompleteRenderInput}  className="form-control col-md-4" type="text"  value={this.state.control_id[i]} onChange={(e) => { this.onFieldChange2("control_id,"+i, e)}}/>
+													</td>
+													<td><TagsInput {...basicAttrs} maxTags={1}  className="form-control col-md-4" type="text"  value={this.state.control_token_quantity[i]} onChange={(e) => { this.onFieldChange2("control_token_quantity,"+i, e) }}/></td>
+												</tr>
+											</tbody>
+										</table>
 
-				</div>
-			</div>
+									</div>
+								</div>					
+						
+						)}
 					</div>
 					<div className="form-group">
 						<div className="col-md-offset-6 col-md-6 ">

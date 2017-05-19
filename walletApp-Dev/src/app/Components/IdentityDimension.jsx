@@ -524,6 +524,7 @@ class IdentityDimensions extends Component {
             showModal: false,
 
             showDetails: false,
+            currentAsset:"",
 
             //Controllers for dimension (not necessarily COID controllers)
             control_list: []
@@ -532,7 +533,13 @@ class IdentityDimensions extends Component {
         this.showDimensionHandler = this.showDimensionHandler.bind(this);
         this.handleHideModal = this.handleHideModal.bind(this);
         this.onFieldChange = this.onFieldChange.bind(this);
+        this.pickerChange = this.pickerChange.bind(this);
 
+    }
+    //*****************************************************************************
+    pickerChange(e){
+        this.setState({currentAsset: e.target.value});
+        console.log('asset change: '+ e.target.value);
     }
     //*****************************************************************************
     //watch for inputs on control_list
@@ -652,7 +659,7 @@ class IdentityDimensions extends Component {
 
     }//end getDimensions
 
-    componentWillMount() {
+    componentWillMount() {       
 
         this.getDimensions();
         //****************************************************** */
@@ -679,7 +686,7 @@ class IdentityDimensions extends Component {
 
             let controlled = localStorage.getItem("controlled_assets")
             controlled = JSON.parse(controlled)
-            console.log("controlled... " + controlled)
+            console.log("controlled... " + JSON.stringify(controlled))
 
             for (var i = 0; i < controlled.length; i++) {
                 controlled_labels.push(controlled[i].asset_id)
@@ -690,6 +697,10 @@ class IdentityDimensions extends Component {
 
 
     }//componentWillMount
+
+    componentDidMount(){
+        
+    }
 
     /*****************************************************************************
     /*****************************************************************************
@@ -834,9 +845,20 @@ class IdentityDimensions extends Component {
         json.address = "", json.flag = 0, json.ID = 0;
         //*************************************************************************
         // GET PROPER DATA FROM SELECTED ASSET (we will pass owners to prepareDelegations)
-        let selected_asset = $("#assetSelect option:selected").text();
+        let selected_asset = this.state.currentAsset//$("#assetSelect option:selected").text();
         this.state.own_assets.forEach(function (asset, index) {
             if (selected_asset == asset.asset_id) {
+                console.log("\n\n SELECTED ASSET: "+ selected_asset + "  Owned assetID: "+asset.asset_id);
+                json.coidAddr = asset.asset_coidAddr,
+                    json.dimensionCtrlAddr = asset.asset_dimCtrlAddr,
+                    json.uniqueId = asset.asset_uniqueId,
+                    json.owners = asset.asset_owners,
+                    json.controllers = asset.asset_controllers
+            }
+        })
+        this.state.control_assets.forEach(function (asset, index) {           
+            if (selected_asset == asset.asset_id) {
+                console.log("\n\n SELECTED ASSET: "+ selected_asset + "  Controlled assetID: "+asset.asset_id);
                 json.coidAddr = asset.asset_coidAddr,
                     json.dimensionCtrlAddr = asset.asset_dimCtrlAddr,
                     json.uniqueId = asset.asset_uniqueId,
@@ -979,7 +1001,7 @@ class IdentityDimensions extends Component {
 
                             <div>
                                 <h5><b>Select asset:</b></h5>
-                                <select id="assetSelect" className="selectpicker show-tick">
+                                <select id="assetSelect" className="selectpicker show-tick" value={this.state.currentAsset} onChange={this.pickerChange}>
                                     <optgroup label="Owned">
                                         {(() => {
                                             if (this.state.owned_assets_label.length > 0) {

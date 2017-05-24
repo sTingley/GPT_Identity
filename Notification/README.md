@@ -1,4 +1,4 @@
-# Digital Twin / Ballot / Gatekeeper&Dao
+# Digital Twin / Ballot
 
 ## Ballot (ballot.js)
 - [ ] TODO : Should create Ballot.sol instance

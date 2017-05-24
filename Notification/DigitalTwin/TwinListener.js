@@ -9,6 +9,7 @@ var app = require('express')(),
         IPFS = require('./ipfs.js'),
         TwinConfig = require('./TwinConfig.json'),
         IdentityDimensionCtrl = require('./IdentityDimensionCtrl.js'),
+	contactCtrl = require('./contactsCtrl.js'),
         AssetCtrl = require('./AssetCtrl.js');
 
 // for parsing application/json
@@ -64,6 +65,10 @@ function getConfiguration(theTarget, oldEndpoint, newEndpoint, txnID) {
         };
 }
 
+// -> -> -> START CONTACT FUNCTIONS -> -> ->
+app.get('/readContacts/:pubKey',contactCtrl.readContacts);
+app.post('/writeContacts',contactCtrl.writeContacts);
+// <- <- <- END CONTACT FUNCTIONS <- <- <-
 
 //TODO: expiredNotification
 // -> -> -> START NOTIFICATION FUNCTIONS -> -> ->

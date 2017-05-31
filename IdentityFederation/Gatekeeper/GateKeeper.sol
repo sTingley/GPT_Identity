@@ -12,6 +12,7 @@ contract GateKeeper {
 
     bytes32[3] validatorsToVote; // randomly selected validators from the DAO list
     bytes32[35] list; // list of validstors from DAO
+    bytes32[10] temp;
 
     uint nonce = 0;
 
@@ -322,9 +323,9 @@ contract GateKeeper {
                 if (msg.sender == chairperson) {
 
                 if(proposals[proposalId].isHuman = true){
-                        for(uint i=0; i< controlTokenQuantityVal.length; i++){
-                                if (controlTokenQuantityVal[i] != 0) {throw;}
-                        }
+                        //for(uint i=0; i< controlTokenQuantityVal.length; i++){
+                        //        if (controlTokenQuantityVal[i] != 0) {throw;}
+                        //}
 
         if (sha3(requesterVal) == proposals[proposalId].requester && proposals[proposalId].ownership_token_check == true ) {
             proposals[proposalId].coidData.myControlTokenID.controlTokenId = controlTokenIdVal;
@@ -726,7 +727,15 @@ contract GateKeeper {
         // Has been added here
         Ballot B = Ballot(ballotAddr);
 
-         B.addSelectedValidator(proposalId, validatorsToVote);
+        for(uint l = 0; l < 10; l++)
+        {
+                temp[l] = 0x0;
+        }
+        temp[0]=validatorsToVote[0];
+        temp[1]=validatorsToVote[1];
+        temp[2]=validatorsToVote[2];
+
+        B.addSelectedValidator(proposalId, temp);
 
 //NO need to call giveRightToVote, addSelectedValidator does that now
 //(see above comment)         B.giveRightToVote(proposalId, validatorsToVote);

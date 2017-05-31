@@ -1,18 +1,16 @@
-
 import "CoreIdentity.sol";
 import "ballot.sol";
 import "Dao.sol";
-import "coidGateKeeper.sol";
-import "IdentityDimensionControl.sol"
-
-//TODO: CHANGE THE CHAIRPERSON--- currently has to be entered manually when a new chain is created/the old chain dies
+//import "coidGateKeeper.sol";
+import "IdentityDimensionControl.sol";
 
 contract MyGateKeeper
 {
 
-    bytes32[3] validatorsToVote; // randomly selected validators from the DAO list
+    bytes32[10] validatorsToVote; // randomly selected validators from the DAO list
 
     event resultReady(bytes32 proposalId, bool result, string resultMessage, address coidGKAddr, address coidAddr, address dimensionCtrlAddr, uint blockNumberVal, bytes32 blockHashVal, bytes32 blockchainIdVal, uint timestamp);
+    event resultReadyKYC(bytes32 proposalId, bool result, string resultMessage, address coidGKAddr, address coidAddr, address dimensionCtrlAddr, uint blockNumberVal, bytes32 blockHashVal, bytes32 blockchainIdVal, uint timestamp);
     event proposalDeleted(string notify); // notify user if the proposal got deleted after experation
 
 
@@ -96,7 +94,7 @@ contract MyGateKeeper
         uint yesVotesRequiredToPass;
         uint numberOfVoters;
         bool isHuman;
-
+        uint propType;
     }
 
     //The struct to keep track of proposalId, uniqueId, pubkey and signature
@@ -119,11 +117,11 @@ contract MyGateKeeper
 
     mapping(bytes32 => bool) calledBefore;
 
-    address chairperson = 0x96392FA83239D150C427C822E4794A690F7A019D;
+    address chairperson = 0x22853BF788BC348B59AF50E0B479BD8960188B77;
 
     //This sets the Eris account that deployed the gatekeeper contract as the chairperson of a proposal
     function MyGateKeeper() {
-        // chairperson = msg.sender;
+       //  chairperson = msg.sender;
     }
 
 
@@ -133,6 +131,23 @@ contract MyGateKeeper
         val = uniqueIdList[i];
     }
 
+    //function to determine update route
+    function setPropType(bytes32 proposalId, uint propType) returns (uint success)
+    {
+        if (msg.sender == chairperson){
+            proposals[proposalId].propType = propType;
+        }
+        if (proposals[proposalId].propType != 0){
+            success =  proposals[proposalId].propType;
+        }
+
+    }
+
+    //function to determine update route
+    function getPropType(bytes32 proposalId) returns (uint)
+    {
+        return (proposals[proposalId].propType);
+    }
 
     // Set coid requster of the Coid proposal
     //AF: Changed types to account for updated types in structs. Added if function to ensure only chairperson calls contract
@@ -507,10 +522,11 @@ contract MyGateKeeper
     function ResultIsReady(bool resultVal, bytes32 proposalId, bytes32 blockchainId) {
 
         bool result;
-        address coidGKAddr;
+        //address coidGKAddr;
         address coidIdentityAddr;
         address dimensionCtrlAddr;
         uint blockNumber;
+        uint n = 2;
 
         if (msg.sender == chairperson)  // only IDF gateKeeper has right to call this function
         {
@@ -520,7 +536,7 @@ contract MyGateKeeper
 
                 coidIdentityAddr = createCOID(proposalId);
 
-                coidGKAddr = createGateKeeper();
+                //coidGKAddr = 0x0;
 
                 dimensionCtrlAddr = createDimensionControl();
 
@@ -530,12 +546,22 @@ contract MyGateKeeper
 
                 proposals[proposalId].coidData.blockHash = 0x0;
 
-                resultReady(proposalId, result, "Your identity has been integrated.", coidGKAddr, coidIdentityAddr, dimensionCtrlAddr, blockNumber, proposals[proposalId].coidData.blockHash, blockchainId, now);
-
+               //later make into just 'if' statements
+                if(proposals[proposalId].propType == n){
+                    resultReadyKYC(proposalId, result, "Your KYC has been integrated.", 0x0, coidIdentityAddr, dimensionCtrlAddr, blockNumber, proposals[proposalId].coidData.blockHash, blockchainId, now);
+                }
+                else{
+                    resultReady(proposalId, result, "Your identity has been integrated.", 0x0, coidIdentityAddr, dimensionCtrlAddr, proposals[proposalId].propType, proposals[proposalId].coidData.blockHash, blockchainId, now);
+                }
             }
             else {
-                //dont make coid
-                resultReady(proposalId, result, "Sorry, your identity was rejected.", 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, now);
+                if(proposals[proposalId].propType == n){
+                    //dont make coid
+                    resultReadyKYC(proposalId, result, "Sorry, your KYC was rejected.", 0x0, 0x0, 0x0, 0x0, 0x0, 0X0, now);
+                }
+                else{
+                    resultReady(proposalId, result, "Sorry, your identity was rejected.", 0x0, 0x0, 0x0, 0x0, 0x0, 0X0, now);
+                }
 
             }
         }
@@ -563,32 +589,14 @@ contract MyGateKeeper
         return MyCoidIdentity;
     }
 
-    // Instantiate coidGateKeepr contract
-    coidGateKeeper MycoidGateKeeper;
-
-    function createGateKeeper() returns (address)
-    {
-
-        if (msg.sender == chairperson) {
-            //create coidGateKeeper instance, and return the address to the requester
-            MycoidGateKeeper = new coidGateKeeper();
-        }
-        else {
-            throw;
-        }
-
-        return MycoidGateKeeper;
-    }
-
-
     //set validators
-    function setValidators(bytes32 proposalId, bytes32[3] validators, address ballotAddr) {
+    function setValidators(bytes32 proposalId, bytes32[10] validators, address ballotAddr) {
         if (msg.sender == chairperson) {
             uint total;
             bool stop;
             uint random;
 
-            for (uint p = 0; p < 3; p++)
+            for (uint p = 0; p < validators.length; p++)
             {
                 validatorsToVote[p] = validators[p];
             }

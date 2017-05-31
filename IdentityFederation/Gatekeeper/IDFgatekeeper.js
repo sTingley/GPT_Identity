@@ -306,30 +306,27 @@ function prepareForm(formdata){
         "gatekeeperAddr":"",
         "dimensionCtrlAddr":""
     }*/
-        
+
         correctForm = JSON.parse(JSON.stringify(formdata));
         correctForm.uniqueIdAttributes=[];
-correctForm.uniqueIdAttributes.push(formdata.uniqueIdAttributes.split(","));  
+correctForm.uniqueIdAttributes.push(formdata.uniqueIdAttributes.split(","));
 correctForm.ownerIdList=formdata.ownerIdList.split(",");
-correctForm.controlIdList=formdata.controlIdList.split(",");   
+correctForm.controlIdList=formdata.controlIdList.split(",");
 correctForm.ownershipTokenAttributes=formdata.ownershipTokenAttributes.split(",");
-correctForm.ownershipTokenQuantity=formdata.ownershipTokenQuantity.split(",");    
+correctForm.ownershipTokenQuantity=formdata.ownershipTokenQuantity.split(",");
 correctForm.controlTokenAttributes=formdata.controlTokenAttributes.split(",");
 correctForm.controlTokenQuantity=formdata.controlTokenQuantity.split(",");
 correctForm.identityRecoveryIdList=formdata.identityRecoveryIdList.split(",");
-correctForm.validatorList=formdata.validatorList.split(",");
-correctForm.delegateeIdList=formdata.delegateeIdList.split(",");
-correctForm.delegateeTokenQuantity=formdata.delegateeTokenQuantity.split(",");
 
 return(correctForm);
-  
+
 
 }
 
 function writeAll(formdata, callback) {
 
-        var owners = formdata.ownerIdList.split(",");
-        var controllers = formdata.controlIdList.split(",");
+        var owners = formdata.ownerIdList;
+        var controllers = formdata.controlIdList;
         var max = Math.max(owners.length, controllers.length);
         var fileName = formdata.assetID + ".json";
         console.log("\n*****THE MIGHTY WRITEALL*****\n");
@@ -362,6 +359,7 @@ function writeAll(formdata, callback) {
             }
         }//end for loop
     }//end writeAll
+
 
 //makes a change unique attributes for a unique ID
 function UniqueAttributeChanger(coidAddr, dimensionCtrlAddr, formdata) {
@@ -1108,7 +1106,7 @@ var eventListener = function () {
 
         _this.bigchain_contract.BigChainQuery(JSON.stringify(theobj), function (error, result) {
 
-            // console.log("A million stars ***************************************************************************************")
+            console.log("A million stars ***************************************************************************************")
             var theEvent;
             _this.bigchain_contract.CallbackReady(function (error, result) {
                 theEvent = result;
@@ -1278,8 +1276,8 @@ var eventListener = function () {
                                 form.gatekeeperAddr = coidGKAddr;
                                 form.coidAddr = coidAddr;
                                 form.dimensionCtrlAddr = dimensionCtrlAddr;
-                                prepareForm(form);
-                                writeAll(form, function(){});
+
+                                writeAll(prepareForm(form), function(){});
 
                                 //makes the core identity
                                 CoidMaker(coidAddr, dimensionCtrlAddr, formdataArray[index])
@@ -1602,3 +1600,4 @@ app.listen(3000, function () {
     console.log("Connected to contract http://10.101.114.231:1337/rpc");
     console.log("Listening on port 3000");
 });
+

@@ -524,10 +524,12 @@ class IdentityDimensions extends Component {
             showModal: false,
 
             showDetails: false,
-            currentAsset:"",
+            currentAsset: "",
 
             //Controllers for dimension (not necessarily COID controllers)
-            control_list: []
+            control_list: [],
+
+            validators: []
 
         };
         this.showDimensionHandler = this.showDimensionHandler.bind(this);
@@ -537,9 +539,9 @@ class IdentityDimensions extends Component {
 
     }
     //*****************************************************************************
-    pickerChange(e){
-        this.setState({currentAsset: e.target.value});
-        console.log('asset change: '+ e.target.value);
+    pickerChange(e) {
+        this.setState({ currentAsset: e.target.value });
+        console.log('asset change: ' + e.target.value);
     }
     //*****************************************************************************
     //watch for inputs on control_list
@@ -659,7 +661,7 @@ class IdentityDimensions extends Component {
 
     }//end getDimensions
 
-    componentWillMount() {       
+    componentWillMount() {
 
         this.getDimensions();
         //****************************************************** */
@@ -698,8 +700,8 @@ class IdentityDimensions extends Component {
 
     }//componentWillMount
 
-    componentDidMount(){
-        
+    componentDidMount() {
+
     }
 
     /*****************************************************************************
@@ -840,7 +842,14 @@ class IdentityDimensions extends Component {
         var json = {};
         //*************************************************************************
         let dimensionName = $("input[name^='dimensionName']").val();
-        if (dimensionName) { json.dimensionName = dimensionName }
+        if (dimensionName) {
+            json.dimensionName = dimensionName;
+            if (dimensionName = "KYC") {
+                json.validators = this.state.validators;
+                let endpoint = "/request_KYC";
+                let isKYC = true;
+            }
+        }
         json.pubKey = localStorage.getItem("pubKey");
         json.address = "", json.flag = 0, json.ID = 0;
         //*************************************************************************
@@ -848,7 +857,7 @@ class IdentityDimensions extends Component {
         let selected_asset = this.state.currentAsset//$("#assetSelect option:selected").text();
         this.state.own_assets.forEach(function (asset, index) {
             if (selected_asset == asset.asset_id) {
-                console.log("\n\n SELECTED ASSET: "+ selected_asset + "  Owned assetID: "+asset.asset_id);
+                console.log("\n\n SELECTED ASSET: " + selected_asset + "  Owned assetID: " + asset.asset_id);
                 json.coidAddr = asset.asset_coidAddr,
                     json.dimensionCtrlAddr = asset.asset_dimCtrlAddr,
                     json.uniqueId = asset.asset_uniqueId,
@@ -856,9 +865,9 @@ class IdentityDimensions extends Component {
                     json.controllers = asset.asset_controllers
             }
         })
-        this.state.control_assets.forEach(function (asset, index) {           
+        this.state.control_assets.forEach(function (asset, index) {
             if (selected_asset == asset.asset_id) {
-                console.log("\n\n SELECTED ASSET: "+ selected_asset + "  Controlled assetID: "+asset.asset_id);
+                console.log("\n\n SELECTED ASSET: " + selected_asset + "  Controlled assetID: " + asset.asset_id);
                 json.coidAddr = asset.asset_coidAddr,
                     json.dimensionCtrlAddr = asset.asset_dimCtrlAddr,
                     json.uniqueId = asset.asset_uniqueId,
@@ -871,6 +880,10 @@ class IdentityDimensions extends Component {
         json.delegations = delegations
         let attributes = this.prepareAttributes();
         json.data = attributes;
+        let controllers_dimension = this.state.control_list;
+        if (controllers_dimension) { json.controllers_dimension = controllers_dimension }
+
+
         //*************************************************************************
         var signature = this.getSignature(json);
         var msg_hash = keccak_256(JSON.stringify(json));
@@ -880,36 +893,54 @@ class IdentityDimensions extends Component {
         //*************************************************************************
         console.log("JSON: " + JSON.stringify(json));
 
-        $.ajax({
-            type: "POST",
-            url: twinUrl + 'dimensions/CreateDimension',
-            data: json,
-            success: function (result) {
-                //returns (bool success, bytes32 callerHash, address test)
-                var data = result;
-                if ($.type(result) != "object") {
-                    data = JSON.parseJSON(result)
-                }
-                console.log("response createDimenson: " + JSON.stringify(data))
+        if (isKYC) {
+            $.ajax({
+                type: "POST",
+                url: twinUrl + endpoint,
+                data: json,
+                success: function (result) {
+                    //returns (bool success, bytes32 callerHash, address test)
+                    var data = result;
+                    if ($.type(result) != "object") {
+                        data = JSON.parseJSON(result)
+                    }
+                    console.log("response from myGatekeeper: " + JSON.stringify(data))
 
-                data = data.Result
-                console.log("data.Result: " + data.Result)
+                }.bind(this),
+            })
+        }
+        else {
+            $.ajax({
+                type: "POST",
+                url: twinUrl + 'dimensions/CreateDimension',
+                data: json,
+                success: function (result) {
+                    //returns (bool success, bytes32 callerHash, address test)
+                    var data = result;
+                    if ($.type(result) != "object") {
+                        data = JSON.parseJSON(result)
+                    }
+                    console.log("response createDimenson: " + JSON.stringify(data))
 
-                data = data.split(",")
-                console.log("DATA: " + data)
+                    data = data.Result
+                    console.log("data.Result: " + data.Result)
 
-                //var dimensionAddr = data.Result[2]
-                //console.log("created dimension address: " + dimensionAddr)
+                    data = data.split(",")
+                    console.log("DATA: " + data)
 
-                //get the array:
-                //data = data.data;
+                    //var dimensionAddr = data.Result[2]
+                    //console.log("created dimension address: " + dimensionAddr)
 
-            }.bind(this),
-            complete: function () {
-                // do something
-                //ST: HERE WE COULD WRITE DIMENSIONS INTO COID JSON?
-            },
-        })
+                    //get the array:
+                    //data = data.data;
+
+                }.bind(this),
+                complete: function () {
+                    // do something
+                    //ST: HERE WE COULD WRITE DIMENSIONS INTO COID JSON?
+                },
+            })
+        }
 
     }//end creationDimension
 
@@ -1058,6 +1089,10 @@ class IdentityDimensions extends Component {
                                     <div className="form-group">
                                         <label htmlFor="control_dist">Enter Persona Controllers. These controllers can be but do not have to be your Core Identity controllers.</label>
                                         <TagsInput {...inputAttrs} value={this.state.control_list} onChange={(e) => { this.onFieldChange("control_list", e) }} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="validators">Enter Persona Validators. These are REQUIRED for a KYC Persona!</label>
+                                        <TagsInput {...inputAttrs} value={this.state.validators} onChange={(e) => { this.onFieldChange("validators", e) }} />
                                     </div>
 
                                     <div className="form-group">

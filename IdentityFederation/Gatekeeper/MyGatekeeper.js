@@ -137,6 +137,7 @@ var notifier = function () {
             });
     }
 
+
 }//end of notifier
 
 var theNotifier = new notifier();
@@ -299,14 +300,14 @@ function prepareForm(formdata){
         "gatekeeperAddr":"",
         "dimensionCtrlAddr":""
     }*/
-        
+
         correctForm = JSON.parse(JSON.stringify(formdata));
         correctForm.uniqueIdAttributes=[];
-correctForm.uniqueIdAttributes.push(formdata.uniqueIdAttributes.split(","));  
+correctForm.uniqueIdAttributes.push(formdata.uniqueIdAttributes.split(","));
 correctForm.ownerIdList=formdata.ownerIdList.split(",");
-correctForm.controlIdList=formdata.controlIdList.split(",");   
+correctForm.controlIdList=formdata.controlIdList.split(",");
 correctForm.ownershipTokenAttributes=formdata.ownershipTokenAttributes.split(",");
-correctForm.ownershipTokenQuantity=formdata.ownershipTokenQuantity.split(",");    
+correctForm.ownershipTokenQuantity=formdata.ownershipTokenQuantity.split(",");
 correctForm.controlTokenAttributes=formdata.controlTokenAttributes.split(",");
 correctForm.controlTokenQuantity=formdata.controlTokenQuantity.split(",");
 correctForm.identityRecoveryIdList=formdata.identityRecoveryIdList.split(",");
@@ -315,14 +316,14 @@ correctForm.delegateeIdList=formdata.delegateeIdList.split(",");
 correctForm.delegateeTokenQuantity=formdata.delegateeTokenQuantity.split(",");
 
 return(correctForm);
-  
+
 
 }
 
 function writeAll(formdata, callback) {
 
-        var owners = formdata.ownerIdList.split(",");
-        var controllers = formdata.controlIdList.split(",");
+        var owners = formdata.ownerIdList;
+        var controllers = formdata.controlIdList;
         var max = Math.max(owners.length, controllers.length);
         var fileName = formdata.assetID + ".json";
         console.log("\n*****THE MIGHTY WRITEALL*****\n");
@@ -356,7 +357,7 @@ function writeAll(formdata, callback) {
         }//end for loop
     }//end writeAll
 
-
+var test;
 //Instantiate one of these
 var gatekeeper = function (MyGKaddr) {
 
@@ -391,7 +392,7 @@ var gatekeeper = function (MyGKaddr) {
 
     //use this to have the gatekeeper scope inside functions
     var _this = this;
-
+test = this;
     //for verification
     this.verifyIt = function (formdata) {
         var msg = formdata.msg;
@@ -516,6 +517,43 @@ var gatekeeper = function (MyGKaddr) {
 
     };
 
+    this.KYC = function (proposalId, formdata, res, callback) {
+
+        //local variables for API calls
+        var proposalId = proposalId;
+        var sig = formdata.sig;
+        var msg = formdata.msg;
+        var requester = formdata.pubKey; // the pubkey of coid requester
+        var myUniqueId = formdata.uniqueId;
+        var myUniqueIdAttributes = formdata.uniqueIdAttributes.split(",");
+        var ballotContractAddr = this.ballotAddress;
+        var validators = [];
+        validators = formdata.validatorList.split(",");
+        var yesVotesRequiredToPass = formdata.yesVotesRequiredToPass;
+        var isHuman = formdata.isHuman;
+        var gatekeeperAddr = formdata.gatekeeperAddr;
+        var propType = Number(formdata.propType);
+
+        try {
+            this.setCoidRequester(requester, proposalId, sig, msg);
+            this.setmyUniqueID(requester, proposalId, myUniqueId, myUniqueIdAttributes);
+            this.setPropType(proposalId, propType);
+            var this1 = this;
+            setTimeout(function(){
+            this1.setValidators(proposalId, validators, ballotContractAddr);
+            this1.initiateCoidProposalSubmission(ballotContractAddr, proposalId, yesVotesRequiredToPass, false, MyGKaddr, propType);
+            //theNotifier.createProposalPendingNotification(requester, proposalId, isHuman, gatekeeperAddr);
+            callback(false, res);
+           },3000)
+        }
+        catch (e) {
+            callback(true, res);
+        }
+
+        return;
+
+    };
+
 
     this.debugging = function (val) {
         _this.gateKeeperContract.debugIt(val, function (error, result) {
@@ -554,8 +592,25 @@ var gatekeeper = function (MyGKaddr) {
 
         while (sync) { require('deasync').sleep(1000); }
 
-        this.setcoidData(proposalId, formdata, res, callback);
-        console.log("right after set coid data....");
+        switch(Number(formdata.propType)) {
+            case 0:
+                //coid request
+                this.setcoidData(proposalId, formdata, res, callback);
+                console.log("right after set coid data....");
+                break;
+            case 1:
+                //Unique Attr request
+                console.log("right after Unique....");
+                break;
+            case 2:
+                //KYC request
+                console.log("proposalId is: " + proposalId + " or "+ this.proposalId);
+                this.KYC(proposalId, formdata, res, callback);
+                console.log("right after KYC....");
+                break;
+            default:
+
+        }
         console.log("formdata: " + formdata);
     }; //end of function
 
@@ -614,6 +669,28 @@ var gatekeeper = function (MyGKaddr) {
 
         //while (sync) { require('deasync').sleep(1000); }
     };
+
+    //set proptype
+    this.setPropType = function (proposalId, propType) {
+        var sync = true;
+
+        //var propType = Number(propType);
+        console.log("proptype: "+propType);
+        _this.gateKeeperContract.setPropType(proposalId, Number(propType), function (err, res) {
+
+            if (err) {
+                console.log("Error setting propType: " + err)
+            }
+            else {
+                console.log("Result setting propType: " + res)
+                sync = false;
+                return;
+            }
+        });//end of callback
+
+        while (sync) { require('deasync').sleep(100); }
+
+    }
 
     this.setmyOwnershipID = function (requester, proposalId, myOwnershipId, myOwnerIdList) {
 
@@ -786,8 +863,11 @@ var gatekeeper = function (MyGKaddr) {
 
     this.setValidators = function (proposalId, validators, ballotAddress) {
         var sync = true;
+        var arr = validators.concat(Array(10 - validators.length).fill(0x0));
+        console.log("validators: "+ validators);
+        console.log("validators for setValidators: "+ arr);
 
-        _this.gateKeeperContract.setValidators(proposalId, validators, ballotAddress, function (err, res) {
+        _this.gateKeeperContract.setValidators(proposalId, arr, ballotAddress, function (err, res) {
             console.log(res);
             console.log("proposalId: " + proposalId);
             console.log("ballotAddress: " + ballotAddress);
@@ -818,12 +898,19 @@ var gatekeeper = function (MyGKaddr) {
     //after all the COID data has been set
     this.initiateCoidProposalSubmission = function (ballotAddress, proposalId, yesVotesRequiredToPass, isHuman, gkaddr) {
         var sync = true;
-        _this.gateKeeperContract.initiateCoidProposalSubmission(ballotAddress, proposalId, yesVotesRequiredToPass, isHuman, gkaddr, function (err, res) {
+        var propType = arguments[5] || 0;
+this.setPropType(proposalId, propType);
+        console.log("propType in initcoid: "+propType);
+
+        _this.gateKeeperContract.initiateCoidProposalSubmission(ballotAddress, proposalId, yesVotesRequiredToPass, isHuman, gkaddr, propType, function (err, res) {
 
             if (err) {
                 console.log("Error for initiateCoidProposalSubmission: " + err);
             }
             else {
+_this.gateKeeperContract.getPropType(proposalId, function (error, result) {
+            console.log("Get Proposal Type contract call: "+result);
+        })
                 console.log("Is COID request has been initiated: " + res);
                 sync = false;
                 return;
@@ -849,7 +936,7 @@ var eventListener = function (MyGKAddr) {
     this.erisAbi = JSON.parse(fs.readFileSync("./abi/" + this.contractAddress));
     this.accountData = require("./accounts.json");
     this.contractMgr = erisContracts.newContractManagerDev(this.erisdburl, chainConfig[this.chain]);
-    this.gateKeeperContract = this.contractMgr.newContractFactory(this.erisAbi).at(this.contractAddress);
+    this.gateKeeperContract = this.contractMgr.newContractFactory(this.erisAbi).at(MyGKAddr);
 
     //ballot contract
     this.ballotAddress = this.contractData['ballot'];
@@ -1073,7 +1160,110 @@ var eventListener = function (MyGKAddr) {
 
                             var GKSig = { "signature": signatureGK, "pubkeyGK": pubkeyGK, "hashGK": hashGK }
                             console.log("GK Sig: " + JSON.stringify(GKSig));
-                            _this.bigchainIt(proposalId, formdataArray[index], coidGKAddr, coidAddr, dimensionCtrlAddr, blockNumber, blockHashVal, blockchainID, timestamp, validatorSigs, GKSig, function (result, theId, theHash) {
+                            _this.bigchainIt(proposalId, formdataArray[index], formdataArray[index].gatekeeperAddr, coidAddr, dimensionCtrlAddr, blockNumber, blockHashVal, blockchainID, timestamp, validatorSigs, GKSig, function (result, theId, theHash) {
+                                // console.log(result);
+                                console.log("THE TXN ID: " + theId)
+                                console.log("THE HASH: " + theHash)
+                                console.log("GK ADDR: " + formdataArray[index].gatekeeperAddr)
+                                console.log("COID ADDR: " + coidAddr)
+                                console.log("DIM CTRL ADDR: " + dimensionCtrlAddr)
+                                theNotifier.notifyCoidCreation(formdataArray[index].pubKey, formdataArray[index].assetID, theId, theHash, coidGKAddr, coidAddr, dimensionCtrlAddr)
+
+                                var form = formdataArray[index];
+                                form.bigchainID = theId;
+                                form.bigchainHash = theHash;
+                                //form.gatekeeperAddr = coidGKAddr;
+                                form.coidAddr = coidAddr;
+                                form.dimensionCtrlAddr = dimensionCtrlAddr;
+                                writeAll(prepareForm(form), function(){});
+
+                                //make the core identity
+                                CoidMaker(coidAddr, dimensionCtrlAddr, formdataArray[index])
+
+                                //delete the proposal
+                                deleteProposal(proposalId);
+                            })
+                        })
+                    },
+                        5000);
+                }
+                else {
+                    console.log("error finding form data--could not write acceptance to bigchaindb!")
+                    deleteProposal(proposalId);
+                }
+            }
+
+        })
+
+var eventGatekeeperResultReadyKYC;
+    _this.gateKeeperContract.resultReadyKYC(
+        function (error, result) {
+            eventGatekeeperResultReadyKYC = result;
+        },
+        function (error, result) {
+
+            //grab parameters from the event
+            var proposalId = (result.args).proposalId;
+            var votingResult = (result.args).result;
+            var resultMessage = (result.args).resultMessage;
+            var coidGKAddr = (result.args).coidGKAddr;
+            var coidAddr = (result.args).coidAddr;
+            var dimensionCtrlAddr = (result.args).dimensionCtrlAddr;
+            var blockNumber = (result.args).blockNumberVal;
+            var blockHashVal = (result.args).blockHashVal;
+            var blockchainID = (result.args).blockchainIdVal;
+            var timestamp = (result.args).timestamp;
+
+            //debugging
+            console.log("KYC EVENT RECIEVED");
+            console.log("Voting result is: " + votingResult);
+            console.log("proposalID is: " + proposalId);
+            console.log("resultMessage is: " + resultMessage);
+            console.log("coidGKAddr is: " + coidGKAddr);
+            console.log("coidAddr is: " + coidAddr);
+            console.log("dimensionCtrlAddr is: " + dimensionCtrlAddr);
+            console.log("blockNumber is: " + blockNumber);
+            console.log("blockHashVal is: " + blockHashVal);
+            console.log("blockchainID is: " + blockchainID);
+            console.log("timestamp is: " + timestamp);
+            console.log("result.args: " + JSON.stringify(result.args));
+
+            //implement logic if and only if votingResult is true:
+            if (votingResult) {
+                //find data given proposalId
+                var index = -1;
+                for (var k = 0; k < indexer; k++) {
+                    if (proposalIDArray[index] = proposalId) {
+                        index = k;
+                    }
+                }
+
+                console.log("index is: " + index);
+
+                if (index != -1) {
+                    //TODO (to make cleaner): un-hardcode m -- grab number of validators from
+                    //NOTE: notice the use of let for m, rather than var!
+                    var validatorSigs = [];
+                    var indexSigs = 0;
+                    for (let m = 0; m < 3; m++) {
+                        _this.ballotContract.getValidatorSignature_byIndex(proposalId, m, function (error, result) {
+                            //TODO: Create labels for validator sigs
+                            console.log("This is the result: " + JSON.stringify(result))
+                            validatorSigs[indexSigs] = result;
+                            indexSigs++;
+                            console.log("m is: " + m);
+                        });
+                    }
+
+                    console.log("validator sigs are: " + validatorSigs);
+
+                    //gatekeeper needs to sign this:
+                    setTimeout(function () {
+                        _this.createSignature("GatekeeperAppVerified", function (signatureGK, pubkeyGK, hashGK) {
+
+                            var GKSig = { "signature": signatureGK, "pubkeyGK": pubkeyGK, "hashGK": hashGK }
+                            console.log("GK Sig: " + JSON.stringify(GKSig));
+                            _this.bigchainIt(proposalId, formdataArray[index], formdataArray[index].gatekeeperAddr, coidAddr, dimensionCtrlAddr, blockNumber, blockHashVal, blockchainID, timestamp, validatorSigs, GKSig, function (result, theId, theHash) {
                                 // console.log(result);
                                 console.log("THE TXN ID: " + theId)
                                 console.log("THE HASH: " + theHash)
@@ -1084,14 +1274,13 @@ var eventListener = function (MyGKAddr) {
                                 var form = formdataArray[index];
                                 form.bigchainID = theId;
                                 form.bigchainHash = theHash;
-                                form.gatekeeperAddr = coidGKAddr;
+                                //form.gatekeeperAddr = coidGKAddr;
                                 form.coidAddr = coidAddr;
                                 form.dimensionCtrlAddr = dimensionCtrlAddr;
-                                prepareForm(form);
-                                writeAll(form, function(){});
+                                writeAll(prepareForm(form), function(){});
 
                                 //make the core identity
-                                CoidMaker(coidAddr, dimensionCtrlAddr, formdataArray[index])
+                                //CoidMaker(coidAddr, dimensionCtrlAddr, formdataArray[index])
 
                                 //delete the proposal
                                 deleteProposal(proposalId);
@@ -1123,6 +1312,9 @@ var eventListener = function (MyGKAddr) {
             var proposalId = result.args.proposalId;
             var requestResult = result.args.requestResult;
             var chainID = keccak_256(_this.chain);
+_this.gateKeeperContract.getPropType(proposalId, function (error, result) {
+            console.log("Get Proposal Type contract call: "+result);
+        })
 
             //debugging statements
             console.log("ballot contract event -- ResultIsReady")
@@ -1195,32 +1387,45 @@ app.post("/MyGatekeeper", function (req, res) {
     console.log('request body...' + JSON.stringify(formdata))
 
     //for testing with hardcoded data
-      /* var formdata =
-           {
-               "pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
-               "sig": "7051442bbf18bb2c86cbc8951a07e27ec6ba05ac3fa427e4c6b948e3dcf91a94046b048edf52445fb22cc776a94b87c3f55426f993458ec744f61f09fb46eeaa",
-               "msg": "8836a77b68579d1d8d4427c0cda24960f6c123f17ccf751328cc621d6237da22",
-               "uniqueId": "E171AACAFBD191C791CAC02DBFCCCACAB35C1AF1ABA1CED1AC9EC6CAD2",
-               "uniqueIdAttributes": "AB12321AA,313113A32,EF313131,133131F,311313A,31223F,12321,12222222,11341",
-               "ownershipId": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C399B28C66",
-               "ownerIdList": "4A56E33E9D718571CED220A7347B96FE43DF4E51,A7576C8A328EEE4BF69589DDB71099250316FF19",
-               "controlId": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C66",
-               "controlIdList": "4A56E33E9D718571CED220A7347B96FE43DF4E51,A7576C8A328EEE4BF69589DDB71099250316FF19",
-               "ownershipTokenId": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C66",
-               "ownershipTokenAttributes": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C65,83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C61",
-               "ownershipTokenQuantity": "0,0",
-               "controlTokenId": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C66",
-               "controlTokenAttributes": "83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C65,83D31E3ED952FACB78606B08CBFDFE6DAF53E9B5BC3C3E85F95C314F99B28C61",
-               "controlTokenQuantity": "0,0",
-               "identityRecoveryIdList": "4A56E33E9D718571CED220A7347B96FE43DF4E51,A7576C8A328EEE4BF69589DDB71099250316FF19",
-               "recoveryCondition": 2,
-               "yesVotesRequiredToPass": 2,
-               "gatekeeperAddr": "29EE74E62B739C254B4C3F9AE8E8CFF15A206B4F",
-               "validatorList": "8B44EDD090224A5C2350C1B2F3F57EE2D3443744462BB7C3C970C337E570EAC4,AAE858DE3899D2FF096DDB5384365C6A86CE7964F1C4F1F22878944D39BD943A,46B6F98E9E34CAF4B66CFA6D2BCF3ED743C1ACCADFC3787F95DFE47ADDA7A661"
-           }*/
+      var formdata =
+        {
+   "pubKey":"029fb6ea7e2394df2b10c9157b3e6c37762b83fe09941fe75cef09cbeb38179dea",
+   "uniqueId":"c5ab1388c4e945e3e0c0d90be3a1687202a7acb5af4ae6a78b8f9d9c208d52dd",
+   "uniqueIdAttributes":"kyc3,a9e1a536e9fc0127738d793451b5dea26dd37d31d76adfa98cfd4a54d118351c,QmcHrja8JXPjPeAm3MwKdRT66pNzqJNrkc1Wp4nR1T3zF5",
+   "ownershipId":"7d5da9d6403dad7aeede09977b67fd2c659793036333e5b82e976642800de775",
+   "ownerIdList":"7d5da9d6403dad7aeede09977b67fd2c659793036333e5b82e976642800de775",
+   "controlId":"7d5da9d6403dad7aeede09977b67fd2c659793036333e5b82e976642800de775",
+   "controlIdList":"7d5da9d6403dad7aeede09977b67fd2c659793036333e5b82e976642800de775",
+   "ownershipTokenId":"75821ef249041f203634f4e233e975d05b855e24069a37cc1ba739ba92b1307a",
+   "ownershipTokenAttributes":"xcfv",
+   "ownershipTokenQuantity":"2",
+   "controlTokenId":"1f840c37063d6c4e129f6d2554519a1e6dbb4bd939a94f5c293c69130ce086da",
+   "controlTokenAttributes":"vghgj",
+   "controlTokenQuantity":"5",
+   "identityRecoveryIdList":"7d5da9d6403dad7aeede09977b67fd2c659793036333e5b82e976642800de775",
+   "recoveryCondition":"0",
+   "yesVotesRequiredToPass":"2",
+   "validatorList":"7d5da9d6403dad7aeede09977b67fd2c659793036333e5b82e976642800de775",
+   "delegateeIdList":"",
+   "delegateeTokenQuantity":"",
+   "isHuman":"false",
+   "timestamp":"",
+   "assetID":"kyc",
+   "Type":"non_cash",
+   "bigchainHash":"",
+   "bigchainID":"",
+   "coidAddr":"",
+   "sig":"6d47e89278dc6a1c55b152618a19dae7a5412c4754bb3204f746d3e837fea07160a9c909cb6ea29bf29734677dd5e92c6202ddb4520918306c1bd4e99ace24ea",
+   "msg":"640b40905d37111b53b56fb7011e449b5e1f0bd9f2f5e7f9978a283c0624311e",
+   "gatekeeperAddr":"B0C7A5CF9B262409FDE0DD6FDF62CF2E5CD64932",
+   "txn_id":"request_new_COID",
+   "propType":"2"
+}
+
 if(formdata.isHuman == 'false'){
     console.log(formdata.gatekeeperAddr)
     var gatekeeperApp = new gatekeeper(formdata.gatekeeperAddr);
+    formdata.yesVotesRequiredToPass = formdata.validatorList.split(",").length;
 
     //ONLY ON SECOND REQUEST
     // console.log("AT INDEX 0: " + gatekeeperApp.debugging(0))

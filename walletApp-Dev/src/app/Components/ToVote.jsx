@@ -370,11 +370,6 @@ class ToVote extends React.Component {
 
 	showHandler(e) {
 		e.preventDefault();
-
-		//call checkisKYC
-		// 1) get value from msg
-		// 2) show or hide a div
-
 		this.setState({
 			showDetails: true,
 			activeProposal: this.dataHandler($(e.target).attr('data-index'))

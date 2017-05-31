@@ -101,20 +101,9 @@ class ModalWin extends React.Component {
 
 
 	componentDidMount() {
+
 		var _this = this;
-		/*
-		$.ajax({
-			type: "POST",
-			url: twinUrl + "ipfs/validateFiles",
-			data: {
-				file_hash: "123,345,657",
-				ipfs_hash: "098,876,654"
-			},
-			success: function(res){
-				console.log("validation response....", res);
-			}
-		});	
-*/
+
 		$.ajax({
 			type: "POST",
 			url: twinUrl + 'getCoidData',
@@ -123,7 +112,7 @@ class ModalWin extends React.Component {
 				"proposalId": this.state.proposal.proposal_id,
 				"gatekeeperAddr": this.state.proposal.gatekeeperAddr,
 				"isHuman": this.state.proposal.isHuman
-			},//.bind(this)d
+			},//.bind(this)
 			success: function (result) {
 				var fileValidation = true;
 				// Fill up data in Modal window
@@ -140,32 +129,49 @@ class ModalWin extends React.Component {
 				}
 				result.ownerArray = ownerArray
 				//console.log(result.ownerArray)
-				console.log('result of getCoidData' + result)
+				console.log('result of getCoidData' + JSON.stringify(result));
 
 				_this.setState({
 					proposal_data: result
 				});
+				
 				$("#proposalDetails").modal('show');
 				$("#proposalDetails").on('hidden.bs.modal', _this.props.hideHandler);
-			}
+				
+				let standardAsset = document.getElementById("standardAsset");
+				let KYC = document.getElementById("KYC");
+
+				if(_this.state.proposal_data.controlId) {
+					KYC.style.display = 'none';
+				} else {
+					standardAsset.style.display = 'none';
+				}
+
+			}//end success
 		});
 	}
 
 
 	render() {
 		var prop = this.state.proposal;
+		//{"type":"proposal","proposal_id":"AAC312616FFE818CA093C9B34BB58DB26AFA7287C0B3DB689F9AAD337BE8C5B1",
+		//"message":"You have been selected to vote on the proposal.","read_status":false,"time":1496256497368,
+		//"gatekeeperAddr":"0000000000000000000000000000000000000000","isHuman":true}
 		var style = {
 			fontSize: '12.5px'
 		}
 		return (
 			<div className="modal fade" id="proposalDetails" tabIndex="-1" role="dialog">
+
 				<div className="modal-dialog modal-lg" role="document">
 					<div className="modal-content">
+
 						<div className="modal-header">
 							<button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 							<h4 className="modal-title" id="asset">COID Proposal Details</h4>
 						</div>
-						<div className="modal-body">
+						
+						<div id="standardAsset" className="modal-body">
 							<table className="table table-striped table-hover" style={style}>
 								<tbody>
 									<tr>
@@ -178,7 +184,6 @@ class ModalWin extends React.Component {
 									{(() => {
 										var ipfs_url = "http://10.101.114.231:8080/ipfs/";
 										if (!$.isEmptyObject(this.state.proposal_data)) {
-											console.log("**", this.state.proposal_data.uniqueIdAttributes)
 											return this.state.proposal_data.uniqueIdAttributes.map((ids, i) => {
 												return (
 													<tr key={i}>
@@ -281,6 +286,19 @@ class ModalWin extends React.Component {
 								</tbody>
 							</table>
 						</div>
+
+						<div id="KYC" className="modal-body">
+							<table className="table table-striped table-hover" style={style}>
+								<tbody>
+									<tr>
+										<td>Proposal ID</td>
+										<td>{prop.proposal_id}</td>
+									</tr>
+
+								</tbody>
+							</table>
+						</div>
+
 						<div className="modal-footer">
 							<button type="button" className="btn btn-primary" data-val="2" onClick={this.submitHandler.bind(this)}>Yes</button>
 							<button type="button" className="btn btn-default" data-val="1" onClick={this.submitHandler.bind(this)}>No</button>
@@ -288,6 +306,8 @@ class ModalWin extends React.Component {
 					</div>
 				</div>
 			</div>
+
+			
 		)
 	}
 };
@@ -298,7 +318,7 @@ class ToVote extends React.Component {
 		super(props);
 		//coid=proposals
 		this.state = {
-			coid: [],
+			coid: [], //array of messages from DT
 			showDetails: false,
 			activeProposal: {}
 		};
@@ -344,12 +364,17 @@ class ToVote extends React.Component {
 		return this.state.coid[index];
 	}
 
-	getActiveData() {
-		return this.state.activeProposal;
-	}
+	// getActiveData() {
+	// 	return this.state.activeProposal;
+	// }
 
 	showHandler(e) {
 		e.preventDefault();
+
+		//call checkisKYC
+		// 1) get value from msg
+		// 2) show or hide a div
+
 		this.setState({
 			showDetails: true,
 			activeProposal: this.dataHandler($(e.target).attr('data-index'))
@@ -357,6 +382,7 @@ class ToVote extends React.Component {
 	}
 
 	render() {
+		console.log("STATE: " + JSON.stringify(this.state));
 		var _that = this;
 		return (
 			<div id="vote_container">

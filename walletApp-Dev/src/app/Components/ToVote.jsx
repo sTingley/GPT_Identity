@@ -1,8 +1,9 @@
 import React from 'react';
+import DayPicker from "react-day-picker";
+
 var crypto = require('crypto');
 var secp256k1 = require('secp256k1');
 var keccak_256 = require('js-sha3').keccak_256;
-
 
 function hex_to_ascii(str1) {
 	var hex = str1.toString();
@@ -13,17 +14,16 @@ function hex_to_ascii(str1) {
 	return str;
 }
 
-
 class ModalWin extends React.Component {
 
 	constructor(props) {
 		super(props);
 		this.state = {
 			proposal: this.props.dataHandler,
-			proposal_data: {}
+			proposal_data: {},
+			selectedDay: new Date() //for signature expiration
 		};
 	}
-
 
 	submitHandler(e) {
 		e.preventDefault();
@@ -62,6 +62,8 @@ class ModalWin extends React.Component {
 		console.log("sig" + signature1)
 		console.log(typeof (signature1))
 
+		let day = this.state.selectedDay;
+		let sigExpire = day.getTime() / 1000;
 
 		var json = {
 			"txnDesc": "sampleDesc",
@@ -69,7 +71,8 @@ class ModalWin extends React.Component {
 			"msg": msg_hash_buffer.toString("hex"),
 			"publicKey": localStorage.getItem("pubKey"),
 			"proposalID": this.state.proposal.proposal_id,
-			"vote": parseInt(ele.attr("data-val"))
+			"vote": parseInt(ele.attr("data-val")),
+			"sigExpire": sigExpire
 		};
 
 		$.ajax({
@@ -97,7 +100,6 @@ class ModalWin extends React.Component {
 			}
 		});
 	}
-
 
 
 	componentDidMount() {
@@ -134,15 +136,15 @@ class ModalWin extends React.Component {
 				_this.setState({
 					proposal_data: result
 				});
-				
+
 				$("#proposalDetails").modal('show');
 				$("#proposalDetails").on('hidden.bs.modal', _this.props.hideHandler);
-				
+
 				let standardAsset = document.getElementById("standardAsset");
 				let KYC = document.getElementById("KYC");
 
-				if(_this.state.proposal_data.controlId) {
-					KYC.style.display = 'none';
+				if (!_this.state.proposal_data.controlId) {
+					KYC.style.display = 'block';
 				} else {
 					standardAsset.style.display = 'none';
 				}
@@ -154,6 +156,7 @@ class ModalWin extends React.Component {
 
 	render() {
 		var prop = this.state.proposal;
+
 		//{"type":"proposal","proposal_id":"AAC312616FFE818CA093C9B34BB58DB26AFA7287C0B3DB689F9AAD337BE8C5B1",
 		//"message":"You have been selected to vote on the proposal.","read_status":false,"time":1496256497368,
 		//"gatekeeperAddr":"0000000000000000000000000000000000000000","isHuman":true}
@@ -170,7 +173,7 @@ class ModalWin extends React.Component {
 							<button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 							<h4 className="modal-title" id="asset">COID Proposal Details</h4>
 						</div>
-						
+
 						<div id="standardAsset" className="modal-body">
 							<table className="table table-striped table-hover" style={style}>
 								<tbody>
@@ -197,7 +200,6 @@ class ModalWin extends React.Component {
 											return <tr><td colSpan="2">No Ids found</td></tr>
 										}
 									})(this)}
-
 
 									<tr>
 										<td>Ownership ID</td>
@@ -294,6 +296,17 @@ class ModalWin extends React.Component {
 										<td>Proposal ID</td>
 										<td>{prop.proposal_id}</td>
 									</tr>
+									<tr>
+										<td>Signature Expiration:</td>
+										<td>
+											<DayPicker
+												disabledDays={{ daysOfWeek: [0] }}
+
+												onDayClick={day => this.state.selectedDay = day}
+
+											/>
+										</td>
+									</tr>
 
 								</tbody>
 							</table>
@@ -307,7 +320,7 @@ class ModalWin extends React.Component {
 				</div>
 			</div>
 
-			
+
 		)
 	}
 };

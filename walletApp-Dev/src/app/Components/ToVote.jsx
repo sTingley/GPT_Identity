@@ -143,10 +143,11 @@ class ModalWin extends React.Component {
 				let standardAsset = document.getElementById("standardAsset");
 				let KYC = document.getElementById("KYC");
 
-				if (!_this.state.proposal_data.controlId) {
+				if (_this.state.proposal.propType == 2) {
 					KYC.style.display = 'block';
-				} else {
 					standardAsset.style.display = 'none';
+				} else {
+					KYC.style.display = 'none';
 				}
 
 			}//end success
@@ -362,7 +363,6 @@ class ToVote extends React.Component {
 				}
 				this.setState({ coid: test });
 				console.log("ToVote state: " + JSON.stringify(this.state))
-				console.log(typeof (result));
 				console.log("result: " + JSON.stringify((result.data)));
 			}.bind(this)
 		});

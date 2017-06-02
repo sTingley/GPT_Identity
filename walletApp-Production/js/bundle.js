@@ -47766,7 +47766,7 @@
 					"isHuman": true,
 					"timestamp": "",
 					"assetID": "MyCOID",
-					"Type": "non_cash",
+					"propType": 0,
 					"bigchainHash": "",
 					"bigchainID": "",
 					"coidAddr": "",
@@ -66695,7 +66695,7 @@
 	
 				qrCode_owned_signature: {},
 	
-				notCOID: true,
+				notCOID: true, //if the asset in view is MYCOID, we dont need second QR
 	
 				//used for identitydimension file upload
 				docs: {}
@@ -66728,9 +66728,14 @@
 				var asset_id = this.props.asset.asset_id;
 				if (asset_id == "MyCOID") {
 					this.setState({ notCOID: false });
-				}
-				if (asset_id != "MyCOID") {
+				} else {
 					this.setState({ notCOID: true });
+				}
+	
+				var standardAsset = document.getElementById("standardAsset");
+				var KYC = document.getElementById("KYC");
+				if (asset_id == "KYC") {
+					standardAsset.style.display = 'none';
 				}
 	
 				var prop = this.props.asset.asset_details;
@@ -66943,477 +66948,545 @@
 										'div',
 										{ role: 'tabpanel', className: 'tab-pane active', id: 'asset_details' },
 										_react2.default.createElement(
-											'table',
-											{ className: 'table table-striped table-hover', style: style },
+											'div',
+											{ id: 'standardAsset' },
 											_react2.default.createElement(
-												'tbody',
-												null,
+												'table',
+												{ className: 'table table-striped table-hover', style: style },
 												_react2.default.createElement(
-													'tr',
+													'tbody',
 													null,
 													_react2.default.createElement(
-														'td',
+														'tr',
 														null,
-														'Asset Name'
-													),
-													_react2.default.createElement(
-														'td',
-														null,
-														this.props.asset.asset_id
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'Asset Class',
 														_react2.default.createElement(
-															'p',
-															{ className: 'text-info' },
-															'Use comma/enter to add class '
+															'td',
+															null,
+															'Asset Name'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															this.props.asset.asset_id
 														)
 													),
 													_react2.default.createElement(
-														'td',
+														'tr',
 														null,
-														_react2.default.createElement(_reactTagsinput2.default, classInput)
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'Asset SubClass',
 														_react2.default.createElement(
-															'p',
-															{ className: 'text-info' },
-															'Use comma/enter to add sub class '
+															'td',
+															null,
+															'Asset Class',
+															_react2.default.createElement(
+																'p',
+																{ className: 'text-info' },
+																'Use comma/enter to add class '
+															)
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(_reactTagsinput2.default, classInput)
 														)
 													),
 													_react2.default.createElement(
-														'td',
-														null,
-														_react2.default.createElement(_reactTagsinput2.default, subClassInput)
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'COID Contract address'
-													),
-													_react2.default.createElement(
-														'td',
+														'tr',
 														null,
 														_react2.default.createElement(
-															'p',
+															'td',
+															null,
+															'Asset SubClass',
+															_react2.default.createElement(
+																'p',
+																{ className: 'text-info' },
+																'Use comma/enter to add sub class '
+															)
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(_reactTagsinput2.default, subClassInput)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'COID Contract address'
+														),
+														_react2.default.createElement(
+															'td',
 															null,
 															_react2.default.createElement(
-																'b',
+																'p',
 																null,
-																' ',
-																prop.coidAddr,
-																' '
-															)
-														)
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'Gatekeeper Contract address'
-													),
-													_react2.default.createElement(
-														'td',
-														null,
-														_react2.default.createElement(
-															'p',
-															null,
-															_react2.default.createElement(
-																'b',
-																null,
-																' ',
-																prop.gatekeeperAddr,
-																' '
-															)
-														)
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'Dimension Control address'
-													),
-													_react2.default.createElement(
-														'td',
-														null,
-														_react2.default.createElement(
-															'p',
-															null,
-															_react2.default.createElement(
-																'b',
-																null,
-																' ',
-																prop.dimensionCtrlAddr,
-																' '
-															)
-														)
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'BigchainDB Transaction ID'
-													),
-													_react2.default.createElement(
-														'td',
-														null,
-														_react2.default.createElement(
-															'p',
-															null,
-															' ',
-															prop.bigchainID,
-															' '
-														)
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'BigchainDB Transaction Hash'
-													),
-													_react2.default.createElement(
-														'td',
-														null,
-														_react2.default.createElement(
-															'p',
-															null,
-															' ',
-															prop.bigchainHash,
-															' '
-														)
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														{ colSpan: '2' },
-														_react2.default.createElement(
-															'b',
-															null,
-															'Official IDs'
-														)
-													)
-												),
-												function () {
-													var ipfs_url = "http://10.101.114.231:8080/ipfs/";
-													if (!$.isEmptyObject(prop)) {
-														return prop.uniqueIdAttributes.map(function (ids, i) {
-															return _react2.default.createElement(
-																'tr',
-																{ key: i },
 																_react2.default.createElement(
-																	'td',
+																	'b',
 																	null,
-																	ids[0]
-																),
+																	' ',
+																	prop.coidAddr,
+																	' '
+																)
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Gatekeeper Contract address'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(
+																'p',
+																null,
 																_react2.default.createElement(
-																	'td',
+																	'b',
 																	null,
+																	' ',
+																	prop.gatekeeperAddr,
+																	' '
+																)
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Dimension Control address'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(
+																'p',
+																null,
+																_react2.default.createElement(
+																	'b',
+																	null,
+																	' ',
+																	prop.dimensionCtrlAddr,
+																	' '
+																)
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'BigchainDB Transaction ID'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(
+																'p',
+																null,
+																' ',
+																prop.bigchainID,
+																' '
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'BigchainDB Transaction Hash'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(
+																'p',
+																null,
+																' ',
+																prop.bigchainHash,
+																' '
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															{ colSpan: '2' },
+															_react2.default.createElement(
+																'b',
+																null,
+																'Official IDs'
+															)
+														)
+													),
+													function () {
+														var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+														if (!$.isEmptyObject(prop)) {
+															return prop.uniqueIdAttributes.map(function (ids, i) {
+																return _react2.default.createElement(
+																	'tr',
+																	{ key: i },
 																	_react2.default.createElement(
-																		'p',
+																		'td',
 																		null,
-																		'File hash: ',
-																		ids[1]
+																		ids[0]
 																	),
 																	_react2.default.createElement(
-																		'p',
+																		'td',
 																		null,
-																		'IPFS hash: ',
 																		_react2.default.createElement(
-																			'a',
-																			{ target: '_blank', href: ipfs_url + "/" + ids[2] },
-																			ids[2]
+																			'p',
+																			null,
+																			'File hash: ',
+																			ids[1]
+																		),
+																		_react2.default.createElement(
+																			'p',
+																			null,
+																			'IPFS hash: ',
+																			_react2.default.createElement(
+																				'a',
+																				{ target: '_blank', href: ipfs_url + "/" + ids[2] },
+																				ids[2]
+																			)
 																		)
 																	)
+																);
+															});
+														} else {
+															return _react2.default.createElement(
+																'tr',
+																null,
+																_react2.default.createElement(
+																	'td',
+																	{ colSpan: '2' },
+																	'No Ids found'
 																)
 															);
-														});
-													} else {
-														return _react2.default.createElement(
-															'tr',
+														}
+													}(this),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Ownership ID'
+														),
+														_react2.default.createElement(
+															'td',
 															null,
 															_react2.default.createElement(
-																'td',
-																{ colSpan: '2' },
-																'No Ids found'
+																'p',
+																null,
+																' ',
+																prop.ownershipId
 															)
-														);
-													}
-												}(this),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'Ownership ID'
+														)
 													),
 													_react2.default.createElement(
-														'td',
+														'tr',
 														null,
 														_react2.default.createElement(
-															'p',
+															'td',
+															null,
+															'Ownership ID List'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															function () {
+																if (!$.isEmptyObject(prop)) {
+																	return prop.ownerIdList.map(function (ids, i) {
+																		return _react2.default.createElement(
+																			'p',
+																			{ key: i },
+																			' ',
+																			prop.ownerIdList[i]
+																		);
+																	});
+																}
+															}(this)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Ownership Token ID'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(
+																'p',
+																null,
+																' ',
+																prop.ownershipTokenId
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Ownership Token Description'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(
+																'p',
+																null,
+																prop.ownershipTokenAttributes
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Ownership Token Quantity'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(
+																'p',
+																null,
+																' ',
+																prop.ownershipTokenQuantity
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Control ID'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(
+																'p',
+																null,
+																' ',
+																prop.controlId
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Control ID List'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															function () {
+																if (!$.isEmptyObject(prop)) {
+																	return prop.controlIdList.map(function (ids, i) {
+																		return _react2.default.createElement(
+																			'p',
+																			{ key: i },
+																			' ',
+																			prop.controlIdList[i]
+																		);
+																	});
+																}
+															}(this)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Control Token ID'
+														),
+														_react2.default.createElement(
+															'td',
 															null,
 															' ',
-															prop.ownershipId
+															_react2.default.createElement(
+																'p',
+																null,
+																' ',
+																prop.controlTokenId
+															)
 														)
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'Ownership ID List'
 													),
 													_react2.default.createElement(
-														'td',
-														null,
-														function () {
-															if (!$.isEmptyObject(prop)) {
-																return prop.ownerIdList.map(function (ids, i) {
-																	return _react2.default.createElement(
-																		'p',
-																		{ key: i },
-																		' ',
-																		prop.ownerIdList[i]
-																	);
-																});
-															}
-														}(this)
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'Ownership Token ID'
-													),
-													_react2.default.createElement(
-														'td',
+														'tr',
 														null,
 														_react2.default.createElement(
-															'p',
+															'td',
+															null,
+															'Control Token Description'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(
+																'p',
+																null,
+																prop.controlTokenAttributes
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Control Token Quantity'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(
+																'p',
+																null,
+																' ',
+																prop.controlTokenQuantity
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Recovery IDs'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															function () {
+																if (!$.isEmptyObject(prop)) {
+																	return prop.identityRecoveryIdList.map(function (ids, i) {
+																		return _react2.default.createElement(
+																			'p',
+																			{ key: i },
+																			' ',
+																			prop.identityRecoveryIdList[i]
+																		);
+																	});
+																}
+															}(this)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Recovery Condition'
+														),
+														_react2.default.createElement(
+															'td',
 															null,
 															' ',
-															prop.ownershipTokenId
+															_react2.default.createElement(
+																'p',
+																null,
+																' ',
+																prop.recoveryCondition
+															)
 														)
 													)
-												),
+												)
+											)
+										),
+										_react2.default.createElement(
+											'div',
+											{ id: 'KYC' },
+											_react2.default.createElement(
+												'table',
+												{ className: 'table table-striped table-hover', style: style },
 												_react2.default.createElement(
-													'tr',
+													'tbody',
 													null,
 													_react2.default.createElement(
-														'td',
-														null,
-														'Ownership Token Description'
-													),
-													_react2.default.createElement(
-														'td',
+														'tr',
 														null,
 														_react2.default.createElement(
-															'p',
+															'td',
 															null,
-															prop.ownershipTokenAttributes
+															'Asset Name'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															this.props.asset.asset_id
 														)
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'Ownership Token Quantity'
 													),
 													_react2.default.createElement(
-														'td',
+														'tr',
 														null,
 														_react2.default.createElement(
-															'p',
+															'td',
 															null,
-															' ',
-															prop.ownershipTokenQuantity
+															'Asset Class',
+															_react2.default.createElement(
+																'p',
+																{ className: 'text-info' },
+																'Use comma/enter to add class '
+															)
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(_reactTagsinput2.default, classInput)
 														)
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'Control ID'
 													),
 													_react2.default.createElement(
-														'td',
+														'tr',
 														null,
 														_react2.default.createElement(
-															'p',
+															'td',
 															null,
-															' ',
-															prop.controlId
-														)
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'Control ID List'
-													),
-													_react2.default.createElement(
-														'td',
-														null,
-														function () {
-															if (!$.isEmptyObject(prop)) {
-																return prop.controlIdList.map(function (ids, i) {
-																	return _react2.default.createElement(
-																		'p',
-																		{ key: i },
-																		' ',
-																		prop.controlIdList[i]
-																	);
-																});
-															}
-														}(this)
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'Control Token ID'
-													),
-													_react2.default.createElement(
-														'td',
-														null,
-														' ',
+															'Asset SubClass',
+															_react2.default.createElement(
+																'p',
+																{ className: 'text-info' },
+																'Use comma/enter to add sub class '
+															)
+														),
 														_react2.default.createElement(
-															'p',
+															'td',
 															null,
-															' ',
-															prop.controlTokenId
-														)
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'Control Token Description'
-													),
-													_react2.default.createElement(
-														'td',
-														null,
-														_react2.default.createElement(
-															'p',
-															null,
-															prop.controlTokenAttributes
-														)
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'Control Token Quantity'
-													),
-													_react2.default.createElement(
-														'td',
-														null,
-														_react2.default.createElement(
-															'p',
-															null,
-															' ',
-															prop.controlTokenQuantity
-														)
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'Recovery IDs'
-													),
-													_react2.default.createElement(
-														'td',
-														null,
-														function () {
-															if (!$.isEmptyObject(prop)) {
-																return prop.identityRecoveryIdList.map(function (ids, i) {
-																	return _react2.default.createElement(
-																		'p',
-																		{ key: i },
-																		' ',
-																		prop.identityRecoveryIdList[i]
-																	);
-																});
-															}
-														}(this)
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'Recovery Condition'
-													),
-													_react2.default.createElement(
-														'td',
-														null,
-														' ',
-														_react2.default.createElement(
-															'p',
-															null,
-															' ',
-															prop.recoveryCondition
+															_react2.default.createElement(_reactTagsinput2.default, subClassInput)
 														)
 													)
 												)
@@ -67871,7 +67944,7 @@
 	
 			_this5.state = {
 				showDetails: false,
-				showDetails1: false,
+				showDetails1: false, //set in dimensionHandler to render delegated data
 				wallet: { pubKey: localStorage.getItem("pubKey") },
 				own_assets: [],
 				controlled_assets: [],
@@ -91234,12 +91307,15 @@
 					"isHuman": false,
 					"timestamp": "",
 					"assetID": this.state.assetID,
-					"Type": "non_cash",
+					"propType": 0,
 					"bigchainHash": "",
 					"bigchainID": "",
 					"coidAddr": ""
 	
 				};
+				if (this.state.isICA = true) {
+					inputObj.propType = 2;
+				}
 				return inputObj;
 			}
 		}, {

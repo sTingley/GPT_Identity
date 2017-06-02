@@ -36,7 +36,7 @@ class Modal extends Component {
 
 			qrCode_owned_signature: {},
 
-			notCOID: true,
+			notCOID: true, //if the asset in view is MYCOID, we dont need second QR
 
 			//used for identitydimension file upload
 			docs: {}
@@ -65,9 +65,16 @@ class Modal extends Component {
 		if (asset_id == "MyCOID") {
 			this.setState({ notCOID: false })
 		}
-		if (asset_id != "MyCOID") {
-			this.setState({ notCOID: true })
+		else { this.setState({ notCOID: true }) }
+
+		let standardAsset = document.getElementById("standardAsset");
+		let KYC = document.getElementById("KYC");
+
+		if(this.props.asset.asset_details.propType == 2) {
+			standardAsset.style.display = 'none';
+			KYC.style.display = 'block';
 		}
+		else {KYC.style.display = 'none'}
 
 		var prop = this.props.asset.asset_details;
 
@@ -233,6 +240,8 @@ class Modal extends Component {
 							<div className="tab-content">
 
 								<div role="tabpanel" className="tab-pane active" id="asset_details">
+
+									<div id="standardAsset">
 									<table className="table table-striped table-hover" style={style}>
 										<tbody>
 											<tr>
@@ -356,6 +365,28 @@ class Modal extends Component {
 											</tr>
 										</tbody>
 									</table>
+									</div>
+
+									<div id="KYC">
+										<table className="table table-striped table-hover" style={style}>
+											<tbody>
+												<tr>
+													<td>Asset Name</td>
+													<td>{this.props.asset.asset_id}</td>
+												</tr>
+												<tr>
+													<td>Asset Class<p className="text-info">Use comma/enter to add class </p></td>
+													<td><TagsInput {...classInput} /></td>
+												</tr>
+												<tr>
+													<td>Asset SubClass<p className="text-info">Use comma/enter to add sub class </p></td>
+													<td><TagsInput {...subClassInput} /></td>
+												</tr>
+											</tbody>
+										</table>
+
+									</div>
+
 								</div>
 
 								<div role="tabpanel" className="tab-pane center-block" id="qrcode" style={qrStyle}>
@@ -649,7 +680,6 @@ Dims.propTypes = {
 //																<td>Token Amount: 1</td>
 
 
-
 class Assets extends Component {
 
 	constructor(props) {
@@ -657,7 +687,7 @@ class Assets extends Component {
 
 		this.state = {
 			showDetails: false,
-			showDetails1: false,
+			showDetails1: false, //set in dimensionHandler to render delegated data
 			wallet: { pubKey: localStorage.getItem("pubKey") },
 			own_assets: [],
 			controlled_assets: [],

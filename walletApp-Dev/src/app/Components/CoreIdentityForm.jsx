@@ -283,7 +283,7 @@ _this=this;
 			"isHuman": true,
 			"timestamp": "",
 			"assetID": "MyCOID",
-			"Type": "non_cash",
+			"propType": 0,
 			"bigchainHash": "",
 			"bigchainID": "",
 			"coidAddr": "",

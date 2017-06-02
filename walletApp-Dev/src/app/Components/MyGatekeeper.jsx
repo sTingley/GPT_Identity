@@ -563,12 +563,13 @@ class MyGatekeeper extends React.Component {
 			"isHuman": false,
 			"timestamp": "",
 			"assetID": this.state.assetID,
-			"Type": "non_cash",
+			"propType": 0,
 			"bigchainHash": "",
 			"bigchainID": "",
 			"coidAddr": "",
 
 		};
+		if(this.state.isICA = true) {inputObj.propType = 2}
 		return inputObj;
 	}
 

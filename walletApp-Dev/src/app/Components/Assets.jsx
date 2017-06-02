@@ -477,13 +477,8 @@ class Dims extends Component {
 
 
 	//**********************************************************************************
-	setDescriptors(e) {
-		//need to set chosen descriptors in the state
-		//then call this function in showAttrs
-	}
-
 	//**********************************************************************************
-	showAttrs2(e) {
+	showAttrs(e) {
 		alert('If you continue, you will spend a token to read entries.')
 		e.preventDefault();
 		var ele = $(e.target);
@@ -626,7 +621,7 @@ class Dims extends Component {
 														return (
 															<tr key={i}>
 																<td>{attrs[0]}</td>
-																<td><button type="button" className="btn btn-primary btn-sm" data-val={i} onClick={this.showAttrs2.bind(this)}>Spend Token</button></td>
+																<td><button type="button" className="btn btn-primary btn-sm" data-val={i} onClick={this.showAttrs.bind(this)}>Spend Token</button></td>
 															</tr>
 														)
 													});
@@ -735,7 +730,8 @@ class Assets extends Component {
 									asset_coidAddr: dataResult.coidAddr,
 									asset_gatekeeperAddr: dataResult.gatekeeperAddr,
 									asset_owners: dataResult.ownerIdList,
-									asset_controllers: dataResult.controlIdList
+									asset_controllers: dataResult.controlIdList,
+									asset_bigchainID: dataResult.bigchainID
 								}
 								localStorage.setItem("owned_assets", JSON.stringify(assetData))
 								//console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets))

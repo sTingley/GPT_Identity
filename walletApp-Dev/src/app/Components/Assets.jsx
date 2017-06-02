@@ -3,13 +3,8 @@ import { Link } from 'react-router';
 import TagsInput from 'react-tagsinput';
 import QRCode from 'qrcode.react';
 import AssetTags from './classAndSubClass.js';
-//import DimensionCreationForm from './DimensionCreationForm.jsx'
-import { Router, Route, IndexRedirect, hashHistory } from 'react-router';
 
-var Web3 = require('web3')
-var web3 = new Web3();
-
-//import wallet from './wallet.js';
+//import { Router, Route, IndexRedirect, hashHistory } from 'react-router';
 
 var crypto = require('crypto');
 var secp256k1 = require('secp256k1');
@@ -34,7 +29,7 @@ class Modal extends Component {
 			asset_subclass: this.tags.getAssetData("subclasses"),
 			qrCode_signature: {},
 
-			qrCode_owned_signature: {},
+			qrCode_COID_device_relation: {},
 
 			notCOID: true, //if the asset in view is MYCOID, we dont need second QR
 
@@ -126,10 +121,9 @@ class Modal extends Component {
 
 		this.setState({
 			qrCode_signature: { "msgHash": qrCode_Object_hash, "signature": signature, "timestamp": theTime },
-			qrCode_owned_signature: { "msgHash": qrCode_owned_Object_hash, "owners_sig": owners_sig, "timestamp": theTime }
+			qrCode_COID_device_relation: { "msgHash": qrCode_owned_Object_hash, "owners_sig": owners_sig, "timestamp": theTime }
 		})
 
-		//this.setState({ qrCode_owned_signature: { "msgHash": qrCode_owned_Object_hash, "owners_sig": owners_sig, "timestamp": theTime } })
 	}
 
 	appendInput() {
@@ -168,7 +162,7 @@ class Modal extends Component {
 
 	render() {
 
-		console.log("******" + JSON.stringify(this.state.qrCode_owned_signature))
+		console.log("******" + JSON.stringify(this.state.qrCode_COID_device_relation))
 
 		var _this = this;
 
@@ -205,11 +199,12 @@ class Modal extends Component {
 			endpoint: twinUrl + "validateQrCode"
 		});
 
-		var qrOwnedConfig = JSON.stringify({
+		var qrOwnedDevice = JSON.stringify({
 			pubKey: prop.pubkey,
-			msgHash: _this.state.qrCode_owned_signature.msgHash,
-			asset_sig: _this.state.qrCode_owned_signature.signature,
-			owners_sig: _this.state.qrCode_owned_signature.owners_sig,
+			msgHash: _this.state.qrCode_COID_device_relation.msgHash,
+			asset_sig: _this.state.qrCode_COID_device_relation.signature,
+			//need to make sure asset_sig is correct
+			owners_sig: _this.state.qrCode_COID_device_relation.owners_sig,
 			owner: prop.ownerIdList
 		});
 
@@ -301,7 +296,7 @@ class Modal extends Component {
 											<tr>
 												<td>Ownership ID List</td>
 												<td>{(() => {
-													if (!$.isEmptyObject(prop)) {
+													if (!$.isEmptyObject(prop.ownerIdList)) {
 														return prop.ownerIdList.map((ids, i) => {
 															return <p key={i}> {prop.ownerIdList[i]}</p>
 														})
@@ -328,7 +323,7 @@ class Modal extends Component {
 											<tr>
 												<td>Control ID List</td>
 												<td>{(() => {
-													if (!$.isEmptyObject(prop)) {
+													if (!$.isEmptyObject(prop.controlIdList)) {
 														return prop.controlIdList.map((ids, i) => {
 															return <p key={i}> {prop.controlIdList[i]}</p>
 														})
@@ -351,7 +346,7 @@ class Modal extends Component {
 											<tr>
 												<td>Recovery IDs</td>
 												<td>{(() => {
-													if (!$.isEmptyObject(prop)) {
+													if (!$.isEmptyObject(prop.identityRecoveryIdList)) {
 														return prop.identityRecoveryIdList.map((ids, i) => {
 															return <p key={i}> {prop.identityRecoveryIdList[i]}</p>
 														})
@@ -394,7 +389,7 @@ class Modal extends Component {
 								</div>
 
 								<div role="tabpanel" className="tab-pane center-block" id="qrcode2" style={qrStyle}>
-									{this.state.notCOID ? <QRCode value={qrOwnedConfig} size={200} /> : null}
+									{this.state.notCOID ? <QRCode value={qrOwnedDevice} size={200} /> : null}
 								</div>
 
 							</div>

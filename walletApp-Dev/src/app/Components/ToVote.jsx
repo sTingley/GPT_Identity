@@ -105,6 +105,8 @@ class ModalWin extends React.Component {
 	componentDidMount() {
 
 		var _this = this;
+		let propType = this.state.proposal.propType;
+		console.log("propType: " + propType);
 
 		$.ajax({
 			type: "POST",
@@ -143,7 +145,7 @@ class ModalWin extends React.Component {
 				let standardAsset = document.getElementById("standardAsset");
 				let KYC = document.getElementById("KYC");
 
-				if (_this.state.proposal.propType == 2) {
+				if (propType == 2) {
 					KYC.style.display = 'block';
 					standardAsset.style.display = 'none';
 				} else {
@@ -302,9 +304,7 @@ class ModalWin extends React.Component {
 										<td>
 											<DayPicker
 												disabledDays={{ daysOfWeek: [0] }}
-
 												onDayClick={day => this.state.selectedDay = day}
-
 											/>
 										</td>
 									</tr>

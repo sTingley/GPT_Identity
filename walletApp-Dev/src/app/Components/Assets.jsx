@@ -65,11 +65,11 @@ class Modal extends Component {
 		let standardAsset = document.getElementById("standardAsset");
 		let KYC = document.getElementById("KYC");
 
-		if(this.props.asset.asset_details.propType == 2) {
+		if (this.props.asset.asset_details.propType == 2) {
 			standardAsset.style.display = 'none';
 			KYC.style.display = 'block';
 		}
-		else {KYC.style.display = 'none'}
+		else { KYC.style.display = 'none' }
 
 		var prop = this.props.asset.asset_details;
 
@@ -237,129 +237,129 @@ class Modal extends Component {
 								<div role="tabpanel" className="tab-pane active" id="asset_details">
 
 									<div id="standardAsset">
-									<table className="table table-striped table-hover" style={style}>
-										<tbody>
-											<tr>
-												<td>Asset Name</td>
-												<td>{this.props.asset.asset_id}</td>
-											</tr>
-											<tr>
-												<td>Asset Class<p className="text-info">Use comma/enter to add class </p></td>
-												<td><TagsInput {...classInput} /></td>
-											</tr>
-											<tr>
-												<td>Asset SubClass<p className="text-info">Use comma/enter to add sub class </p></td>
-												<td><TagsInput {...subClassInput} /></td>
-											</tr>
-											<tr>
-												<td>COID Contract address</td>
-												<td><p><b> {prop.coidAddr} </b></p></td>
-											</tr>
-											<tr>
-												<td>Gatekeeper Contract address</td>
-												<td><p><b> {prop.gatekeeperAddr} </b></p></td>
-											</tr>
-											<tr>
-												<td>Dimension Control address</td>
-												<td><p><b> {prop.dimensionCtrlAddr} </b></p></td>
-											</tr>
-											<tr>
-												<td>BigchainDB Transaction ID</td>
-												<td><p> {prop.bigchainID} </p></td>
-											</tr>
-											<tr>
-												<td>BigchainDB Transaction Hash</td>
-												<td><p> {prop.bigchainHash} </p></td>
-											</tr>
-											<tr>
-												<td colSpan="2"><b>Official IDs</b></td>
-											</tr>
-											{(() => {
-												var ipfs_url = "http://10.101.114.231:8080/ipfs/";
-												if (!$.isEmptyObject(prop)) {
-													return prop.uniqueIdAttributes.map((ids, i) => {
-														return (
-															<tr key={i}>
-																<td>{ids[0]}</td>
-																<td><p>File hash: {ids[1]}</p><p>IPFS hash: <a target="_blank" href={ipfs_url + "/" + ids[2]}>{ids[2]}</a></p></td>
-															</tr>
-														)
-													});
-												} else {
-													return <tr><td colSpan="2">No Ids found</td></tr>
-												}
-											})(this)}
-											<tr>
-												<td>Ownership ID</td>
-												<td><p> {prop.ownershipId}</p></td>
-											</tr>
-											<tr>
-												<td>Ownership ID List</td>
-												<td>{(() => {
-													if (!$.isEmptyObject(prop.ownerIdList)) {
-														return prop.ownerIdList.map((ids, i) => {
-															return <p key={i}> {prop.ownerIdList[i]}</p>
-														})
+										<table className="table table-striped table-hover" style={style}>
+											<tbody>
+												<tr>
+													<td>Asset Name</td>
+													<td>{this.props.asset.asset_id}</td>
+												</tr>
+												<tr>
+													<td>Asset Class<p className="text-info">Use comma/enter to add class </p></td>
+													<td><TagsInput {...classInput} /></td>
+												</tr>
+												<tr>
+													<td>Asset SubClass<p className="text-info">Use comma/enter to add sub class </p></td>
+													<td><TagsInput {...subClassInput} /></td>
+												</tr>
+												<tr>
+													<td>COID Contract address</td>
+													<td><p><b> {prop.coidAddr} </b></p></td>
+												</tr>
+												<tr>
+													<td>Gatekeeper Contract address</td>
+													<td><p><b> {prop.gatekeeperAddr} </b></p></td>
+												</tr>
+												<tr>
+													<td>Dimension Control address</td>
+													<td><p><b> {prop.dimensionCtrlAddr} </b></p></td>
+												</tr>
+												<tr>
+													<td>BigchainDB Transaction ID</td>
+													<td><p> {prop.bigchainID} </p></td>
+												</tr>
+												<tr>
+													<td>BigchainDB Transaction Hash</td>
+													<td><p> {prop.bigchainHash} </p></td>
+												</tr>
+												<tr>
+													<td colSpan="2"><b>Official IDs</b></td>
+												</tr>
+												{(() => {
+													var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+													if (!$.isEmptyObject(prop)) {
+														return prop.uniqueIdAttributes.map((ids, i) => {
+															return (
+																<tr key={i}>
+																	<td>{ids[0]}</td>
+																	<td><p>File hash: {ids[1]}</p><p>IPFS hash: <a target="_blank" href={ipfs_url + "/" + ids[2]}>{ids[2]}</a></p></td>
+																</tr>
+															)
+														});
+													} else {
+														return <tr><td colSpan="2">No Ids found</td></tr>
 													}
 												})(this)}
-												</td>
-											</tr>
-											<tr>
-												<td>Ownership Token ID</td>
-												<td><p> {prop.ownershipTokenId}</p></td>
-											</tr>
-											<tr>
-												<td>Ownership Token Description</td>
-												<td><p>{prop.ownershipTokenAttributes}</p></td>
-											</tr>
-											<tr>
-												<td>Ownership Token Quantity</td>
-												<td><p> {prop.ownershipTokenQuantity}</p></td>
-											</tr>
-											<tr>
-												<td>Control ID</td>
-												<td><p> {prop.controlId}</p></td>
-											</tr>
-											<tr>
-												<td>Control ID List</td>
-												<td>{(() => {
-													if (!$.isEmptyObject(prop.controlIdList)) {
-														return prop.controlIdList.map((ids, i) => {
-															return <p key={i}> {prop.controlIdList[i]}</p>
-														})
-													}
-												})(this)}
-												</td>
-											</tr>
-											<tr>
-												<td>Control Token ID</td>
-												<td> <p> {prop.controlTokenId}</p></td>
-											</tr>
-											<tr>
-												<td>Control Token Description</td>
-												<td><p>{prop.controlTokenAttributes}</p></td>
-											</tr>
-											<tr>
-												<td>Control Token Quantity</td>
-												<td><p> {prop.controlTokenQuantity}</p></td>
-											</tr>
-											<tr>
-												<td>Recovery IDs</td>
-												<td>{(() => {
-													if (!$.isEmptyObject(prop.identityRecoveryIdList)) {
-														return prop.identityRecoveryIdList.map((ids, i) => {
-															return <p key={i}> {prop.identityRecoveryIdList[i]}</p>
-														})
-													}
-												})(this)}
-												</td>
-											</tr>
-											<tr>
-												<td>Recovery Condition</td>
-												<td> <p> {prop.recoveryCondition}</p></td>
-											</tr>
-										</tbody>
-									</table>
+												<tr>
+													<td>Ownership ID</td>
+													<td><p> {prop.ownershipId}</p></td>
+												</tr>
+												<tr>
+													<td>Ownership ID List</td>
+													<td>{(() => {
+														if (!$.isEmptyObject(prop.ownerIdList)) {
+															return prop.ownerIdList.map((ids, i) => {
+																return <p key={i}> {prop.ownerIdList[i]}</p>
+															})
+														}
+													})(this)}
+													</td>
+												</tr>
+												<tr>
+													<td>Ownership Token ID</td>
+													<td><p> {prop.ownershipTokenId}</p></td>
+												</tr>
+												<tr>
+													<td>Ownership Token Description</td>
+													<td><p>{prop.ownershipTokenAttributes}</p></td>
+												</tr>
+												<tr>
+													<td>Ownership Token Quantity</td>
+													<td><p> {prop.ownershipTokenQuantity}</p></td>
+												</tr>
+												<tr>
+													<td>Control ID</td>
+													<td><p> {prop.controlId}</p></td>
+												</tr>
+												<tr>
+													<td>Control ID List</td>
+													<td>{(() => {
+														if (!$.isEmptyObject(prop.controlIdList)) {
+															return prop.controlIdList.map((ids, i) => {
+																return <p key={i}> {prop.controlIdList[i]}</p>
+															})
+														}
+													})(this)}
+													</td>
+												</tr>
+												<tr>
+													<td>Control Token ID</td>
+													<td> <p> {prop.controlTokenId}</p></td>
+												</tr>
+												<tr>
+													<td>Control Token Description</td>
+													<td><p>{prop.controlTokenAttributes}</p></td>
+												</tr>
+												<tr>
+													<td>Control Token Quantity</td>
+													<td><p> {prop.controlTokenQuantity}</p></td>
+												</tr>
+												<tr>
+													<td>Recovery IDs</td>
+													<td>{(() => {
+														if (!$.isEmptyObject(prop.identityRecoveryIdList)) {
+															return prop.identityRecoveryIdList.map((ids, i) => {
+																return <p key={i}> {prop.identityRecoveryIdList[i]}</p>
+															})
+														}
+													})(this)}
+													</td>
+												</tr>
+												<tr>
+													<td>Recovery Condition</td>
+													<td> <p> {prop.recoveryCondition}</p></td>
+												</tr>
+											</tbody>
+										</table>
 									</div>
 
 									<div id="KYC">

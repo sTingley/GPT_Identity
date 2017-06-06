@@ -4,36 +4,13 @@ import UploadIpfsFile from './UploadIpfsFile.jsx';
 var secp256k1 = require('secp256k1');
 var keccak_256 = require('js-sha3').keccak_256;
 
-class DimensionDelegationForm extends React.Component {
-
-    constructor(props) {
-        super(props)
-        this.maxDelegations = this.props.max
-    }
-    render() {
-        var style = {
-            fontSize: '12.5px'
-        }
-        return (
-            <div className="form-group col-md-12">
-                <div className="col-md-10">
-                    <table className="table table-striped table-hover" style={style}>
-                        <tbody>
-                            <tr>
-                                <th><b>Delegatee</b></th>
-                                <th><b>Control Token Quantity</b></th>
-                            </tr>
-                            <tr>
-                                <td><input name={'delegatee-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Public Key of Delegatee" /></td>
-                                <td><input name={'delegatee-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Control Token Quantity" /></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        );
-    }
-};
+/*
+CLASSES:
+    DimensionDelegationForm: (for adding delegations and tokens)
+    DimensionAttributeForm: (for uploading files for desc/attr pairs)
+    DimensionForm: (rendered when we click an owned or controlled dimension)
+    IdentityDimensions: PARENT CLASS
+*/
 
 class DimensionAttributeForm extends React.Component {
 
@@ -50,6 +27,35 @@ class DimensionAttributeForm extends React.Component {
                 </div>
                 <div className="col-md-2">
                     <button type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn btn-warning pull-right"><span className="glyphicon glyphicon-upload"></span>Upload File</button>
+                </div>
+            </div>
+        );
+    }
+};
+
+class DimensionDelegationForm extends React.Component {
+
+    constructor(props) {
+        super(props)
+        this.maxDelegations = this.props.max
+    }
+    render() {
+        var style = { fontSize: '12.5px' }
+        return (
+            <div className="form-group col-md-12">
+                <div className="col-md-10">
+                    <table className="table table-striped table-hover" style={style}>
+                        <tbody>
+                            <tr>
+                                <th><b>Delegatee</b></th>
+                                <th><b>Control Token Quantity</b></th>
+                            </tr>
+                            <tr>
+                                <td><input name={'delegatee-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Public Key of Delegatee" /></td>
+                                <td><input name={'delegatee-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Control Token Quantity" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         );
@@ -526,10 +532,14 @@ class IdentityDimensions extends Component {
             showDetails: false,
             currentAsset: "",
 
+            // owndIsSelected: false,
+            // ctrlIsSelected: false,
+
             //Controllers for dimension (not necessarily COID controllers)
             control_list: [],
 
-            validators: []
+
+
 
         };
         this.showDimensionHandler = this.showDimensionHandler.bind(this);
@@ -698,11 +708,12 @@ class IdentityDimensions extends Component {
         }
 
 
+
     }//componentWillMount
 
     componentDidMount() {
-
     }
+
 
     /*****************************************************************************
     /*****************************************************************************
@@ -730,7 +741,9 @@ class IdentityDimensions extends Component {
     /*file_attrs looks like: [{key: "IPFS_hash | shaHash}]
         [{"input-0":"QmPcY8sJ8hSfWhzqX8iLzQEbgiESjqTaeEEoJUrZwhLNk5|9bb7e24956771c4f1bbfe5eceff9e9e1457fafa5d3af3a56f4d7cef0bdd509dc"},
         {"input-1":"QmUJGfdKUCFiL2cKE3dcVFL5Q6PsvcWJSPxff5snJ46tuk|28a6ce8b3c55a60f5923cb87e5fd1c47decb973d1973f047f722141460fdad71"},]*/
-    prepareAttributes() {
+    prepareAttributes(selectedAsset, bigchainTrxnID) {
+        console.log("selectedAsset: " + selectedAsset)
+        console.log("bigchainID: " + bigchainTrxnID)
         let attrs = [];
         let labels = this.getLabelValues();
         //labelVals: [{"input-0":"mydocument"},{"input-1":"seconddocument"}]
@@ -754,6 +767,19 @@ class IdentityDimensions extends Component {
             objArray.push(obj)
             console.log("objArray: " + JSON.stringify(objArray))
         }
+
+        let passBigchainObj = document.getElementById("passAsset");
+        if(passBigchainObj.selectedIndex == 0) {
+            alert('select one answer');
+        }
+        if(passBigchainObj.selectedIndex == 1){
+            let objKYC = {};
+            objKYC.descriptor = "bigchainID";
+            objKYC.attribute = bigchainTrxnID;
+            objKYC.flag = 0;
+            objArray.push(objKYC);
+        }
+
         //needed to stringify this obj Array for backend
         return JSON.stringify(objArray)
     }
@@ -844,45 +870,45 @@ class IdentityDimensions extends Component {
         let dimensionName = $("input[name^='dimensionName']").val();
         if (dimensionName) {
             json.dimensionName = dimensionName;
-            if (dimensionName = "KYC") {
-                json.validators = this.state.validators;
-                let endpoint = "/request_KYC";
-                let isKYC = true;
-            }
         }
         json.pubKey = localStorage.getItem("pubKey");
         json.address = "", json.flag = 0, json.ID = 0;
         //*************************************************************************
         // GET PROPER DATA FROM SELECTED ASSET (we will pass owners to prepareDelegations)
         let selected_asset = this.state.currentAsset//$("#assetSelect option:selected").text();
+
+        let bigchainTrxnID; //we will pass this to prepareAttributes function
         this.state.own_assets.forEach(function (asset, index) {
             if (selected_asset == asset.asset_id) {
+                // this.state.owndIsSelected = true;
                 console.log("\n\n SELECTED ASSET: " + selected_asset + "  Owned assetID: " + asset.asset_id);
                 json.coidAddr = asset.asset_coidAddr,
                     json.dimensionCtrlAddr = asset.asset_dimCtrlAddr,
                     json.uniqueId = asset.asset_uniqueId,
                     json.owners = asset.asset_owners,
-                    json.controllers = asset.asset_controllers
+                    json.controllers = asset.asset_controllers,
+                    bigchainTrxnID = asset.asset_bigchainID
             }
         })
         this.state.control_assets.forEach(function (asset, index) {
             if (selected_asset == asset.asset_id) {
+                // this.state.ctrlIsSelected = true;
                 console.log("\n\n SELECTED ASSET: " + selected_asset + "  Controlled assetID: " + asset.asset_id);
                 json.coidAddr = asset.asset_coidAddr,
                     json.dimensionCtrlAddr = asset.asset_dimCtrlAddr,
                     json.uniqueId = asset.asset_uniqueId,
                     json.owners = asset.asset_owners,
                     json.controllers = asset.asset_controllers
+                    bigchainTrxnID = asset.asset_bigchainID
             }
         })
         //*************************************************************************
         let delegations = this.prepareDelegationDistribution(dimensionName, json.owners);
         json.delegations = delegations
-        let attributes = this.prepareAttributes();
+        let attributes = this.prepareAttributes(selected_asset, bigchainTrxnID);
         json.data = attributes;
         let controllers_dimension = this.state.control_list;
         if (controllers_dimension) { json.controllers_dimension = controllers_dimension }
-
 
         //*************************************************************************
         var signature = this.getSignature(json);
@@ -893,61 +919,43 @@ class IdentityDimensions extends Component {
         //*************************************************************************
         console.log("JSON: " + JSON.stringify(json));
 
-        if (isKYC) {
-            $.ajax({
-                type: "POST",
-                url: twinUrl + endpoint,
-                data: json,
-                success: function (result) {
-                    //returns (bool success, bytes32 callerHash, address test)
-                    var data = result;
-                    if ($.type(result) != "object") {
-                        data = JSON.parseJSON(result)
-                    }
-                    console.log("response from myGatekeeper: " + JSON.stringify(data))
+        $.ajax({
+            type: "POST",
+            url: twinUrl + 'dimensions/CreateDimension',
+            data: json,
+            success: function (result) {
+                //returns (bool success, bytes32 callerHash, address test)
+                var data = result;
+                if ($.type(result) != "object") {
+                    data = JSON.parseJSON(result)
+                }
+                console.log("response createDimenson: " + JSON.stringify(data))
 
-                }.bind(this),
-            })
-        }
-        else {
-            $.ajax({
-                type: "POST",
-                url: twinUrl + 'dimensions/CreateDimension',
-                data: json,
-                success: function (result) {
-                    //returns (bool success, bytes32 callerHash, address test)
-                    var data = result;
-                    if ($.type(result) != "object") {
-                        data = JSON.parseJSON(result)
-                    }
-                    console.log("response createDimenson: " + JSON.stringify(data))
+                data = data.Result
+                console.log("data.Result: " + data.Result)
+                data = data.split(",")
+                console.log("DATA: " + data)
 
-                    data = data.Result
-                    console.log("data.Result: " + data.Result)
+                //var dimensionAddr = data.Result[2]
+                //console.log("created dimension address: " + dimensionAddr)
 
-                    data = data.split(",")
-                    console.log("DATA: " + data)
+                //get the array:
+                //data = data.data;
 
-                    //var dimensionAddr = data.Result[2]
-                    //console.log("created dimension address: " + dimensionAddr)
+            }.bind(this),
+            complete: function () {
+                // do something
+                //ST: HERE WE COULD WRITE DIMENSIONS INTO COID JSON?
+            },
+        })
 
-                    //get the array:
-                    //data = data.data;
-
-                }.bind(this),
-                complete: function () {
-                    // do something
-                    //ST: HERE WE COULD WRITE DIMENSIONS INTO COID JSON?
-                },
-            })
-        }
 
     }//end creationDimension
 
     //*****************************************************************************
     render() {
 
-        console.log("this.state.idims: " + JSON.stringify(this.state.iDimensions))
+        //console.log("this.state.idims: " + JSON.stringify(this.state.iDimensions))
 
         var _that = this
 
@@ -964,6 +972,7 @@ class IdentityDimensions extends Component {
         };
 
         return (
+
             <div id="IDENTITYDIMENSIONS_MODAL">
 
                 <h1>Personas</h1>
@@ -1028,6 +1037,8 @@ class IdentityDimensions extends Component {
 
                         </div>{/*tabpanel dimensions*/}
 
+
+
                         <div className="tabpanel" role="tabpanel" className="tab-pane" id="addDimension"><br />
 
                             <div>
@@ -1058,17 +1069,29 @@ class IdentityDimensions extends Component {
                                 </select>
                             </div>
 
+
+
                             <div id="SubmitContainer">
                                 <form method="POST" id="register" role="form">
                                     <div className="form-group">
                                         <label htmlFor="dimensionName">Persona name:</label>
                                         <input name="dimensionName" className="form-control col-md-4" type="text" placeholder="Dimension Name" />
                                     </div>
+
                                     <div className="form-group">
+                                        <label>Pass asset as JSON object:</label>
+                                        <select id="passAsset">
+                                            <option value="selectOption">--- Please select ---</option>
+                                            <option value="Yes">Yes</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="form-group" id="unique_id_div">
                                         <label htmlFor="unique_id">Enter descriptor(s) and attribute(s):</label>
                                         {this.state.inputs.map(input => <DimensionAttributeForm handleShowModal={this.handleShowModal.bind(this)} max="10" key={input} labelref={input} />)}
                                     </div>
-                                    <div className="form-group">
+                                    <div className="form-group" id="unique_id_btn">
                                         <div className="col-md-offset-6 col-md-6 ">
                                             <button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendAttribute.bind(this)}>
                                                 <span className="glyphicon glyphicon-plus"></span>Add More
@@ -1090,10 +1113,6 @@ class IdentityDimensions extends Component {
                                         <label htmlFor="control_dist">Enter Persona Controllers. These controllers can be but do not have to be your Core Identity controllers.</label>
                                         <TagsInput {...inputAttrs} value={this.state.control_list} onChange={(e) => { this.onFieldChange("control_list", e) }} />
                                     </div>
-                                    <div className="form-group">
-                                        <label htmlFor="validators">Enter Persona Validators. These are REQUIRED for a KYC Persona!</label>
-                                        <TagsInput {...inputAttrs} value={this.state.validators} onChange={(e) => { this.onFieldChange("validators", e) }} />
-                                    </div>
 
                                     <div className="form-group">
                                         <div className="col-sm-6">
@@ -1101,6 +1120,7 @@ class IdentityDimensions extends Component {
                                         </div>
                                     </div>
                                 </form>
+
                                 {this.state.showModal ? <UploadIpfsFile pubKey={this.state.pubKey} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}
                             </div>{/*CreateDimensionContainer*/}
 
@@ -1118,21 +1138,3 @@ class IdentityDimensions extends Component {
 
 
 export default IdentityDimensions
-
-//<IdentityDimensions dimensions={dimensions} onDelete={this.handleDeleteDimension.bind(this) } key={dimensions.ID} onClick={this.showHandler.bind(this)}/>
-//handleShowModal={this.handleShowModal.bind(this)}
-
-            // let delegatee = $("input[name^='delegatee_addr']").val()
-            // if (delegatee) json.delegatee = delegatee
-            // let tokenQuantity = $("input[name^='tokenQuantity']").val()
-            // if (tokenQuantity) json.tokenQuantity = tokenQuantity
-
-// <tr>
-//     <th><b>Delegate tokens</b></th>
-// </tr>
-// <tr>
-//     <td><input name="delegatee_addr" className="form-control col-md-4" type="text" placeholder="Delegatee Address" /></td>
-// </tr>
-// <tr>
-//     <td><input name="tokenQuantity" className="form-control col-md-4" type="text" placeholder="Token Quantity" /></td>
-// </tr>

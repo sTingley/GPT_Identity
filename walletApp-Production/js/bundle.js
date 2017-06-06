@@ -63831,6 +63831,8 @@
 			value: function componentDidMount() {
 	
 				var _this = this;
+				var propType = this.state.proposal.propType;
+				console.log("propType: " + propType);
 	
 				$.ajax({
 					type: "POST",
@@ -63869,7 +63871,7 @@
 						var standardAsset = document.getElementById("standardAsset");
 						var KYC = document.getElementById("KYC");
 	
-						if (_this.state.proposal.propType == 2) {
+						if (propType == 2) {
 							KYC.style.display = 'block';
 							standardAsset.style.display = 'none';
 						} else {
@@ -64300,11 +64302,9 @@
 												null,
 												_react2.default.createElement(_reactDayPicker2.default, {
 													disabledDays: { daysOfWeek: [0] },
-	
 													onDayClick: function onDayClick(day) {
 														return _this3.state.selectedDay = day;
 													}
-	
 												})
 											)
 										)
@@ -68084,7 +68084,8 @@
 											asset_coidAddr: dataResult.coidAddr,
 											asset_gatekeeperAddr: dataResult.gatekeeperAddr,
 											asset_owners: dataResult.ownerIdList,
-											asset_controllers: dataResult.controlIdList
+											asset_controllers: dataResult.controlIdList,
+											asset_bigchainID: dataResult.bigchainID
 										};
 										localStorage.setItem("controlled_assets", JSON.stringify(assetData));
 									}.bind(this),
@@ -71329,7 +71330,8 @@
 	                                        asset_coidAddr: dataResult.coidAddr,
 	                                        asset_gatekeeperAddr: dataResult.gatekeeperAddr,
 	                                        asset_owners: dataResult.ownerIdList,
-	                                        asset_controllers: dataResult.controlIdList
+	                                        asset_controllers: dataResult.controlIdList,
+	                                        asset_bigchainID: dataResult.bigchainID
 	                                    };
 	                                    localStorage.setItem("owned_assets", JSON.stringify(assetData));
 	                                    //console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets))
@@ -71406,7 +71408,8 @@
 	                                        asset_coidAddr: dataResult.coidAddr,
 	                                        asset_gatekeeperAddr: dataResult.gatekeeperAddr,
 	                                        asset_owners: dataResult.ownerIdList,
-	                                        asset_controllers: dataResult.controlIdList
+	                                        asset_controllers: dataResult.controlIdList,
+	                                        asset_bigchainID: dataResult.bigchainID
 	                                    };
 	                                    localStorage.setItem("controlled_assets", JSON.stringify(assetData));
 	                                }.bind(this),
@@ -71606,24 +71609,77 @@
 	var secp256k1 = __webpack_require__(/*! secp256k1 */ 261);
 	var keccak_256 = __webpack_require__(/*! js-sha3 */ 325).keccak_256;
 	
-	var DimensionDelegationForm = function (_React$Component) {
-	    _inherits(DimensionDelegationForm, _React$Component);
+	/*
+	CLASSES:
+	    DimensionDelegationForm: (for adding delegations and tokens)
+	    DimensionAttributeForm: (for uploading files for desc/attr pairs)
+	    DimensionForm: (rendered when we click an owned or controlled dimension)
+	    IdentityDimensions: PARENT CLASS
+	*/
 	
-	    function DimensionDelegationForm(props) {
-	        _classCallCheck(this, DimensionDelegationForm);
+	var DimensionAttributeForm = function (_React$Component) {
+	    _inherits(DimensionAttributeForm, _React$Component);
 	
-	        var _this2 = _possibleConstructorReturn(this, (DimensionDelegationForm.__proto__ || Object.getPrototypeOf(DimensionDelegationForm)).call(this, props));
+	    function DimensionAttributeForm(props) {
+	        _classCallCheck(this, DimensionAttributeForm);
+	
+	        var _this2 = _possibleConstructorReturn(this, (DimensionAttributeForm.__proto__ || Object.getPrototypeOf(DimensionAttributeForm)).call(this, props));
 	
 	        _this2.maxDelegations = _this2.props.max;
 	        return _this2;
 	    }
 	
+	    _createClass(DimensionAttributeForm, [{
+	        key: 'render',
+	        value: function render() {
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'form-group col-md-12' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'col-md-10' },
+	                    _react2.default.createElement(
+	                        'label',
+	                        { htmlFor: 'unique_id_attrs' },
+	                        ' Persona Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research". '
+	                    ),
+	                    _react2.default.createElement('input', { name: 'label-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: 'Descriptor' })
+	                ),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'col-md-2' },
+	                    _react2.default.createElement(
+	                        'button',
+	                        { type: 'button', 'data-id': this.props.labelref, onClick: this.props.handleShowModal, className: 'btn btn-warning pull-right' },
+	                        _react2.default.createElement('span', { className: 'glyphicon glyphicon-upload' }),
+	                        'Upload File'
+	                    )
+	                )
+	            );
+	        }
+	    }]);
+	
+	    return DimensionAttributeForm;
+	}(_react2.default.Component);
+	
+	;
+	
+	var DimensionDelegationForm = function (_React$Component2) {
+	    _inherits(DimensionDelegationForm, _React$Component2);
+	
+	    function DimensionDelegationForm(props) {
+	        _classCallCheck(this, DimensionDelegationForm);
+	
+	        var _this3 = _possibleConstructorReturn(this, (DimensionDelegationForm.__proto__ || Object.getPrototypeOf(DimensionDelegationForm)).call(this, props));
+	
+	        _this3.maxDelegations = _this3.props.max;
+	        return _this3;
+	    }
+	
 	    _createClass(DimensionDelegationForm, [{
 	        key: 'render',
 	        value: function render() {
-	            var style = {
-	                fontSize: '12.5px'
-	            };
+	            var style = { fontSize: '12.5px' };
 	            return _react2.default.createElement(
 	                'div',
 	                { className: 'form-group col-md-12' },
@@ -71680,53 +71736,6 @@
 	    }]);
 	
 	    return DimensionDelegationForm;
-	}(_react2.default.Component);
-	
-	;
-	
-	var DimensionAttributeForm = function (_React$Component2) {
-	    _inherits(DimensionAttributeForm, _React$Component2);
-	
-	    function DimensionAttributeForm(props) {
-	        _classCallCheck(this, DimensionAttributeForm);
-	
-	        var _this3 = _possibleConstructorReturn(this, (DimensionAttributeForm.__proto__ || Object.getPrototypeOf(DimensionAttributeForm)).call(this, props));
-	
-	        _this3.maxDelegations = _this3.props.max;
-	        return _this3;
-	    }
-	
-	    _createClass(DimensionAttributeForm, [{
-	        key: 'render',
-	        value: function render() {
-	            return _react2.default.createElement(
-	                'div',
-	                { className: 'form-group col-md-12' },
-	                _react2.default.createElement(
-	                    'div',
-	                    { className: 'col-md-10' },
-	                    _react2.default.createElement(
-	                        'label',
-	                        { htmlFor: 'unique_id_attrs' },
-	                        ' Persona Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research". '
-	                    ),
-	                    _react2.default.createElement('input', { name: 'label-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: 'Descriptor' })
-	                ),
-	                _react2.default.createElement(
-	                    'div',
-	                    { className: 'col-md-2' },
-	                    _react2.default.createElement(
-	                        'button',
-	                        { type: 'button', 'data-id': this.props.labelref, onClick: this.props.handleShowModal, className: 'btn btn-warning pull-right' },
-	                        _react2.default.createElement('span', { className: 'glyphicon glyphicon-upload' }),
-	                        'Upload File'
-	                    )
-	                )
-	            );
-	        }
-	    }]);
-	
-	    return DimensionAttributeForm;
 	}(_react2.default.Component);
 	
 	;
@@ -72490,10 +72499,11 @@
 	            showDetails: false,
 	            currentAsset: "",
 	
-	            //Controllers for dimension (not necessarily COID controllers)
-	            control_list: [],
+	            // owndIsSelected: false,
+	            // ctrlIsSelected: false,
 	
-	            validators: []
+	            //Controllers for dimension (not necessarily COID controllers)
+	            control_list: []
 	
 	        };
 	        _this7.showDimensionHandler = _this7.showDimensionHandler.bind(_this7);
@@ -72727,7 +72737,9 @@
 	
 	    }, {
 	        key: 'prepareAttributes',
-	        value: function prepareAttributes() {
+	        value: function prepareAttributes(selectedAsset, bigchainTrxnID) {
+	            console.log("selectedAsset: " + selectedAsset);
+	            console.log("bigchainID: " + bigchainTrxnID);
 	            var attrs = [];
 	            var labels = this.getLabelValues();
 	            //labelVals: [{"input-0":"mydocument"},{"input-1":"seconddocument"}]
@@ -72751,6 +72763,19 @@
 	                objArray.push(obj);
 	                console.log("objArray: " + JSON.stringify(objArray));
 	            }
+	
+	            var passBigchainObj = document.getElementById("passAsset");
+	            if (passBigchainObj.selectedIndex == 0) {
+	                alert('select one answer');
+	            }
+	            if (passBigchainObj.selectedIndex == 1) {
+	                var objKYC = {};
+	                objKYC.descriptor = "bigchainID";
+	                objKYC.attribute = bigchainTrxnID;
+	                objKYC.flag = 0;
+	                objArray.push(objKYC);
+	            }
+	
 	            //needed to stringify this obj Array for backend
 	            return JSON.stringify(objArray);
 	        }
@@ -72853,33 +72878,33 @@
 	            var dimensionName = $("input[name^='dimensionName']").val();
 	            if (dimensionName) {
 	                json.dimensionName = dimensionName;
-	                if (dimensionName = "KYC") {
-	                    json.validators = this.state.validators;
-	                    var _endpoint = "/request_KYC";
-	                    var _isKYC = true;
-	                }
 	            }
 	            json.pubKey = localStorage.getItem("pubKey");
 	            json.address = "", json.flag = 0, json.ID = 0;
 	            //*************************************************************************
 	            // GET PROPER DATA FROM SELECTED ASSET (we will pass owners to prepareDelegations)
 	            var selected_asset = this.state.currentAsset; //$("#assetSelect option:selected").text();
+	
+	            var bigchainTrxnID = void 0; //we will pass this to prepareAttributes function
 	            this.state.own_assets.forEach(function (asset, index) {
 	                if (selected_asset == asset.asset_id) {
+	                    // this.state.owndIsSelected = true;
 	                    console.log("\n\n SELECTED ASSET: " + selected_asset + "  Owned assetID: " + asset.asset_id);
-	                    json.coidAddr = asset.asset_coidAddr, json.dimensionCtrlAddr = asset.asset_dimCtrlAddr, json.uniqueId = asset.asset_uniqueId, json.owners = asset.asset_owners, json.controllers = asset.asset_controllers;
+	                    json.coidAddr = asset.asset_coidAddr, json.dimensionCtrlAddr = asset.asset_dimCtrlAddr, json.uniqueId = asset.asset_uniqueId, json.owners = asset.asset_owners, json.controllers = asset.asset_controllers, bigchainTrxnID = asset.asset_bigchainID;
 	                }
 	            });
 	            this.state.control_assets.forEach(function (asset, index) {
 	                if (selected_asset == asset.asset_id) {
+	                    // this.state.ctrlIsSelected = true;
 	                    console.log("\n\n SELECTED ASSET: " + selected_asset + "  Controlled assetID: " + asset.asset_id);
 	                    json.coidAddr = asset.asset_coidAddr, json.dimensionCtrlAddr = asset.asset_dimCtrlAddr, json.uniqueId = asset.asset_uniqueId, json.owners = asset.asset_owners, json.controllers = asset.asset_controllers;
+	                    bigchainTrxnID = asset.asset_bigchainID;
 	                }
 	            });
 	            //*************************************************************************
 	            var delegations = this.prepareDelegationDistribution(dimensionName, json.owners);
 	            json.delegations = delegations;
-	            var attributes = this.prepareAttributes();
+	            var attributes = this.prepareAttributes(selected_asset, bigchainTrxnID);
 	            json.data = attributes;
 	            var controllers_dimension = this.state.control_list;
 	            if (controllers_dimension) {
@@ -72895,51 +72920,34 @@
 	            //*************************************************************************
 	            console.log("JSON: " + JSON.stringify(json));
 	
-	            if (isKYC) {
-	                $.ajax({
-	                    type: "POST",
-	                    url: twinUrl + endpoint,
-	                    data: json,
-	                    success: function (result) {
-	                        //returns (bool success, bytes32 callerHash, address test)
-	                        var data = result;
-	                        if ($.type(result) != "object") {
-	                            data = JSON.parseJSON(result);
-	                        }
-	                        console.log("response from myGatekeeper: " + JSON.stringify(data));
-	                    }.bind(this)
-	                });
-	            } else {
-	                $.ajax({
-	                    type: "POST",
-	                    url: twinUrl + 'dimensions/CreateDimension',
-	                    data: json,
-	                    success: function (result) {
-	                        //returns (bool success, bytes32 callerHash, address test)
-	                        var data = result;
-	                        if ($.type(result) != "object") {
-	                            data = JSON.parseJSON(result);
-	                        }
-	                        console.log("response createDimenson: " + JSON.stringify(data));
-	
-	                        data = data.Result;
-	                        console.log("data.Result: " + data.Result);
-	
-	                        data = data.split(",");
-	                        console.log("DATA: " + data);
-	
-	                        //var dimensionAddr = data.Result[2]
-	                        //console.log("created dimension address: " + dimensionAddr)
-	
-	                        //get the array:
-	                        //data = data.data;
-	                    }.bind(this),
-	                    complete: function complete() {
-	                        // do something
-	                        //ST: HERE WE COULD WRITE DIMENSIONS INTO COID JSON?
+	            $.ajax({
+	                type: "POST",
+	                url: twinUrl + 'dimensions/CreateDimension',
+	                data: json,
+	                success: function (result) {
+	                    //returns (bool success, bytes32 callerHash, address test)
+	                    var data = result;
+	                    if ($.type(result) != "object") {
+	                        data = JSON.parseJSON(result);
 	                    }
-	                });
-	            }
+	                    console.log("response createDimenson: " + JSON.stringify(data));
+	
+	                    data = data.Result;
+	                    console.log("data.Result: " + data.Result);
+	                    data = data.split(",");
+	                    console.log("DATA: " + data);
+	
+	                    //var dimensionAddr = data.Result[2]
+	                    //console.log("created dimension address: " + dimensionAddr)
+	
+	                    //get the array:
+	                    //data = data.data;
+	                }.bind(this),
+	                complete: function complete() {
+	                    // do something
+	                    //ST: HERE WE COULD WRITE DIMENSIONS INTO COID JSON?
+	                }
+	            });
 	        } //end creationDimension
 	
 	        //*****************************************************************************
@@ -72951,7 +72959,7 @@
 	                _React$createElement,
 	                _React$createElement2;
 	
-	            console.log("this.state.idims: " + JSON.stringify(this.state.iDimensions));
+	            //console.log("this.state.idims: " + JSON.stringify(this.state.iDimensions))
 	
 	            var _that = this;
 	
@@ -73223,6 +73231,34 @@
 	                                        { className: 'form-group' },
 	                                        _react2.default.createElement(
 	                                            'label',
+	                                            null,
+	                                            'Pass asset as JSON object:'
+	                                        ),
+	                                        _react2.default.createElement(
+	                                            'select',
+	                                            { id: 'passAsset' },
+	                                            _react2.default.createElement(
+	                                                'option',
+	                                                { value: 'selectOption' },
+	                                                '--- Please select ---'
+	                                            ),
+	                                            _react2.default.createElement(
+	                                                'option',
+	                                                { value: 'Yes' },
+	                                                'Yes'
+	                                            ),
+	                                            _react2.default.createElement(
+	                                                'option',
+	                                                { value: 'No' },
+	                                                'No'
+	                                            )
+	                                        )
+	                                    ),
+	                                    _react2.default.createElement(
+	                                        'div',
+	                                        { className: 'form-group', id: 'unique_id_div' },
+	                                        _react2.default.createElement(
+	                                            'label',
 	                                            { htmlFor: 'unique_id' },
 	                                            'Enter descriptor(s) and attribute(s):'
 	                                        ),
@@ -73232,7 +73268,7 @@
 	                                    ),
 	                                    _react2.default.createElement(
 	                                        'div',
-	                                        { className: 'form-group' },
+	                                        { className: 'form-group', id: 'unique_id_btn' },
 	                                        _react2.default.createElement(
 	                                            'div',
 	                                            { className: 'col-md-offset-6 col-md-6 ' },
@@ -73286,18 +73322,6 @@
 	                                        'div',
 	                                        { className: 'form-group' },
 	                                        _react2.default.createElement(
-	                                            'label',
-	                                            { htmlFor: 'validators' },
-	                                            'Enter Persona Validators. These are REQUIRED for a KYC Persona!'
-	                                        ),
-	                                        _react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs, { value: this.state.validators, onChange: function onChange(e) {
-	                                                _this8.onFieldChange("validators", e);
-	                                            } }))
-	                                    ),
-	                                    _react2.default.createElement(
-	                                        'div',
-	                                        { className: 'form-group' },
-	                                        _react2.default.createElement(
 	                                            'div',
 	                                            { className: 'col-sm-6' },
 	                                            _react2.default.createElement(
@@ -73323,24 +73347,6 @@
 	;
 	
 	exports.default = IdentityDimensions;
-	
-	//<IdentityDimensions dimensions={dimensions} onDelete={this.handleDeleteDimension.bind(this) } key={dimensions.ID} onClick={this.showHandler.bind(this)}/>
-	//handleShowModal={this.handleShowModal.bind(this)}
-	
-	// let delegatee = $("input[name^='delegatee_addr']").val()
-	// if (delegatee) json.delegatee = delegatee
-	// let tokenQuantity = $("input[name^='tokenQuantity']").val()
-	// if (tokenQuantity) json.tokenQuantity = tokenQuantity
-	
-	// <tr>
-	//     <th><b>Delegate tokens</b></th>
-	// </tr>
-	// <tr>
-	//     <td><input name="delegatee_addr" className="form-control col-md-4" type="text" placeholder="Delegatee Address" /></td>
-	// </tr>
-	// <tr>
-	//     <td><input name="tokenQuantity" className="form-control col-md-4" type="text" placeholder="Token Quantity" /></td>
-	// </tr>
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/buffer/index.js */ 239).Buffer))
 
 /***/ },

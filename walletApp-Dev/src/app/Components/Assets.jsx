@@ -819,7 +819,8 @@ class Assets extends Component {
 									asset_coidAddr: dataResult.coidAddr,
 									asset_gatekeeperAddr: dataResult.gatekeeperAddr,
 									asset_owners: dataResult.ownerIdList,
-									asset_controllers: dataResult.controlIdList
+									asset_controllers: dataResult.controlIdList,
+									asset_bigchainID: dataResult.bigchainID
 								}
 								localStorage.setItem("controlled_assets", JSON.stringify(assetData))
 

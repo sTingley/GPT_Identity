@@ -457,7 +457,7 @@ class Asset extends React.Component {
                 console.log("result: " + JSON.stringify(data))
             }.bind(this),
         })
-        
+
     }
     // END OFFICIAL ID FUNCTIONS:
     //**********************************************************************
@@ -590,7 +590,6 @@ class Asset extends React.Component {
 
                     <div className="tab-content">
 
-
                         <div role="tabpanel" className="tab-pane active" id="officalID">
                             <table className="table table-striped table-hover" style={style}>
                                 <tbody>
@@ -601,12 +600,22 @@ class Asset extends React.Component {
                                         var ipfs_url = "http://10.101.114.231:8080/ipfs/";
                                         if (!$.isEmptyObject(prop)) {
                                             return prop.uniqueIdAttributes.map((ids, i) => {
-                                                return (
-                                                    <tr key={i}>
-                                                        <td>{ids[0]}</td>
-                                                        <td><p>File hash: {ids[1]}</p><p>IPFS hash: <a target="_blank" href={ipfs_url + "/" + ids[2]}>{ids[2]}</a></p></td>
-                                                    </tr>
-                                                )
+                                                if (ids[2].charAt(0) == "Q") {
+                                                    return (
+                                                        <tr key={i}>
+                                                            <td>{ids[0]}</td>
+                                                            <td><p>File hash: {ids[1]}</p><p>IPFS hash: <a target="_blank" href={ipfs_url + "/" + ids[2]}>{ids[2]}</a></p></td>
+                                                        </tr>
+                                                    )
+                                                }
+                                                else {
+                                                    return (
+                                                        <tr key={i}>
+                                                            <td>{ids[0]}</td>
+                                                            <td><p>File hash: {ids[1]}</p><p>BigChain hash: <a href="javascript:" onClick={(e) => { this.bigchainGet(ids[2]) }}>{ids[2]}</a></p></td>
+                                                        </tr>
+                                                    )
+                                                }
                                             });
                                         } else {
                                             return <tr><td colSpan="2">No Ids found</td></tr>
@@ -637,7 +646,7 @@ class Asset extends React.Component {
                                         <td><b>Owner ID List</b></td>
                                         <td>
                                             {(() => {
-                                                if (!$.isEmptyObject(prop)) {
+                                                if (!$.isEmptyObject(prop.ownerIdList)) {
                                                     return prop.ownerIdList.map((ids, i) => {
                                                         return <p key={i}> {prop.ownerIdList[i]}</p>
                                                     })
@@ -663,8 +672,7 @@ class Asset extends React.Component {
                                 </button>
                                 </div>
                             </div>
-
-                        </div>{/*tab-pane controllers*/}
+                        </div>{/*tab-pane owners*/}
 
                         <div role="tabpanel" className="tab-pane" id="controllers">
                             <table className="table table-striped table-hover" style={style}>
@@ -673,7 +681,7 @@ class Asset extends React.Component {
                                         <td><b>Control ID List</b></td>
                                         <td>
                                             {(() => {
-                                                if (!$.isEmptyObject(prop)) {
+                                                if (!$.isEmptyObject(prop.controlIdList)) {
                                                     return prop.controlIdList.map((ids, i) => {
                                                         return <p key={i}> {prop.controlIdList[i]}</p>
                                                     })
@@ -706,7 +714,7 @@ class Asset extends React.Component {
                                     <tr>
                                         <td>Recovery IDs</td>
                                         <td>{(() => {
-                                            if (!$.isEmptyObject(prop)) {
+                                            if (!$.isEmptyObject(prop.identityRecoveryIdList)) {
                                                 return prop.identityRecoveryIdList.map((ids, i) => {
                                                     return <p key={i}> {prop.identityRecoveryIdList[i]}</p>
                                                 })
@@ -734,7 +742,6 @@ class Asset extends React.Component {
                                     <span className="glyphicon glyphicon-plus"></span>Update Recovery
                                 </button>
                             </div>
-
                         </div>{/*tab-pane recovery*/}
 
                         <div role="tabpanel" className="tab-pane" id="delegations">
@@ -817,14 +824,14 @@ class Identities extends React.Component {
     //handle choice from asset navigation bar. Ex: asset.asset_id="MyCOID"
     handleSelectAsset(asset) {
         let assetID = asset.asset_id
-        console.log("ASSET onclick: "+JSON.stringify(asset));
+        console.log("ASSET onclick: " + JSON.stringify(asset));
         if (assetID) {
-            console.log("typeof _this" + typeof(_this));// will tell me if this is defined
-            if(typeof(_this) != 'undefined'){
+            console.log("typeof _this" + typeof (_this));// will tell me if this is defined
+            if (typeof (_this) != 'undefined') {
                 _this.state.asset = asset;
             }
             this.setState({ showDetails: true, active_asset: asset })
-            
+
         }
     }
 
@@ -928,162 +935,162 @@ class Identities extends React.Component {
         //ADD THE CODE SO THAT MYCOID displays on the page by default?
 
         // -> -> -> START get OWNED assets -> -> ->
-		$.ajax({
-			type: "POST",
-			url: twinUrl + 'getOwnedAssets',
-			data: { "pubKey": localStorage.getItem("pubKey") },
-			error: function(){},
-			success: function (result) {
-				var data = result;
-				if ($.type(result) != "object") {
-					data = JSON.parseJSON(result)
-				}
+        $.ajax({
+            type: "POST",
+            url: twinUrl + 'getOwnedAssets',
+            data: { "pubKey": localStorage.getItem("pubKey") },
+            error: function () { },
+            success: function (result) {
+                var data = result;
+                if ($.type(result) != "object") {
+                    data = JSON.parseJSON(result)
+                }
 
-				//get the array:
-				data = data.data;
-console.log("Get Owned Assets result: " + data);
-				//DEBUGGING:
-				//console.log("getOwnedAssets result: " + data);
-				var assetData = []
+                //get the array:
+                data = data.data;
+                console.log("Get Owned Assets result: " + data);
+                //DEBUGGING:
+                //console.log("getOwnedAssets result: " + data);
+                var assetData = []
 
-				if (data.length > 0) {
+                if (data.length > 0) {
 
-					//loop through OWNED assets
-					for (let i = 0; i < data.length; i++) {
-						//AJAX each asset:
-						$.ajax({
-							type: "POST",
-							url: twinUrl + 'getAsset',
-							data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": data[i] },
-							success: function (result) {
-								var dataResult = result;
-								if ($.type(result) != "object") {
-									dataResult = JSON.parseJSON(result)
-								}
+                    //loop through OWNED assets
+                    for (let i = 0; i < data.length; i++) {
+                        //AJAX each asset:
+                        $.ajax({
+                            type: "POST",
+                            url: twinUrl + 'getAsset',
+                            data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": data[i] },
+                            success: function (result) {
+                                var dataResult = result;
+                                if ($.type(result) != "object") {
+                                    dataResult = JSON.parseJSON(result)
+                                }
 
-								//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-								var theArray = this.state.own_assets;
+                                //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
+                                var theArray = this.state.own_assets;
 
-								//console.log("length is: " + theArray.length)
-								//console.log(theArray)
-								//TODO: RENAME asset_name TO ASSET DETAILS
-								theArray[theArray.length] = {
-									asset_id: dataResult.assetID,
-									asset_details: dataResult
-								}
-								this.setState({ own_assets: theArray });
+                                //console.log("length is: " + theArray.length)
+                                //console.log(theArray)
+                                //TODO: RENAME asset_name TO ASSET DETAILS
+                                theArray[theArray.length] = {
+                                    asset_id: dataResult.assetID,
+                                    asset_details: dataResult
+                                }
+                                this.setState({ own_assets: theArray });
 
-								assetData[assetData.length] = {
-									asset_id: dataResult.assetID,
-									asset_uniqueId: dataResult.uniqueId,
-									asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
-									asset_coidAddr: dataResult.coidAddr,
-									asset_gatekeeperAddr: dataResult.gatekeeperAddr,
-									asset_owners: dataResult.ownerIdList,
-									asset_controllers: dataResult.controlIdList,
+                                assetData[assetData.length] = {
+                                    asset_id: dataResult.assetID,
+                                    asset_uniqueId: dataResult.uniqueId,
+                                    asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
+                                    asset_coidAddr: dataResult.coidAddr,
+                                    asset_gatekeeperAddr: dataResult.gatekeeperAddr,
+                                    asset_owners: dataResult.ownerIdList,
+                                    asset_controllers: dataResult.controlIdList,
                                     asset_bigchainID: dataResult.bigchainID
-								}
-								localStorage.setItem("owned_assets", JSON.stringify(assetData))
-								//console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets))
-							}.bind(this),
-							complete: function () { },
-						})
-					}//end for
-				}//end if (data > 0)
-				else{
-					var assetData = []
-				assetData[assetData.length] = {
-									asset_id: "",
-									asset_uniqueId: "",
-									asset_dimCtrlAddr: "",
-									asset_coidAddr: "",
-									asset_gatekeeperAddr: "",
-									asset_owners: "",
-									asset_controllers: ""
-								}
-								localStorage.setItem("owned_assets", JSON.stringify(assetData))
-				}
-			}.bind(this)
-		})
-		// <- <- <- END get OWNED assets <- <- <-
-		// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
-		// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
-		// -> -> -> START get CONTROLLED assets -> -> ->
-		$.ajax({
-			type: "POST",
-			url: twinUrl + 'getControlledAssets',
-			data: { "pubKey": localStorage.getItem("pubKey") },
-			error: function(){},
-			success: function (result) {
-				var data = result;
-				if ($.type(result) != "object") {
-					data = JSON.parseJSON(result)
-				}
-				console.log("got data: " + JSON.stringify(data));
+                                }
+                                localStorage.setItem("owned_assets", JSON.stringify(assetData))
+                                //console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets))
+                            }.bind(this),
+                            complete: function () { },
+                        })
+                    }//end for
+                }//end if (data > 0)
+                else {
+                    var assetData = []
+                    assetData[assetData.length] = {
+                        asset_id: "",
+                        asset_uniqueId: "",
+                        asset_dimCtrlAddr: "",
+                        asset_coidAddr: "",
+                        asset_gatekeeperAddr: "",
+                        asset_owners: "",
+                        asset_controllers: ""
+                    }
+                    localStorage.setItem("owned_assets", JSON.stringify(assetData))
+                }
+            }.bind(this)
+        })
+        // <- <- <- END get OWNED assets <- <- <-
+        // <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
+        // -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
+        // -> -> -> START get CONTROLLED assets -> -> ->
+        $.ajax({
+            type: "POST",
+            url: twinUrl + 'getControlledAssets',
+            data: { "pubKey": localStorage.getItem("pubKey") },
+            error: function () { },
+            success: function (result) {
+                var data = result;
+                if ($.type(result) != "object") {
+                    data = JSON.parseJSON(result)
+                }
+                console.log("got data: " + JSON.stringify(data));
 
-				data = data.data;
-				console.log("Get Controlled Assets result: " + data);
-				var assetData = []
+                data = data.data;
+                console.log("Get Controlled Assets result: " + data);
+                var assetData = []
 
-				if (data.length > 0) {
-					//loop through OWNED assets
-					for (let i = 0; i < data.length; i++) {
-						//console.log("i is: " + i + " filename: " + data[i])
-						//AJAX each asset:
-						$.ajax({
-							type: "POST",
-							url: twinUrl + 'getAsset',
-							data: { "pubKey": localStorage.getItem("pubKey"), "flag": 1, "fileName": data[i] },
-							success: function (result) {
-								var dataResult = result;
-								if ($.type(result) != "object") {
-									dataResult = JSON.parseJSON(result)
-								}
+                if (data.length > 0) {
+                    //loop through OWNED assets
+                    for (let i = 0; i < data.length; i++) {
+                        //console.log("i is: " + i + " filename: " + data[i])
+                        //AJAX each asset:
+                        $.ajax({
+                            type: "POST",
+                            url: twinUrl + 'getAsset',
+                            data: { "pubKey": localStorage.getItem("pubKey"), "flag": 1, "fileName": data[i] },
+                            success: function (result) {
+                                var dataResult = result;
+                                if ($.type(result) != "object") {
+                                    dataResult = JSON.parseJSON(result)
+                                }
 
-								var theArray = this.state.controlled_assets;
-								//console.log("length is: " + theArray.length)
-								//console.log(JSON.stringify(theArray))
+                                var theArray = this.state.controlled_assets;
+                                //console.log("length is: " + theArray.length)
+                                //console.log(JSON.stringify(theArray))
 
-								theArray[theArray.length] = {
-									asset_id: dataResult.assetID,
-									asset_details: dataResult
-								}
-								this.setState({ controlled_assets: theArray });
-								//this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
+                                theArray[theArray.length] = {
+                                    asset_id: dataResult.assetID,
+                                    asset_details: dataResult
+                                }
+                                this.setState({ controlled_assets: theArray });
+                                //this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
 
-								assetData[assetData.length] = {
-									asset_id: dataResult.assetID,
-									asset_uniqueId: dataResult.uniqueId,
-									asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
-									asset_coidAddr: dataResult.coidAddr,
-									asset_gatekeeperAddr: dataResult.gatekeeperAddr,
-									asset_owners: dataResult.ownerIdList,
-									asset_controllers: dataResult.controlIdList,
+                                assetData[assetData.length] = {
+                                    asset_id: dataResult.assetID,
+                                    asset_uniqueId: dataResult.uniqueId,
+                                    asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
+                                    asset_coidAddr: dataResult.coidAddr,
+                                    asset_gatekeeperAddr: dataResult.gatekeeperAddr,
+                                    asset_owners: dataResult.ownerIdList,
+                                    asset_controllers: dataResult.controlIdList,
                                     asset_bigchainID: dataResult.bigchainID
-								}
-								localStorage.setItem("controlled_assets", JSON.stringify(assetData))
+                                }
+                                localStorage.setItem("controlled_assets", JSON.stringify(assetData))
 
-							}.bind(this),
-							complete: function () { },
-						})
-					}//end for
-				}
-				else{
-					var assetData = []
-				assetData[assetData.length] = {
-									asset_id: "",
-									asset_uniqueId: "",
-									asset_dimCtrlAddr: "",
-									asset_coidAddr: "",
-									asset_gatekeeperAddr: "",
-									asset_owners: "",
-									asset_controllers: ""
-								}
-								localStorage.setItem("controlled_assets", JSON.stringify(assetData))
-				}
-			}.bind(this)
-		})
-		// <- <- <- END get CONTROLLED assets <- <- <-
+                            }.bind(this),
+                            complete: function () { },
+                        })
+                    }//end for
+                }
+                else {
+                    var assetData = []
+                    assetData[assetData.length] = {
+                        asset_id: "",
+                        asset_uniqueId: "",
+                        asset_dimCtrlAddr: "",
+                        asset_coidAddr: "",
+                        asset_gatekeeperAddr: "",
+                        asset_owners: "",
+                        asset_controllers: ""
+                    }
+                    localStorage.setItem("controlled_assets", JSON.stringify(assetData))
+                }
+            }.bind(this)
+        })
+        // <- <- <- END get CONTROLLED assets <- <- <-
 
 
     }

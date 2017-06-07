@@ -587,7 +587,33 @@ class Dims extends Component {
 
 				console.log("repsonse readEntry: " + JSON.stringify(data))
 				console.log("data.Result: " + data.Result);
-				window.open(ipfs_url + data.Result, '_blank');
+				if (data.Result.charAt(0) == "Q") {
+					window.open(ipfs_url + data.Result, '_blank');
+				}
+				else {
+					var bigchainServer = 'http://10.101.114.230:5000'
+					var endpoint = '/getTransaction/' + txID;
+					$.ajax({
+						method: 'GET',
+						url: bigchainServer + endpoint,
+						headers: { 'Access-Control-Allow-Origin': '*' },
+						crossDomain: true,
+						dataType: 'json',
+						contentType: 'application/json',
+						cache: false,
+						success: function (resp) {
+							//the response is body -- send that
+							console.log(resp)
+							var full_data = resp
+							var short_data = resp.asset.data.Coid_Data;
+							console.log("short data is..." + short_data.ownershipId)
+							console.log(JSON.stringify(full_data))
+							console.log(JSON.stringify(short_data))
+							var something = window.open("data:text/json," + encodeURIComponent(JSON.stringify(short_data)), "_blank");
+							something.focus();
+						}//end success 
+					});//end bigchain ajax
+				}//end else
 			}
 		})
 

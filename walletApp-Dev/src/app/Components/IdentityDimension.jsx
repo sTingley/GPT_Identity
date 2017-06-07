@@ -75,6 +75,39 @@ class DimensionForm extends Component {
             pubkey: localStorage.getItem("pubKey"),
             delegations: ['input-0']
         };
+
+        this.bigchainGet = this.bigchainGet.bind(this);
+    }
+
+    bigchainGet(attr) {
+        //e.preventDefault();
+        var txID = attr;//req.body.bigchainID;
+        console.log(txID);
+        console.log("BIGCHAINGET ONCLICK");
+        //var formdata = req.body;
+        //BIGCHAIN ENDPOINT:
+        var bigchainServer = 'http://10.101.114.230:5000'
+        var endpoint = '/getTransaction/' + txID;
+        $.ajax({
+            method: 'GET',
+            url: bigchainServer + endpoint,
+            headers: { 'Access-Control-Allow-Origin': '*' },
+            crossDomain: true,
+            dataType: 'json',
+            contentType: 'application/json',
+            cache: false,
+            success: function (resp) {
+                //the response is body -- send that
+                console.log(resp)
+                var full_data = resp
+                var short_data = resp.asset.data.Coid_Data;
+                console.log("short data is..." + short_data.ownershipId)
+                console.log(JSON.stringify(full_data))
+                console.log(JSON.stringify(short_data))
+                var something = window.open("data:text/json," + encodeURIComponent(JSON.stringify(short_data)), "_blank");
+                something.focus();
+            }
+        });
     }
 
     //HANDLE THE CHOICE OF USER INPUT
@@ -378,7 +411,7 @@ class DimensionForm extends Component {
                                                             return (
                                                                 <tr key={i}>
                                                                     <td>{attrs[0]}</td>
-                                                                    <td><a>{attrs[1]}></a></td>
+                                                                    <td><p><a href="javascript:" onClick={(e) => { this.bigchainGet(attrs[1]) }}>{attrs[1]}</a></p></td>
                                                                 </tr>
                                                             )
                                                     });
@@ -715,6 +748,8 @@ class IdentityDimensions extends Component {
     }
 
 
+
+
     /*****************************************************************************
     /*****************************************************************************
      * IN ORDER TO ADD DIMENSION ATTRIBUTES, we have these functions
@@ -769,10 +804,10 @@ class IdentityDimensions extends Component {
         }
 
         let passBigchainObj = document.getElementById("passAsset");
-        if(passBigchainObj.selectedIndex == 0) {
+        if (passBigchainObj.selectedIndex == 0) {
             alert('select one answer');
         }
-        if(passBigchainObj.selectedIndex == 1){
+        if (passBigchainObj.selectedIndex == 1) {
             let objKYC = {};
             objKYC.descriptor = "bigchainID";
             objKYC.attribute = bigchainTrxnID;
@@ -899,7 +934,7 @@ class IdentityDimensions extends Component {
                     json.uniqueId = asset.asset_uniqueId,
                     json.owners = asset.asset_owners,
                     json.controllers = asset.asset_controllers
-                    bigchainTrxnID = asset.asset_bigchainID
+                bigchainTrxnID = asset.asset_bigchainID
             }
         })
         //*************************************************************************
@@ -1034,10 +1069,7 @@ class IdentityDimensions extends Component {
                                 </table>
                                 {this.state.showDetails ? <DimensionForm hideHandler={this.hideHandler.bind(this)} dataHandler={this.state.activeDimension} /> : null}
                             </div>
-
                         </div>{/*tabpanel dimensions*/}
-
-
 
                         <div className="tabpanel" role="tabpanel" className="tab-pane" id="addDimension"><br />
 
@@ -1068,8 +1100,6 @@ class IdentityDimensions extends Component {
                                     </optgroup>
                                 </select>
                             </div>
-
-
 
                             <div id="SubmitContainer">
                                 <form method="POST" id="register" role="form">

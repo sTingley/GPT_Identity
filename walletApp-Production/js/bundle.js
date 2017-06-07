@@ -66827,6 +66827,7 @@
 		}, {
 			key: 'render',
 			value: function render() {
+				var _this3 = this;
 	
 				console.log("******" + JSON.stringify(this.state.qrCode_COID_device_relation));
 	
@@ -67135,35 +67136,69 @@
 														var ipfs_url = "http://10.101.114.231:8080/ipfs/";
 														if (!$.isEmptyObject(prop)) {
 															return prop.uniqueIdAttributes.map(function (ids, i) {
-																return _react2.default.createElement(
-																	'tr',
-																	{ key: i },
-																	_react2.default.createElement(
-																		'td',
-																		null,
-																		ids[0]
-																	),
-																	_react2.default.createElement(
-																		'td',
-																		null,
+																if (ids[2].charAt(0) == "Q") {
+																	return _react2.default.createElement(
+																		'tr',
+																		{ key: i },
 																		_react2.default.createElement(
-																			'p',
+																			'td',
 																			null,
-																			'File hash: ',
-																			ids[1]
+																			ids[0]
 																		),
 																		_react2.default.createElement(
-																			'p',
+																			'td',
 																			null,
-																			'IPFS hash: ',
 																			_react2.default.createElement(
-																				'a',
-																				{ target: '_blank', href: ipfs_url + "/" + ids[2] },
-																				ids[2]
+																				'p',
+																				null,
+																				'File hash: ',
+																				ids[1]
+																			),
+																			_react2.default.createElement(
+																				'p',
+																				null,
+																				'IPFS hash: ',
+																				_react2.default.createElement(
+																					'a',
+																					{ target: '_blank', href: ipfs_url + "/" + ids[2] },
+																					ids[2]
+																				)
 																			)
 																		)
-																	)
-																);
+																	);
+																} else {
+																	return _react2.default.createElement(
+																		'tr',
+																		{ key: i },
+																		_react2.default.createElement(
+																			'td',
+																			null,
+																			ids[0]
+																		),
+																		_react2.default.createElement(
+																			'td',
+																			null,
+																			_react2.default.createElement(
+																				'p',
+																				null,
+																				'File hash: ',
+																				ids[1]
+																			),
+																			_react2.default.createElement(
+																				'p',
+																				null,
+																				'BigChain hash: ',
+																				_react2.default.createElement(
+																					'a',
+																					{ href: 'javascript:', onClick: function onClick(e) {
+																							_this3.bigchainGet(ids[2]);
+																						} },
+																					ids[2]
+																				)
+																			)
+																		)
+																	);
+																}
 															});
 														} else {
 															return _react2.default.createElement(
@@ -67454,6 +67489,99 @@
 														null,
 														_react2.default.createElement(
 															'td',
+															{ colSpan: '2' },
+															_react2.default.createElement(
+																'b',
+																null,
+																'Official IDs'
+															)
+														)
+													),
+													function () {
+														var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+														if (!$.isEmptyObject(prop)) {
+															return prop.uniqueIdAttributes.map(function (ids, i) {
+																if (ids[2].charAt(0) == "Q") {
+																	return _react2.default.createElement(
+																		'tr',
+																		{ key: i },
+																		_react2.default.createElement(
+																			'td',
+																			null,
+																			ids[0]
+																		),
+																		_react2.default.createElement(
+																			'td',
+																			null,
+																			_react2.default.createElement(
+																				'p',
+																				null,
+																				'File hash: ',
+																				ids[1]
+																			),
+																			_react2.default.createElement(
+																				'p',
+																				null,
+																				'IPFS hash: ',
+																				_react2.default.createElement(
+																					'a',
+																					{ target: '_blank', href: ipfs_url + "/" + ids[2] },
+																					ids[2]
+																				)
+																			)
+																		)
+																	);
+																} else {
+																	return _react2.default.createElement(
+																		'tr',
+																		{ key: i },
+																		_react2.default.createElement(
+																			'td',
+																			null,
+																			ids[0]
+																		),
+																		_react2.default.createElement(
+																			'td',
+																			null,
+																			_react2.default.createElement(
+																				'p',
+																				null,
+																				'File hash: ',
+																				ids[1]
+																			),
+																			_react2.default.createElement(
+																				'p',
+																				null,
+																				'BigChain hash: ',
+																				_react2.default.createElement(
+																					'a',
+																					{ href: 'javascript:', onClick: function onClick(e) {
+																							_this3.bigchainGet(ids[2]);
+																						} },
+																					ids[2]
+																				)
+																			)
+																		)
+																	);
+																}
+															});
+														} else {
+															return _react2.default.createElement(
+																'tr',
+																null,
+																_react2.default.createElement(
+																	'td',
+																	{ colSpan: '2' },
+																	'No Ids found'
+																)
+															);
+														}
+													}(this),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
 															null,
 															'Asset Class',
 															_react2.default.createElement(
@@ -67524,15 +67652,15 @@
 		function Dims(props) {
 			_classCallCheck(this, Dims);
 	
-			var _this3 = _possibleConstructorReturn(this, (Dims.__proto__ || Object.getPrototypeOf(Dims)).call(this, props));
+			var _this4 = _possibleConstructorReturn(this, (Dims.__proto__ || Object.getPrototypeOf(Dims)).call(this, props));
 	
-			_this3.pubKey = localStorage.getItem("pubKey");
-			_this3.privKey = localStorage.getItem("privKey");
-			_this3.tags = new _classAndSubClass2.default(_this3.pubKey, props.dimension.dimension_id);
-			_this3.state = {
+			_this4.pubKey = localStorage.getItem("pubKey");
+			_this4.privKey = localStorage.getItem("privKey");
+			_this4.tags = new _classAndSubClass2.default(_this4.pubKey, props.dimension.dimension_id);
+			_this4.state = {
 	
-				asset_class: _this3.tags.getAssetData("classes"),
-				asset_subclass: _this3.tags.getAssetData("subclasses"),
+				asset_class: _this4.tags.getAssetData("classes"),
+				asset_subclass: _this4.tags.getAssetData("subclasses"),
 	
 				inputs: ['input-0'],
 	
@@ -67541,10 +67669,10 @@
 				dimensionDataArray: []
 	
 			};
-			_this3.handleClassChange = _this3.handleClassChange.bind(_this3);
-			_this3.handleSubClassChange = _this3.handleSubClassChange.bind(_this3);
-			_this3.maxUniqAttr = 10;
-			return _this3;
+			_this4.handleClassChange = _this4.handleClassChange.bind(_this4);
+			_this4.handleSubClassChange = _this4.handleSubClassChange.bind(_this4);
+			_this4.maxUniqAttr = 10;
+			return _this4;
 		}
 	
 		_createClass(Dims, [{
@@ -67680,7 +67808,7 @@
 		}, {
 			key: 'render',
 			value: function render() {
-				var _this4 = this;
+				var _this5 = this;
 	
 				var prop = this.props.dimension;
 	
@@ -67893,7 +68021,7 @@
 																	null,
 																	_react2.default.createElement(
 																		'button',
-																		{ type: 'button', className: 'btn btn-primary btn-sm', 'data-val': i, onClick: _this4.showAttrs.bind(_this4) },
+																		{ type: 'button', className: 'btn btn-primary btn-sm', 'data-val': i, onClick: _this5.showAttrs.bind(_this5) },
 																		'Spend Token'
 																	)
 																)
@@ -67938,9 +68066,9 @@
 		function Assets(props) {
 			_classCallCheck(this, Assets);
 	
-			var _this5 = _possibleConstructorReturn(this, (Assets.__proto__ || Object.getPrototypeOf(Assets)).call(this, props));
+			var _this6 = _possibleConstructorReturn(this, (Assets.__proto__ || Object.getPrototypeOf(Assets)).call(this, props));
 	
-			_this5.state = {
+			_this6.state = {
 				showDetails: false,
 				showDetails1: false, //set in dimensionHandler to render delegated data
 				wallet: { pubKey: localStorage.getItem("pubKey") },
@@ -67953,11 +68081,11 @@
 			};
 	
 			// event handlers must attached with current scope
-			_this5.assetHandler = _this5.assetHandler.bind(_this5);
-			_this5.dimensionHandler = _this5.dimensionHandler.bind(_this5);
-			_this5.hideHandler = _this5.hideHandler.bind(_this5);
-			_this5.searchHandler = _this5.searchHandler.bind(_this5);
-			return _this5;
+			_this6.assetHandler = _this6.assetHandler.bind(_this6);
+			_this6.dimensionHandler = _this6.dimensionHandler.bind(_this6);
+			_this6.hideHandler = _this6.hideHandler.bind(_this6);
+			_this6.searchHandler = _this6.searchHandler.bind(_this6);
+			return _this6;
 		}
 	
 		//*******************************************************************************
@@ -68247,7 +68375,7 @@
 		}, {
 			key: 'render',
 			value: function render() {
-				var _this6 = this;
+				var _this7 = this;
 	
 				return _react2.default.createElement(
 					'div',
@@ -68317,15 +68445,15 @@
 								{ className: 'row assets' },
 								this.state.own_assets.map(function (asset, i) {
 									var cssClass = "btn btn-success";
-									if (_this6.state.show_only.length > 0) {
-										if (_this6.state.show_only.toString().indexOf(asset.asset_id.toString()) == -1) {
+									if (_this7.state.show_only.length > 0) {
+										if (_this7.state.show_only.toString().indexOf(asset.asset_id.toString()) == -1) {
 											cssClass += " hidden";
 										} else cssClass.replace("hidden", "");
 									}
 									return _react2.default.createElement(
 										'button',
 										{ type: 'button', key: i, className: cssClass, onClick: function onClick() {
-												return _this6.assetHandler(asset);
+												return _this7.assetHandler(asset);
 											} },
 										_react2.default.createElement('span', { className: 'glyphicon glyphicon-ok-circle' }),
 										asset.asset_id
@@ -68352,15 +68480,15 @@
 								{ className: 'row assets' },
 								this.state.controlled_assets.map(function (asset) {
 									var cssClass = "btn btn-info";
-									if (_this6.state.show_only.length > 0) {
-										if (_this6.state.show_only.toString().indexOf(asset.asset_id.toString()) >= 0) {
+									if (_this7.state.show_only.length > 0) {
+										if (_this7.state.show_only.toString().indexOf(asset.asset_id.toString()) >= 0) {
 											cssClass += " show";
 										} else cssClass += " hidden";
 									}
 									return _react2.default.createElement(
 										'button',
 										{ type: 'button', key: asset.asset_id, className: cssClass, onClick: function onClick() {
-												return _this6.assetHandler(asset);
+												return _this7.assetHandler(asset);
 											} },
 										_react2.default.createElement('span', { className: 'glyphicon glyphicon-link' }),
 										asset.asset_id
@@ -68387,15 +68515,15 @@
 								{ className: 'row assets' },
 								this.state.delegated_dims.map(function (dimension, i) {
 									var cssClass = "btn btn-danger";
-									if (_this6.state.show_only.length > 0) {
-										if (_this6.state.show_only.toString().indexOf(dimension.dimension_id.toString()) >= 0) {
+									if (_this7.state.show_only.length > 0) {
+										if (_this7.state.show_only.toString().indexOf(dimension.dimension_id.toString()) >= 0) {
 											cssClass += " show";
 										} else cssClass += " hidden";
 									}
 									return _react2.default.createElement(
 										'button',
 										{ type: 'button', key: i, className: cssClass, onClick: function onClick() {
-												return _this6.dimensionHandler(dimension);
+												return _this7.dimensionHandler(dimension);
 											} },
 										_react2.default.createElement('span', { className: 'glyphicon glyphicon-piggy-bank' }),
 										dimension.dimension_id
@@ -71756,13 +71884,47 @@
 	            pubkey: localStorage.getItem("pubKey"),
 	            delegations: ['input-0']
 	        };
+	
+	        _this4.bigchainGet = _this4.bigchainGet.bind(_this4);
 	        return _this4;
 	    }
 	
-	    //HANDLE THE CHOICE OF USER INPUT
-	
-	
 	    _createClass(DimensionForm, [{
+	        key: 'bigchainGet',
+	        value: function bigchainGet(attr) {
+	            //e.preventDefault();
+	            var txID = attr; //req.body.bigchainID;
+	            console.log(txID);
+	            console.log("BIGCHAINGET ONCLICK");
+	            //var formdata = req.body;
+	            //BIGCHAIN ENDPOINT:
+	            var bigchainServer = 'http://10.101.114.230:5000';
+	            var endpoint = '/getTransaction/' + txID;
+	            $.ajax({
+	                method: 'GET',
+	                url: bigchainServer + endpoint,
+	                headers: { 'Access-Control-Allow-Origin': '*' },
+	                crossDomain: true,
+	                dataType: 'json',
+	                contentType: 'application/json',
+	                cache: false,
+	                success: function success(resp) {
+	                    //the response is body -- send that
+	                    console.log(resp);
+	                    var full_data = resp;
+	                    var short_data = resp.asset.data.Coid_Data;
+	                    console.log("short data is..." + short_data.ownershipId);
+	                    console.log(JSON.stringify(full_data));
+	                    console.log(JSON.stringify(short_data));
+	                    var something = window.open("data:text/json," + encodeURIComponent(JSON.stringify(short_data)), "_blank");
+	                    something.focus();
+	                }
+	            });
+	        }
+	
+	        //HANDLE THE CHOICE OF USER INPUT
+	
+	    }, {
 	        key: 'submitHandler',
 	        value: function submitHandler(e) {
 	            var _this5 = this;
@@ -72196,10 +72358,15 @@
 	                                                                'td',
 	                                                                null,
 	                                                                _react2.default.createElement(
-	                                                                    'a',
+	                                                                    'p',
 	                                                                    null,
-	                                                                    attrs[1],
-	                                                                    '>'
+	                                                                    _react2.default.createElement(
+	                                                                        'a',
+	                                                                        { href: 'javascript:', onClick: function onClick(e) {
+	                                                                                _this6.bigchainGet(attrs[1]);
+	                                                                            } },
+	                                                                        attrs[1]
+	                                                                    )
 	                                                                )
 	                                                            )
 	                                                        );

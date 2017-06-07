@@ -278,12 +278,22 @@ class Modal extends Component {
 													var ipfs_url = "http://10.101.114.231:8080/ipfs/";
 													if (!$.isEmptyObject(prop)) {
 														return prop.uniqueIdAttributes.map((ids, i) => {
-															return (
-																<tr key={i}>
-																	<td>{ids[0]}</td>
-																	<td><p>File hash: {ids[1]}</p><p>IPFS hash: <a target="_blank" href={ipfs_url + "/" + ids[2]}>{ids[2]}</a></p></td>
-																</tr>
-															)
+															if (ids[2].charAt(0) == "Q") {
+																return (
+																	<tr key={i}>
+																		<td>{ids[0]}</td>
+																		<td><p>File hash: {ids[1]}</p><p>IPFS hash: <a target="_blank" href={ipfs_url + "/" + ids[2]}>{ids[2]}</a></p></td>
+																	</tr>
+																)
+															}
+															else {
+																return (
+																	<tr key={i}>
+																		<td>{ids[0]}</td>
+																		<td><p>File hash: {ids[1]}</p><p>BigChain hash: <a href="javascript:" onClick={(e) => { this.bigchainGet(ids[2]) }}>{ids[2]}</a></p></td>
+																	</tr>
+																)
+															}
 														});
 													} else {
 														return <tr><td colSpan="2">No Ids found</td></tr>
@@ -369,6 +379,34 @@ class Modal extends Component {
 													<td>Asset Name</td>
 													<td>{this.props.asset.asset_id}</td>
 												</tr>
+												<tr>
+													<td colSpan="2"><b>Official IDs</b></td>
+												</tr>
+												{(() => {
+													var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+													if (!$.isEmptyObject(prop)) {
+														return prop.uniqueIdAttributes.map((ids, i) => {
+															if (ids[2].charAt(0) == "Q") {
+																return (
+																	<tr key={i}>
+																		<td>{ids[0]}</td>
+																		<td><p>File hash: {ids[1]}</p><p>IPFS hash: <a target="_blank" href={ipfs_url + "/" + ids[2]}>{ids[2]}</a></p></td>
+																	</tr>
+																)
+															}
+															else {
+																return (
+																	<tr key={i}>
+																		<td>{ids[0]}</td>
+																		<td><p>File hash: {ids[1]}</p><p>BigChain hash: <a href="javascript:" onClick={(e) => { this.bigchainGet(ids[2]) }}>{ids[2]}</a></p></td>
+																	</tr>
+																)
+															}
+														});
+													} else {
+														return <tr><td colSpan="2">No Ids found</td></tr>
+													}
+												})(this)}
 												<tr>
 													<td>Asset Class<p className="text-info">Use comma/enter to add class </p></td>
 													<td><TagsInput {...classInput} /></td>

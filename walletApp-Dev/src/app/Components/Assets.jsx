@@ -412,7 +412,7 @@ class Modal extends Component {
 												</tr>
 												{(() => {
 													var ipfs_url = "http://10.101.114.231:8080/ipfs/";
-													if (!$.isEmptyObject(prop.validatorList)) {
+													if (!$.isEmptyObject(prop.validatorSigs)) {
 														return prop.validatorList.map((ids, i) => {
 															var sigs = prop.validatorSigs[i];
 															return (

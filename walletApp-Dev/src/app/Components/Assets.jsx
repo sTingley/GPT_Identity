@@ -592,7 +592,7 @@ class Dims extends Component {
 				}
 				else {
 					var bigchainServer = 'http://10.101.114.230:5000'
-					var endpoint = '/getTransaction/' + txID;
+					var endpoint = '/getTransaction/' + data.Result;
 					$.ajax({
 						method: 'GET',
 						url: bigchainServer + endpoint,
@@ -760,6 +760,9 @@ class Assets extends Component {
 		this.assetHandler = this.assetHandler.bind(this);
 		this.dimensionHandler = this.dimensionHandler.bind(this);
 		this.hideHandler = this.hideHandler.bind(this);
+
+		this.hideHandler1 = this.hideHandler1.bind(this);
+
 		this.searchHandler = this.searchHandler.bind(this);
 	}
 
@@ -820,7 +823,8 @@ class Assets extends Component {
 									asset_gatekeeperAddr: dataResult.gatekeeperAddr,
 									asset_owners: dataResult.ownerIdList,
 									asset_controllers: dataResult.controlIdList,
-									asset_bigchainID: dataResult.bigchainID
+									asset_bigchainID: dataResult.bigchainID,
+									asset_type: dataResult.propType
 								}
 								localStorage.setItem("owned_assets", JSON.stringify(assetData))
 								//console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets))
@@ -884,7 +888,8 @@ class Assets extends Component {
 									asset_gatekeeperAddr: dataResult.gatekeeperAddr,
 									asset_owners: dataResult.ownerIdList,
 									asset_controllers: dataResult.controlIdList,
-									asset_bigchainID: dataResult.bigchainID
+									asset_bigchainID: dataResult.bigchainID,
+									asset_type: dataResult.propType
 								}
 								localStorage.setItem("controlled_assets", JSON.stringify(assetData))
 
@@ -1025,6 +1030,10 @@ class Assets extends Component {
 		this.setState({ showDetails: false, active_asset: {} });
 	}
 
+	hideHandler1() {
+        this.setState({ showDetails1: false, active_dimension: {} });
+    }
+
 	searchHandler(e) {
 		var str = e.target.value.trim();
 		var _this = this;
@@ -1132,7 +1141,7 @@ class Assets extends Component {
 				</div><br />
 
 				{this.state.showDetails ? <Modal hideHandler={this.hideHandler} asset={this.state.active_asset} /> : null}
-				{this.state.showDetails1 ? <Dims hideHandler={this.hideHandler} dimension={this.state.active_dimension} /> : null}
+				{this.state.showDetails1 ? <Dims hideHandler={this.hideHandler1} dimension={this.state.active_dimension} /> : null}
 			</div>
 		);
 	}

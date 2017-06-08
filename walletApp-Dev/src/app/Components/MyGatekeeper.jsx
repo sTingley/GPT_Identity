@@ -569,7 +569,24 @@ class MyGatekeeper extends React.Component {
 			"coidAddr": "",
 
 		};
-		if(this.state.isICA = true) {inputObj.propType = 2}
+		if(this.state.isICA == true) {
+			inputObj.propType = 2
+			inputObj.ownershipId=keccak_256(inputObj.pubKey).toUpperCase()
+            inputObj.ownerIdList=keccak_256(inputObj.pubKey).toUpperCase()
+            inputObj.controlId=""
+            inputObj.controlIdList=[""]
+            inputObj.ownershipTokenId=""
+            inputObj.ownershipTokenAttributes=[""]
+            inputObj.ownershipTokenQuantity=[""]
+            inputObj.controlTokenId=""
+            inputObj.controlTokenAttributes=[""]
+            inputObj.controlTokenQuantity=[""]
+            inputObj.identityRecoveryIdList=[""]
+            inputObj.recoveryCondition=""
+            inputObj.yesVotesRequiredToPass=""
+            inputObj.delegateeIdList=[""]
+            inputObj.delegateeTokenQuantity=[""]
+		}
 		return inputObj;
 	}
 

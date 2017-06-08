@@ -125,14 +125,28 @@ class Asset extends React.Component {
     }
     //*****************************************************************************
     //if the asset in scope is 'MyCOID', we cannot add additional owners
-    MyCOID_check() {
+    assetType_check() {
         let asset_id = this.props.asset.asset_id
         console.log("assetID.. " + asset_id)
-        let e = document.getElementById("OWNERSHIP");
-        // if (asset_id == "MyCOID")
-        // { e.style.display = 'none'; }
-        // if (asset_id != "MyCOID")
-        // { e.style.display = 'block'; }
+
+        let own = document.getElementById("OWNERSHIP");
+        let ctrl = document.getElementById("controllers");
+        let recovery = document.getElementById("recovery");
+        let dele = document.getElementById("delegations");
+
+        if (asset_id == "MyCOID")
+        { own.style.display = 'none'; }
+        else
+        { own.style.display = 'block'; }
+
+        let storage = Array(localStorage.getItem("owned_assets"))
+        storage = JSON.parse(storage); //now storage is an object
+        console.log("typeof storage: " + typeof(storage));
+
+        storage.forEach(function(element) {
+            console.log("element: " + JSON.stringify(element))
+        })
+
     }
     //*****************************************************************************
     //Passed as a prop to DimensionAttributeForm
@@ -579,7 +593,7 @@ class Asset extends React.Component {
                 <div className="modal-header">
                     <ul className="nav nav-pills" role="tablist">
                         <li role="presentation" className="active"><a href="#officalID" role="tab" data-toggle="tab">Official IDs</a></li>
-                        <li role="presentation"><a href="#owners" onClick={this.MyCOID_check.bind(this)} role="tab" data-toggle="tab">Ownership</a></li>
+                        <li role="presentation"><a href="#owners" onClick={this.assetType_check.bind(this)} role="tab" data-toggle="tab">Ownership</a></li>
                         <li role="presentation"><a href="#controllers" role="tab" data-toggle="tab">Control</a></li>
                         <li role="presentation"><a href="#recovery" role="tab" data-toggle="tab">Recovery</a></li>
                         <li role="presentation"><a href="#delegations" role="tab" data-toggle="tab">Delegations</a></li>
@@ -988,7 +1002,8 @@ class Identities extends React.Component {
                                     asset_gatekeeperAddr: dataResult.gatekeeperAddr,
                                     asset_owners: dataResult.ownerIdList,
                                     asset_controllers: dataResult.controlIdList,
-                                    asset_bigchainID: dataResult.bigchainID
+                                    asset_bigchainID: dataResult.bigchainID,
+                                    asset_type: dataResult.propType
                                 }
                                 localStorage.setItem("owned_assets", JSON.stringify(assetData))
                                 //console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets))
@@ -1066,7 +1081,8 @@ class Identities extends React.Component {
                                     asset_gatekeeperAddr: dataResult.gatekeeperAddr,
                                     asset_owners: dataResult.ownerIdList,
                                     asset_controllers: dataResult.controlIdList,
-                                    asset_bigchainID: dataResult.bigchainID
+                                    asset_bigchainID: dataResult.bigchainID,
+                                    asset_type: dataResult.propType
                                 }
                                 localStorage.setItem("controlled_assets", JSON.stringify(assetData))
 

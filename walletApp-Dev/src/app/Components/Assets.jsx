@@ -408,6 +408,29 @@ class Modal extends Component {
 													}
 												})(this)}
 												<tr>
+													<td colSpan="2"><b>Signatures</b></td>
+												</tr>
+												{(() => {
+													var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+													if (!$.isEmptyObject(prop.validatorList)) {
+														return prop.validatorList.map((ids, i) => {
+															var sigs = prop.validatorSigs[i];
+															return (
+																<tr key={i}>
+																	<td></td>
+																	<td>
+																		<p>Public Key: {sigs[2]}</p>
+																		<textarea value={'Signature: ' + sigs[1]} />
+																		<p>Expiration Date: {String(new Date(Number(sigs[3]) * 1000))}</p>
+																	</td>
+																</tr>
+															)
+														});
+													} else {
+														return <tr><td colSpan="2">No signatures</td></tr>
+													}
+												})(this)}
+												<tr>
 													<td>Asset Class<p className="text-info">Use comma/enter to add class </p></td>
 													<td><TagsInput {...classInput} /></td>
 												</tr>
@@ -1031,8 +1054,8 @@ class Assets extends Component {
 	}
 
 	hideHandler1() {
-        this.setState({ showDetails1: false, active_dimension: {} });
-    }
+		this.setState({ showDetails1: false, active_dimension: {} });
+	}
 
 	searchHandler(e) {
 		var str = e.target.value.trim();
@@ -1057,6 +1080,7 @@ class Assets extends Component {
 
 		return (
 			<div id="assets-container" className="assets">
+
 				<div className="row" id="search-bar">
 					<div className="col-md-6">
 						<h3 className="margin0px">Manage Assets</h3><hr />

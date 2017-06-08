@@ -89,6 +89,8 @@ class Asset extends React.Component {
         this.state = {
 
             asset: props.asset || {},
+            //added assetType to try to hide divs properly
+            //assetType: props.asset.asset_name.propType,
 
             file_attrs: [],
             inputs: ['input-0'],
@@ -111,7 +113,9 @@ class Asset extends React.Component {
             delegatee_token_quantity: [],
             controlled_assets: [],
             own_assets: []
+
         };
+
         var _this = this;
         this.handleHideModal = this.handleHideModal.bind(this);
         this.onFieldChange = this.onFieldChange.bind(this);
@@ -126,26 +130,33 @@ class Asset extends React.Component {
     //*****************************************************************************
     //if the asset in scope is 'MyCOID', we cannot add additional owners
     assetType_check() {
-        let asset_id = this.props.asset.asset_id
-        console.log("assetID.. " + asset_id)
+        // let asset_id = this.props.asset.asset_id
+        // console.log("assetID.. " + asset_id)
 
-        let own = document.getElementById("OWNERSHIP");
-        let ctrl = document.getElementById("controllers");
-        let recovery = document.getElementById("recovery");
-        let dele = document.getElementById("delegations");
+        // let own = document.getElementById("OWNERSHIP");
+        // let ctrl = document.getElementById("controllers");
+        // let recovery = document.getElementById("recovery");
+        // let dele = document.getElementById("delegations");
 
-        if (asset_id == "MyCOID")
-        { own.style.display = 'none'; }
-        else
-        { own.style.display = 'block'; }
+        // if (asset_id == "MyCOID")
+        // { own.style.display = 'none'; }
+        // else
+        // { own.style.display = 'block'; }
 
-        let storage = Array(localStorage.getItem("owned_assets"))
-        storage = JSON.parse(storage); //now storage is an object
-        console.log("typeof storage: " + typeof(storage));
+        // let storage = Array(localStorage.getItem("owned_assets"))
+        // storage = JSON.parse(storage); //now storage is an object
+        // console.log("typeof storage: " + typeof(storage));
 
-        storage.forEach(function(element) {
-            console.log("element: " + JSON.stringify(element))
-        })
+        // storage.forEach(function(element) {
+        //     if(asset_id = element.asset_id && element.asset_type == 2){
+        //         console.log("found")
+        //         ctrl.style.display = 'none';
+        //         recovery.style.display = 'none';
+        //         dele.style.display = 'none';
+        //     }
+        //     //console.log("element: " + JSON.stringify(element))
+        // })
+
 
     }
     //*****************************************************************************
@@ -565,6 +576,45 @@ class Asset extends React.Component {
     //**********************************************************************
     //**********************************************************************
 
+    componentWillMount(){
+
+        let asset_id = this.state.asset.asset_id
+
+        const ownDiv = document.getElementById("owners");
+        const ctrlDiv = document.getElementById("controllers");
+        const recoveryDiv = document.getElementById("recovery");
+        const deleDiv = document.getElementById("delegations");
+        
+        //let asset_type = this.state.assetType;
+        //console.log("assetType: " + asset_type)
+
+        // if(asset_type == 2){
+        //     console.log("assetType is 2")
+        //     ctrl.style.display = 'none';
+        //     recovery.style.display = 'none';
+        //     dele.style.display = 'none';
+        // }
+
+        // if (asset_id == "MyCOID")
+        // { own.style.display = 'none'; }
+        // else
+        // { own.style.display = 'block'; }
+
+        let storage = Array(localStorage.getItem("owned_assets"))
+        storage = JSON.parse(storage); //now storage is an object
+        console.log("typeof storage: " + typeof(storage));
+
+        storage.forEach(function(element) {
+            if(asset_id = element.asset_id && element.asset_type == 2){
+                console.log("found")
+                $('controllers').addClass("hidden");
+                // ctrl.style.display = 'none';
+                // recovery.style.display = 'none';
+                // dele.style.display = 'none';
+            }
+            //console.log("element: " + JSON.stringify(element))
+        })
+    }
     componentDidMount() {
         // $("#assetDetails").modal('show');
         // $("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
@@ -572,7 +622,7 @@ class Asset extends React.Component {
 
     render() {
         console.log("asset: " + JSON.stringify(this.state.asset))
-        console.log("file_Attrs.. " + JSON.stringify(this.state.file_attrs))
+
         var style = {
             fontSize: '12.5px'
         }
@@ -584,7 +634,9 @@ class Asset extends React.Component {
             }
         };
 
-        var prop = this.props.asset.asset_name;
+        let prop = this.props.asset.asset_name;
+
+        //onClick={this.assetType_check.bind(this)}
 
         return (
             <div id="SubmitContainer">
@@ -593,7 +645,7 @@ class Asset extends React.Component {
                 <div className="modal-header">
                     <ul className="nav nav-pills" role="tablist">
                         <li role="presentation" className="active"><a href="#officalID" role="tab" data-toggle="tab">Official IDs</a></li>
-                        <li role="presentation"><a href="#owners" onClick={this.assetType_check.bind(this)} role="tab" data-toggle="tab">Ownership</a></li>
+                        <li role="presentation"><a href="#owners" role="tab" data-toggle="tab">Ownership</a></li>
                         <li role="presentation"><a href="#controllers" role="tab" data-toggle="tab">Control</a></li>
                         <li role="presentation"><a href="#recovery" role="tab" data-toggle="tab">Recovery</a></li>
                         <li role="presentation"><a href="#delegations" role="tab" data-toggle="tab">Delegations</a></li>
@@ -653,7 +705,7 @@ class Asset extends React.Component {
                             </div>
                         </div>{/*tab-pane officialIDs*/}
 
-                        <div role="tabpanel" className="tab-pane" id="owners">
+                        <div role="tabpanel" className="tab-pane" id="owners" name="owners">
                             <table className="table table-striped table-hover" style={style}>
                                 <tbody>
                                     <tr>
@@ -688,7 +740,7 @@ class Asset extends React.Component {
                             </div>
                         </div>{/*tab-pane owners*/}
 
-                        <div role="tabpanel" className="tab-pane" id="controllers">
+                        <div role="tabpanel" className="tab-pane" id="controllers" name="controllers">
                             <table className="table table-striped table-hover" style={style}>
                                 <tbody>
                                     <tr>
@@ -722,7 +774,7 @@ class Asset extends React.Component {
                             </div>
                         </div>{/*tab-pane controllers*/}
 
-                        <div role="tabpanel" className="tab-pane" id="recovery">
+                        <div role="tabpanel" className="tab-pane" id="recovery" name="recovery">
                             <table className="table table-striped table-hover" style={style}>
                                 <tbody>
                                     <tr>
@@ -758,7 +810,7 @@ class Asset extends React.Component {
                             </div>
                         </div>{/*tab-pane recovery*/}
 
-                        <div role="tabpanel" className="tab-pane" id="delegations">
+                        <div role="tabpanel" className="tab-pane" id="delegations" name="delegations">
                             <table className="table table-striped table-hover" style={style}>
                                 <tbody>
                                     <tr>

@@ -218,7 +218,7 @@ class Modal extends Component {
 		}
 
 		var popUpWidth = {
-            width: '80%'
+            width: '70%'
         }
 
 		return (
@@ -424,7 +424,7 @@ class Modal extends Component {
 																	<td></td>
 																	<td>
 																		<p>Public Key: {sigs[2]}</p>
-																		<textarea value={'Signature: ' + sigs[1]} />
+																		<p>Signature: {sigs[1]}</p>
 																		<p>Expiration Date: {String(new Date(Number(sigs[3]) * 1000))}</p>
 																	</td>
 																</tr>

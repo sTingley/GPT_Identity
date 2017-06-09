@@ -83,31 +83,31 @@
 	
 	var _Upload2 = _interopRequireDefault(_Upload);
 	
-	var _ToVote = __webpack_require__(/*! ./Components/ToVote.jsx */ 545);
+	var _ToVote = __webpack_require__(/*! ./Components/ToVote.jsx */ 352);
 	
 	var _ToVote2 = _interopRequireDefault(_ToVote);
 	
-	var _Notifications = __webpack_require__(/*! ./Components/Notifications.jsx */ 561);
+	var _Notifications = __webpack_require__(/*! ./Components/Notifications.jsx */ 368);
 	
 	var _Notifications2 = _interopRequireDefault(_Notifications);
 	
-	var _Assets = __webpack_require__(/*! ./Components/Assets.jsx */ 562);
+	var _Assets = __webpack_require__(/*! ./Components/Assets.jsx */ 369);
 	
 	var _Assets2 = _interopRequireDefault(_Assets);
 	
-	var _MyCOID = __webpack_require__(/*! ./Components/MyCOID.jsx */ 574);
+	var _MyCOID = __webpack_require__(/*! ./Components/MyCOID.jsx */ 381);
 	
 	var _MyCOID2 = _interopRequireDefault(_MyCOID);
 	
-	var _IdentityDimension = __webpack_require__(/*! ./Components/IdentityDimension.jsx */ 575);
+	var _IdentityDimension = __webpack_require__(/*! ./Components/IdentityDimension.jsx */ 382);
 	
 	var _IdentityDimension2 = _interopRequireDefault(_IdentityDimension);
 	
-	var _Documents = __webpack_require__(/*! ./Components/Documents.jsx */ 576);
+	var _Documents = __webpack_require__(/*! ./Components/Documents.jsx */ 383);
 	
 	var _Documents2 = _interopRequireDefault(_Documents);
 	
-	var _MyGateKeeper = __webpack_require__(/*! ./Components/MyGateKeeper.jsx */ 577);
+	var _MyGateKeeper = __webpack_require__(/*! ./Components/MyGateKeeper.jsx */ 384);
 	
 	var _MyGateKeeper2 = _interopRequireDefault(_MyGateKeeper);
 	
@@ -52242,200 +52242,7 @@
 	exports.default = UploadKeyStore;
 
 /***/ },
-/* 352 */,
-/* 353 */,
-/* 354 */,
-/* 355 */,
-/* 356 */,
-/* 357 */,
-/* 358 */,
-/* 359 */,
-/* 360 */,
-/* 361 */,
-/* 362 */,
-/* 363 */,
-/* 364 */,
-/* 365 */,
-/* 366 */,
-/* 367 */,
-/* 368 */,
-/* 369 */,
-/* 370 */,
-/* 371 */,
-/* 372 */,
-/* 373 */,
-/* 374 */,
-/* 375 */,
-/* 376 */,
-/* 377 */,
-/* 378 */,
-/* 379 */,
-/* 380 */,
-/* 381 */,
-/* 382 */,
-/* 383 */,
-/* 384 */,
-/* 385 */,
-/* 386 */,
-/* 387 */,
-/* 388 */,
-/* 389 */,
-/* 390 */,
-/* 391 */,
-/* 392 */,
-/* 393 */,
-/* 394 */,
-/* 395 */,
-/* 396 */,
-/* 397 */,
-/* 398 */,
-/* 399 */,
-/* 400 */,
-/* 401 */,
-/* 402 */,
-/* 403 */,
-/* 404 */,
-/* 405 */,
-/* 406 */,
-/* 407 */,
-/* 408 */,
-/* 409 */,
-/* 410 */,
-/* 411 */,
-/* 412 */,
-/* 413 */,
-/* 414 */,
-/* 415 */,
-/* 416 */,
-/* 417 */,
-/* 418 */,
-/* 419 */,
-/* 420 */,
-/* 421 */,
-/* 422 */,
-/* 423 */,
-/* 424 */,
-/* 425 */,
-/* 426 */,
-/* 427 */,
-/* 428 */,
-/* 429 */,
-/* 430 */,
-/* 431 */,
-/* 432 */,
-/* 433 */,
-/* 434 */,
-/* 435 */,
-/* 436 */,
-/* 437 */,
-/* 438 */,
-/* 439 */,
-/* 440 */,
-/* 441 */,
-/* 442 */,
-/* 443 */,
-/* 444 */,
-/* 445 */,
-/* 446 */,
-/* 447 */,
-/* 448 */,
-/* 449 */,
-/* 450 */,
-/* 451 */,
-/* 452 */,
-/* 453 */,
-/* 454 */,
-/* 455 */,
-/* 456 */,
-/* 457 */,
-/* 458 */,
-/* 459 */,
-/* 460 */,
-/* 461 */,
-/* 462 */,
-/* 463 */,
-/* 464 */,
-/* 465 */,
-/* 466 */,
-/* 467 */,
-/* 468 */,
-/* 469 */,
-/* 470 */,
-/* 471 */,
-/* 472 */,
-/* 473 */,
-/* 474 */,
-/* 475 */,
-/* 476 */,
-/* 477 */,
-/* 478 */,
-/* 479 */,
-/* 480 */,
-/* 481 */,
-/* 482 */,
-/* 483 */,
-/* 484 */,
-/* 485 */,
-/* 486 */,
-/* 487 */,
-/* 488 */,
-/* 489 */,
-/* 490 */,
-/* 491 */,
-/* 492 */,
-/* 493 */,
-/* 494 */,
-/* 495 */,
-/* 496 */,
-/* 497 */,
-/* 498 */,
-/* 499 */,
-/* 500 */,
-/* 501 */,
-/* 502 */,
-/* 503 */,
-/* 504 */,
-/* 505 */,
-/* 506 */,
-/* 507 */,
-/* 508 */,
-/* 509 */,
-/* 510 */,
-/* 511 */,
-/* 512 */,
-/* 513 */,
-/* 514 */,
-/* 515 */,
-/* 516 */,
-/* 517 */,
-/* 518 */,
-/* 519 */,
-/* 520 */,
-/* 521 */,
-/* 522 */,
-/* 523 */,
-/* 524 */,
-/* 525 */,
-/* 526 */,
-/* 527 */,
-/* 528 */,
-/* 529 */,
-/* 530 */,
-/* 531 */,
-/* 532 */,
-/* 533 */,
-/* 534 */,
-/* 535 */,
-/* 536 */,
-/* 537 */,
-/* 538 */,
-/* 539 */,
-/* 540 */,
-/* 541 */,
-/* 542 */,
-/* 543 */,
-/* 544 */,
-/* 545 */
+/* 352 */
 /*!***************************************!*\
   !*** ./src/app/Components/ToVote.jsx ***!
   \***************************************/
@@ -52455,7 +52262,7 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _reactDayPicker = __webpack_require__(/*! react-day-picker */ 546);
+	var _reactDayPicker = __webpack_require__(/*! react-day-picker */ 353);
 	
 	var _reactDayPicker2 = _interopRequireDefault(_reactDayPicker);
 	
@@ -53253,7 +53060,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/buffer/index.js */ 239).Buffer))
 
 /***/ },
-/* 546 */
+/* 353 */
 /*!*****************************************!*\
   !*** ./~/react-day-picker/DayPicker.js ***!
   \*****************************************/
@@ -53262,13 +53069,13 @@
 	/* eslint-disable no-var */
 	/* eslint-env node */
 	
-	var DayPicker = __webpack_require__(/*! ./lib/src/DayPicker */ 547);
-	var DateUtils = __webpack_require__(/*! ./lib/src/DateUtils */ 555);
-	var LocaleUtils = __webpack_require__(/*! ./lib/src/LocaleUtils */ 556);
-	var ModifiersUtils = __webpack_require__(/*! ./lib/src/ModifiersUtils */ 559);
-	var Weekday = __webpack_require__(/*! ./lib/src/Weekday */ 558);
-	var Navbar = __webpack_require__(/*! ./lib/src/Navbar */ 550);
-	var PropTypes = __webpack_require__(/*! ./lib/src/PropTypes */ 549);
+	var DayPicker = __webpack_require__(/*! ./lib/src/DayPicker */ 354);
+	var DateUtils = __webpack_require__(/*! ./lib/src/DateUtils */ 362);
+	var LocaleUtils = __webpack_require__(/*! ./lib/src/LocaleUtils */ 363);
+	var ModifiersUtils = __webpack_require__(/*! ./lib/src/ModifiersUtils */ 366);
+	var Weekday = __webpack_require__(/*! ./lib/src/Weekday */ 365);
+	var Navbar = __webpack_require__(/*! ./lib/src/Navbar */ 357);
+	var PropTypes = __webpack_require__(/*! ./lib/src/PropTypes */ 356);
 	
 	module.exports = DayPicker.default || DayPicker;
 	module.exports.DateUtils = DateUtils.default || DateUtils;
@@ -53280,7 +53087,7 @@
 
 
 /***/ },
-/* 547 */
+/* 354 */
 /*!*************************************************!*\
   !*** ./~/react-day-picker/lib/src/DayPicker.js ***!
   \*************************************************/
@@ -53300,51 +53107,51 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _Caption = __webpack_require__(/*! ./Caption */ 548);
+	var _Caption = __webpack_require__(/*! ./Caption */ 355);
 	
 	var _Caption2 = _interopRequireDefault(_Caption);
 	
-	var _Navbar = __webpack_require__(/*! ./Navbar */ 550);
+	var _Navbar = __webpack_require__(/*! ./Navbar */ 357);
 	
 	var _Navbar2 = _interopRequireDefault(_Navbar);
 	
-	var _Month = __webpack_require__(/*! ./Month */ 552);
+	var _Month = __webpack_require__(/*! ./Month */ 359);
 	
 	var _Month2 = _interopRequireDefault(_Month);
 	
-	var _Day = __webpack_require__(/*! ./Day */ 557);
+	var _Day = __webpack_require__(/*! ./Day */ 364);
 	
 	var _Day2 = _interopRequireDefault(_Day);
 	
-	var _Weekday = __webpack_require__(/*! ./Weekday */ 558);
+	var _Weekday = __webpack_require__(/*! ./Weekday */ 365);
 	
 	var _Weekday2 = _interopRequireDefault(_Weekday);
 	
-	var _Helpers = __webpack_require__(/*! ./Helpers */ 554);
+	var _Helpers = __webpack_require__(/*! ./Helpers */ 361);
 	
 	var Helpers = _interopRequireWildcard(_Helpers);
 	
-	var _DateUtils = __webpack_require__(/*! ./DateUtils */ 555);
+	var _DateUtils = __webpack_require__(/*! ./DateUtils */ 362);
 	
 	var DateUtils = _interopRequireWildcard(_DateUtils);
 	
-	var _LocaleUtils = __webpack_require__(/*! ./LocaleUtils */ 556);
+	var _LocaleUtils = __webpack_require__(/*! ./LocaleUtils */ 363);
 	
 	var LocaleUtils = _interopRequireWildcard(_LocaleUtils);
 	
-	var _ModifiersUtils = __webpack_require__(/*! ./ModifiersUtils */ 559);
+	var _ModifiersUtils = __webpack_require__(/*! ./ModifiersUtils */ 366);
 	
 	var ModifiersUtils = _interopRequireWildcard(_ModifiersUtils);
 	
-	var _classNames = __webpack_require__(/*! ./classNames */ 551);
+	var _classNames = __webpack_require__(/*! ./classNames */ 358);
 	
 	var _classNames2 = _interopRequireDefault(_classNames);
 	
-	var _keys = __webpack_require__(/*! ./keys */ 560);
+	var _keys = __webpack_require__(/*! ./keys */ 367);
 	
 	var _keys2 = _interopRequireDefault(_keys);
 	
-	var _PropTypes = __webpack_require__(/*! ./PropTypes */ 549);
+	var _PropTypes = __webpack_require__(/*! ./PropTypes */ 356);
 	
 	var _PropTypes2 = _interopRequireDefault(_PropTypes);
 	
@@ -53971,7 +53778,7 @@
 	//# sourceMappingURL=DayPicker.js.map
 
 /***/ },
-/* 548 */
+/* 355 */
 /*!***********************************************!*\
   !*** ./~/react-day-picker/lib/src/Caption.js ***!
   \***********************************************/
@@ -53988,7 +53795,7 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _PropTypes = __webpack_require__(/*! ./PropTypes */ 549);
+	var _PropTypes = __webpack_require__(/*! ./PropTypes */ 356);
 	
 	var _PropTypes2 = _interopRequireDefault(_PropTypes);
 	
@@ -54022,7 +53829,7 @@
 	//# sourceMappingURL=Caption.js.map
 
 /***/ },
-/* 549 */
+/* 356 */
 /*!*************************************************!*\
   !*** ./~/react-day-picker/lib/src/PropTypes.js ***!
   \*************************************************/
@@ -54068,7 +53875,7 @@
 	//# sourceMappingURL=PropTypes.js.map
 
 /***/ },
-/* 550 */
+/* 357 */
 /*!**********************************************!*\
   !*** ./~/react-day-picker/lib/src/Navbar.js ***!
   \**********************************************/
@@ -54086,11 +53893,11 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _PropTypes = __webpack_require__(/*! ./PropTypes */ 549);
+	var _PropTypes = __webpack_require__(/*! ./PropTypes */ 356);
 	
 	var _PropTypes2 = _interopRequireDefault(_PropTypes);
 	
-	var _classNames = __webpack_require__(/*! ./classNames */ 551);
+	var _classNames = __webpack_require__(/*! ./classNames */ 358);
 	
 	var _classNames2 = _interopRequireDefault(_classNames);
 	
@@ -54169,7 +53976,7 @@
 	//# sourceMappingURL=Navbar.js.map
 
 /***/ },
-/* 551 */
+/* 358 */
 /*!**************************************************!*\
   !*** ./~/react-day-picker/lib/src/classNames.js ***!
   \**************************************************/
@@ -54209,7 +54016,7 @@
 	//# sourceMappingURL=classNames.js.map
 
 /***/ },
-/* 552 */
+/* 359 */
 /*!*********************************************!*\
   !*** ./~/react-day-picker/lib/src/Month.js ***!
   \*********************************************/
@@ -54226,17 +54033,17 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _PropTypes = __webpack_require__(/*! ./PropTypes */ 549);
+	var _PropTypes = __webpack_require__(/*! ./PropTypes */ 356);
 	
 	var _PropTypes2 = _interopRequireDefault(_PropTypes);
 	
-	var _Weekdays = __webpack_require__(/*! ./Weekdays */ 553);
+	var _Weekdays = __webpack_require__(/*! ./Weekdays */ 360);
 	
 	var _Weekdays2 = _interopRequireDefault(_Weekdays);
 	
-	var _Helpers = __webpack_require__(/*! ./Helpers */ 554);
+	var _Helpers = __webpack_require__(/*! ./Helpers */ 361);
 	
-	var _DateUtils = __webpack_require__(/*! ./DateUtils */ 555);
+	var _DateUtils = __webpack_require__(/*! ./DateUtils */ 362);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -54354,7 +54161,7 @@
 	//# sourceMappingURL=Month.js.map
 
 /***/ },
-/* 553 */
+/* 360 */
 /*!************************************************!*\
   !*** ./~/react-day-picker/lib/src/Weekdays.js ***!
   \************************************************/
@@ -54371,7 +54178,7 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _PropTypes = __webpack_require__(/*! ./PropTypes */ 549);
+	var _PropTypes = __webpack_require__(/*! ./PropTypes */ 356);
 	
 	var _PropTypes2 = _interopRequireDefault(_PropTypes);
 	
@@ -54433,7 +54240,7 @@
 	//# sourceMappingURL=Weekdays.js.map
 
 /***/ },
-/* 554 */
+/* 361 */
 /*!***********************************************!*\
   !*** ./~/react-day-picker/lib/src/Helpers.js ***!
   \***********************************************/
@@ -54457,9 +54264,9 @@
 	exports.getWeekArray = getWeekArray;
 	exports.startOfMonth = startOfMonth;
 	
-	var _DateUtils = __webpack_require__(/*! ./DateUtils */ 555);
+	var _DateUtils = __webpack_require__(/*! ./DateUtils */ 362);
 	
-	var _LocaleUtils = __webpack_require__(/*! ./LocaleUtils */ 556);
+	var _LocaleUtils = __webpack_require__(/*! ./LocaleUtils */ 363);
 	
 	function cancelEvent(e) {
 	  e.preventDefault();
@@ -54586,7 +54393,7 @@
 	//# sourceMappingURL=Helpers.js.map
 
 /***/ },
-/* 555 */
+/* 362 */
 /*!*************************************************!*\
   !*** ./~/react-day-picker/lib/src/DateUtils.js ***!
   \*************************************************/
@@ -54800,7 +54607,7 @@
 	//# sourceMappingURL=DateUtils.js.map
 
 /***/ },
-/* 556 */
+/* 363 */
 /*!***************************************************!*\
   !*** ./~/react-day-picker/lib/src/LocaleUtils.js ***!
   \***************************************************/
@@ -54858,7 +54665,7 @@
 	//# sourceMappingURL=LocaleUtils.js.map
 
 /***/ },
-/* 557 */
+/* 364 */
 /*!*******************************************!*\
   !*** ./~/react-day-picker/lib/src/Day.js ***!
   \*******************************************/
@@ -54875,11 +54682,11 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _classNames = __webpack_require__(/*! ./classNames */ 551);
+	var _classNames = __webpack_require__(/*! ./classNames */ 358);
 	
 	var _classNames2 = _interopRequireDefault(_classNames);
 	
-	var _PropTypes = __webpack_require__(/*! ./PropTypes */ 549);
+	var _PropTypes = __webpack_require__(/*! ./PropTypes */ 356);
 	
 	var _PropTypes2 = _interopRequireDefault(_PropTypes);
 	
@@ -54990,7 +54797,7 @@
 	//# sourceMappingURL=Day.js.map
 
 /***/ },
-/* 558 */
+/* 365 */
 /*!***********************************************!*\
   !*** ./~/react-day-picker/lib/src/Weekday.js ***!
   \***********************************************/
@@ -55008,7 +54815,7 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _PropTypes = __webpack_require__(/*! ./PropTypes */ 549);
+	var _PropTypes = __webpack_require__(/*! ./PropTypes */ 356);
 	
 	var _PropTypes2 = _interopRequireDefault(_PropTypes);
 	
@@ -55060,7 +54867,7 @@
 	//# sourceMappingURL=Weekday.js.map
 
 /***/ },
-/* 559 */
+/* 366 */
 /*!******************************************************!*\
   !*** ./~/react-day-picker/lib/src/ModifiersUtils.js ***!
   \******************************************************/
@@ -55074,9 +54881,9 @@
 	exports.dayMatchesModifier = dayMatchesModifier;
 	exports.getModifiersForDay = getModifiersForDay;
 	
-	var _DateUtils = __webpack_require__(/*! ./DateUtils */ 555);
+	var _DateUtils = __webpack_require__(/*! ./DateUtils */ 362);
 	
-	var _Helpers = __webpack_require__(/*! ./Helpers */ 554);
+	var _Helpers = __webpack_require__(/*! ./Helpers */ 361);
 	
 	/**
 	 * Return `true` if a date matches the specified modifier.
@@ -55144,7 +54951,7 @@
 	//# sourceMappingURL=ModifiersUtils.js.map
 
 /***/ },
-/* 560 */
+/* 367 */
 /*!********************************************!*\
   !*** ./~/react-day-picker/lib/src/keys.js ***!
   \********************************************/
@@ -55167,7 +54974,7 @@
 	//# sourceMappingURL=keys.js.map
 
 /***/ },
-/* 561 */
+/* 368 */
 /*!**********************************************!*\
   !*** ./src/app/Components/Notifications.jsx ***!
   \**********************************************/
@@ -55363,7 +55170,7 @@
 	exports.default = Notifications;
 
 /***/ },
-/* 562 */
+/* 369 */
 /*!***************************************!*\
   !*** ./src/app/Components/Assets.jsx ***!
   \***************************************/
@@ -55387,11 +55194,11 @@
 	
 	var _reactTagsinput2 = _interopRequireDefault(_reactTagsinput);
 	
-	var _qrcode = __webpack_require__(/*! qrcode.react */ 563);
+	var _qrcode = __webpack_require__(/*! qrcode.react */ 370);
 	
 	var _qrcode2 = _interopRequireDefault(_qrcode);
 	
-	var _classAndSubClass = __webpack_require__(/*! ./classAndSubClass.js */ 573);
+	var _classAndSubClass = __webpack_require__(/*! ./classAndSubClass.js */ 380);
 	
 	var _classAndSubClass2 = _interopRequireDefault(_classAndSubClass);
 	
@@ -55630,12 +55437,16 @@
 					marginRight: '15px'
 				};
 	
+				var popUpWidth = {
+					width: '70%'
+				};
+	
 				return _react2.default.createElement(
 					'div',
 					{ className: 'modal fade', id: 'assetDetails', key: this.props.asset.asset_id, tabIndex: '-1', role: 'dialog', 'aria-labelledby': 'asset' },
 					_react2.default.createElement(
 						'div',
-						{ className: 'modal-dialog modal-lg', role: 'document' },
+						{ className: 'modal-dialog modal-lg', role: 'document', style: popUpWidth },
 						_react2.default.createElement(
 							'div',
 							{ className: 'modal-content' },
@@ -56328,6 +56139,64 @@
 														null,
 														_react2.default.createElement(
 															'td',
+															{ colSpan: '2' },
+															_react2.default.createElement(
+																'b',
+																null,
+																'Signatures'
+															)
+														)
+													),
+													function () {
+														var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+														if (!$.isEmptyObject(prop.validatorSigs)) {
+															return prop.validatorList.map(function (ids, i) {
+																var sigs = prop.validatorSigs[i];
+																return _react2.default.createElement(
+																	'tr',
+																	{ key: i },
+																	_react2.default.createElement('td', null),
+																	_react2.default.createElement(
+																		'td',
+																		null,
+																		_react2.default.createElement(
+																			'p',
+																			null,
+																			'Public Key: ',
+																			sigs[2]
+																		),
+																		_react2.default.createElement(
+																			'p',
+																			null,
+																			'Signature: ',
+																			sigs[1]
+																		),
+																		_react2.default.createElement(
+																			'p',
+																			null,
+																			'Expiration Date: ',
+																			String(new Date(Number(sigs[3]) * 1000))
+																		)
+																	)
+																);
+															});
+														} else {
+															return _react2.default.createElement(
+																'tr',
+																null,
+																_react2.default.createElement(
+																	'td',
+																	{ colSpan: '2' },
+																	'No signatures'
+																)
+															);
+														}
+													}(this),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
 															null,
 															'Asset Class',
 															_react2.default.createElement(
@@ -56551,7 +56420,7 @@
 							window.open(ipfs_url + data.Result, '_blank');
 						} else {
 							var bigchainServer = 'http://10.101.114.230:5000';
-							var endpoint = '/getTransaction/' + txID;
+							var endpoint = '/getTransaction/' + data.Result;
 							$.ajax({
 								method: 'GET',
 								url: bigchainServer + endpoint,
@@ -56855,6 +56724,9 @@
 			_this6.assetHandler = _this6.assetHandler.bind(_this6);
 			_this6.dimensionHandler = _this6.dimensionHandler.bind(_this6);
 			_this6.hideHandler = _this6.hideHandler.bind(_this6);
+	
+			_this6.hideHandler1 = _this6.hideHandler1.bind(_this6);
+	
 			_this6.searchHandler = _this6.searchHandler.bind(_this6);
 			return _this6;
 		}
@@ -56920,7 +56792,8 @@
 											asset_gatekeeperAddr: dataResult.gatekeeperAddr,
 											asset_owners: dataResult.ownerIdList,
 											asset_controllers: dataResult.controlIdList,
-											asset_bigchainID: dataResult.bigchainID
+											asset_bigchainID: dataResult.bigchainID,
+											asset_type: dataResult.propType
 										};
 										localStorage.setItem("owned_assets", JSON.stringify(assetData));
 										//console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets))
@@ -56984,7 +56857,8 @@
 											asset_gatekeeperAddr: dataResult.gatekeeperAddr,
 											asset_owners: dataResult.ownerIdList,
 											asset_controllers: dataResult.controlIdList,
-											asset_bigchainID: dataResult.bigchainID
+											asset_bigchainID: dataResult.bigchainID,
+											asset_type: dataResult.propType
 										};
 										localStorage.setItem("controlled_assets", JSON.stringify(assetData));
 									}.bind(this),
@@ -57122,6 +56996,11 @@
 			key: 'hideHandler',
 			value: function hideHandler() {
 				this.setState({ showDetails: false, active_asset: {} });
+			}
+		}, {
+			key: 'hideHandler1',
+			value: function hideHandler1() {
+				this.setState({ showDetails1: false, active_dimension: {} });
 			}
 		}, {
 			key: 'searchHandler',
@@ -57305,7 +57184,7 @@
 					),
 					_react2.default.createElement('br', null),
 					this.state.showDetails ? _react2.default.createElement(Modal, { hideHandler: this.hideHandler, asset: this.state.active_asset }) : null,
-					this.state.showDetails1 ? _react2.default.createElement(Dims, { hideHandler: this.hideHandler, dimension: this.state.active_dimension }) : null
+					this.state.showDetails1 ? _react2.default.createElement(Dims, { hideHandler: this.hideHandler1, dimension: this.state.active_dimension }) : null
 				);
 			}
 		}]);
@@ -57321,7 +57200,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/buffer/index.js */ 239).Buffer))
 
 /***/ },
-/* 563 */
+/* 370 */
 /*!*************************************!*\
   !*** ./~/qrcode.react/lib/index.js ***!
   \*************************************/
@@ -57332,8 +57211,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	// qr.js doesn't handle error level of zero (M) so we need to do it right,
 	// thus the deep require.
-	var QRCodeImpl = __webpack_require__(/*! qr.js/lib/QRCode */ 564);
-	var ErrorCorrectLevel = __webpack_require__(/*! qr.js/lib/ErrorCorrectLevel */ 568);
+	var QRCodeImpl = __webpack_require__(/*! qr.js/lib/QRCode */ 371);
+	var ErrorCorrectLevel = __webpack_require__(/*! qr.js/lib/ErrorCorrectLevel */ 375);
 	
 	function getBackingStorePixelRatio(ctx) {
 	  return ctx.webkitBackingStorePixelRatio || ctx.mozBackingStorePixelRatio || ctx.msBackingStorePixelRatio || ctx.oBackingStorePixelRatio || ctx.backingStorePixelRatio || 1;
@@ -57436,17 +57315,17 @@
 	module.exports = QRCode;
 
 /***/ },
-/* 564 */
+/* 371 */
 /*!*******************************!*\
   !*** ./~/qr.js/lib/QRCode.js ***!
   \*******************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var BitByte = __webpack_require__(/*! ./8BitByte */ 565);
-	var RSBlock = __webpack_require__(/*! ./RSBlock */ 567);
-	var BitBuffer = __webpack_require__(/*! ./BitBuffer */ 569);
-	var util = __webpack_require__(/*! ./util */ 570);
-	var Polynomial = __webpack_require__(/*! ./Polynomial */ 571);
+	var BitByte = __webpack_require__(/*! ./8BitByte */ 372);
+	var RSBlock = __webpack_require__(/*! ./RSBlock */ 374);
+	var BitBuffer = __webpack_require__(/*! ./BitBuffer */ 376);
+	var util = __webpack_require__(/*! ./util */ 377);
+	var Polynomial = __webpack_require__(/*! ./Polynomial */ 378);
 	
 	function QRCode(typeNumber, errorCorrectLevel) {
 		this.typeNumber = typeNumber;
@@ -57883,13 +57762,13 @@
 
 
 /***/ },
-/* 565 */
+/* 372 */
 /*!*********************************!*\
   !*** ./~/qr.js/lib/8BitByte.js ***!
   \*********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var mode = __webpack_require__(/*! ./mode */ 566);
+	var mode = __webpack_require__(/*! ./mode */ 373);
 	
 	function QR8bitByte(data) {
 		this.mode = mode.MODE_8BIT_BYTE;
@@ -57915,7 +57794,7 @@
 
 
 /***/ },
-/* 566 */
+/* 373 */
 /*!*****************************!*\
   !*** ./~/qr.js/lib/mode.js ***!
   \*****************************/
@@ -57930,14 +57809,14 @@
 
 
 /***/ },
-/* 567 */
+/* 374 */
 /*!********************************!*\
   !*** ./~/qr.js/lib/RSBlock.js ***!
   \********************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	// ErrorCorrectLevel
-	var ECL = __webpack_require__(/*! ./ErrorCorrectLevel */ 568);
+	var ECL = __webpack_require__(/*! ./ErrorCorrectLevel */ 375);
 	
 	function QRRSBlock(totalCount, dataCount) {
 		this.totalCount = totalCount;
@@ -58238,7 +58117,7 @@
 
 
 /***/ },
-/* 568 */
+/* 375 */
 /*!******************************************!*\
   !*** ./~/qr.js/lib/ErrorCorrectLevel.js ***!
   \******************************************/
@@ -58254,7 +58133,7 @@
 
 
 /***/ },
-/* 569 */
+/* 376 */
 /*!**********************************!*\
   !*** ./~/qr.js/lib/BitBuffer.js ***!
   \**********************************/
@@ -58301,15 +58180,15 @@
 
 
 /***/ },
-/* 570 */
+/* 377 */
 /*!*****************************!*\
   !*** ./~/qr.js/lib/util.js ***!
   \*****************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var Mode = __webpack_require__(/*! ./mode */ 566);
-	var Polynomial = __webpack_require__(/*! ./Polynomial */ 571);
-	var math = __webpack_require__(/*! ./math */ 572);
+	var Mode = __webpack_require__(/*! ./mode */ 373);
+	var Polynomial = __webpack_require__(/*! ./Polynomial */ 378);
+	var math = __webpack_require__(/*! ./math */ 379);
 	
 	var QRMaskPattern = {
 		PATTERN000 : 0,
@@ -58589,13 +58468,13 @@
 
 
 /***/ },
-/* 571 */
+/* 378 */
 /*!***********************************!*\
   !*** ./~/qr.js/lib/Polynomial.js ***!
   \***********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var math = __webpack_require__(/*! ./math */ 572);
+	var math = __webpack_require__(/*! ./math */ 379);
 	
 	function QRPolynomial(num, shift) {
 	
@@ -58665,7 +58544,7 @@
 
 
 /***/ },
-/* 572 */
+/* 379 */
 /*!*****************************!*\
   !*** ./~/qr.js/lib/math.js ***!
   \*****************************/
@@ -58718,7 +58597,7 @@
 
 
 /***/ },
-/* 573 */
+/* 380 */
 /*!************************************************!*\
   !*** ./src/app/Components/classAndSubClass.js ***!
   \************************************************/
@@ -58792,7 +58671,7 @@
 	exports.default = AssetTags;
 
 /***/ },
-/* 574 */
+/* 381 */
 /*!***************************************!*\
   !*** ./src/app/Components/MyCOID.jsx ***!
   \***************************************/
@@ -58804,9 +58683,9 @@
 	    value: true
 	});
 	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
@@ -58999,6 +58878,8 @@
 	        _this4.state = {
 	
 	            asset: props.asset || {},
+	            //added assetType to try to hide divs properly
+	            //assetType: props.asset.asset_name.propType,
 	
 	            file_attrs: [],
 	            inputs: ['input-0'],
@@ -59021,7 +58902,9 @@
 	            delegatee_token_quantity: [],
 	            controlled_assets: [],
 	            own_assets: []
+	
 	        };
+	
 	        var _this = _this4;
 	        _this4.handleHideModal = _this4.handleHideModal.bind(_this4);
 	        _this4.onFieldChange = _this4.onFieldChange.bind(_this4);
@@ -59042,16 +58925,36 @@
 	        //if the asset in scope is 'MyCOID', we cannot add additional owners
 	
 	    }, {
-	        key: 'MyCOID_check',
-	        value: function MyCOID_check() {
-	            var asset_id = this.props.asset.asset_id;
-	            console.log("assetID.. " + asset_id);
-	            var e = document.getElementById("OWNERSHIP");
-	            // if (asset_id == "MyCOID")
-	            // { e.style.display = 'none'; }
-	            // if (asset_id != "MyCOID")
-	            // { e.style.display = 'block'; }
-	        }
+	        key: 'assetType_check',
+	        value: function assetType_check() {}
+	        // let asset_id = this.props.asset.asset_id
+	        // console.log("assetID.. " + asset_id)
+	
+	        // let own = document.getElementById("OWNERSHIP");
+	        // let ctrl = document.getElementById("controllers");
+	        // let recovery = document.getElementById("recovery");
+	        // let dele = document.getElementById("delegations");
+	
+	        // if (asset_id == "MyCOID")
+	        // { own.style.display = 'none'; }
+	        // else
+	        // { own.style.display = 'block'; }
+	
+	        // let storage = Array(localStorage.getItem("owned_assets"))
+	        // storage = JSON.parse(storage); //now storage is an object
+	        // console.log("typeof storage: " + typeof(storage));
+	
+	        // storage.forEach(function(element) {
+	        //     if(asset_id = element.asset_id && element.asset_type == 2){
+	        //         console.log("found")
+	        //         ctrl.style.display = 'none';
+	        //         recovery.style.display = 'none';
+	        //         dele.style.display = 'none';
+	        //     }
+	        //     //console.log("element: " + JSON.stringify(element))
+	        // })
+	
+	
 	        //*****************************************************************************
 	        //Passed as a prop to DimensionAttributeForm
 	
@@ -59512,6 +59415,47 @@
 	        //**********************************************************************
 	
 	    }, {
+	        key: 'componentWillMount',
+	        value: function componentWillMount() {
+	
+	            var asset_id = this.state.asset.asset_id;
+	
+	            var ownDiv = document.getElementById("owners");
+	            var ctrlDiv = document.getElementById("controllers");
+	            var recoveryDiv = document.getElementById("recovery");
+	            var deleDiv = document.getElementById("delegations");
+	
+	            //let asset_type = this.state.assetType;
+	            //console.log("assetType: " + asset_type)
+	
+	            // if(asset_type == 2){
+	            //     console.log("assetType is 2")
+	            //     ctrl.style.display = 'none';
+	            //     recovery.style.display = 'none';
+	            //     dele.style.display = 'none';
+	            // }
+	
+	            // if (asset_id == "MyCOID")
+	            // { own.style.display = 'none'; }
+	            // else
+	            // { own.style.display = 'block'; }
+	
+	            var storage = Array(localStorage.getItem("owned_assets"));
+	            storage = JSON.parse(storage); //now storage is an object
+	            console.log("typeof storage: " + (typeof storage === 'undefined' ? 'undefined' : _typeof(storage)));
+	
+	            storage.forEach(function (element) {
+	                if (asset_id = element.asset_id && element.asset_type == 2) {
+	                    console.log("found");
+	                    $('controllers').addClass("hidden");
+	                    // ctrl.style.display = 'none';
+	                    // recovery.style.display = 'none';
+	                    // dele.style.display = 'none';
+	                }
+	                //console.log("element: " + JSON.stringify(element))
+	            });
+	        }
+	    }, {
 	        key: 'componentDidMount',
 	        value: function componentDidMount() {
 	            // $("#assetDetails").modal('show');
@@ -59523,7 +59467,7 @@
 	            var _this5 = this;
 	
 	            console.log("asset: " + JSON.stringify(this.state.asset));
-	            console.log("file_Attrs.. " + JSON.stringify(this.state.file_attrs));
+	
 	            var style = {
 	                fontSize: '12.5px'
 	            };
@@ -59536,6 +59480,8 @@
 	            };
 	
 	            var prop = this.props.asset.asset_name;
+	
+	            //onClick={this.assetType_check.bind(this)}
 	
 	            return _react2.default.createElement(
 	                'div',
@@ -59566,7 +59512,7 @@
 	                            { role: 'presentation' },
 	                            _react2.default.createElement(
 	                                'a',
-	                                { href: '#owners', onClick: this.MyCOID_check.bind(this), role: 'tab', 'data-toggle': 'tab' },
+	                                { href: '#owners', role: 'tab', 'data-toggle': 'tab' },
 	                                'Ownership'
 	                            )
 	                        ),
@@ -59744,7 +59690,7 @@
 	                        ),
 	                        _react2.default.createElement(
 	                            'div',
-	                            { role: 'tabpanel', className: 'tab-pane', id: 'owners' },
+	                            { role: 'tabpanel', className: 'tab-pane', id: 'owners', name: 'owners' },
 	                            _react2.default.createElement(
 	                                'table',
 	                                { className: 'table table-striped table-hover', style: style },
@@ -59821,7 +59767,7 @@
 	                        ),
 	                        _react2.default.createElement(
 	                            'div',
-	                            { role: 'tabpanel', className: 'tab-pane', id: 'controllers' },
+	                            { role: 'tabpanel', className: 'tab-pane', id: 'controllers', name: 'controllers' },
 	                            _react2.default.createElement(
 	                                'table',
 	                                { className: 'table table-striped table-hover', style: style },
@@ -59894,7 +59840,7 @@
 	                        ),
 	                        _react2.default.createElement(
 	                            'div',
-	                            { role: 'tabpanel', className: 'tab-pane', id: 'recovery' },
+	                            { role: 'tabpanel', className: 'tab-pane', id: 'recovery', name: 'recovery' },
 	                            _react2.default.createElement(
 	                                'table',
 	                                { className: 'table table-striped table-hover', style: style },
@@ -59986,7 +59932,7 @@
 	                        ),
 	                        _react2.default.createElement(
 	                            'div',
-	                            { role: 'tabpanel', className: 'tab-pane', id: 'delegations' },
+	                            { role: 'tabpanel', className: 'tab-pane', id: 'delegations', name: 'delegations' },
 	                            _react2.default.createElement(
 	                                'table',
 	                                { className: 'table table-striped table-hover', style: style },
@@ -60264,7 +60210,8 @@
 	                                        asset_gatekeeperAddr: dataResult.gatekeeperAddr,
 	                                        asset_owners: dataResult.ownerIdList,
 	                                        asset_controllers: dataResult.controlIdList,
-	                                        asset_bigchainID: dataResult.bigchainID
+	                                        asset_bigchainID: dataResult.bigchainID,
+	                                        asset_type: dataResult.propType
 	                                    };
 	                                    localStorage.setItem("owned_assets", JSON.stringify(assetData));
 	                                    //console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets))
@@ -60342,7 +60289,8 @@
 	                                        asset_gatekeeperAddr: dataResult.gatekeeperAddr,
 	                                        asset_owners: dataResult.ownerIdList,
 	                                        asset_controllers: dataResult.controlIdList,
-	                                        asset_bigchainID: dataResult.bigchainID
+	                                        asset_bigchainID: dataResult.bigchainID,
+	                                        asset_type: dataResult.propType
 	                                    };
 	                                    localStorage.setItem("controlled_assets", JSON.stringify(assetData));
 	                                }.bind(this),
@@ -60501,7 +60449,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/buffer/index.js */ 239).Buffer))
 
 /***/ },
-/* 575 */
+/* 382 */
 /*!**************************************************!*\
   !*** ./src/app/Components/IdentityDimension.jsx ***!
   \**************************************************/
@@ -62322,7 +62270,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/buffer/index.js */ 239).Buffer))
 
 /***/ },
-/* 576 */
+/* 383 */
 /*!******************************************!*\
   !*** ./src/app/Components/Documents.jsx ***!
   \******************************************/
@@ -62731,7 +62679,7 @@
 	exports.default = Documents;
 
 /***/ },
-/* 577 */
+/* 384 */
 /*!*********************************************!*\
   !*** ./src/app/Components/MyGateKeeper.jsx ***!
   \*********************************************/
@@ -63538,8 +63486,23 @@
 					"coidAddr": ""
 	
 				};
-				if (this.state.isICA = true) {
+				if (this.state.isICA == true) {
 					inputObj.propType = 2;
+					inputObj.ownershipId = (0, _jsSha.keccak_256)(inputObj.pubKey).toUpperCase();
+					inputObj.ownerIdList = (0, _jsSha.keccak_256)(inputObj.pubKey).toUpperCase();
+					inputObj.controlId = "";
+					inputObj.controlIdList = [""];
+					inputObj.ownershipTokenId = "";
+					inputObj.ownershipTokenAttributes = [""];
+					inputObj.ownershipTokenQuantity = [""];
+					inputObj.controlTokenId = "";
+					inputObj.controlTokenAttributes = [""];
+					inputObj.controlTokenQuantity = [""];
+					inputObj.identityRecoveryIdList = [""];
+					inputObj.recoveryCondition = "";
+					inputObj.yesVotesRequiredToPass = "";
+					inputObj.delegateeIdList = [""];
+					inputObj.delegateeTokenQuantity = [""];
 				}
 				return inputObj;
 			}

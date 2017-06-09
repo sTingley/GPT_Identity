@@ -217,9 +217,13 @@ class Modal extends Component {
 			marginRight: '15px'
 		}
 
+		var popUpWidth = {
+            width: '80%'
+        }
+
 		return (
 			<div className="modal fade" id="assetDetails" key={this.props.asset.asset_id} tabIndex="-1" role="dialog" aria-labelledby="asset">
-				<div className="modal-dialog modal-lg" role="document">
+				<div className="modal-dialog modal-lg" role="document" style={popUpWidth}>
 					<div className="modal-content">
 
 						<div className="modal-header">

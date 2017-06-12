@@ -1,9 +1,11 @@
 'use strict'
 
+
 //grab the chain configuration:
 var chainConfig = require('/home/demoadmin/.eris/ErisChainConfig.json')
 console.log("Chain Configuration Account: " + chainConfig.primaryAccount)
 console.log("Chain URL: " + chainConfig.chainURL)
+
 
 //for calling contract:
 var contracts = require('eris-contracts')
@@ -31,10 +33,12 @@ manager = contracts.newContractManagerDev(chainUrl, chainConfig.primaryAccount)
 //Make the contract object using ABI and address of deployed contract
 contract = manager.newContractFactory(abi).at(address)
 
+
 //This is for signature generation:
 function createSignature(nonHashedMessage, callback) {
     //make message hash
     var hash = crypto.createHash('sha256').update(nonHashedMessage).digest('hex')
+
     var pubKey = chainConfig.primaryAccount.pubKey;
     var privKey = chainConfig.primaryAccount.privKey;
 
@@ -64,7 +68,7 @@ var inProgress = 0;
 //continuous listening for requestMade event
 contract.requestMade(
     function (error, result) {
-        //do nothing, we never want the event listening to stop    
+        //do nothing, we never want the event listening to stop
     },
     function (error, result) {
         //check if in progress
@@ -79,7 +83,7 @@ contract.requestMade(
 //continuous listening for CallbackReady event
 contract.CallbackReady(
     function (error, result) {
-        //do nothing, we never want the event listening to stop    
+        //do nothing, we never want the event listening to stop
     },
     function (error, result) {
         //check if in progress
@@ -197,7 +201,7 @@ function Process() {
 
             })//end contract.getCurrentInList
 
-        }//end if statement	
+        }//end if statement
 
     })//end contract.listIsEmpty
 

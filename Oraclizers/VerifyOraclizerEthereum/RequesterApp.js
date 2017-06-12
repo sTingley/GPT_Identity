@@ -41,7 +41,7 @@ var response;
 //continuous listening for requestMade event
 contract.requestMade(
     function (error, result) {
-        //do nothing, we never want the event listening to stop    
+        //do nothing, we never want the event listening to stop
     },
     function (error, result) {
         //check if in progress
@@ -56,7 +56,7 @@ contract.requestMade(
 //continuous listening for CallbackReady event
 contract.CallbackReady(
     function (error, result) {
-        //do nothing, we never want the event listening to stop    
+        //do nothing, we never want the event listening to stop
     },
     function (error, result) {
         //check if in progress
@@ -123,12 +123,15 @@ function verify(msg, signature, pubKey) {
     //INPUT msg: This is a hex string of the message hash from wallet
     //INPUT signature: This is a hex string of the signature from wallet
     //INPUT pubKey: This is a hex string of the public key from wallet
-    
+
     //convert all to buffers:
     msg = new Buffer(msg, "hex");
     signature = new Buffer(signature, "hex");
     pubKey = new Buffer(pubKey, "hex");
     var verified = secp256k1.verify(msg, signature, pubKey)
     return verified;
-    
+
 }
+
+
+

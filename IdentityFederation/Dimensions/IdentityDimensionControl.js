@@ -106,6 +106,8 @@ var connector = new TwinConnector();
 
 //********************************************* */
 
+//NOTE: Other js files seem to recieve owners and controllers as large strings and not arrays, if this happens here then the split(',') command must be used
+// in order to parse the request properly.
 var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
     this.chain = 'primaryAccount'
     this.erisdburl = chainConfig.chainURL
@@ -151,6 +153,32 @@ var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
         return verified;
     }
 
+    this.clearExpirations = function(formdata, callback)
+    {
+        var currentDate = new Date();
+        currentDate = parseInt(currentDate.getTime())/1000;
+        var spliceArr = [];
+        console.log("CLEAR EXPIR: "+JSON.stringify(formdata));
+        //first check to avoid an out-of-bounds error
+        if (formdata.dimension.delegations.length > 0) {
+            for (var i = 0; i < formdata.dimension.delegations.length; i++) {
+                var check = (currentDate > Number(formdata.dimension.delegations[i].expiration) );
+                console.log(check);
+                if (check){
+                    console.log(formdata.dimension.delegations[i].delegatee);
+                    //formdata.dimension.delegations.splice(i,1);
+                        spliceArr.push(i);
+                        console.log(currentDate+ "  token cleared "+i);
+                }
+            }
+            if(spliceArr.length>0){
+                for (var i = spliceArr.length - 1; i >=0 ; i--) {formdata.dimension.delegations.splice(spliceArr[i],1);console.log("spliced "+spliceArr[i]);}
+            }
+        callback();
+        }
+        else{callback();}
+    }
+
     this.writeAll = function (formdata, callback) {
         var max = Math.max(formdata.dimension.controllers.length, formdata.dimension.owners.length);
         max = Math.max(formdata.dimension.delegations.length, max);
@@ -162,6 +190,7 @@ var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
         var c = 0;
         var d = 0;
         var delegateeLog;
+        if(formdata.dimension.controllers[0] == ""){formdata.dimension.controllers.splice(0)}
         var total = formdata.dimension.controllers.length + formdata.dimension.owners.length + formdata.dimension.delegations.length;
         console.log("total calls: "+ total);
         for (var i = 0; i < max; i++) {
@@ -184,7 +213,7 @@ var IdentityDimensionControl = function (iDimensionCtrlContractAddress) {
             if (typeof (formdata.dimension.delegations[i]) != 'undefined' && typeof (formdata.dimension.delegations[i]) != 'null' && formdata.dimension.delegations[i] != "" && formdata.dimension.delegations[i].owner != "") {
                 var delegatee = formdata.dimension.delegations[i].delegatee;
                 var accessCategories = formdata.dimension.delegations[i].accessCategories;
-                delegateeLog = formdata;
+                delegateeLog = JSON.parse(JSON.stringify(formdata));
                 delegateeLog.dimension.pubKey = "";
                 delegateeLog.dimension.coidAddr = "";
                 delegateeLog.dimension.uniqueId = "";
@@ -238,8 +267,8 @@ console.log(formdata)
                     "coidAddr": "",
                     "dimensionCtrlAddr": "",
                     "uniqueId": "",
-                    "owners": [""],
-                    "controllers": [""],
+                    "owners": [],
+                    "controllers": [],
                     "delegations": [],
                     "data": []
                 }
@@ -262,12 +291,12 @@ console.log(formdata)
             controllers = formdata.controllers;
         }
         if(typeof(formdata.owners)=="string"){
-            owners[0]=formdata.owners;
+            owners=formdata.owners.split(",");
         }
         else{
             owners = formdata.owners;
         }
-        var pubKey = owners[0];
+        var pubKey = (owners[0]);
         var delegations = Object(JSON.parse(formdata.delegations));
         var data = Object(JSON.parse(formdata.data));
 //var data = log.dimension.data;
@@ -606,46 +635,69 @@ console.log("ATTRIBUTE3 :" + attribute3);
             owners = formdata.owners;
         }
 
-
+console.log(owners + "  owners  "+ formdata.owners);
         //if(verified){console.log("\n-----VERIFIED-----\n");
         self.contract.readEntry(pubKey, type, ID, descriptor, function (error, result) {
             if (result) {
                 var attribute=result[0]+result[1]+result[2];
+                var test = result[0]+result[1]+result[2];
+                console.log("byte return: "+test);
                 attribute = web3.toAscii(attribute.replace("/0/g","")).replace(/\u0000/g, '');
                 console.log("\nATTRIBUTE\n" + attribute + " "+ attribute.length);
                 result=[];
                 result=attribute;
-                //consider adding a bool return to readEntry in contract
-                                connector.GetDimension(owners[0], String(formdata.dimensionName) + ".json", 0, function (results) {
-                    var index = 0;
-                    var keepGoing = true;
-                    for (var i = 0; i < results.dimension.data.length; i++) {
-                        console.log("here1");
-                        if (results.dimension.data[i].descriptor == formdata.descriptor && results.dimension.data[i].flag == 1 && results.dimension.delegations.length > 0 && results.dimension.delegations[0].owner != "") {
-                            console.log("here2");
-                            while (keepGoing) {
-                                console.log("here3");
-                                for (var k = 0; k < results.dimension.delegations.length; k++) {
-                                    var keys = results.dimension.delegations[k].accessCategories.split(",");
-                                    if (results.dimension.delegations[k].expiration <= results.dimension.delegations[index].expiration && results.dimension.delegations[k].delegateee == pubKey && (keys.includes(formadata.descriptor) || results.dimension.delegations.accessCategories == "")) {
-                                        index = k; console.log("here4");
+callback(error, result);
+/*
+                if (Boolean(result[3])) {
+                    connector.GetDimension(owners[0], String(formdata.dimensionName) + ".json", 0, function (results) {
+                        //self.clearExpirations(results, function () {
+                        var index = 0;
+                        var keepGoing = true;
+console.log("\nRESULTS: "+JSON.stringify(results));
+                        for (var i = 0; i < results.dimension.data.length; i++) {
+                            console.log("here1");
+                            if (results.dimension.data[i].descriptor == formdata.descriptor && results.dimension.data[i].flag == 1 && results.dimension.delegations.length > 0 && results.dimension.delegations[0].owner != "") {
+                                console.log("here2");
+                                while (keepGoing) {
+                                    console.log("here3");
+                                    for (var k = 0; k < results.dimension.delegations.length; k++) {
+                                        var keys = results.dimension.delegations[k].accessCategories.split(",");
+                                        if (results.dimension.delegations[k].expiration <= results.dimension.delegations[index].expiration && results.dimension.delegations[k].delegateee == pubKey && (keys.includes(formadata.descriptor) || results.dimension.delegations.accessCategories == "")) {
+                                            index = k; console.log("here4");
+                                        }
                                     }
-                                }
-                                if (results.dimension.delegations[index].amount == 0) {
-                                    results.dimension.delegations.splice(index, 1); console.log("here5");
-                                }
-                                else {
-                                    //just subtract remaining amount from the current delegation amount
-                                    results.dimension.delegations[index].amount = results.dimension.delegations[index].amount - 1;
-                                    keepGoing = false; console.log("here6");
-                                    console.log("RW ALL");
-                                    self.writeAll(results, function () { callback(error, result) });
-                                }
-                            }//end while
-                        }
-                    }//end for
-                    callback(error, result)
-                })
+                                    if (results.dimension.delegations[index].amount == 0) {
+                                        results.dimension.delegations.splice(index, 1); console.log("here5");
+                                    }
+                                    else {
+                                        //just subtract remaining amount from the current delegation amount
+                                        results.dimension.delegations[index].amount = String(Number(results.dimension.delegations[index].amount) - 1);
+                                        console.log(results.dimension.delegations[index].delegatee+" AMOUNT: "+results.dimension.delegations[index].amount);
+                                        keepGoing = false; console.log("here6");
+                                        console.log("RW ALL");
+
+                                            //console.log(JSON.stringify(results));
+                                            self.writeAll(results, function () { console.log("Read CALLBACK");callback(error, result) });
+
+
+                                    }
+                                }//end while
+                            }
+                        }//end for
+                        //callback(error, result)
+                   // })// end clearexp
+                    })// get json
+                }
+                if(test == "0536F7272792C20796F7520646F6E2774206861766520616E79206F7220656E60000000000000F75676820746F6B656E7320666F72207468697320646174612E0000000000000000000000000000000000000000000000000000000000000000") {
+                    //result = "Sorry, you don't have any or enough tokens for this data.";
+                    //self.clearExpirations(results, function () {
+                    //    self.writeAll(results, function () { console.log("Read CALLBACK");callback(error, result) });
+                    //})
+                }
+
+
+
+         */
             }
             else{
                 callback(error, result);
@@ -694,6 +746,8 @@ console.log("ATTRIBUTE3 :" + attribute3);
         //didnt want to edit the same log
         var delegateeLog;
         var sync;
+        var currentDate = new Date();
+        currentDate = currentDate.getTime();
 
         connector.GetDimension(formdata[0].owner[0], formdata[0].dimension + ".json", 0, function (results) {
                 var j = 0;
@@ -727,7 +781,7 @@ console.log("FDL: "+ formdata.length);
                                         "delegatee": formdata[j].delegatee,
                                         "amount": formdata[j].amount,
                                         "dimension": formdata[j].dimension,
-                                        "expiration": formdata[j].timeFrame,
+                                        "expiration": String(currentDate+formdata[j].timeFrame),
                                         "accessCategories": formdata[j].accessCategories
                                 };
                                 results.dimension.delegations.push(entry);
@@ -807,7 +861,7 @@ console.log("FDL: "+ formdata.length);
         var amount = formdata.amount;
         var dimension = formdata.dimension;
         var all = Boolean(formdata.all.toLowerCase() == 'true');//boolean - true or false
-
+        var spliceArr = [];
         //put info inside for how to remove asset
         //connector.RemoveAsset();
 
@@ -822,7 +876,13 @@ console.log("FDL: "+ formdata.length);
 
                             for (j = 0; j < log.dimension.delegations.length; j++) {
                                 if (log.dimension.delegations[j].owner == owner && log.dimension.delegations[j].delegatee == delegatee) {
-                                    log.dimension.delegations.splice(j, 1);
+                                   spliceArr.push(j);
+                                   if (j == (log.delegations.length - 1)) {
+                                        if (spliceArr.length > 0) {
+                                            for (var i = spliceArr.length - 1; i >= 0; i--) { log.delegations.splice(spliceArr[i], 1); console.log("spliced " + spliceArr[i]); }
+                                        }
+
+                                    }
                                 }
                             }
                         }
@@ -1027,6 +1087,7 @@ for (let endpoint in IdentityConfig) {
         console.log("req: " + JSON.stringify(req.body))
 
         var formdata = req.body
+        //console.log("\nformdata :\n" + formdata+"\n");
 
         //their contract address
         var contractAddress = formdata.dimensionCtrlAddr;

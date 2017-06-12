@@ -51,7 +51,8 @@ var NotificationCtrl =
                                 "read_status": false,
                                 "time": timestamp,
                                 "gatekeeperAddr": params.gatekeeperAddr,
-                                "isHuman": params.isHuman
+                                "isHuman": params.isHuman,
+                                "propType": params.propType
 
                         };
                 };

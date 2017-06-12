@@ -18,7 +18,7 @@ var wallet = function(){
   this.generateKeys = function() {
     do {
         this.privKey = crypto.randomBytes(32)
-	// this.pubKey = secp256k1.publicKeyCreate(this.privKey);
+        // this.pubKey = secp256k1.publicKeyCreate(this.privKey);
     } while (!secp256k1.privateKeyVerify(this.privKey))
     this.pubKey = secp256k1.publicKeyCreate(this.privKey);
     console.log('generating keys.... ')
@@ -86,7 +86,7 @@ var wallet = function(){
   //******************************************************************************
   // Keys & signatures are normally represented as hexstrings
   this.buffer_to_hexString = function(buffer) {
-	return buffer.toString("hex");
+        return buffer.toString("hex");
   }
 
   //******************************************************************************
@@ -124,7 +124,7 @@ var wallet = function(){
 
   this.retrieveWallet = function(pub) {
 
-      
+
 
   }
 

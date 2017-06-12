@@ -1,14 +1,3 @@
-//See the Digital Identity Specification for more on terminology
-//Descriptor is something that describes a dimension category. Ex "MyAddr"
-//Attribute is the reference. For exmaple, a bigchainDB transaction ID or an IPFS hash.
-
-
-//READ ME: A new strategy for managing arrays is used in this contract.
-//When you delete something, don't restructure the size; set the value(s) null.
-//When you add something, find the first null index.
-//This strategy saves lookups, and ultimately, should be used for future arrays.
-//NOTE: IdentityDimensionControl manages tokens and function call permissions of this contract.
-
 contract IdentityDimension
 {
     bytes32 chairperson;
@@ -20,8 +9,13 @@ contract IdentityDimension
 
 
     //the following are hash tables: key is descriptor; value is attribute
-    mapping(bytes32 => bytes32) publicAttributes;
-    mapping(bytes32 => bytes32) privateAttributes;
+    struct attributes{
+        bytes32 attribute;
+        bytes32 attribute2;
+        bytes32 attribute3;
+    }
+    mapping(bytes32 => attributes) publicAttributes;
+    mapping(bytes32 => attributes) privateAttributes;
 
     //the following keeps track of the descriptors that are public and private
     bytes32[] publicDescriptors;
@@ -55,7 +49,7 @@ contract IdentityDimension
         //using the hex encoder: http://www.convertstring.com/EncodeDecode/HexEncode
         bytes32 theDescriptor = 0x4F776E6572;
 
-        this.addEntry(theDescriptor,sha3(uniqueID),flag);
+        this.addEntry(theDescriptor,sha3(uniqueID),"0x0","0x0",flag);
     }
 
 
@@ -73,17 +67,18 @@ contract IdentityDimension
     //creates an attribute/descriptor and puts it in the appropriate array,
     //determined by the flag (flag = 0 => public; flag = 1 => private)
     //NOT for updates
-    function addEntry(bytes32 descriptor, bytes32 attribute, uint flag) accessCheck(msg.sender) returns (bool success)
+    function addEntry(bytes32 descriptor, bytes32 attribute, bytes32 attribute2, bytes32 attribute3, uint flag) accessCheck(msg.sender) returns (bool success)
     {
         success = false;
 
         //public
         if(flag == 0)
         {
-            if(publicAttributes[descriptor] != 0x0)
+        //if attribute is blank
+            if(publicAttributes[descriptor].attribute == 0x0)
             {
                 //add to the mapping
-                publicAttributes[descriptor] = attribute;
+                publicAttributes[descriptor] = attributes(attribute,attribute2,attribute3);
                 success = true;
                 //add to the array
                 addPublicDescriptor(descriptor);
@@ -92,15 +87,16 @@ contract IdentityDimension
         }
         else //private
         {
-            if(privateAttributes[descriptor] != 0x0)
+            if(privateAttributes[descriptor].attribute == 0x0)
             {
                 //add to the mapping
-                privateAttributes[descriptor] = attribute;
+                privateAttributes[descriptor] = attributes(attribute,attribute2,attribute3);
                 success = true;
                 //add to the array
                 addPrivateDescriptor(descriptor);
             }
         }
+
     }
 
     //removes an entry
@@ -109,10 +105,10 @@ contract IdentityDimension
     {
         success = false;
 
-        if(publicAttributes[descriptor] != 0x0)
+        if(publicAttributes[descriptor].attribute != 0x0)
         {
             //remove from the mapping
-            publicAttributes[descriptor] = 0x0;
+            publicAttributes[descriptor] = attributes(0x0,0x0,0x0);
             success = true;
             //remove from the array
             removePublicDescriptor(descriptor);
@@ -120,10 +116,10 @@ contract IdentityDimension
         }
         else
         {
-            if(privateAttributes[descriptor] != 0x0)
+            if(privateAttributes[descriptor].attribute != 0x0)
             {
                 //remove from the mapping
-                privateAttributes[descriptor] = 0x0;
+                privateAttributes[descriptor] = attributes(0x0,0x0,0x0);
                 success = true;
                 //remove from the array
                 removePrivateDescriptor(descriptor);
@@ -136,28 +132,36 @@ contract IdentityDimension
     //Gives you an attribute for a given descriptor.
     //return success = false if not found
     //value is the attribute for the descriptor
-    function readEntry(bytes32 descriptor) accessCheck(msg.sender) returns (bytes32 value, bool success, bool isPublic)
+    function readEntry(bytes32 descriptor) accessCheck(msg.sender) returns (bytes32 value,bytes32 value2,bytes32 value3, bool success, bool isPublic)
     {
 
         isPublic = true;
         success = true;
         value = 0x0;
-        bytes32 pub = publicAttributes[descriptor];
-        bytes32 priv = privateAttributes[descriptor];
+        attributes pub = publicAttributes[descriptor];
+        attributes priv = privateAttributes[descriptor];
 
-        if(pub != 0x0)
+        if(pub.attribute != 0x0)
         {
             //it's public
-            value = pub;
+            value = pub.attribute;
+            value2 = pub.attribute2;
+            value3 = pub.attribute3;
+            //value4 = pub.attribute4;
+            //value5 = pub.attribute5;
             //no need to change isPublic (since by default is true)
             //no need to change success (since by default is true)
         }
         else
         {
-            if(priv != 0x0)
+            if(priv.attribute != 0x0)
             {
                 //it's private
-                value = priv;
+                value = priv.attribute;
+                value2 = priv.attribute2;
+                value3 = priv.attribute3;
+               // value4 = priv.attribute4;
+               // value5 = priv.attribute5;
 
                 isPublic = false;
                 //no need to change success (since by default is true)
@@ -174,16 +178,16 @@ contract IdentityDimension
 
     function changeDescriptor(bytes32 oldDescriptor, bytes32 newDescriptor) accessCheck(msg.sender) returns (bool success)
     {
-        bytes32 pub = publicAttributes[oldDescriptor];
-        bytes32 priv = privateAttributes[oldDescriptor];
+        attributes pub = publicAttributes[oldDescriptor];
+        attributes priv = privateAttributes[oldDescriptor];
 
-        success = (pub != 0x0 || priv != 0x0);
+        success = (pub.attribute != 0x0 || priv.attribute != 0x0);
         if(success)
         {
-            if(pub != 0x0)
+            if(pub.attribute != 0x0)
             {
                 //update mapping
-                publicAttributes[oldDescriptor] = 0x0;
+                publicAttributes[oldDescriptor] = attributes(0x0,0x0,0x0);
                 publicAttributes[newDescriptor] = pub;
                 //update arrays
                 removePublicDescriptor(oldDescriptor);
@@ -192,7 +196,7 @@ contract IdentityDimension
             else
             {
                 //update mapping
-                privateAttributes[oldDescriptor] = 0x0;
+                privateAttributes[oldDescriptor] = attributes(0x0,0x0,0x0);
                 privateAttributes[newDescriptor] = priv;
                 //update arrays
                 removePrivateDescriptor(oldDescriptor);
@@ -209,12 +213,22 @@ contract IdentityDimension
     //put flag = 2.
     //In calling this function, if someone doesn't want to change the attribute,
     //you can put the attribute as an empty bytes32.
-    function update(bytes32 descriptor, bytes32 attribute, uint flag) accessCheck(msg.sender) returns (bool success)
+    function update(bytes32 descriptor,bytes32 attribute,bytes32 attribute2,bytes32 attribute3, uint flag) accessCheck(msg.sender) returns (bool success)
     {
-        bytes32 value = 0x0;
+        bytes32 value;
+        bytes32 value2;
+        bytes32 value3;
+        //bytes32 value4;
+        //bytes32 value5;
         bool entryExists;
         bool isPublic;
-        (value, entryExists, isPublic) = readEntry(descriptor);
+        (value, value2, value3, entryExists, isPublic) = readEntry(descriptor);
+        delete value;
+        //delete value2;
+        //delete value3;
+        //delete value4;
+        //delete value5;
+
 
         success = entryExists;
 
@@ -226,21 +240,25 @@ contract IdentityDimension
                 if(isPublic)
                 {
                     flag = 0;
+
                 }
                 else
                 {
                     flag = 1;
+
                 }
             }
 
             //find the correct attribute for removing and then adding the entry
             if(attribute == 0x0)
             {
-                attribute = value;//value is current value of the attribute for the descriptor
+               // attribute = value;//value is current value of the attribute for the descriptor
             }//else keep it as it is
+            else{
 
-            //remove the entry then add it
-            success = removeEntry(descriptor) && addEntry(descriptor,attribute,flag);
+                //remove the entry then add it
+                success = removeEntry(descriptor) && addEntry(descriptor,attribute,attribute2,attribute3,flag);
+            }
         }
 
     }
@@ -248,13 +266,13 @@ contract IdentityDimension
     //tellls you if a descriptor is public
     function isPublic(bytes32 descriptor) returns (bool result)
     {
-        result = (publicAttributes[descriptor] != 0x0);
+        result = (publicAttributes[descriptor].attribute != 0x0);
     }
 
     //tells you if a descriptor is private
     function isPrivate(bytes32 descriptor) returns (bool result)
     {
-        result = (privateAttributes[descriptor] != 0x0);
+        result = (privateAttributes[descriptor].attribute != 0x0);
     }
 
     //delimiter is a comma
@@ -456,3 +474,4 @@ contract IdentityDimension
     }
 
  }
+

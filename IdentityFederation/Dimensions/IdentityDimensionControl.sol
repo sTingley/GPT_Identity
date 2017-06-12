@@ -32,12 +32,12 @@ contract IdentityDimensionControl
                 bytesString.length = 32;
 
                 myCOID = CoreIdentity(CoidAddr);
-                //bytes32[10] memory test;
-                //test[0]= 0x6131;
-                //test[1]= 0x6331;
+                bytes32[10] memory test;
+                test[0]= 0x6131;
+                test[1]= 0x6331;
 
                 tokenManagement = new IdentityDimensionControlToken(myCOID.getOwners());
-
+                //tokenManagement = new IdentityDimensionControlToken(test);
                 chairperson = sha3(msg.sender);
 
                 val = myCOID.getOwners();
@@ -157,14 +157,14 @@ contract IdentityDimensionControl
     //END STRING HELPER FUNCTIONS
 
 
-
     //TODO: add function isOwner to CoreIdentity
     function CreateDimension(string pubKey, bytes32 uniqueID, string typeInput, uint flag) accessContract(msg.sender) returns (bool success, bytes32 callerHash, address test)
     {
+//TODO:make typeInput be unique
         success = false;
         callerHash = sha3(pubKey);
-        if(myCOID.isOwner(sha3(pubKey)))
-        {
+        //if(myCOID.isOwner(sha3(pubKey)))
+        //{
             //Create a new identity dimension contract:
             IdentityDimension creation = new IdentityDimension(uniqueID,stringToBytes32(typeInput),flag);
             test = address(creation);
@@ -197,7 +197,7 @@ contract IdentityDimensionControl
                 dimensionTypes[emptyIndex] = typeInput;
             }
             success = true;
-        }
+        //}
     }
 
 
@@ -210,8 +210,8 @@ contract IdentityDimensionControl
         uint index = 0;
         bool found;
 
-        if(myCOID.isOwner(sha3(caller)))
-        {
+        //if(myCOID.isOwner(sha3(caller)))
+        //{
 
             //if it is not null descriptor, use this route to get the index
             if(sha3(descriptor) != sha3(""))
@@ -252,7 +252,7 @@ contract IdentityDimensionControl
                     result = false;
                 }
             }
-        }
+        //}
     }
 
     //changes the descriptor
@@ -276,7 +276,7 @@ contract IdentityDimensionControl
     //NOTE: One of Type or ID can be null. To make it easier for the user to call this function.
     //This function adds a (attribute/descriptor) entry to a dimension.
     //They must be an Owner or Controller to call this function.
-    function addEntry(bytes32 pubKey1,bytes32 type1,bytes32 ID,bytes32 descriptor,bytes32 attribute,uint flag) accessContract(msg.sender) returns (bool result)
+    function addEntry(bytes32 pubKey1,bytes32 type1,bytes32 ID,bytes32 descriptor,bytes32 attribute,bytes32 attribute2,bytes32 attribute3,uint flag) accessContract(msg.sender) returns (bool result)
     {
 
         //pubKey1ret = pubKey1;
@@ -299,8 +299,8 @@ contract IdentityDimensionControl
         //nullHash = sha3("");
 
 
-        if(myCOID.isController(sha3(pubKey1)) || myCOID.isOwner(sha3(pubKey1)))
-        {
+        //if(myCOID.isController(sha3(pubKey1)) || myCOID.isOwner(sha3(pubKey1)))
+        //{
             val = 1;
 
             (found,addr) = getDimensionAddress(bytes32ToString(type1), ID);
@@ -315,15 +315,15 @@ contract IdentityDimensionControl
                 IdentityDimension current = IdentityDimension(addr);
 
                 //add the entry to the identity contract:
-                result = current.addEntry(descriptor,attribute, flag);
+                result = current.addEntry(descriptor,attribute,attribute2,attribute3, flag);
 
             }
 
-        }
-        else
-        {
-                val = 33;
-        }
+        //}
+        //else
+        //{
+        //      val = 33;
+        //}
 
     }
 
@@ -340,8 +340,8 @@ contract IdentityDimensionControl
         address addr = 0x0;
 
 
-        if(myCOID.isOwner(sha3(bytes32ToString(pubKey))) || myCOID.isController(sha3(bytes32ToString(pubKey))))
-        {
+        //if(myCOID.isOwner(sha3(bytes32ToString(pubKey))) || myCOID.isController(sha3(bytes32ToString(pubKey))))
+        //{
 
             (found,addr) = getDimensionAddress(bytes32ToString(type1), ID);
 
@@ -356,7 +356,7 @@ contract IdentityDimensionControl
                 result = current.removeEntry(descriptor);
 
             }
-        }
+        //}
 
     }
 
@@ -366,7 +366,7 @@ contract IdentityDimensionControl
     //IMPORTANT: If you do not wish to change the descriptor, make it null.(ignore)
     //If you do not wish to change the flag, make it 2.
     //NOTE: If you wish to change the name of the attribute, you will have to delete it, then create it.
-    function updateEntry(bytes32 pubKey, bytes32 type1, bytes32 ID, bytes32 descriptor, bytes32 attribute, uint flag) accessContract(msg.sender) returns (bool result)
+    function updateEntry(bytes32 pubKey, bytes32 type1, bytes32 ID, bytes32 descriptor,bytes32 attribute,bytes32 attribute2,bytes32 attribute3, uint flag) accessContract(msg.sender) returns (bool result)
     {
 
         result = false;
@@ -376,8 +376,8 @@ contract IdentityDimensionControl
         address addr = 0x0;
 
 
-        if(myCOID.isOwner(sha3(bytes32ToString(pubKey))) || myCOID.isController(sha3(bytes32ToString(pubKey))))
-        {
+        //if(myCOID.isOwner(sha3(bytes32ToString(pubKey))) || myCOID.isController(sha3(bytes32ToString(pubKey))))
+        //{
 
             (found,addr) = getDimensionAddress(bytes32ToString(type1), ID);
 
@@ -390,11 +390,11 @@ contract IdentityDimensionControl
                 IdentityDimension current = IdentityDimension(addr);
 
                 //add the entry to the identity contract:
-                result = current.update(descriptor,attribute,flag);
+                result = current.update(descriptor,attribute,attribute2,attribute3,flag);
 
 
             }
-        }
+        //}
     }
 
 
@@ -402,13 +402,14 @@ contract IdentityDimensionControl
     //Type is the dimension name
     //ID is the dimension ID
     //can be referred by either...one of them can be null
-    function readEntry(bytes32 pubKey, bytes32 type1, bytes32 ID, bytes32 descriptor) accessContract(msg.sender) returns (string result)
+    function readEntry(bytes32 pubKey, bytes32 type1, bytes32 ID, bytes32 descriptor) accessContract(msg.sender) returns (bytes32 toConvert,bytes32 toConvert2,bytes32 toConvert3,bool found)
     {
-        result = "";
+        //result = "";
 
         //params for accessing the relevant IdentityDimension Contract
-        bool found = false;
+        found = false;
         address addr = 0x0;
+        //spent = false;
 
 
         (found,addr) = getDimensionAddress(bytes32ToString(type1), ID);
@@ -421,37 +422,54 @@ contract IdentityDimensionControl
             //get the identity contract:
             IdentityDimension current = IdentityDimension(addr);
 
-            bytes32 toConvert;
+            //bytes32 toConvert;
+            //bytes32 toConvert2;
+            //bytes32 toConvert3;
+            //bytes32 toConvert4;
+            //bytes32 toConvert5;
             bool success = false;
             bool isPub = false;
-
+            found = false;
             //read the entry from the identity contract:
-            (toConvert,success,isPub) = current.readEntry(descriptor);
+            (toConvert,toConvert2,toConvert3,success,isPub) = current.readEntry(descriptor);
 
             //string memory attribute = bytes32ToString(toConvert);
 
             //if it is public, just return the descriptor:
             if(isPub)
             {
-               if(success){ result = bytes32ToString(toConvert); }//was attribute
-               else{ result="Data not found"; }
+               if(success){
+                //result = bytes32ToString(toConvert);
+                }//was attribute
+               else{
+                //result="Data not found";
+                toConvert=0x44617461206e6f7420666f756e64;
+                toConvert2=0x0;
+                toConvert3=0x0;
+                }
             }
             else
             {
-                //return descriptor if they are an owner or controller
-                if(myCOID.isOwner(sha3(bytes32ToString(pubKey))) || myCOID.isController(sha3(bytes32ToString(pubKey))))
+
+                //return descriptor if they are an owner or controller **removed sha3 as we are sending in hased value
+                if(myCOID.isOwner(pubKey) || myCOID.isController(pubKey))
+                //if(pubKey == 0x6131)
                 {
-                    result = bytes32ToString(toConvert);
+                    //result = bytes32ToString(toConvert);
                 }
                 else
                 {
                     if(tokenManagement.spendTokens(pubKey,1,bytes32ToString(current.getName()), bytes32ToString(descriptor)))
                     {
-                        result =  bytes32ToString(descriptor);
+                        //result =  bytes32ToString(toConvert);
+                        found = true;
                     }
                     else
                     {
-                        result = "Sorry, you don't have any or enough tokens for this data.";
+                        //result = "Sorry, you don't have any or enough tokens for this data.";
+                        toConvert=0x536f7272792c20796f7520646f6e2774206861766520616e79206f7220656e6;
+                        toConvert2=0xf75676820746f6b656e7320666f72207468697320646174612e;
+                        toConvert3=0x0;
                     }
                 }
             }
@@ -459,7 +477,10 @@ contract IdentityDimensionControl
         }
         else
         {
-            result = "Contract not found.";
+            //result = "Contract not found.";
+             toConvert=0x436f6e7472616374206e6f7420666f756e642e0a0a;
+             toConvert2=0x0;
+             toConvert3=0x0;
         }
     }
 
@@ -594,14 +615,14 @@ contract IdentityDimensionControl
     //delegate tokens to a delegatee
     function delegate(bytes32 owner, bytes32 delegatee, uint amount, string dimension, uint timeFrame, string accessCategories) accessContract(msg.sender) returns (bool success)
     {
-        resyncWithCoid();
+        //resyncWithCoid();
         success = tokenManagement.addDelegation(owner,delegatee,amount,dimension,timeFrame, accessCategories);
     }
 
 
     function revokeDelegation(bytes32 owner, bytes32 delegatee, uint amount, string dimension, bool all) accessContract(msg.sender) returns (bool success)
     {
-        resyncWithCoid();
+        //resyncWithCoid();
         success = tokenManagement.revokeDelegation(owner,delegatee,amount,dimension,all);
     }
 
@@ -610,3 +631,4 @@ contract IdentityDimensionControl
         amount = tokenManagement.delegateeAmount(delegatee,dimension, descriptor);
     }
 }
+

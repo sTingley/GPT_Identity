@@ -18,9 +18,9 @@ var contactsCtrl =
             var fileName = PATH + keccak_256(param.pubKey).toUpperCase() + ".json";
             var cryptoEncr = new Crypto({ pubKey: keccak_256(param.pubKey).toUpperCase() });
             console.log('pubKey: ' + param.pubKey);
-	    var unique = true;
+            var unique = true;
             if (fs.existsSync(fileName)) {
-                
+
                 //debugging
                 console.log("File exists: " + fs.existsSync(fileName))
 
@@ -35,7 +35,7 @@ var contactsCtrl =
                     for (var j = 0; j < fileContent.contacts.length; j++) {
                         if (fileContent.contacts[j].contactName == names[i]) {
                             unique = false;
-			    console.log("name is already in list: "+names[i]);
+                            console.log("name is already in list: "+names[i]);
                         }
                         if (unique && j == fileContent.contacts.length - 1) {
                             var entry = {
@@ -49,7 +49,7 @@ var contactsCtrl =
 
 
 
-		 /*for (var i = 0; i < names.length; i++) {
+                 /*for (var i = 0; i < names.length; i++) {
                     var entry ={
                         "contactName":names[i],
                         "pubKey": pubKeys[i]
@@ -59,7 +59,7 @@ var contactsCtrl =
             }
             else{
                 fileContent={
-		    "pubkey":param.pubKey,
+                    "pubkey":param.pubKey,
                     "contacts":[]
                 }
                 for (var i = 0; i < names.length; i++) {
@@ -67,9 +67,9 @@ var contactsCtrl =
                         "contactName":names[i],
                         "pubKey": pubKeys[i]
                     }
-                     fileContent.contacts.push(entry)                                      
+                     fileContent.contacts.push(entry)
                 }
-                
+
 
             }
 
@@ -102,7 +102,7 @@ var contactsCtrl =
                 res.json({ 'data': 'Contacts unavailable' });
             }
         }
-        
+
 
     }
 module.exports = contactsCtrl;

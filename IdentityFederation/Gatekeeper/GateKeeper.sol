@@ -381,7 +381,7 @@ contract GateKeeper {
             Ballot B = Ballot(ballotAddr); // Instantiate the ballot contract, and allows it to talk to the ballot contract
 
             // Send the proposal to ballot contract with proposalId, numbers of voters for that proposal and yesVotesRequiredToPass
-            B.setMyProposalID(proposalId, validatorsToVote.length, yesVotesRequiredToPass, isHuman, 0x0); // trigger the event COIDRequest in ballot.sol
+            B.setMyProposalID(proposalId, validatorsToVote.length, yesVotesRequiredToPass, isHuman, 0x0,0); // trigger the event COIDRequest in ballot.sol
 
             proposals[proposalId].coidproposal_check = true;
 

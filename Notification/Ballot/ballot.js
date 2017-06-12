@@ -59,6 +59,7 @@ var ballotApp = function () {
             .send(inputs)
             .set('Accept', 'application/json')
             .end((err, res) => {
+                if (err){console.log("/ballot/writeNotify error: " + err)}
                 if (res.status == 200) {
                     // do something
                 }
@@ -111,10 +112,11 @@ var ballotApp = function () {
         var validator = result.args.validator;
         var isHuman = result.args.isHuman;
         var address = result.args.myGKaddr;
+        var propType = result.args.propType;
 
         console.log("isHuman val: " + isHuman);
         console.log("address is: " + address);
-        _this.createNotification({ "pubKey": validator, "proposalID": proposal, "message": "You have been selected to vote on the proposal.", "isHuman":isHuman, "gatekeeperAddr": address });
+        _this.createNotification({ "pubKey": validator, "proposalID": proposal, "message": "You have been selected to vote on the proposal.", "isHuman":isHuman, "gatekeeperAddr": address, "propType": propType });
         console.log("pass on err check: ballot contract notify event");
     })
 } //end of ballotApp
@@ -138,12 +140,18 @@ app.post("/vote", function (req, res) {
     var proposalID = req.body.proposalID;
     var vote = parseInt(req.body.vote);
     var txnDesc = req.body.txnDesc;
+    var sigExpire = req.body.sigExpire || 0;
+    //var currentDate = new Date();
+    //currentDate = parseInt(currentDate.getTime()) / 1000;
+    //currentDate = currentDate + sigExpire
 
     console.log(publicKey + " is pub key");
     console.log(proposalID + " is proposalID");
     console.log(signature + " is signature");
     console.log(vote + " is vote")
     console.log(msg + " is msg")
+    console.log(sigExpire + " is sigExpire");
+    //console.log(currentDate + " is the expiiration date");
 
     //Commenting this block to skip verification & bigchain
 
@@ -168,7 +176,7 @@ app.post("/vote", function (req, res) {
     })*/
 
 
-    ballot.ballotContract.vote(proposalID, vote, publicKey, msg, signature, function (error, result) {
+    ballot.ballotContract.vote(proposalID, vote, publicKey, msg, signature, sigExpire, function (error, result) {
         if (error) {
             res.json({ "status": "failed", "msg": "Error on submitting vote", "proposal_id": proposalID });
             console.log("Error on submitting vote proposal ID : " + proposalID, error);
@@ -190,6 +198,7 @@ app.post("/vote", function (req, res) {
 app.post("/getCoidData", function (req, res) {
 
     console.log("ISHUMAN VALUE: " + req.body.isHuman);
+    console.log(req.body)
     if(req.body.isHuman == true || req.body.isHuman == "true")
     {
         retrieveData(gateKeeper, function (result) {
@@ -198,10 +207,10 @@ app.post("/getCoidData", function (req, res) {
     }
     else
     {
-	console.log("inside the else statement -- isHuman false")
+        console.log("inside the else statement -- isHuman false")
         var theAddr = req.body.gatekeeperAddr;
         var myGK = contractMgr.newContractFactory(myGK_Abi).at(theAddr);
-        
+
         retrieveData(myGK, function (result) {
             res.json(result);
         });

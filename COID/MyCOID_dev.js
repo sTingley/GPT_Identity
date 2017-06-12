@@ -194,7 +194,33 @@ var MyCOID = function (contractAddress) {
         return verified;
     }
 
-
+    this.clearExpirations = function (formdata, callback) {
+        var currentDate = new Date();
+        currentDate = parseInt(currentDate.getTime())/1000;
+        var spliceArr = [];
+        console.log("CLEAR EXPIR: " + JSON.stringify(formdata));
+        //first check to avoid an out-of-bounds error
+        if (formdata.delegations.length > 0) {
+            for (var i = 0; i < formdata.delegations.length; i++) {
+                var check = (currentDate > Number(formdata.delegations[i].expiration));
+                console.log(check);
+                if (check) {
+                    console.log(formdata.delegations[i].delegatee);
+                    spliceArr.push(i);
+                    console.log(currentDate + "  token cleared " + i);
+                    var ctrlIndex = formdata.controlIdList.indexOf(formdata.delegations[i].owner);
+                    if (ctrlIndex >= 0) {
+                        formdata.controlTokenQuantity[ctrlIndex] += Number(formdata.delegations[i].amount);
+                    }
+                }
+            }
+            if (spliceArr.length > 0) {
+                for (var i = spliceArr.length - 1; i >= 0; i--) { formdata.delegations.splice(spliceArr[i], 1); console.log("spliced " + spliceArr[i]); }
+            }
+            callback();
+        }
+        else{callback();}
+    }
 
     this.bigchainIt = function (formdata, callback) {
 
@@ -290,11 +316,24 @@ var MyCOID = function (contractAddress) {
 
 
     this.writeAll = function (formdata, callback) {
+        if (typeof(formdata.delegations) == 'object' && formdata.delegations[0] == "") {
+            formdata.delegations.splice(0, 1);
+            //formdata.delegateeTokenQuantity.splice(0, 1);
+            console.log("empty delegatee removed from results: " + formdata);
+        }
+
+         if (typeof(formdata.delegations) != 'object'){
+            formdata.delegations = [];
+            formdata.delegateeTokenQuantity = [];
+         }
+
         var max = Math.max(formdata.ownerIdList.length, formdata.controlIdList.length);
-        //var fileName = "CAR.json";
+        var max = Math.max(max, formdata.delegations.length);
+
         var fileName = formdata.assetID + ".json";
         var owners = formdata.ownerIdList;
         var controllers = formdata.controlIdList;
+        //var delegatees = formdata.delegateeIdList;
         //max = Math.max(formdata.dimension.delegations.length, max);
         console.log("\n*****THE MIGHTY WRITEALL*****\n");
         console.log(JSON.stringify(formdata));
@@ -304,7 +343,7 @@ var MyCOID = function (contractAddress) {
         var c = 0;
         var d = 0;
         var delegateeLog;
-        var total = owners.length + controllers.length;// + formdata.dimension.delegations.length;
+        var total = owners.length + controllers.length + formdata.delegations.length;
         console.log("TOTAL: " + total);
         console.log(owners + " len " + owners.length);
         for (var i = 0; i < max; i++) {
@@ -323,6 +362,28 @@ var MyCOID = function (contractAddress) {
                     console.log("Writing to Controller: " + controllers[c] + " K: " + k);
                     c++;
                     if (k == total) { console.log("controlller callback"); callback() }
+                })
+            }
+            if (typeof (formdata.delegations[i]) != 'undefined' && typeof (formdata.delegations[i]) != 'null' && formdata.delegations[i] != "" && formdata.delegations[i].owner != "") {
+                var delegatee = formdata.delegations[i].delegatee;
+                delegateeLog = JSON.parse(JSON.stringify(formdata));
+                delegateeLog.pubKey = "";
+                delegateeLog.coidAddr = "";
+                delegateeLog.uniqueId = "";
+                delegateeLog.controlIdList = "";
+                delegateeLog.ownerIdList = "";
+
+                for (var n = 0; n < delegateeLog.delegations.length; n++) {
+                    if (delegateeLog.delegations[n].delegatee != delegatee) {
+                        delegateeLog.delegations.splice(n, 1);
+                    }
+                }
+
+                theNotifier.SetAsset(String(formdata.delegations[i].delegatee), String(fileName), 2, 0, delegateeLog, "", "", function () {
+                    k++;
+                    console.log("Writing to Delegatee: " + formdata.delegations[d].delegatee + " K: " + k);
+                    d++;
+                    if (k == total) { callback() }
                 })
             }
         }//end for loop
@@ -363,31 +424,149 @@ var MyCOID = function (contractAddress) {
         var msg = formdata.msg;
         var sig = formdata.sig;
 
-        self.contract.getControllerList(function (error, result) {
+        self.contract.getControllers(function (error, result) {
             console.log("get controller list...")
             callback(error, result)
         })
     }
 
 
-    //REVOKE DELEGATION TO A DELEGATEE AS A CONTROLLER
+   //REVOKE DELEGATION TO A DELEGATEE AS A CONTROLLER
     this.revokeControlDelegation = function (formdata, callback) {
-        var controller = formdata.controller;
+        var controller = formdata.pubKey;
         var delegatee = formdata.delegatee;
-        var amount = formdata.amount;
+        var amount = Number(formdata.amount);
         var msg = formdata.msg;
         var sig = formdata.sig;
-
+        var pubKey = formdata.pubKey;
+        var fileName = formdata.filename;
+        var flag = formdata.flag;
+        var all = Boolean(formdata.all.toLowerCase() == 'true');//boolean - true or false;
+        var spliceArr=[];
+        var isCtrl = false;
         //TODO:
         var controllerHash = keccak_256(controller).toUpperCase()
+        var owner = controllerHash;
         var delegateeHash = keccak_256(delegatee).toUpperCase()
-        theNotifier.GetAsset(pubKey, fileName, flag, function (result) {
-            self.contract.revokeDelegation(controllerHash, delegateeHash, amount, function (error, result) {
-                callback(error, result)
+
+        theNotifier.GetAsset(pubKey, fileName, flag, function (results) {
+            self.contract.revokeDelegation(controllerHash, delegateeHash, amount, all, function (error, result) {
+                if (result) {
+                    var ctrlIndex = results.controlIdList.indexOf(controllerHash);
+                    if (ctrlIndex >= 0) {
+                        isCtrl = true;
+                    }
+                    var log = results;
+                    if (all)//if the flag is true, just revoke everything from the owner
+                    {
+                        if (log.delegations.length > 0) {
+
+                            for (var j = 0; j < log.delegations.length; j++) {
+                                if (log.delegations[j].owner == owner && log.delegations[j].delegatee == delegateeHash) {
+                                spliceArr.push(j);
+                                if (isCtrl) {
+                                        results.controlTokenQuantity[ctrlIndex] = Number(results.controlTokenQuantity[ctrlIndex])+ Number(log.delegations[j].amount);
+                                    }
+                                if(j == (log.delegations.length-1)){
+                                     if (spliceArr.length > 0) {
+                                         for(var i = spliceArr.length-1; i >= 0 ; i--) { log.delegations.splice(spliceArr[i], 1); console.log("spliced " + spliceArr[i]); }
+                                        }
+
+                                }
+                                }
+                            }
+                        }
+
+                    }
+                    else {
+                        //logic below is similar to the function spendTokens
+
+                        //first make sure they have the amount FROM that owner:
+                        var actualAmount = 0;
+
+                        if (log.delegations.length > 0) {
+                            for (var z = 0; z < log.delegations.length; z++) {
+                                if (log.delegations[z].delegatee == delegateeHash && log.delegations[z].owner == owner) {
+                                    actualAmount = actualAmount + log.delegations[z].amount;
+                                }
+                            }
+                        }
+
+                        //if they have less than the owner wants to remove, just remove how much they have
+                        if (actualAmount < amount) {
+                            amount = actualAmount;
+                        }
+
+                        if (amount > 0) {
+
+                            var keepGoing = true;
+
+                            var index = 0;
+                            while (keepGoing) {
+                                //first find index in delegations with closest expiration.
+                                //uint index = 0;
+                                //This correctly sets var index as the 1st available owner
+                                for (var n = 0; n < log.delegations.length; n++) {
+                                    if (log.delegations[n].owner == owner) {
+                                        index = n;
+                                        break;
+                                    }
+                                }
+
+                                //size of delegations must be greater than zero because actualAmount != 0
+                                //could probably initialize k=index to save cycles later
+                                for (var k = 0; k < log.delegations.length; k++) {
+                                    if (log.delegations[k].owner == owner) {
+                                        if (log.delegations[k].expiration <= log.delegations[index].expiration) {
+                                            index = k;
+                                        }
+                                    }
+                                }
+
+                                //now spend the amount
+                                if (amount >= log.delegations[index].amount) {
+                                    amount = amount - log.delegations[index].amount;
+                                    if (isCtrl) {
+                                        results.controlTokenQuantity[ctrlIndex] += Number(log.delegations[index].amount);
+                                    }
+                                    log.delegations.splice(index, 1);//this function clears and returns coins back to owner
+                                }
+                                else {
+                                    //no need to give tokens back to owner--they are infinite and created on the fly
+
+                                    //just subtract remaining amount from the current delegation amount
+                                    log.delegations[index].amount = log.delegations[index].amount - amount;
+                                    if (isCtrl) {
+                                        results.controlTokenQuantity[ctrlIndex] = Number(results.controlTokenQuantity[ctrlIndex])+amount;
+                                    }
+                                    //now set amount = 0 since we are done
+                                    amount = 0;
+
+                                }
+
+                                if (amount == 0) {
+                                    keepGoing = false;
+                                }
+
+                            }//end while(keepgoing)
+
+                        }// end if amount>0
+                    }//end else
+
+                    console.log("\n\nREVOKE LOG: " + JSON.stringify(log) + "\n\n");
+                    self.bigchainIt(results, function (res, bigchainID, bigchainHash) {
+                        results.bigchainID = bigchainID;
+                        results.bigchainHash = bigchainHash;
+                        self.writeAll(results, function () { callback(error, result) })
+                    });
+
+
+                }
+                else { callback(error, result); }
+
             })
         })
     }
-
 
     //SPEND MY TOKENS AS A DELEGATEE
     this.spendMyTokens = function (formdata, callback) {
@@ -395,12 +574,86 @@ var MyCOID = function (contractAddress) {
         var sig = formdata.sig;
         var delegatee = formdata.delegatee;
         var amount = formdata.amount;
+        var pubKey = formdata.pubKey;
+        var fileName = formdata.filename;
+        var flag = formdata.flag;
+        var index = 0;
+        var keepGoing = true;
+        var isCtrl = false;
+        var ctrlIndex = -1;
 
         //TODO:
         var delegateeHash = keccak_256(delegatee).toUpperCase()
-        theNotifier.GetAsset(pubKey, fileName, flag, function (result) {
+        theNotifier.GetAsset(pubKey, fileName, flag, function (results) {
             self.contract.spendMyTokens(delegateeHash, amount, function (error, result) {
-                callback(error, result)
+                if (result) {
+                    self.clearExpirations(results, function () {
+                        while (keepGoing) {
+                            //first find index in delegations with closest expiration.
+                            // uint index = 0;
+
+                            for (var n = 0; n < results.delegations.length; n++) {
+                                if (results.delegations[n].delegatee == delegateeHash) {
+                                    index = n;
+                                    break;
+                                }
+                            }
+
+                            //size of delegations must be greater than zero because actualAmount != 0
+                            for (var k = 0; k < results.delegations.length; k++) {
+                                if (results.delegations[k].expiration <= results.delegations[index].expiration && results.delegations[k].delegatee == delegateeHash && results.delegations[k].amount > 0) {
+                                    index = k;
+                                }
+                            }
+
+                            //now spend the amount
+                            if (amount >= results.delegations[index].amount) {
+                                amount = amount - results.delegations[index].amount;
+                                ctrlIndex = results.controlIdList.indexOf(results.delegations[index].owner);
+                                if (ctrlIndex >= 0) {
+                                        results.controlTokenQuantity[ctrlIndex] += Number(results.delegations[index].amount);
+                                    }
+                                results.delegations.splice(index, 1);
+                            }
+                            else {
+                                //just subtract remaining amount from the current delegation amount
+                                results.delegations[index].amount = results.delegations[index].amount - amount;
+                                ctrlIndex = results.controlIdList.indexOf(results.delegations[index].owner);
+                                if (ctrlIndex >= 0) {
+                                        results.controlTokenQuantity[ctrlIndex] += amount;
+                                    }
+                                //now set amount = 0 since we are done
+                                amount = 0;
+
+                            }
+
+                            if (amount == 0) {
+                                keepGoing = false;
+                                self.bigchainIt(results, function (res, bigchainID, bigchainHash) {
+                                    results.bigchainID = bigchainID;
+                                    results.bigchainHash = bigchainHash;
+                                    self.writeAll(results, function () { callback(error, result) })
+                                });
+                            }
+
+                        }
+                    })
+                }
+                else {
+                    console.log("Error occurred while spending: " + error);
+                    if(result == 'false' || result === false){
+                        self.clearExpirations(results, function () {
+                             self.bigchainIt(results, function (res, bigchainID, bigchainHash) {
+                                    results.bigchainID = bigchainID;
+                                    results.bigchainHash = bigchainHash;
+                                    self.writeAll(results, function () { callback(error, result) })
+                                });
+                        })
+                    }
+                    else{
+                        callback(error, result);
+                    }
+                }
             })
         })
     }
@@ -423,33 +676,58 @@ var MyCOID = function (contractAddress) {
 
     //DELEGATE TOKENS AS A CONTROLLER TO A DELEGATEE
     this.delegate = function (formdata, callback) {
+        console.log(JSON.stringify(formdata));
         var delegatee = formdata.delegatee;
-        var controller = formdata.controller;
-        var amount = formdata.amount;
+        var controller = formdata.pubKey;
+        var amount = Number(formdata.amount);
         var pubKey = formdata.pubKey;
-        var fileName = formdata.fileName;
+        var fileName = formdata.filename;
+        var flag = formdata.flag;
+        var isOwner = true;
+        var timeFrame = Number(formdata.timeFrame) || 5000;
+        var currentDate = new Date();
+        currentDate = currentDate.getTime() / 1000;
 
         //TODO:
         var controllerHash = keccak_256(controller).toUpperCase()
         var delegateeHash = keccak_256(delegatee).toUpperCase()
+
+console.log("pubkey: "+pubKey+" filename: "+fileName+" flag: "+flag+"\n")
         theNotifier.GetAsset(pubKey, fileName, flag, function (results) {
-            self.contract.delegate(controllerHash, delegateeHash, amount, function (error, result) {
+            self.contract.delegate(controllerHash, delegateeHash, amount, timeFrame, function (error, result) {
                 if (result) {
-                    var entry = {}
-                    results.push(entry);
+                    if(typeof(results.delegations) == 'undefined' || typeof(results.delegations) == 'null'){
+                        results.delegations=[];
+                    }
+                    console.log("Contract call complete");
+                    var entry = {
+                        "owner": controllerHash,
+                        "delegatee": delegateeHash,
+                        "amount": formdata.amount,
+                        "expiration": String(currentDate + timeFrame)
+                    };
+                    results.delegations.push(entry);
+                    var ctrlIndex = results.controlIdList.indexOf(controllerHash);
+                    if(ctrlIndex>=0){
+                        results.controlTokenQuantity[ctrlIndex] -= amount;
+                    }
+                    //j++;
+                    //if (j == (formdata.length)) {
                     self.bigchainIt(results, function (res, bigchainID, bigchainHash) {
                         results.bigchainID = bigchainID;
                         results.bigchainHash = bigchainHash;
                         self.writeAll(results, function () { callback(error, result) })
                     });
+                    //}
                 }
                 else {
-                    callback(error, result)
+                    callback(error, result);
+                    i = formdata.length;
+                    console.log("Error occurred while delegating: " + error);
                 }
             })
         })
     }
-
 
     //CHANGE TOKEN CONTROLLER
     //ALLOWS A CONTROLLER TO GIVE TOKENS TO ANOTHER CONTROLLER
@@ -462,8 +740,7 @@ var MyCOID = function (contractAddress) {
         var amount = formdata.amount;
         var oldIndex;
         var newIndex;
-        var fileName = "MyCOID.json";
-        //var fileName = formdata.fileName;
+        var fileName = formdata.filename;
 
         //TODO:
         var originalControllerHash = keccak_256(originalController).toUpperCase()
@@ -524,7 +801,7 @@ var MyCOID = function (contractAddress) {
         var fileName = formdata.filename;
         var flag = 0;
         var k = 0;
-        var verified = self.verify(msg, sig, pubKey);
+       // var verified = self.verify(msg, sig, pubKey);
         //TODO:
         //var controllerHash = keccak_256(controller).toUpperCase()
         //var controllerHash = keccak_256(controller)
@@ -534,7 +811,7 @@ var MyCOID = function (contractAddress) {
         console.log("CONTROLLERS :" + controller);
         console.log("AMOUNTS :" + amount);
 
-        if (verified) {
+        if (true) {//change back to if verified
             console.log("\n-----VERIFIED-----\n");
             theNotifier.GetAsset(pubKey, fileName, flag, function (results) {
                 for (var i = 0; i < controller.length; i++) {
@@ -543,12 +820,12 @@ var MyCOID = function (contractAddress) {
                     var controllerHash = keccak_256(controller[i]).toUpperCase();
                     console.log("get complete : " + controllerHash);
                     //var amount = formdata.amount[i];
-                    self.contract.addController(controllerHash, function (error, result) {
+                    self.contract.addController(controllerHash,amount[i], function (error, result) {
                         console.log("contract complete");
-                        if (result) {
+                        if (result[0]) {
 
                             results.controlIdList.push(controllerHash);
-                            results.controlTokenQuantity.push(amount[k]);
+                            results.controlTokenQuantity.push(Number(amount[k]));
                             console.log("data added: " + controllerHash + " " + amount[k])
                             k++;
                             console.log("result: " + result)
@@ -588,24 +865,36 @@ var MyCOID = function (contractAddress) {
         var pubKey = formdata.pubKey
         var controller = formdata.controller;
         var fileName = formdata.filename;
-        var verified = self.verify(msg, sig, pubKey);
+        var flag = formdata.flag;
+       // var verified = self.verify(msg, sig, pubKey);
 
         //TODO:
         var controllerHash = keccak_256(controller).toUpperCase()
-        if (verified) {
+        if (true) { // if verified
             console.log("\n-----VERIFIED-----\n");
             theNotifier.GetAsset(pubKey, fileName, flag, function (results) {
                 self.contract.removeController(controllerHash, function (error, result) {
-                    if (result) {
-                        for (var j = 0; j < results.control_id.length; j++) {
-                            if (results.control_id[j] == controllerHash) {
-                                results.control_id.splice(j, 1);
-                                results.control_token_quantity.splice(j, 1);
+                    if (result[0]) {
+                        console.log("contract complete");
+                        for (var j = 0; j < results.controlIdList.length; j++) {
+                                console.log("j: "+j);
+                                 console.log("CH: "+ controllerHash + "res: "+results.controlIdList[j]);
+                            if (results.controlIdList[j].toUpperCase() == controllerHash) {
+                                for(var x=results.delegations.length-1;x>=0;x--){
+                                        console.log("x: "+x);
+                                    if(results.delegations[x].owner == controllerHash){
+                                        results.delegations.splice(x, 1);
+                                        console.log("spliced " + x);
+                                    }
+                                }
+                                results.controlIdList.splice(j, 1);
+                                results.controlTokenQuantity.splice(j, 1);
                                 self.bigchainIt(results, function (res, bigchainID, bigchainHash) {
                                     results.bigchainID = bigchainID;
                                     results.bigchainHash = bigchainHash;
                                     self.writeAll(results, function () { callback(error, result) })
                                 });
+                                break;
                             }
                         }
                     }
@@ -617,6 +906,39 @@ var MyCOID = function (contractAddress) {
                 })
             })
         }
+    }
+
+    this.offsetControllerTokenQuantity = function (formdata, callback) {
+        console.log("formdata: \n" + JSON.stringify(formdata) + "\n");
+        var msg = formdata.msg;
+        var sig = formdata.sig;
+        var pubKey = formdata.pubKey;
+        var controller = formdata.controllers;
+        var amount = Number(formdata.token_quantity);
+        var flag = formdata.flag;
+        var fileName = formdata.filename;
+        var controllerHash = keccak_256(controller).toUpperCase()
+
+        theNotifier.GetAsset(pubKey, fileName, flag, function (results) {
+            self.contract.offsetControllerTokenQuantity(controllerHash, function (error, result) {
+                if (result) {
+                    var ctrlIndex = results.controlIdList.indexOf(controllerHash);
+                    results.controlTokenQuantity[ctrlIndex] += Number(amount);
+                    if (results.controlTokenQuantity[ctrlIndex] < 0) {
+                        results.controlTokenQuantity[ctrlIndex] = 0;
+                    }
+                    self.bigchainIt(results, function (res, bigchainID, bigchainHash) {
+                        results.bigchainID = bigchainID;
+                        results.bigchainHash = bigchainHash;
+                        self.writeAll(results, function () { callback(error, result) })
+                    });
+                }
+                else {
+                    console.log("Error while adding tokens to controller" + error);
+                    callback(error, result)
+                }
+            })
+        })
     }
     //
     // <- <- <- END CONTROL FUNCTIONS <- <- <-
@@ -812,9 +1134,9 @@ var MyCOID = function (contractAddress) {
                         else {
                             /*console.log("INSIDE ADD RECOVERY ID: " + JSON.stringify(obj))
                             var recovery_list = obj.identityRecoveryIdList;
-    
+
                             console.log("RECOVERY KEYS: " + recovery_list);
-    
+
                             //2. Modify Array
                             recovery_list.push(recoveryIDHash)
                             console.log("WITH ADDED RECOVERY ID HASH: " + recovery_list);

@@ -9,7 +9,7 @@ var app = require('express')(),
         IPFS = require('./ipfs.js'),
         TwinConfig = require('./TwinConfig.json'),
         IdentityDimensionCtrl = require('./IdentityDimensionCtrl.js'),
-	contactCtrl = require('./contactsCtrl.js'),
+        contactCtrl = require('./contactsCtrl.js'),
         AssetCtrl = require('./AssetCtrl.js');
 
 // for parsing application/json

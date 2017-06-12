@@ -1,41 +1,38 @@
 contract ControlToken
 {
-    //helper arrays
-    bytes32[] public controllerHashes;
-    bytes32[] public delegateeHashes;
-    uint[] public tokensOwned;
+
+    //No need to keep track of giving the owners tokens
+    //Tokens are infinite and created on the fly
+
+    bytes32 chairperson;
+
+    struct delegation
+    {
+        bytes32 owner;
+        bytes32 delegatee;
+        uint amount;
+        uint expiration;
+    }
 
     //avoid looping to find first empty index when unnecessary in arrays
     uint controllerHashesIndexer;
-    uint delegateeHashesIndexer;
     uint tokensOwnedIndexer;
 
-
-    //all helper arrays
-    uint[][] public temp;
-    uint[] public temp2;
+    delegation[] delegations;
+    bytes32[10] owners;
+    bytes32[] public controllerHashes;
+    uint[] public tokensOwned;
     bytes32[] public tempBytes;
-    uint[] public indexList;
 
-    //the delegatee relationship array
-    uint[][] public relations;
-    //Dimension one is the controller hash
-    //Dimension two is the delegatee hash
-    //The value (uint) is the amount of tokens they have been delegated
-
-
-
-    //CONSTRUCTOR
-    function ControlToken(bytes32[10] theControllerHashes, uint[10] theTokensOwned)
+    //CONSTRUCTOR:
+    //*There are only ten owners, because a core identity has maximum ten owners.
+    function ControlToken(bytes32[10] theOwnersHash, bytes32[10] theControllerHashes, uint[10] theTokensOwned)
     {
+        owners = theOwnersHash;
+        chairperson = sha3(msg.sender);
+
         controllerHashesIndexer = 0;
-        delegateeHashesIndexer = 0;
         tokensOwnedIndexer = 0;
-
-        //push values into array
-        //set the indexer to the first empty value in the arrays:
-        //QUESTION: is "" the null bytes32?
-
 
         //set indexer for controllerHashes:
         for(uint i = 0; i < theControllerHashes.length; i++)
@@ -56,6 +53,13 @@ contract ControlToken
                 tokensOwnedIndexer++;
             }
         }
+
+    }//end constructor
+
+    //testing purposes
+    function getOwnersList() returns (bytes32[10] list)
+    {
+        list = owners;
     }
 
     function getControllersList() returns (bytes32[10] list)
@@ -80,201 +84,319 @@ contract ControlToken
     }
 
 
-    //Revoke a Delegation
-    function revokeDelegation(bytes32 controllerHash, bytes32 delegateeHash, uint amount) returns (bool success)
+    modifier access(address addr)
     {
-
-        success = false;
-
-        if(amount < 0)
+        //only this contract and the chairperson can call this contract
+        if(sha3(addr) != chairperson && addr != address(this))
         {
             throw;
         }
+        _
+    }
 
-        uint indexC; //index of controller
-        bool wasFoundC; //if the controller was found
+    //This resyncs the owner list
+    //IdentityDimensionControl to get owners from coid and set it here
+    function resetOwners(bytes32[10] newOwners) access(msg.sender)
+    {
+        owners = newOwners;
+    }
 
-        uint indexD; //index of delegatee
-        bool wasFoundD; //if the delegatee was found
 
-        (indexC,wasFoundC) = findIndexOfController(controllerHash);
-        (indexD,wasFoundD) = findIndexOfDelegatee(delegateeHash);
+    //Helper function. Tells if the owner exists. The index returned is their position in the array, and is relevant if exists = true.
+    //INPUT: ownerHash.
+    function ownerExists(bytes32 ownerHash) access(msg.sender) returns (bool exists, uint index)
+    {
+        exists = false;
+        index = 0;
 
-         if(wasFoundD && wasFoundC)
-         {
-            success = true;
-
-            uint currentAmount = relations[indexC][indexD];
-            if(amount >= currentAmount)
+        for(uint i = 0; i < owners.length; i++)
+        {
+            //checking exists == false below saves lookups because:
+            //the way the compiler works is if the first condition in an "and" statement is false,
+            //it won't check the second
+            if(exists == false && owners[i] == ownerHash)
             {
-                relations[indexC][indexD] = 0;
+                exists = true;
+                index = i;
+            }
+        }
+    }
+
+    //This function adds a delegation to our delegation arrays.
+    function delegate(bytes32 owner, bytes32 delegatee, uint amount, uint timeFrame) access(msg.sender) returns (bool success)
+    {
+
+        //only allow the delegation if the owner has tokens and exists:
+        uint index = 0;
+        bool isController = false;
+        (success,index) = this.ownerExists(owner);
+        if(success == false){
+            (index,success) = this.findIndexOfController(owner);
+            isController = true;
+            if(tokensOwned[index]<amount){
+                success = false;
+            }
+        }
+
+        if(success)
+        {
+
+            //create the delegation on the fly
+            //now do the delegation
+            delegation memory toAdd;
+
+            uint expiration = now + timeFrame;
+
+            //set params
+            toAdd.owner = owner;
+            toAdd.delegatee = delegatee;
+            toAdd.amount = amount;
+            toAdd.expiration = expiration;
+
+            //this check necessary to avoid out of bounds error in looping:
+            if(delegations.length == 0)
+            {
+                //push to array:
+                delegations.push(toAdd);
+                if(isController){
+                    tokensOwned[index] -= amount;
+                }
             }
             else
             {
-                relations[indexC][indexD] = relations[indexC][indexD] - amount;
-            }
-         }
+                //find the first empty index in the array (if it exists)
+                bool emptyIndex = false;
+                uint Index = 0;
 
-         clearUnusedDelegatees();
-
-    }
-
-    function spendMyTokens(bytes32 delegateeHash, uint amount)
-    {
-
-        uint indexD; //index of delegatee
-        bool wasFoundD; //if the delegatee was found
-        (indexD,wasFoundD) = findIndexOfDelegatee(delegateeHash);
-
-        if(wasFoundD)
-        {
-            if(myAmount(delegateeHash) >= amount)
-            {
-                //spend the tokens (i.e. take away delegations from controllers)
-                bool stop = false;
-                uint indexer = 0;
-                uint amountLeftToSpend = amount;
-                while(stop == false)
+                for(uint i = 0; i < delegations.length; i++)
                 {
-                    if(relations[indexer][indexD] > amountLeftToSpend)
+                    //checking emptyIndex first saves unnecessary lookups if something is already found
+                    if(emptyIndex && (delegations[i].amount == 0 || delegations[i].expiration >= now))
                     {
-                        relations[indexer][indexD] = relations[indexer][indexD] - amountLeftToSpend;
-
-                        stop = true;
+                        emptyIndex = true;
+                        Index = i;
                     }
-                    else
-                    {
-                        uint val = relations[indexer][indexD];
+                }
 
-                        amountLeftToSpend = amountLeftToSpend - val;
-                        relations[indexer][indexD] = 0;
-
+                if(emptyIndex)
+                {
+                    delegations[Index] = toAdd;
+                }
+                else
+                {
+                    delegations.push(toAdd);
+                    if(isController){
+                        tokensOwned[index] -= amount;
                     }
-                    indexer++;
                 }
             }
         }
-
-        clearUnusedDelegatees();
     }
 
 
-
-    //Get how many tokens a delegatee has
-    function myAmount(bytes32 delegateeHash) returns (uint amount)
+    //This function revokes delegations from a owner to a delegatee.
+    //If the flag all is set to true, then it revokes through all dimensions, all tokens from that delegatee to the owner
+    //In that case, the caller of the function can set amount and dimension null.
+    //If the flag all is set to false, then it revokes the amount in the specified dimension.
+    //IMPORTANT: since presumably the tokens are given on some agreement/payment, perhaps this function should be implemented by a DAO court
+    function revokeDelegation(bytes32 owner, bytes32 delegatee, uint amount, bool all) access(msg.sender) returns (bool success)
     {
-        uint indexD; //index of delegatee
-        bool wasFoundD; //if the delegatee was found
-        (indexD,wasFoundD) = findIndexOfDelegatee(delegateeHash);
+        success = false;
 
-        amount = 0;
-
-        if(wasFoundD)
+        if(all)//if the flag is true, just revoke everything from the owner
         {
-            for(uint i = 0; i < controllerHashesIndexer; i++)
+            if(delegations.length > 0)
             {
-                amount = amount + relations[i][0];
-            }
-        }
-    }
-
-
-
-
-    //Delegation of a Token to a User
-    function delegate(bytes32 controllerHash, bytes32 delegateeHash, uint amount) returns (bool success)
-    {
-
-        if(amount <= 0)
-        {
-            throw;
-        }
-
-        bool isController = true;
-
-        uint indexC; //index of controller
-        bool wasFoundC; //if the controller was found
-
-        uint indexD; //index of delegatee
-        bool wasFoundD; //if the delegatee was found
-
-        (indexC, wasFoundC) = findIndexOfController(controllerHash);
-
-        if(!wasFoundC)
-        {
-            //controller does not exist
-            isController = false;
-        }
-
-        (indexD,wasFoundD) = findIndexOfDelegatee(delegateeHash);
-
-        if(!wasFoundD)
-        {
-
-
-            //update relations list
-            temp.length = 0;
-            for(uint p = 0; p < controllerHashes.length; p++)
-            {
-              temp2.length = 0;
-              for(uint z = 0; z < delegateeHashes.length; z++)
-              {
-                    if(delegateeHashes.length*controllerHashes.length > 0)//make sure they have something
+                for(uint i = 0; i < delegations.length; i++)
+                {
+                    if(delegations[i].owner == owner && delegations[i].delegatee == delegatee)
                     {
-                        temp2.push(relations[p][z]);
+                        clearDelegation(i); //this function returns the tokens to the owner
                     }
-              }
-
-              temp2.push(0);
-
-              temp.push(temp2);
+                }
             }
-            relations = temp;
 
-
-            //add them to the list only after
-            delegateeHashes.push(delegateeHash);
-            indexD = delegateeHashes.length-1;
-            delegateeHashesIndexer++;
-
-        }
-
-        if(!isController)
-        {
-            //deny delegation--you must be a controller to delegate
-            success = false;
         }
         else
         {
-            //check amount they have left to delegate
-            uint availableAmount = tokensOwned[indexC] - amountDelegated(controllerHash);
+            //logic below is similar to the function spendTokens
 
-            if(availableAmount < amount)
+            //first make sure they have the amount FROM that owner:
+            uint actualAmount = 0;
+
+            if(delegations.length > 0)
             {
-                //deny delegation -- they do not have enough funds
-                success = false;
+                for(uint z = 0; z < delegations.length; z++)
+                {
+                    if(delegations[z].delegatee == delegatee && delegations[z].owner == owner)
+                    {
+                        actualAmount = actualAmount + delegations[z].amount;
+                    }
+                }
             }
-            else
-            {
-                success = true;
 
-                //set added amount in relationship array
-                relations[indexC][indexD] = relations[indexC][indexD] + amount;
+            //if they have less than the owner wants to remove, just remove how much they have
+            if(actualAmount < amount)
+            {
+                amount = actualAmount;
+            }
+
+            if(amount > 0)
+            {
+
+                bool keepGoing = true;
+
+                uint index=0;
+                while(keepGoing)
+                {
+                    //first find index in delegations with closest expiration.
+                    //uint index = 0;
+                    //This correctly sets var index as the 1st available owner
+                    for(uint n=0;n<delegations.length;n++){
+                        if(delegations[n].owner == owner){
+                                index=n;
+                                break;
+                        }
+                    }
+
+                    //size of delegations must be greater than zero because actualAmount != 0
+                    //could probably initialize k=index to save cycles later
+                    for(uint k = 0; k < delegations.length; k++)
+                    {
+                        if(delegations[k].owner == owner)
+                        {
+                            if(delegations[k].expiration <= delegations[index].expiration)
+                            {
+                                index = k;
+                            }
+                        }
+                    }
+
+                    //now spend the amount
+                    if(amount >= delegations[index].amount)
+                    {
+                        amount = amount - delegations[index].amount;
+                        clearDelegation(index);//this function clears and returns coins back to owner
+                    }
+                    else
+                    {
+                        //no need to give tokens back to owner--they are infinite and created on the fly
+
+                        //just subtract remaining amount from the current delegation amount
+                        delegations[index].amount = delegations[index].amount - amount;
+
+                        //now set amount = 0 since we are done
+                        amount = 0;
+
+                    }
+
+                    if(amount == 0)
+                    {
+                        keepGoing = false;
+                    }
+
+                }
+
+            }
+        }
+
+        success = true;
+    }
+
+
+
+
+    //spends the tokens specified by amount, Bearing in mind
+    //that we want to spend the ones closest to expiration first.
+    function spendMyTokens(bytes32 delegatee, uint amount) access(msg.sender) returns (bool success)
+    {
+        //this is the only place to clear expirations.
+        //it is accurate for the expiration within abs[(block function was called) - (block after rest of code is executed in this function)]
+        clearExpirations();
+
+        success = false;
+
+        //first make sure they have the relevant amount:
+        uint actualAmount = myAmount(delegatee);
+
+        if(actualAmount >= amount && amount > 0)
+        {
+            success = true;
+            bool keepGoing = true;
+            uint index=0;
+
+            while(keepGoing)
+            {
+                //first find index in delegations with closest expiration.
+               // uint index = 0;
+
+                for(uint n=0;n<delegations.length;n++){
+                        if(delegations[n].delegatee == delegatee){
+                                index=n;
+                                break;
+                        }
+                    }
+
+                //size of delegations must be greater than zero because actualAmount != 0
+                for(uint k = 0; k < delegations.length; k++)
+                {
+                    if(delegations[k].expiration <= delegations[index].expiration && delegations[k].delegatee == delegatee && delegations[k].amount > 0)
+                    {
+                        index = k;
+                    }
+                }
+
+                //now spend the amount
+                if(amount >= delegations[index].amount)
+                {
+                    amount = amount - delegations[index].amount;
+                    clearDelegation(index);//this function clears and returns coins back to owner
+                }
+                else
+                {
+                    //just subtract remaining amount from the current delegation amount
+                    delegations[index].amount = delegations[index].amount - amount;
+
+                    //now set amount = 0 since we are done
+                    amount = 0;
+
+                }
+
+                if(amount == 0)
+                {
+                    keepGoing = false;
+                }
 
             }
 
         }
-
-        //clearUnusedDelegatees();
-
     }
 
+
+    //helper function: tells you how many tokens a delegatee has for a given identityDimension
+    //in order to access a specific descriptor
+    function myAmount(bytes32 delegatee) access(msg.sender) returns (uint amount)
+    {
+
+        amount = 0;
+
+        //check size to avoid an out-of-bounds error
+        if(delegations.length > 0)
+        {
+            for(uint i = 0; i < delegations.length; i++)
+            {
+                if(delegations[i].delegatee == delegatee )
+                {
+                    amount = amount + delegations[i].amount;
+                }
+            }
+        }
+    }
 
 
     //Give a controller your token:
     function changeTokenController(bytes32 originalControllerHash, bytes32 newControllerHash, uint amount) returns (bool success)
     {
-
         if(amount <= 0)
         {
             throw;
@@ -294,7 +416,7 @@ contract ControlToken
         //only proceed if they are both controllers
         if(foundOrigC && foundNewC)
         {
-            success = true;
+            //success = true;
             //make sure original controller possesses amount he wants to give
             if(tokensOwned[indexOrigC] >= amount)
             {
@@ -302,7 +424,7 @@ contract ControlToken
 
                 tokensOwned[indexOrigC] = tokensOwned[indexOrigC] - amount;
                 tokensOwned[indexNewC] = tokensOwned[indexNewC] + amount;
-
+/*
                 //redistribute amount delegated control tokens
                 //if they
 
@@ -312,58 +434,53 @@ contract ControlToken
                 uint amountLeft = amount;
                 while(stop && indexer < delegateeHashes.length-1&&false==true)
                 {
-                    if(relations[indexOrigC][indexer] > 0)
+                    if(relations[indexOrigC][indexer].amount > 0)
                     {
-                        if(relations[indexOrigC][indexer] > amountLeft)
+                        if(relations[indexOrigC][indexer].amount > amountLeft)
                         {
                             //just switch the amount left and we are done
-                            relations[indexOrigC][indexer] = relations[indexOrigC][indexer] - amountLeft;
-                            relations[indexNewC][indexer] = relations[indexNewC][indexer] + amountLeft;
+                            relations[indexOrigC][indexer].amount = relations[indexOrigC][indexer].amount - amountLeft;
+                            relations[indexNewC][indexer].amount = relations[indexNewC][indexer].amount + amountLeft;
 
                             stop = true;
                         }
                         else
                         {
                             //current posession is less than or equal to the amount left
-                            uint currentPosession = relations[indexOrigC][indexer];
+                            uint currentPosession = relations[indexOrigC][indexer].amount;
                             amountLeft = amountLeft - currentPosession;
 
                             //balance transfer
-                            relations[indexOrigC][indexer] = 0;
-                            relations[indexNewC][indexer] = amountLeft;
+                            relations[indexOrigC][indexer].amount = 0;
+                            relations[indexNewC][indexer].amount = amountLeft;
                         }
                     }
                     indexer++;
                 }
-
+*/
             }
         }
     }
 
     //Returns Amount Delegated by Controller
-    function amountDelegated(bytes32 controllerHash) returns (uint val)
+    function amountDelegated(bytes32 controllerHash) returns (uint amount)
     {
-            //calculate how many they have delegated
+        amount=0;
 
-            val = 0;
-
-            uint indexC; //index of controller
-            bool foundC; //if the controller was found
-
-            (indexC, foundC) = findIndexOfController(controllerHash);
-
-            if(foundC)
+        //check size to avoid an out-of-bounds error
+        if(delegations.length > 0)
+        {
+            for(uint i = 0; i < delegations.length; i++)
             {
-                //loop through all the delegations:
-
-                for(uint i = 0; i < relations[indexC].length; i++)
+                if(delegations[i].owner == controllerHash )
                 {
-                    val = val + relations[indexC][i];
+                    amount = amount + delegations[i].amount;
                 }
             }
+        }
     }
 
-    function addController(bytes32 controllerHash) returns (bool success)
+    function addController(bytes32 controllerHash,uint amount) returns (bool success)
     {
         success = false;
 
@@ -381,23 +498,11 @@ contract ControlToken
             controllerHashesIndexer++;
 
             //start them off with zero coins (later, someone can delegate them):
-            tokensOwned.push(0);
+            tokensOwned.push(amount);
             tokensOwnedIndexer++;
 
             success = true;
-
-            //first create zero delegations:
-            temp2.length = 0;
-            for(uint i = 0; i < delegateeHashes.length; i++)
-            {
-                temp2.push(0);
-            }
-
-            //now put this in the array:
-            relations.push(temp2);
-
         }
-
     }
 
     function removeController(bytes32 controllerHash) returns (bool success, uint minIndex)
@@ -416,84 +521,39 @@ contract ControlToken
         }
         else
         {
-            //find controller with least amount of tokens
-            if(controllerHashes.length > 1)
+            tokensOwned[indexC] = 0;
+            controllerHashes[indexC] = 0;
+            //check size to avoid an out-of-bounds error
+            if(delegations.length > 0)
             {
-                //uint minIndex;
-                if(indexC == 0)
+                for(uint i = 0; i < delegations.length; i++)
                 {
-                    minIndex = 1;
-                }
-                else
-                {
-                    minIndex = 0;
-                }
-
-                for(uint i = 0; i < controllerHashes.length; i++)
-                {
-
-                    if(i != indexC && (tokensOwned[minIndex] > tokensOwned[i]))
+                    if(delegations[i].owner == controllerHash )
                     {
-                        minIndex = i;
+                        delegations[i].owner = 0x0;
+                        delegations[i].delegatee = 0x0;
+                        delegations[i].amount = 0;
+                        delegations[i].expiration = 0;
                     }
                 }
-
-                tokensOwned[minIndex] = tokensOwned[minIndex] + tokensOwned[indexC];
-                tokensOwned[indexC] = 0;
-
-                for(uint j = 0; j < delegateeHashes.length; j++)
-                {
-                    if(delegateeHashes.length > 0)
-                    {
-                        //give the tokens from indexC to minIndex:
-                        relations[minIndex][j] += relations[indexC][j];
-                        relations[indexC][j] = 0;
-                    }
-                }
-
-
-            }
-            else
-            {
-                //there was only one controller
-                for(uint k = 0; k < delegateeHashes.length;k++)
-                {
-                    if(delegateeHashes.length > 0)
-                    {
-                        relations[indexC][k] = 0;
-                    }
-                }
-
-
             }
 
-            //remove from relations, tokensOwned, controllerHashes:
+        }
+    }
 
-            //update relations:
-            temp.length = 0;
-            for(uint r = 0; r <  controllerHashes.length; r++)
-            {
-                    if(r != indexC)
-                    {
-                        temp2.length = 0;
-                        for(uint p = 0; p < delegateeHashes.length; p++)
-                        {
-                            if(delegateeHashes.length*controllerHashes.length > 0)//both nonzero
-                            {
-                                temp2.push(relations[r][p]);
-                            }
-                        }
+    function offsetControllerTokenQuantity(bytes32 controllerHash, int val)returns (bool success){
+        success = false;
+        uint index = 0;
+        uint y = 0;
 
-                        if(temp2.length > 0)
-                        {
-                            temp.push(temp2);
-                        }
-                     }
+        (index,success) = findIndexOfController(controllerHash);
+        if(success){
+            int x = int(tokensOwned[index]);
+            x += val;
+            if(x<0){
+                x = 0;
             }
-            relations = temp;
-
-            removeIndexFromTokensArray(indexC);
-            removeIndexFromControllerArray(indexC);
+            tokensOwned[index] = uint(x);
 
         }
 
@@ -516,122 +576,43 @@ contract ControlToken
 
     }
 
-    //Returns Index of Delegatee in delegateeHashes (which references relations array)
-    function findIndexOfDelegatee(bytes32 delegateeHash) returns (uint index, bool wasFound)
+    //helper function: clears the delegation at the index in the array
+    //also gives the tokens back to the owner if they are still a owner
+    //if they are no longer a owner, the tokens are lost.
+    function clearDelegation(uint index) internal
     {
-        wasFound = false;
-        index = 0;
+        bool found = false;
+        uint ctrlIndex = 0;
+        //grab the owner and their amount before you clear them:
+        bytes32 owner = delegations[index].owner;
+        uint amount = delegations[index].amount;
+        (ctrlIndex,found) = findIndexOfController(owner);
+        if(found){
+            tokensOwned[ctrlIndex] = tokensOwned[ctrlIndex] + amount;
+        }
 
-        for(uint i = 0; i < delegateeHashes.length; i++)
+        delegations[index].owner = 0x0;
+        delegations[index].delegatee = 0x0;
+        delegations[index].amount = 0;
+        delegations[index].expiration = 0;
+    }
+
+    //helper function: clears expirations.
+    function clearExpirations() internal
+    {
+        //first check to avoid an out-of-bounds error
+        if(delegations.length > 0)
         {
-            if(delegateeHashes.length > 0)
+            for(uint i = 0; i < delegations.length; i++)
             {
-                if(!wasFound && delegateeHashes[i] == delegateeHash)
+                if(now > delegations[i].expiration)
                 {
-                    wasFound = true;
-                    index = i;
+                    //recall clearDelegation gives the tokens back to the owner,
+                    //so no need to do that here.
+                    clearDelegation(i);
                 }
             }
         }
-
     }
-
-    function removeIndexFromControllerArray(uint index)
-    {
-        tempBytes.length = 0;
-        for(uint i = 0; i < controllerHashes.length; i++)
-        {
-            if(i != index)
-            {
-                tempBytes.push(controllerHashes[i]);
-            }
-        }
-        controllerHashes = tempBytes;
-        controllerHashesIndexer--;
-    }
-
-    function removeIndexFromTokensArray(uint index)
-    {
-        temp2.length = 0;
-        for(uint i = 0; i < tokensOwned.length; i++)
-        {
-            if(i != index)
-            {
-                temp2.push(tokensOwned[i]);
-            }
-        }
-        tokensOwned = temp2;
-        tokensOwnedIndexer--;
-    }
-
-    function removeIndexFromDelegateesArray(uint index)
-    {
-        tempBytes.length = 0;
-        for(uint i = 0; i < delegateeHashes.length; i++)
-        {
-            if(i != index)
-            {
-                tempBytes.push(delegateeHashes[i]);
-            }
-        }
-        delegateeHashes = tempBytes;
-        //delegateeHashesIndexer--; DONT DO THIS HERE
-    }
-
-
-    //Clears delegatees who are not delegated anything from memory
-    function clearUnusedDelegatees()
-    {
-        // indexList.length = 0;//these represent indecies of delegates with 0 tokens
-
-        // if(delegateeHashes.length*controllerHashes.length > 0)//i.e. they both are nonzero
-        // {
-        //     for(uint m = 0; m < delegateeHashes.length; m++)
-        //     {
-        //         //find in relations
-        //         if(myAmount(delegateeHashes[m]) == 0)
-        //         {
-        //             indexList.push(m);
-
-        //         }
-        //     }
-
-        //     uint subtracter = 0;
-        //     for(uint z = 0; z < indexList.length; z++)
-        //     {
-        //         removeIndexFromDelegateesArray(z - subtracter);
-        //         subtracter = subtracter + 1;
-        //         delegateeHashesIndexer = delegateeHashesIndexer - 1;
-        //     }
-
-        //     //now update relations
-        //     temp.length = 0;
-        //     for(uint k = 0; k < controllerHashes.length; k++)
-        //     {
-        //         temp2.length = 0; //delegatees
-        //         for(uint i = 0; i < delegateeHashes.length; i++)
-        //         {
-        //             bool isInIndexList = false;
-        //             for(uint r = 0; r < indexList.length; r++)
-        //             {
-        //                 if(r == i)
-        //                 {
-        //                     isInIndexList = true;
-        //                 }
-        //             }
-
-        //             if(isInIndexList == false)
-        //             {
-        //                 temp2.push(temp[k][i]);
-        //             }
-        //         }
-
-        //         temp.push(temp2);
-        //     }
-        // }
-
-    }
-
-
 }
 

@@ -118,15 +118,15 @@ contract CoreIdentity
         complete = false;
         if(identityRecoveryIdListStruct.identityRecoveryIdList[9] == 0x0 || identityRecoveryIdListStruct.identityRecoveryIdList[9] == 0){
             //set recovery struct here
-	    for(var i=0;i<10;i++){
+            for(var i=0;i<10;i++){
             if(theIdentityRecoveryList != 0x0 && theIdentityRecoveryList != 0 && identityRecoveryIdListStruct.identityRecoveryIdList[i] == 0x0){
                 identityRecoveryIdListStruct.identityRecoveryIdList[i] = theIdentityRecoveryList;
                 complete = true;
             }
-	    }
+            }
         }
         if(theRecoveryCondition != 0x0){
-            identityRecoveryIdListStruct.recoveryCondition = theRecoveryCondition; 
+            identityRecoveryIdListStruct.recoveryCondition = theRecoveryCondition;
             complete = true;
         }
         testIt = 5;
@@ -153,7 +153,7 @@ contract CoreIdentity
             }
         }
         if(theRecoveryCondition != 0x0){
-            identityRecoveryIdListStruct.recoveryCondition = theRecoveryCondition; 
+            identityRecoveryIdListStruct.recoveryCondition = theRecoveryCondition;
             complete = true;
         }
         testIt = 6;
@@ -170,9 +170,9 @@ contract CoreIdentity
         myUtils = new Utils();
         (ownershipStruct.ownerIDList, controlStruct.controlIDList) = myUtils.AtoSubsetOfB(owners, controllers);
 
-	//TODO: REMOVE AND UNCOMMENT BELOW
-	ownershipStruct.ownershipID = 0x0;
-	controlStruct.controlTokenID = 0x0;
+        //TODO: REMOVE AND UNCOMMENT BELOW
+        ownershipStruct.ownershipID = 0x0;
+        controlStruct.controlTokenID = 0x0;
 
        // ownershipStruct.ownershipID = calculateOwnershipID(ownershipStruct.ownerIDList,uniqueIdStruct.uniqueID);
       //  controlStruct.controlTokenID = calculateControlID(controlStruct.controlIDList,uniqueIdStruct.uniqueID);
@@ -184,7 +184,7 @@ contract CoreIdentity
         OT.setOwnershipTokenVals(ownershipStruct.ownerIDList,ownershipStruct.ownershipStakes);
 
          //instantiate Control tokens:
-        CT = new ControlToken(controlStruct.controlIDList,controlStruct.controlTokensOwned);
+        CT = new ControlToken(owners,controllers,controlStruct.controlTokensOwned);
 
         testIt = 34;
    }
@@ -194,33 +194,33 @@ contract CoreIdentity
 
    function isOwner(bytes32 ownerHash) returns (bool result)
    {
-	result = false;
-	for(uint i = 0; i < ownershipStruct.ownerIDList.length; i++)
-	{
-		if(ownershipStruct.ownerIDList[i] == ownerHash)
-		{
-			result = true;
-		}
-	}
+        result = false;
+        for(uint i = 0; i < ownershipStruct.ownerIDList.length; i++)
+        {
+                if(ownershipStruct.ownerIDList[i] == ownerHash)
+                {
+                        result = true;
+                }
+        }
    }
    function isController(bytes32 controllerHash) returns (bool result)
    {
-	result = false;
-	for(uint i = 0; i < controlStruct.controlIDList.length; i++)
-	{
-		if(controlStruct.controlIDList[i] == controllerHash)
-		{	
-			result = true;
-		}
-	}
+        result = false;
+        for(uint i = 0; i < controlStruct.controlIDList.length; i++)
+        {
+                if(controlStruct.controlIDList[i] == controllerHash)
+                {
+                        result = true;
+                }
+        }
    }
    function getOwners() returns (bytes32[10] result)
    {
-	result = ownershipStruct.ownerIDList;
+        result = ownershipStruct.ownerIDList;
    }
    function getControllers() returns (bytes32[10] result)
    {
-	result = controlStruct.controlIDList;
+        result = controlStruct.controlIDList;
    }
 
    //for debugging
@@ -238,9 +238,9 @@ contract CoreIdentity
 
 
    //START CONTROL FUNCTIONS
-   function revokeDelegation(bytes32 controllerHash, bytes32 delegateeHash, uint amount) returns (bool success)
+   function revokeDelegation(bytes32 controllerHash, bytes32 delegateeHash, uint amount, bool all) returns (bool success)
    {
-       success = CT.revokeDelegation(controllerHash,delegateeHash,amount);
+       success = CT.revokeDelegation(controllerHash,delegateeHash,amount,all);
    }
    function spendMyTokens(bytes32 delegateeHash, uint amount) returns (bool result)
    {
@@ -250,9 +250,9 @@ contract CoreIdentity
    {
        amount = CT.myAmount(delegateeHash);
    }
-   function delegate(bytes32 controllerHash, bytes32 delegateeHash, uint amount) returns (bool success)
+   function delegate(bytes32 controllerHash, bytes32 delegateeHash, uint amount,uint timeFrame) returns (bool success)
    {
-       success = CT.delegate(controllerHash,delegateeHash,amount);
+       success = CT.delegate(controllerHash,delegateeHash,amount,timeFrame);
    }
    function changeTokenController(bytes32 originalControllerHash, bytes32 newControllerHash, uint amount) returns (bool success)
    {
@@ -265,14 +265,23 @@ contract CoreIdentity
        }
 
    }
+   function offsetControllerTokenQuantity(bytes32 controllerHash, int val) returns (bool success){
+
+        success = CT.offsetControllerTokenQuantity(controllerHash,val);
+        if(success)
+        {
+           controlStruct.controlTokensOwned = CT.getControllerVal();
+           controlStruct.controlIDList = CT.getControllersList();
+        }
+   }
    function amountDelegated(bytes32 controllerHash) returns (uint val)
    {
        val = CT.amountDelegated(controllerHash);
    }
-   function addController(bytes32 controllerHash) returns (bytes32[10] listo)
+   function addController(bytes32 controllerHash,uint amount) returns (bool success,bytes32[10] listo)
    {
-	
-        bool success = false;
+
+        success = false;
        //TODO: make sure the person ADDING controllerHash is in ownersList!!
         //The oraclizer will have to verify this
 //       for(uint i=0; i< ownershipStruct.ownerIDList.length; i++){
@@ -281,7 +290,7 @@ contract CoreIdentity
 //               success = CT.addController(controllerHash);
 //          }
 //       }
-       success = CT.addController(controllerHash);
+       success = CT.addController(controllerHash,amount);
        if(success)
        {
         //TODO: update controller list in COID and amounts
@@ -421,22 +430,22 @@ contract CoreIdentity
             bytes32 myVal;
             uint j = 0;
 
-	    if(hashMe.length > 1)
-	    {
-            	for(uint i = 1; i < hashMe.length; i++)
-            	{
-                	myVal = hashMe[i];
+            if(hashMe.length > 1)
+            {
+                for(uint i = 1; i < hashMe.length; i++)
+                {
+                        myVal = hashMe[i];
 
-                	j = i -1;
-                	while(j >= 0 && hashMe[j] > myVal)
-                	{
-                        	hashMe[j+1] = hashMe[j];
-                        	j = j -1;
-                	}
+                        j = i -1;
+                        while(j >= 0 && hashMe[j] > myVal)
+                        {
+                                hashMe[j+1] = hashMe[j];
+                                j = j -1;
+                        }
 
-                	hashMe[j+1] = myVal;
-            	}
-	    }
+                        hashMe[j+1] = myVal;
+                }
+            }
 
             ownershipID = sha3(uniqueID,hashMe);
    }
@@ -457,23 +466,23 @@ contract CoreIdentity
 
             bytes32 myVal;
             uint j = 0;
-	    
-	    if(hashMe.length > 1)
-	    {
-            	for(uint i = 1; i < hashMe.length; i++)
-            	{
-                	myVal = hashMe[i];
 
-               		j = i -1;
-                	while(j >= 0 && hashMe[j] > myVal)
-                	{
-                        	hashMe[j+1] = hashMe[j];
-                        	j = j -1;
-                	}
+            if(hashMe.length > 1)
+            {
+                for(uint i = 1; i < hashMe.length; i++)
+                {
+                        myVal = hashMe[i];
 
-                	hashMe[j+1] = myVal;
-            	}
-	    }
+                        j = i -1;
+                        while(j >= 0 && hashMe[j] > myVal)
+                        {
+                                hashMe[j+1] = hashMe[j];
+                                j = j -1;
+                        }
+
+                        hashMe[j+1] = myVal;
+                }
+            }
 
             controlID = sha3(uniqueID,hashMe);
 

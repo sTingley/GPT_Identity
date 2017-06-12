@@ -1,3 +1,4 @@
+
 //The same strategy used in IdentityDimension is used here for arrays:
 //When you delete something, don't restructure the size; set the value(s) null.
 //When you add something, find the first null index.
@@ -23,7 +24,7 @@ contract IdentityDimensionControlToken
         uint amount;
         string dimension;
         uint expiration;
-        string accessCategories;//if it is null, then the delegation is for all attributes
+        string accessCategories;//if it is null, then the delegation is for all dimensions
                                 //else, it is a list with delimiter comma
     }
 
@@ -342,7 +343,77 @@ contract IdentityDimensionControlToken
     //helper function, assumes the delegation array has a non-expired delegation at index k
     //helper function, assumes the delegation array has a non-expired delegation at index k
     //tells you if a delegation at index k allows access to a descriptor
-    function allowsDescriptor(uint k, string descriptor) internal returns (bool allowed)
+    function allowsDescriptor(uint k, string descriptor) returns(bool allowed) {
+
+
+        allowed = false;
+        uint x = 0;
+        //delegations[k].accessCategories;
+        if (sha3(delegations[k].accessCategories) == sha3("")) {
+            //if it is empty, then it allows access to every descriptor
+            allowed = true;
+        } else {
+            //delimiter is a comma
+            bytes _wholeString = bytes(delegations[k].accessCategories);
+            bytes memory _toFind = bytes(descriptor);
+            bytes memory temp  =  _wholeString;
+            for (x = 0; x < temp.length; x++) {
+                            delete temp[x];
+                        }
+            // for string length test
+            uint begin = 0;
+            uint end = 0;
+            uint index = 0;
+            uint commaOffset = 0;
+            // 0123456789
+            // test,hi,te,col,ye
+            if (_wholeString.length > 1) {
+                //loop through to find matches
+                for (uint i = 0; i < _wholeString.length; i++) {
+
+                    if (_wholeString[i] == "," || i == _wholeString.length - 1) {
+                        if (i == _wholeString.length - 1) {
+                            temp[index] = (_wholeString[i]);
+                        }
+
+                        begin = end;
+                        if (begin == 0 || i == _wholeString.length - 1) { commaOffset = 0; }
+                        else { commaOffset = 1; }
+                        end = i;
+                        if (begin == 0 && i == _wholeString.length - 1) { end++; }
+                        index = 0;
+                        if (_toFind.length == end - begin - commaOffset) {
+                            uint j = 0;
+                            for ( x = 0; x < _toFind.length; x++) {
+                                if (_toFind[x] == temp[x]) {
+                                    j++;
+                                }
+                                if (j == _toFind.length) {
+                                    allowed = true;
+                                }
+                            }
+                        }
+
+                        for (x = 0; x < temp.length; x++) {
+                            delete temp[x];
+                        }
+                    } else {
+                        if (!allowed) {
+                            temp[index] = (_wholeString[i]);
+                            index++;
+                        }
+                    }
+                }
+            } else {
+                //since _wholeString cannot be null, length is 1
+                allowed = (sha3(descriptor) == sha3(delegations[k].accessCategories));
+            }
+        }
+    }
+
+
+
+/*    function allowsDescriptor(uint k, string descriptor) internal returns (bool allowed)
     {
         allowed = false;
 
@@ -411,7 +482,7 @@ contract IdentityDimensionControlToken
             }
 
         }
-    }
+    }*/
 
 
     //helper function: clears the delegation at the index in the array
@@ -449,3 +520,4 @@ contract IdentityDimensionControlToken
         }
     }
 }
+

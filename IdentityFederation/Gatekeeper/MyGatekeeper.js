@@ -76,7 +76,7 @@ var notifier = function () {
             });
     };
 
-    this.createProposalPendingNotification = function (requester, proposalId, isHumanVal, gkAddr) {
+    this.createProposalPendingNotification = function (requester, proposalId, isHumanVal, gkAddr, propType) {
         console.log("proposal pending event caught.. mygk addr:  " + gkAddr)
 
         superAgent.post(this.twinUrl + "/ballot/writeNotify")
@@ -86,6 +86,7 @@ var notifier = function () {
                 "proposalID": proposalId,
                 "isHuman": isHumanVal,
                 "gatekeeperAddr": gkAddr,
+                "propType": propType,
                 "message": "Your proposal is pending for validation"
             })
             .set('Accept', 'application/json')
@@ -305,15 +306,15 @@ function prepareForm(formdata){
         correctForm.uniqueIdAttributes=[];
 correctForm.uniqueIdAttributes.push(formdata.uniqueIdAttributes.split(","));
 correctForm.ownerIdList=formdata.ownerIdList.split(",");
-correctForm.controlIdList=formdata.controlIdList.split(",");
-correctForm.ownershipTokenAttributes=formdata.ownershipTokenAttributes.split(",");
-correctForm.ownershipTokenQuantity=formdata.ownershipTokenQuantity.split(",");
-correctForm.controlTokenAttributes=formdata.controlTokenAttributes.split(",");
-correctForm.controlTokenQuantity=formdata.controlTokenQuantity.split(",");
-correctForm.identityRecoveryIdList=formdata.identityRecoveryIdList.split(",");
+correctForm.controlIdList=formdata.controlIdList.split(",") || [];
+correctForm.ownershipTokenAttributes=formdata.ownershipTokenAttributes.split(",") || [];
+correctForm.ownershipTokenQuantity=formdata.ownershipTokenQuantity.split(",") || [];
+correctForm.controlTokenAttributes=formdata.controlTokenAttributes.split(",") || [];
+correctForm.controlTokenQuantity=formdata.controlTokenQuantity.split(",") || [];
+correctForm.identityRecoveryIdList=formdata.identityRecoveryIdList.split(",") || [];
 correctForm.validatorList=formdata.validatorList.split(",");
-correctForm.delegateeIdList=formdata.delegateeIdList.split(",");
-correctForm.delegateeTokenQuantity=formdata.delegateeTokenQuantity.split(",");
+correctForm.delegateeIdList=formdata.delegateeIdList.split(",") || [];
+correctForm.delegateeTokenQuantity=formdata.delegateeTokenQuantity.split(",") || [];
 
 return(correctForm);
 
@@ -487,6 +488,7 @@ test = this;
         var yesVotesRequiredToPass = formdata.yesVotesRequiredToPass;
         var isHuman = formdata.isHuman;
         var gatekeeperAddr = formdata.gatekeeperAddr;
+        var propType = Number(formdata.propType);
 
         try {
             this.setCoidRequester(requester, proposalId, sig, msg);
@@ -502,9 +504,9 @@ test = this;
             this1.setmyIdentityRecoveryIdList(requester, proposalId, myIdentityRecoveryIdList, myRecoveryCondition);
             this1.setValidators(proposalId, validators, ballotContractAddr);
 
-            this1.initiateCoidProposalSubmission(ballotContractAddr, proposalId, yesVotesRequiredToPass, false, MyGKaddr);
+            this1.initiateCoidProposalSubmission(ballotContractAddr, proposalId, yesVotesRequiredToPass, false, MyGKaddr, propType);
 
-            theNotifier.createProposalPendingNotification(requester, proposalId, isHuman, gatekeeperAddr);
+            //theNotifier.createProposalPendingNotification(requester, proposalId, isHuman, gatekeeperAddr);
 
             callback(false, res);
            },3000)
@@ -542,7 +544,7 @@ test = this;
             setTimeout(function(){
             this1.setValidators(proposalId, validators, ballotContractAddr);
             this1.initiateCoidProposalSubmission(ballotContractAddr, proposalId, yesVotesRequiredToPass, false, MyGKaddr, propType);
-            //theNotifier.createProposalPendingNotification(requester, proposalId, isHuman, gatekeeperAddr);
+            //theNotifier.createProposalPendingNotification(requester, proposalId, isHuman, gatekeeperAddr, propType);
             callback(false, res);
            },3000)
         }
@@ -1239,13 +1241,13 @@ var eventGatekeeperResultReadyKYC;
                 }
 
                 console.log("index is: " + index);
+                var validatorSigs = [];
 
                 if (index != -1) {
                     //TODO (to make cleaner): un-hardcode m -- grab number of validators from
                     //NOTE: notice the use of let for m, rather than var!
-                    var validatorSigs = [];
                     var indexSigs = 0;
-                    for (let m = 0; m < 3; m++) {
+                    for (let m = 0; m < formdataArray[index].validatorList.split(',').length; m++) {
                         _this.ballotContract.getValidatorSignature_byIndex(proposalId, m, function (error, result) {
                             //TODO: Create labels for validator sigs
                             console.log("This is the result: " + JSON.stringify(result))
@@ -1254,6 +1256,10 @@ var eventGatekeeperResultReadyKYC;
                             console.log("m is: " + m);
                         });
                     }
+                    _this.ballotContract.getSigExpirations(proposalId, function (error, result) {
+                        console.log("validators: "+result[0]);
+                        console.log("Expirations: "+result[1]);
+                    })
 
                     console.log("validator sigs are: " + validatorSigs);
 
@@ -1277,6 +1283,31 @@ var eventGatekeeperResultReadyKYC;
                                 //form.gatekeeperAddr = coidGKAddr;
                                 form.coidAddr = coidAddr;
                                 form.dimensionCtrlAddr = dimensionCtrlAddr;
+                                form.ownerIdList = keccak_256(form.pubKey);
+                                form.validatorSigs = validatorSigs;
+                                var chainUrl = chainConfig.chainURL;
+                                var contrData = require("./epm.json");
+                                var accounts = require('./accounts.json')
+                                var manager = erisContracts.newContractManagerDev(chainUrl, chainConfig.primaryAccount)
+
+                                var abiAddr = contrData['CoreIdentity'];
+                                var abi_COID = JSON.parse(fs.readFileSync('./abi/' + abiAddr, 'utf8'))
+                                var contract = manager.newContractFactory(abi_COID).at(coidAddr)
+
+                                var dimCtrlAddr = contrData['IdentityDimensionControl'];
+                                var abi_dimCtrl = JSON.parse(fs.readFileSync('./abi/' + dimCtrlAddr, 'utf8'))
+                                var dimCtrlContract = manager.newContractFactory(abi_dimCtrl).at(dimensionCtrlAddr)
+                                var myOwnerIdList = form.ownerIdList.split(",");
+                                myOwnerIdList = myOwnerIdList.concat(Array(10 - myOwnerIdList.length).fill("0"));
+                                //var myOwnershipTokenQuantity = form.ownershipTokenQuantity.split(",");
+                                var myOwnershipTokenQuantity = Array(10).fill("0");
+
+                                contract.setOwnership(myOwnerIdList, myOwnershipTokenQuantity, function (error) {
+                                dimCtrlContract.IdentityDimensionControlInstantiation(coidAddr, function (err, result) {
+                                                    if (err) { console.log("dimensioninstantiation error: " + err) }
+                                                    console.log("DimensionInstantiation: " + JSON.stringify(result))
+                                                })
+                                })
                                 writeAll(prepareForm(form), function(){});
 
                                 //make the core identity
@@ -1314,6 +1345,10 @@ var eventGatekeeperResultReadyKYC;
             var chainID = keccak_256(_this.chain);
 _this.gateKeeperContract.getPropType(proposalId, function (error, result) {
             console.log("Get Proposal Type contract call: "+result);
+        })
+_this.ballotContract.getSigExpirations(proposalId, function (error, result) {
+            console.log("validators: "+result[0]);
+            console.log("Expirations: "+result[1]);
         })
 
             //debugging statements
@@ -1387,40 +1422,40 @@ app.post("/MyGatekeeper", function (req, res) {
     console.log('request body...' + JSON.stringify(formdata))
 
     //for testing with hardcoded data
-      var formdata =
+/*      var formdata =
         {
    "pubKey":"029fb6ea7e2394df2b10c9157b3e6c37762b83fe09941fe75cef09cbeb38179dea",
-   "uniqueId":"c5ab1388c4e945e3e0c0d90be3a1687202a7acb5af4ae6a78b8f9d9c208d52dd",
-   "uniqueIdAttributes":"kyc3,a9e1a536e9fc0127738d793451b5dea26dd37d31d76adfa98cfd4a54d118351c,QmcHrja8JXPjPeAm3MwKdRT66pNzqJNrkc1Wp4nR1T3zF5",
-   "ownershipId":"7d5da9d6403dad7aeede09977b67fd2c659793036333e5b82e976642800de775",
-   "ownerIdList":"7d5da9d6403dad7aeede09977b67fd2c659793036333e5b82e976642800de775",
-   "controlId":"7d5da9d6403dad7aeede09977b67fd2c659793036333e5b82e976642800de775",
-   "controlIdList":"7d5da9d6403dad7aeede09977b67fd2c659793036333e5b82e976642800de775",
-   "ownershipTokenId":"75821ef249041f203634f4e233e975d05b855e24069a37cc1ba739ba92b1307a",
+   "uniqueId":"a7ab1388c4e945e3e0c0d90be3a1687202a7acb5af4ae6a78b8f9d9c208d52dd",
+   "uniqueIdAttributes":"kyc4,e1e1a536e9fc0127738d793451b5dea26dd37d31d76adfa98cfd4a54d118351c,QmcHrja8JXPjPeAm3MwKdRT66pNzqJNrkc1Wp4nR1T3zF5",
+   "ownershipId":"",
+   "ownerIdList":"",
+   "controlId":"",
+   "controlIdList":"",
+   "ownershipTokenId":"",
    "ownershipTokenAttributes":"xcfv",
    "ownershipTokenQuantity":"2",
    "controlTokenId":"1f840c37063d6c4e129f6d2554519a1e6dbb4bd939a94f5c293c69130ce086da",
    "controlTokenAttributes":"vghgj",
    "controlTokenQuantity":"5",
-   "identityRecoveryIdList":"7d5da9d6403dad7aeede09977b67fd2c659793036333e5b82e976642800de775",
-   "recoveryCondition":"0",
-   "yesVotesRequiredToPass":"2",
+   "identityRecoveryIdList":"",
+   "recoveryCondition":"",
+   "yesVotesRequiredToPass":"",
    "validatorList":"7d5da9d6403dad7aeede09977b67fd2c659793036333e5b82e976642800de775",
    "delegateeIdList":"",
    "delegateeTokenQuantity":"",
    "isHuman":"false",
    "timestamp":"",
-   "assetID":"kyc",
+   "assetID":"kycTESTCHAIN",
    "Type":"non_cash",
    "bigchainHash":"",
    "bigchainID":"",
    "coidAddr":"",
    "sig":"6d47e89278dc6a1c55b152618a19dae7a5412c4754bb3204f746d3e837fea07160a9c909cb6ea29bf29734677dd5e92c6202ddb4520918306c1bd4e99ace24ea",
    "msg":"640b40905d37111b53b56fb7011e449b5e1f0bd9f2f5e7f9978a283c0624311e",
-   "gatekeeperAddr":"B0C7A5CF9B262409FDE0DD6FDF62CF2E5CD64932",
+   "gatekeeperAddr":"859537ED6976A033F18A6D78D375804DE1DCCB61",
    "txn_id":"request_new_COID",
    "propType":"2"
-}
+}*/
 
 if(formdata.isHuman == 'false'){
     console.log(formdata.gatekeeperAddr)

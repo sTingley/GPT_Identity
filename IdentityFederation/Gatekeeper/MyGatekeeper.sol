@@ -117,7 +117,7 @@ contract MyGateKeeper
 
     mapping(bytes32 => bool) calledBefore;
 
-    address chairperson = 0x22853BF788BC348B59AF50E0B479BD8960188B77;
+    address chairperson = 0x8FD9F2E375387D7AC3DBF53B1E727B9C63053943;
 
     //This sets the Eris account that deployed the gatekeeper contract as the chairperson of a proposal
     function MyGateKeeper() {
@@ -324,7 +324,7 @@ contract MyGateKeeper
 
     // This is going to be used by the gatekeeper contract to submit the COID proposal
     // true if the coidproposal has been initiated, flse, if the
-    function initiateCoidProposalSubmission(address ballotAddr, bytes32 proposalId, uint yesVotesRequiredToPass, bool isHuman, address myGKaddr) returns (bool result)
+    function initiateCoidProposalSubmission(address ballotAddr, bytes32 proposalId, uint yesVotesRequiredToPass, bool isHuman, address myGKaddr, uint propType) returns (bool result)
     {
 
         if (msg.sender == chairperson)  // the chairperson == gatekeeper
@@ -339,7 +339,7 @@ contract MyGateKeeper
             Ballot B = Ballot(ballotAddr); // Instantiate the ballot contract, and allows it to talk to the ballot contract
 
             // Send the proposal to ballot contract with proposalId, numbers of voters for that proposal and yesVotesRequiredToPass
-            B.setMyProposalID(proposalId, validatorsToVote.length, yesVotesRequiredToPass, isHuman, myGKaddr); // trigger the event COIDRequest in ballot.sol
+            B.setMyProposalID(proposalId, validatorsToVote.length, yesVotesRequiredToPass, isHuman, myGKaddr, propType); // trigger the event COIDRequest in ballot.sol
 
             proposals[proposalId].coidproposal_check = true;
 

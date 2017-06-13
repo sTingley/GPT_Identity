@@ -4,6 +4,7 @@ var app = require('express')(),
         bodyParser = require('body-parser'),
         fileUpload = require('express-fileupload'),
         NotificationCtrl = require('./NotificationCtrl.js'),
+        BallotCtrl = require('./ballotCtrl.js'),
         http = require('http'),
         expiredNotification = require('./expiredNotification.js'),
         IPFS = require('./ipfs.js'),
@@ -72,10 +73,13 @@ app.post('/writeContacts',contactCtrl.writeContacts);
 
 //TODO: expiredNotification
 // -> -> -> START NOTIFICATION FUNCTIONS -> -> ->
-app.post('/ballot/writeNotify', NotificationCtrl.writeNotification);
+app.post('/ballot/writeNotify', BallotCtrl.writeBallot);
 app.post('/ballot/writeExpiredProposal', expiredNotification.writeExpiredProposalNotification);
-app.get('/ballot/readNotify/:pubKey', NotificationCtrl.fetchNotification);
+app.get('/ballot/readNotify/:pubKey', BallotCtrl.fetchBallot);
 app.get('/ballot/readExpiredProposal/:pubKey', expiredNotification.fetchExpiredProposalNotification);
+
+app.post('/notification/writeNotify', NotificationCtrl.writeNotification);
+app.get('/notification/readNotify/:pubKey', NotificationCtrl.fetchNotification);
 // <- <- <- END NOTIFICATION FUNCTIONS <- <- <-
 
 // -> -> -> START ASSET FUNCTIONS -> -> ->

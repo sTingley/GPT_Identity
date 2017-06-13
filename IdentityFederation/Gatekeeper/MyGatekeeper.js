@@ -79,20 +79,18 @@ var notifier = function () {
     this.createProposalPendingNotification = function (requester, proposalId, isHumanVal, gkAddr, propType) {
         console.log("proposal pending event caught.. mygk addr:  " + gkAddr)
 
-        superAgent.post(this.twinUrl + "/ballot/writeNotify")
+        superAgent.post(this.twinUrl + "/notification/writeNotify")
             .send({
-                "notificationType": "proposalPending",
-                "pubKey": requester,
+                "pubKey": keccak_256(requester).toUpperCase(),
                 "proposalID": proposalId,
                 "isHuman": isHumanVal,
                 "gatekeeperAddr": gkAddr,
-                "propType": propType,
                 "message": "Your proposal is pending for validation"
             })
             .set('Accept', 'application/json')
             .end((err, res) => {
                 //if(res.status == 200){
-                //    console.log("proposalPending message sent successfully");
+                    console.log("proposalPending message sent successfully");
                 // }
             });
     };
@@ -506,7 +504,7 @@ test = this;
 
             this1.initiateCoidProposalSubmission(ballotContractAddr, proposalId, yesVotesRequiredToPass, false, MyGKaddr, propType);
 
-            //theNotifier.createProposalPendingNotification(requester, proposalId, isHuman, gatekeeperAddr);
+            theNotifier.createProposalPendingNotification(requester, proposalId, isHuman, gatekeeperAddr,0);
 
             callback(false, res);
            },3000)
@@ -544,7 +542,7 @@ test = this;
             setTimeout(function(){
             this1.setValidators(proposalId, validators, ballotContractAddr);
             this1.initiateCoidProposalSubmission(ballotContractAddr, proposalId, yesVotesRequiredToPass, false, MyGKaddr, propType);
-            //theNotifier.createProposalPendingNotification(requester, proposalId, isHuman, gatekeeperAddr, propType);
+            theNotifier.createProposalPendingNotification(requester, proposalId, isHuman, gatekeeperAddr, propType);
             callback(false, res);
            },3000)
         }

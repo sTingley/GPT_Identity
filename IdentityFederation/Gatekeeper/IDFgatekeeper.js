@@ -116,10 +116,9 @@ var notifier = function () {
 
     this.createProposalPendingNotification = function (requester, proposalId) {
 
-        superAgent.post(this.twinUrl + "/ballot/writeNotify")
+        superAgent.post(this.twinUrl + "/notification/writeNotify")
             .send({
-                "notificationType": "proposalPending",
-                "pubKey": requester,
+                "pubKey": keccak_256(requester).toUpperCase(),
                 "proposalID": proposalId,
                 "isHuman": true,
                 "gatekeeperAddr": "",
@@ -127,9 +126,9 @@ var notifier = function () {
             })
             .set('Accept', 'application/json')
             .end((err, res) => {
-                if (res.status == 200) {
+                //if (res.status == 200) {
                     console.log("proposalPending message sent successfully");
-                }
+                //}
             });
     };
 
@@ -574,7 +573,7 @@ var gatekeeper = function () {
 
                 this1.initiateCoidProposalSubmission(ballotContractAddr, proposalId, yesVotesRequiredToPass, isHuman);
                 //this.selectValidators(proposalId, DaoContractAddr, ballotContractAddr);
-                //theNotifier.createProposalPendingNotification(requester, proposalId);
+                theNotifier.createProposalPendingNotification(requester, proposalId);
 
 
                 callback(false, res);

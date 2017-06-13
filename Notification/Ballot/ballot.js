@@ -60,9 +60,9 @@ var ballotApp = function () {
             .set('Accept', 'application/json')
             .end((err, res) => {
                 if (err){console.log("/ballot/writeNotify error: " + err)}
-                if (res.status == 200) {
+               // if (res.status == 200) {
                     // do something
-                }
+                //}
             });
     };
 
@@ -84,6 +84,24 @@ var ballotApp = function () {
             .end((err, res) => {
                 if (res.status == 200) {
                     // do something
+                }
+            });
+    };
+
+    this.createProposalPendingNotification = function (requester, proposalId) {
+
+        request.post(this.twinUrl + "/notification/writeNotify")
+            .send({
+                "pubKey": requester,
+                "proposalID": proposalId,
+                "isHuman": true,
+                "gatekeeperAddr": "",
+                "message": "Your proposal is pending for validation"
+            })
+            .set('Accept', 'application/json')
+            .end((err, res) => {
+                if (res.status == 200) {
+                    console.log("proposalPending message sent successfully");
                 }
             });
     };
@@ -117,6 +135,7 @@ var ballotApp = function () {
         console.log("isHuman val: " + isHuman);
         console.log("address is: " + address);
         _this.createNotification({ "pubKey": validator, "proposalID": proposal, "message": "You have been selected to vote on the proposal.", "isHuman":isHuman, "gatekeeperAddr": address, "propType": propType });
+        _this.createProposalPendingNotification(validator, proposal);
         console.log("pass on err check: ballot contract notify event");
     })
 } //end of ballotApp

@@ -14,6 +14,7 @@ class UploadIpfsFile extends React.Component {
     }
 
     componentDidMount() {
+        console.log("IPFSFILE props.pubkey: " + this.state.pubKey)
         $.ajax({
             url: twinUrl + "ipfs/alldocs/" + this.state.pubKey,
             dataType: 'json',
@@ -26,6 +27,10 @@ class UploadIpfsFile extends React.Component {
             }.bind(this)
         });
 
+        if(this.props.flag) {
+            $("#descriptors .modal").modal('show');
+            $("#descriptors .modal").on('hidden.bs.modal', this.props.handleHideModal);
+        }
 
 
         $("#SubmitContainer .modal").modal('show');

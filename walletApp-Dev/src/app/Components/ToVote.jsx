@@ -300,6 +300,25 @@ class ModalWin extends React.Component {
 										<td>{prop.proposal_id}</td>
 									</tr>
 									<tr>
+										<td colSpan="2"><b>Official IDs</b></td>
+									</tr>
+									{(() => {
+										var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+										if (!$.isEmptyObject(this.state.proposal_data)) {
+											return this.state.proposal_data.uniqueIdAttributes.map((ids, i) => {
+												return (
+													<tr key={i}>
+														<td>{ids[0]}</td>
+														<td><p>File hash: {ids[2]}</p><p>IPFS hash: <a target="_blank" href={ipfs_url + "/" + ids[1]}>{ids[1]}</a></p></td>
+													</tr>
+												)
+											});
+
+										} else {
+											return <tr><td colSpan="2">No Ids found</td></tr>
+										}
+									})(this)}
+									<tr>
 										<td>Signature Expiration:</td>
 										<td>
 											<DayPicker
@@ -394,7 +413,7 @@ class ToVote extends React.Component {
 		var _that = this;
 		return (
 			<div id="vote_container">
-				<h1>Proposals pending for your action</h1> <hr />
+				<h1>Identity and Asset Proposals Pending for Your Action</h1> <hr />
 				<table className="table table-striped">
 					<tbody>
 						{(() => {

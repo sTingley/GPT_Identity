@@ -23,6 +23,7 @@ import MyCOID from './Components/MyCOID.jsx';
 import IdentityDimension from './Components/IdentityDimension.jsx';
 import Documents from './Components/Documents.jsx';
 import MyGateKeeper from './Components/MyGateKeeper.jsx';
+import Attestations from './Components/Attestations.jsx';
 
 class App extends React.Component {
 
@@ -90,6 +91,7 @@ render((
 			<Route path="myGateKeeper" component={MyGateKeeper} onEnter={validateLogin} />
 			<Route path="mycoreidentity" component={MyCOID} onEnter={validateLogin} />
 			<Route path="identitydimension" component={IdentityDimension} onEnter={validateLogin} />
+			<Route path="Attestations" component={Attestations} onEnter={validateLogin} />
       	</Route>
     </Router>
 ), document.getElementById('app'));

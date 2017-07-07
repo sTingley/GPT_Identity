@@ -36,7 +36,7 @@ class AttributeForm extends React.Component {
         return (
             <div className="form-group col-md-12" style={style}>
                 <div className="col-md-10">
-                    <label htmlFor="unique_id_attrs"> Dimension Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research". </label>
+                    <label htmlFor="unique_id_attrs"> Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research". </label>
                     <input name={'label-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Descriptor" />
                 </div>
                 <div className="col-md-2">
@@ -112,7 +112,12 @@ class Asset extends React.Component {
             delegatee_id: [],
             delegatee_token_quantity: [],
             controlled_assets: [],
-            own_assets: []
+            own_assets: [],
+            
+            removeIfICA:'hidden',
+            removeIfMyCOID:{
+                visibility: 'visible'
+            }
 
         };
 
@@ -579,41 +584,62 @@ class Asset extends React.Component {
     componentWillMount(){
 
         let asset_id = this.state.asset.asset_id
+        console.log("Asset in asset class: "+JSON.stringify(this.state.asset));
 
         const ownDiv = document.getElementById("owners");
         const ctrlDiv = document.getElementById("controllers");
         const recoveryDiv = document.getElementById("recovery");
         const deleDiv = document.getElementById("delegations");
-        
-        //let asset_type = this.state.assetType;
-        //console.log("assetType: " + asset_type)
 
-        // if(asset_type == 2){
-        //     console.log("assetType is 2")
-        //     ctrl.style.display = 'none';
-        //     recovery.style.display = 'none';
-        //     dele.style.display = 'none';
-        // }
-
-        // if (asset_id == "MyCOID")
-        // { own.style.display = 'none'; }
-        // else
-        // { own.style.display = 'block'; }
-
-        let storage = Array(localStorage.getItem("owned_assets"))
-        storage = JSON.parse(storage); //now storage is an object
-        console.log("typeof storage: " + typeof(storage));
-
-        storage.forEach(function(element) {
-            if(asset_id = element.asset_id && element.asset_type == 2){
-                console.log("found")
-                $('controllers').addClass("hidden");
-                // ctrl.style.display = 'none';
-                // recovery.style.display = 'none';
-                // dele.style.display = 'none';
+        if(this.state.asset.asset_name.propType == "2"){
+            //this.setState({ removeIfICA: 'hidden' })
+            this.state.removeIfICA = 'hidden';
+            this.state.removeIfMyCOID.visibility = 'hidden';
+        }
+        else{
+            if(this.state.asset.asset_id == "MyCOID"){
+                this.state.removeIfMyCOID.visibility = 'hidden';
             }
-            //console.log("element: " + JSON.stringify(element))
-        })
+            else{
+                this.state.removeIfMyCOID.visibility = 'visible';
+            }
+            //this.setState({ removeIfICA: 'visible' })
+            this.state.removeIfICA = 'visible';
+        }
+
+        // let storage = Array(localStorage.getItem("owned_assets"))
+        // storage = JSON.parse(storage); //now storage is an object
+        // console.log("typeof storage: " + typeof(storage));
+
+        // storage.forEach(function(element) {
+        //     if(asset_id = element.asset_id && element.asset_type == 2){
+        //         console.log("found")
+        //         $('controllers').addClass("hidden");
+        //         // ctrl.style.display = 'none';
+        //         // recovery.style.display = 'none';
+        //         // dele.style.display = 'none';
+        //     }
+        //     //console.log("element: " + JSON.stringify(element))
+        // })
+    }
+
+    componentWillUpdate(nextProps, nextState) {
+        console.log("NextProps: " + JSON.stringify(nextProps));
+        if (nextProps.asset.asset_name.propType == "2") {
+            //this.setState({ removeIfICA: 'hidden' })
+            this.state.removeIfICA = 'hidden';
+            this.state.removeIfMyCOID.visibility = 'hidden';
+        }
+        else {
+            //this.setState({ removeIfICA: 'visible' })
+            if (nextProps.asset.asset_id == "MyCOID") {
+                this.state.removeIfMyCOID.visibility = 'hidden';
+            }
+            else {
+                this.state.removeIfMyCOID.visibility = 'visible';
+            }
+            this.state.removeIfICA = 'visible';
+        }
     }
     componentDidMount() {
         // $("#assetDetails").modal('show');
@@ -625,6 +651,10 @@ class Asset extends React.Component {
 
         var style = {
             fontSize: '12.5px'
+        }
+
+        var removeIfICA = {
+            visibility: this.state.removeIfICA
         }
         var inputAttrs = {
             addKeys: [13, 188],	// Enter and comma
@@ -646,9 +676,9 @@ class Asset extends React.Component {
                     <ul className="nav nav-pills" role="tablist">
                         <li role="presentation" className="active"><a href="#officalID" role="tab" data-toggle="tab">Official IDs</a></li>
                         <li role="presentation"><a href="#owners" role="tab" data-toggle="tab">Ownership</a></li>
-                        <li role="presentation"><a href="#controllers" role="tab" data-toggle="tab">Control</a></li>
-                        <li role="presentation"><a href="#recovery" role="tab" data-toggle="tab">Recovery</a></li>
-                        <li role="presentation"><a href="#delegations" role="tab" data-toggle="tab">Delegations</a></li>
+                        <li style={removeIfICA} role="presentation"><a href="#controllers" role="tab" data-toggle="tab">Control</a></li>
+                        <li style={removeIfICA} role="presentation"><a href="#recovery" role="tab" data-toggle="tab">Recovery</a></li>
+                        <li style={removeIfICA} role="presentation"><a href="#delegations" role="tab" data-toggle="tab">Delegations</a></li>
                     </ul>
                 </div>{/*END MODAL-HEADER*/}
 
@@ -722,7 +752,7 @@ class Asset extends React.Component {
                                     </tr>
                                 </tbody>
                             </table>
-                            <div id="OWNERSHIP">
+                            <div id="OWNERSHIP" style={this.state.removeIfMyCOID}>
                                 <div className="form-group">
                                     <label htmlFor="control_dist">Enter Owners and their ownership token(s).</label>
                                     {this.state.inputs_owners.map(input => <TokenDistributionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
@@ -921,6 +951,7 @@ class Identities extends React.Component {
                 console.log("getOwnedAssets result: " + data);
                 //data is: MYCOID.json
 
+                var assetData = []
                 if (data.length > 0) {
                     //loop through OWNED assets
                     for (let i = 0; i < data.length; i++) {
@@ -941,10 +972,36 @@ class Identities extends React.Component {
                                 if (dataResult.assetID = "MyCOID")
                                     this.setState({ own_assets: theArray });
 
+                                // assetData[assetData.length] = {
+                                //     asset_id: dataResult.assetID,
+                                //     asset_uniqueId: dataResult.uniqueId,
+                                //     asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
+                                //     asset_coidAddr: dataResult.coidAddr,
+                                //     asset_gatekeeperAddr: dataResult.gatekeeperAddr,
+                                //     asset_owners: dataResult.ownerIdList,
+                                //     asset_controllers: dataResult.controlIdList,
+                                //     asset_bigchainID: dataResult.bigchainID,
+                                //     asset_type: dataResult.propType
+                                // }
+                                // localStorage.setItem("owned_assets", JSON.stringify(assetData))
+
                             }.bind(this)
                         })
                     }//end for loop
                 }
+                // else {
+                //     var assetData = []
+                //     assetData[assetData.length] = {
+                //         asset_id: "",
+                //         asset_uniqueId: "",
+                //         asset_dimCtrlAddr: "",
+                //         asset_coidAddr: "",
+                //         asset_gatekeeperAddr: "",
+                //         asset_owners: "",
+                //         asset_controllers: ""
+                //     }
+                //     localStorage.setItem("owned_assets", JSON.stringify(assetData))
+                // }
             }.bind(this) //success
         })
         // <- <- <- END get OWNED assets <- <- <-
@@ -964,6 +1021,7 @@ class Identities extends React.Component {
                 //debugging:
                 console.log("Get Controlled Assets result: " + data);
 
+                var assetData = []
                 if (data.length > 0) {
                     //loop through OWNED assets
                     for (let i = 0; i < data.length; i++) {
@@ -988,6 +1046,19 @@ class Identities extends React.Component {
                         })
                     }//end for loop
                 }
+                // else {
+                //     var assetData = []
+                //     assetData[assetData.length] = {
+                //         asset_id: "",
+                //         asset_uniqueId: "",
+                //         asset_dimCtrlAddr: "",
+                //         asset_coidAddr: "",
+                //         asset_gatekeeperAddr: "",
+                //         asset_owners: "",
+                //         asset_controllers: ""
+                //     }
+                //     localStorage.setItem("controlled_assets", JSON.stringify(assetData))
+                // }
             }.bind(this)
         })
         // <- <- <- END get CONTROLLED assets <- <- <-
@@ -997,169 +1068,6 @@ class Identities extends React.Component {
     //Invoke this code immediately after mounting occurs:
     //************************************************************************
     componentDidMount() {
-        //TODO:
-        //ADD THE CODE SO THAT MYCOID displays on the page by default?
-
-        // -> -> -> START get OWNED assets -> -> ->
-        $.ajax({
-            type: "POST",
-            url: twinUrl + 'getOwnedAssets',
-            data: { "pubKey": localStorage.getItem("pubKey") },
-            error: function () { },
-            success: function (result) {
-                var data = result;
-                if ($.type(result) != "object") {
-                    data = JSON.parseJSON(result)
-                }
-
-                //get the array:
-                data = data.data;
-                console.log("Get Owned Assets result: " + data);
-                //DEBUGGING:
-                //console.log("getOwnedAssets result: " + data);
-                var assetData = []
-
-                if (data.length > 0) {
-
-                    //loop through OWNED assets
-                    for (let i = 0; i < data.length; i++) {
-                        //AJAX each asset:
-                        $.ajax({
-                            type: "POST",
-                            url: twinUrl + 'getAsset',
-                            data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": data[i] },
-                            success: function (result) {
-                                var dataResult = result;
-                                if ($.type(result) != "object") {
-                                    dataResult = JSON.parseJSON(result)
-                                }
-
-                                //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-                                var theArray = this.state.own_assets;
-
-                                //console.log("length is: " + theArray.length)
-                                //console.log(theArray)
-                                //TODO: RENAME asset_name TO ASSET DETAILS
-                                theArray[theArray.length] = {
-                                    asset_id: dataResult.assetID,
-                                    asset_details: dataResult
-                                }
-                                this.setState({ own_assets: theArray });
-
-                                assetData[assetData.length] = {
-                                    asset_id: dataResult.assetID,
-                                    asset_uniqueId: dataResult.uniqueId,
-                                    asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
-                                    asset_coidAddr: dataResult.coidAddr,
-                                    asset_gatekeeperAddr: dataResult.gatekeeperAddr,
-                                    asset_owners: dataResult.ownerIdList,
-                                    asset_controllers: dataResult.controlIdList,
-                                    asset_bigchainID: dataResult.bigchainID,
-                                    asset_type: dataResult.propType
-                                }
-                                localStorage.setItem("owned_assets", JSON.stringify(assetData))
-                                //console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets))
-                            }.bind(this),
-                            complete: function () { },
-                        })
-                    }//end for
-                }//end if (data > 0)
-                else {
-                    var assetData = []
-                    assetData[assetData.length] = {
-                        asset_id: "",
-                        asset_uniqueId: "",
-                        asset_dimCtrlAddr: "",
-                        asset_coidAddr: "",
-                        asset_gatekeeperAddr: "",
-                        asset_owners: "",
-                        asset_controllers: ""
-                    }
-                    localStorage.setItem("owned_assets", JSON.stringify(assetData))
-                }
-            }.bind(this)
-        })
-        // <- <- <- END get OWNED assets <- <- <-
-        // <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
-        // -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
-        // -> -> -> START get CONTROLLED assets -> -> ->
-        $.ajax({
-            type: "POST",
-            url: twinUrl + 'getControlledAssets',
-            data: { "pubKey": localStorage.getItem("pubKey") },
-            error: function () { },
-            success: function (result) {
-                var data = result;
-                if ($.type(result) != "object") {
-                    data = JSON.parseJSON(result)
-                }
-                console.log("got data: " + JSON.stringify(data));
-
-                data = data.data;
-                console.log("Get Controlled Assets result: " + data);
-                var assetData = []
-
-                if (data.length > 0) {
-                    //loop through OWNED assets
-                    for (let i = 0; i < data.length; i++) {
-                        //console.log("i is: " + i + " filename: " + data[i])
-                        //AJAX each asset:
-                        $.ajax({
-                            type: "POST",
-                            url: twinUrl + 'getAsset',
-                            data: { "pubKey": localStorage.getItem("pubKey"), "flag": 1, "fileName": data[i] },
-                            success: function (result) {
-                                var dataResult = result;
-                                if ($.type(result) != "object") {
-                                    dataResult = JSON.parseJSON(result)
-                                }
-
-                                var theArray = this.state.controlled_assets;
-                                //console.log("length is: " + theArray.length)
-                                //console.log(JSON.stringify(theArray))
-
-                                theArray[theArray.length] = {
-                                    asset_id: dataResult.assetID,
-                                    asset_details: dataResult
-                                }
-                                this.setState({ controlled_assets: theArray });
-                                //this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
-
-                                assetData[assetData.length] = {
-                                    asset_id: dataResult.assetID,
-                                    asset_uniqueId: dataResult.uniqueId,
-                                    asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
-                                    asset_coidAddr: dataResult.coidAddr,
-                                    asset_gatekeeperAddr: dataResult.gatekeeperAddr,
-                                    asset_owners: dataResult.ownerIdList,
-                                    asset_controllers: dataResult.controlIdList,
-                                    asset_bigchainID: dataResult.bigchainID,
-                                    asset_type: dataResult.propType
-                                }
-                                localStorage.setItem("controlled_assets", JSON.stringify(assetData))
-
-                            }.bind(this),
-                            complete: function () { },
-                        })
-                    }//end for
-                }
-                else {
-                    var assetData = []
-                    assetData[assetData.length] = {
-                        asset_id: "",
-                        asset_uniqueId: "",
-                        asset_dimCtrlAddr: "",
-                        asset_coidAddr: "",
-                        asset_gatekeeperAddr: "",
-                        asset_owners: "",
-                        asset_controllers: ""
-                    }
-                    localStorage.setItem("controlled_assets", JSON.stringify(assetData))
-                }
-            }.bind(this)
-        })
-        // <- <- <- END get CONTROLLED assets <- <- <-
-
 
     }
 
@@ -1173,7 +1081,8 @@ class Identities extends React.Component {
         return (
             <div id="MyCOIDContainer">
 
-                <h1>Identity Utility</h1><hr />
+                <h1>Identity Utility</h1>
+                <h5><i>My Assets</i></h5><hr />
 
                 <div className="modal-header" role="navigation">
                     <ul className="nav nav-tabs">
@@ -1208,7 +1117,7 @@ class Identities extends React.Component {
                             </ul>
                         </li>
 
-                        <li role="presentation"><a href="#/identityDimension">Identity Dimensions</a></li>
+                        <li role="presentation"><a href="#/identityDimension">Personas</a></li>
                     </ul>{/*nav nav-tabs*/}
                 </div><br />{/*END MODAL-HEADER*/}
 

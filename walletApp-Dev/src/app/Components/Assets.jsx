@@ -4,6 +4,8 @@ import TagsInput from 'react-tagsinput';
 import QRCode from 'qrcode.react';
 import AssetTags from './classAndSubClass.js';
 
+import DayPicker from "react-day-picker";
+
 //import { Router, Route, IndexRedirect, hashHistory } from 'react-router';
 
 var crypto = require('crypto');
@@ -40,6 +42,7 @@ class Modal extends Component {
 		this.handleClassChange = this.handleClassChange.bind(this);
 		this.handleSubClassChange = this.handleSubClassChange.bind(this);
 		this.maxUniqAttr = 10;
+		this.bigchainGet = this.bigchainGet.bind(this);
 	}
 
 	handleClassChange(tags) {
@@ -159,6 +162,37 @@ class Modal extends Component {
 		this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
 	}
 
+	bigchainGet(attr) {
+        //e.preventDefault();
+        var txID = attr;//req.body.bigchainID;
+        console.log(txID);
+        console.log("BIGCHAINGET ONCLICK");
+        //var formdata = req.body;
+        //BIGCHAIN ENDPOINT:
+        var bigchainServer = 'http://10.101.114.230:5000'
+        var endpoint = '/getTransaction/' + txID;
+        $.ajax({
+            method: 'GET',
+            url: bigchainServer + endpoint,
+            headers: { 'Access-Control-Allow-Origin': '*' },
+            crossDomain: true,
+            dataType: 'json',
+            contentType: 'application/json',
+            cache: false,
+            success: function (resp) {
+                //the response is body -- send that
+                console.log(resp)
+                var full_data = resp
+                var short_data = resp.asset.data.Coid_Data;
+                console.log("short data is..." + short_data.ownershipId)
+                console.log(JSON.stringify(full_data))
+                console.log(JSON.stringify(short_data))
+                var something = window.open("data:text/json," + encodeURIComponent(JSON.stringify(short_data)), "_blank");
+                something.focus();
+            }
+        });
+    }
+
 
 	render() {
 
@@ -167,6 +201,7 @@ class Modal extends Component {
 		var _this = this;
 
 		var prop = this.props.asset.asset_details;
+		console.log("asset_details.. " + JSON.stringify(prop));
 		var style = {
 			fontSize: '12.5px'
 		}
@@ -218,8 +253,8 @@ class Modal extends Component {
 		}
 
 		var popUpWidth = {
-            width: '70%'
-        }
+			width: '70%'
+		}
 
 		return (
 			<div className="modal fade" id="assetDetails" key={this.props.asset.asset_id} tabIndex="-1" role="dialog" aria-labelledby="asset">
@@ -304,6 +339,10 @@ class Modal extends Component {
 													}
 												})(this)}
 												<tr>
+													<td>Ownership Token Description</td>
+													<td><p>{prop.ownershipTokenAttributes}</p></td>
+												</tr>
+												<tr>
 													<td>Ownership ID</td>
 													<td><p> {prop.ownershipId}</p></td>
 												</tr>
@@ -319,16 +358,23 @@ class Modal extends Component {
 													</td>
 												</tr>
 												<tr>
+													<td>Ownership Token Quantity</td>
+													<td>{(() => {
+														if (!$.isEmptyObject(prop.ownershipTokenQuantity)) {
+															return prop.ownershipTokenQuantity.map((ids, i) => {
+																return <p key={i}> {prop.ownershipTokenQuantity[i]}</p>
+															})
+														}
+													})(this)}
+													</td>
+												</tr>
+												<tr>
 													<td>Ownership Token ID</td>
 													<td><p> {prop.ownershipTokenId}</p></td>
 												</tr>
 												<tr>
-													<td>Ownership Token Description</td>
-													<td><p>{prop.ownershipTokenAttributes}</p></td>
-												</tr>
-												<tr>
-													<td>Ownership Token Quantity</td>
-													<td><p> {prop.ownershipTokenQuantity}</p></td>
+													<td>Control Token Description</td>
+													<td><p>{prop.controlTokenAttributes}</p></td>
 												</tr>
 												<tr>
 													<td>Control ID</td>
@@ -346,16 +392,19 @@ class Modal extends Component {
 													</td>
 												</tr>
 												<tr>
+													<td>Control Token Quantity</td>
+													<td>{(() => {
+														if (!$.isEmptyObject(prop.controlTokenQuantity)) {
+															return prop.controlIdList.map((ids, i) => {
+																return <p key={i}> {prop.controlTokenQuantity[i]}</p>
+															})
+														}
+													})(this)}
+													</td>
+												</tr>
+												<tr>
 													<td>Control Token ID</td>
 													<td> <p> {prop.controlTokenId}</p></td>
-												</tr>
-												<tr>
-													<td>Control Token Description</td>
-													<td><p>{prop.controlTokenAttributes}</p></td>
-												</tr>
-												<tr>
-													<td>Control Token Quantity</td>
-													<td><p> {prop.controlTokenQuantity}</p></td>
 												</tr>
 												<tr>
 													<td>Recovery IDs</td>
@@ -412,26 +461,25 @@ class Modal extends Component {
 													}
 												})(this)}
 												<tr>
-													<td colSpan="2"><b>Signatures</b></td>
+													<td colSpan="2"><b>Attestations</b></td>
 												</tr>
 												{(() => {
 													var ipfs_url = "http://10.101.114.231:8080/ipfs/";
 													if (!$.isEmptyObject(prop.validatorSigs)) {
-														return prop.validatorList.map((ids, i) => {
-															var sigs = prop.validatorSigs[i];
+														return prop.validatorSigs.map((ids, i) => {
 															return (
 																<tr key={i}>
 																	<td></td>
 																	<td>
-																		<p>Public Key: {sigs[2]}</p>
-																		<p>Signature: {sigs[1]}</p>
-																		<p>Expiration Date: {String(new Date(Number(sigs[3]) * 1000))}</p>
+																		<p>Public Key: {ids[2]}</p>
+																		<p>Signature: {ids[1]}</p>
+																		<p>Expiration: {String(new Date(Number(ids[3]) * 1000))}</p>
 																	</td>
 																</tr>
 															)
 														});
 													} else {
-														return <tr><td colSpan="2">No signatures</td></tr>
+														return <tr><td colSpan="2">No signatures found.</td></tr>
 													}
 												})(this)}
 												<tr>
@@ -445,7 +493,7 @@ class Modal extends Component {
 											</tbody>
 										</table>
 
-									</div>
+									</div>{/*KYC*/}
 
 								</div>
 
@@ -489,7 +537,9 @@ class Dims extends Component {
 
 			dimension: props.dimension || {},
 
-			dimensionDataArray: []
+			dimensionDataArray: [],
+
+			signICA: false
 
 		};
 		this.handleClassChange = this.handleClassChange.bind(this);
@@ -529,7 +579,17 @@ class Dims extends Component {
 		$("#assetDetails").modal('show');
 		$("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
 
+		let standardDim = document.getElementById("standardDim");
+		let ICA_Dim = document.getElementById("ICA_Dim");
+
 		var prop = this.props.dimension.dimension_details;
+
+		if (prop.propType == 2) {
+			standardDim.style.display = 'none';
+			ICA_Dim.style.display = 'block';
+		}
+		else { ICA_Dim.style.display = 'none' }
+
 
 	}
 
@@ -564,6 +624,79 @@ class Dims extends Component {
 
 	handleShowModal(e) {
 		this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
+	}
+
+	//*****************************************************************************
+    //takes in a msg/json and returns a signature (needed for requests)
+    getSignature(msg) {
+        console.log("creating signature, signing msg: \n" + JSON.stringify(msg))
+        var privKey = localStorage.getItem("privKey")
+        var privKey1 = new Buffer(privKey, "hex");
+        var msg_hash = keccak_256(JSON.stringify(msg));
+        var msg_hash_buffer = new Buffer(msg_hash, "hex")
+        let signature = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1))
+        signature = JSON.parse(signature).signature;
+        signature = JSON.stringify(signature);
+        signature = JSON.parse(signature).data;
+        signature = new Buffer(signature, "hex");
+        signature = signature.toString("hex");
+        return signature
+    }
+
+	signICA(e) {
+		//e.preventDefault();
+		this.state.signICA = true;
+
+		let json = {};
+		json.pubKey = localStorage.getItem("pubKey");
+		//need transaction ID
+		//need bigchain ID (descriptor)
+		var dataArray = this.state.dimensionDataArray;
+		console.log("dataArray: " + dataArray);
+		let txID;
+
+		for(var i=0; i<dataArray.length; i++){
+			if(String(dataArray[i]).split(",")[1].charAt(0) != "Q"){
+				txID=String(dataArray[i]).split(",");
+				txID = txID[1]
+			}
+		}
+
+		//let txID = String(dataArray[0]).split(",");
+		console.log("txID: " + txID);
+		//txID = txID[1];
+		//console.log("now txID: " + txID);
+
+		json.txid = txID;
+
+		var signature = this.getSignature(json);
+		var msg_hash = keccak_256(JSON.stringify(json));
+        var msg_hash_buffer = new Buffer(msg_hash, "hex");
+        json.msg = msg_hash_buffer.toString("hex");
+        json.sig = signature;
+
+		console.log("attestICA JSON: " + JSON.stringify(json));
+
+		$.ajax({
+			type: "POST",
+			url: twinUrl + 'signature/attestIca',
+			data: json,
+			success: function (result) {
+				var data = result;
+				if ($.type(result) != "object") {
+					console.log("not object")
+					//data = JSON.parseJSON(result)
+				}
+				console.log("repsonse sign ICA: " + JSON.stringify(data))
+			}
+		})
+
+		//now need to set signICA back to false?
+	}
+
+
+	selectDay(day){
+		console.log("selected day: " + day);
 	}
 
 
@@ -651,7 +784,8 @@ class Dims extends Component {
 
 		var prop = this.props.dimension
 
-		console.log("dimension(prop): " + JSON.stringify(prop))
+		console.log("dimension(props): " + JSON.stringify(prop))
+
 
 		var dataArray = this.state.dimensionDataArray;
 
@@ -702,26 +836,57 @@ class Dims extends Component {
 							<div className="tab-content">
 
 								<div role="tabpanel" className="tab-pane active" id="asset_details">
-									<table className="table table-striped table-hover" style={style}>
-										<tbody>
-											<tr>
-												<td>Dimension Name</td>
-												<td>{prop.dimension_id}</td>
-											</tr>
-											<tr>
-												<td>Dimension Class<p className="text-info">Use comma/enter to add class </p></td>
-												<td><TagsInput {...classInput} /></td>
-											</tr>
-											<tr>
-												<td>Dimension SubClass<p className="text-info">Use comma/enter to add sub class </p></td>
-												<td><TagsInput {...subClassInput} /></td>
-											</tr>
-											<tr>
-												<td>Dimension Contract address</td>
-												<td><p><b> {prop.dimension_details.address} </b></p></td>
-											</tr>
-										</tbody>
-									</table>
+
+
+									<div id="standardDim">
+										<table className="table table-striped table-hover" style={style}>
+											<tbody>
+												<tr>
+													<td>Dimension Name</td>
+													<td>{prop.dimension_id}</td>
+												</tr>
+												<tr>
+													<td>Dimension Class<p className="text-info">Use comma/enter to add class </p></td>
+													<td><TagsInput {...classInput} /></td>
+												</tr>
+												<tr>
+													<td>Dimension SubClass<p className="text-info">Use comma/enter to add sub class </p></td>
+													<td><TagsInput {...subClassInput} /></td>
+												</tr>
+												<tr>
+													<td>Dimension Contract address</td>
+													<td><p><b> {prop.dimension_details.address} </b></p></td>
+												</tr>
+											</tbody>
+										</table>
+
+									</div>{/*standardDim*/}
+
+									<div id="ICA_Dim">
+										<table className="table table-striped table-hover" style={style}>
+											<tbody>
+												<tr>
+													<td>Dimension Name</td>
+													<td>{prop.dimension_id}</td>
+												</tr>
+												<tr>
+													<td>Owner List</td>
+													<td>{(() => {
+														if (!$.isEmptyObject(prop.dimension_details.owners)) {
+															return prop.dimension_details.owners.map((ids, i) => {
+																return <p key={i}>{ids}</p>
+															})
+														}
+													})(this)}
+													</td>
+												</tr>
+											</tbody>
+										</table>
+										<button className="btn btn-success" onClick={(e) => this.signICA()}>Sign Identity Claim</button>
+									</div>{/*ICA_Dim*/}
+
+									{this.state.signICA ? <DayPicker disabledDays={{ daysOfWeek: [0] }} onDayClick={day => this.selectDay(day)} /> : null}
+
 								</div>
 
 								<div title="tabs" role="tabpanel" className="tab-pane center-block" id="show_descriptors">

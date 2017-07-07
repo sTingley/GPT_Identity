@@ -176,9 +176,7 @@ class UniqueIDAttributesForm extends React.Component {
 				<div className="col-md-10">
 					<label htmlFor="unique_id_attrs"> Unique Identfiers e.g. Serial Numbers, MAC Addresses, Vehicle Identitfication Numbers</label>
 					<input name={'label-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Label" />
-				</div>
-				<div className="col-md-2">
-					<button type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn btn-warning pull-right"><span className="glyphicon glyphicon-upload"></span>Upload File</button>
+					<button type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn btn-sm btn-warning pull-right"><span className="glyphicon glyphicon-upload"></span>Upload File</button>
 				</div>
 			</div>
 		);
@@ -315,7 +313,7 @@ class MyGatekeeper extends React.Component {
 				inputProps: {
 					placeholder: "use ENTER to add values",
 					style: { width: '30%' },
-					id: "3"
+					id: "4"
 				}
 			}],
 			suggest_attrs2: [{
@@ -323,18 +321,44 @@ class MyGatekeeper extends React.Component {
 				inputProps: {
 					placeholder: "use ENTER to add values",
 					style: { width: '30%' },
-					id: "13"
+					id: "14"
 				}
-			}]
+			}],
+
+			currentAsset: "",
+			owned_assets: []
 
 
 		};
+
+		this.pickerChange = this.pickerChange.bind(this);
 
 		this.maxUniqAttr = 10;
 		this.onFieldChange = this.onFieldChange.bind(this);
 		this.onFieldChange2 = this.onFieldChange2.bind(this);
 		this.handleHideModal = this.handleHideModal.bind(this);
 		this.checkboxChange = this.checkboxChange.bind(this);
+	}
+
+	//*****************************************************************************
+	pickerChange(e) {
+		this.setState({ currentAsset: e.target.value });
+		console.log('asset change: ' + e.target.value);
+	}
+
+	componentWillMount() {
+		if (localStorage.getItem("owned_assets")) {
+
+			let own_assets = [];
+
+			let owned = localStorage.getItem("owned_assets");
+			owned = JSON.parse(owned);
+
+			for (var i = 0; i < owned.length; i++) {
+				own_assets.push(owned[i]);
+			}
+			this.setState({ owned_assets: own_assets })
+		}
 	}
 
 	componentDidMount() {
@@ -467,7 +491,6 @@ class MyGatekeeper extends React.Component {
 	prepareJsonToSubmit() {
 		console.log();
 
-
 		for (var x = 0; x < this.state.recovery_id.length; x++) {
 			var index = this.state.names.indexOf(this.state.recovery_id[x]);
 			if (index >= 0) {
@@ -569,23 +592,23 @@ class MyGatekeeper extends React.Component {
 			"coidAddr": "",
 
 		};
-		if(this.state.isICA == true) {
+		if (this.state.isICA == true) {
 			inputObj.propType = 2
-			inputObj.ownershipId=keccak_256(inputObj.pubKey).toUpperCase()
-            inputObj.ownerIdList=keccak_256(inputObj.pubKey).toUpperCase()
-            inputObj.controlId=""
-            inputObj.controlIdList=[""]
-            inputObj.ownershipTokenId=""
-            inputObj.ownershipTokenAttributes=[""]
-            inputObj.ownershipTokenQuantity=[""]
-            inputObj.controlTokenId=""
-            inputObj.controlTokenAttributes=[""]
-            inputObj.controlTokenQuantity=[""]
-            inputObj.identityRecoveryIdList=[""]
-            inputObj.recoveryCondition=""
-            inputObj.yesVotesRequiredToPass=""
-            inputObj.delegateeIdList=[""]
-            inputObj.delegateeTokenQuantity=[""]
+			inputObj.ownershipId = keccak_256(inputObj.pubKey).toUpperCase()
+			inputObj.ownerIdList = keccak_256(inputObj.pubKey).toUpperCase()
+			inputObj.controlId = ""
+			inputObj.controlIdList = [""]
+			inputObj.ownershipTokenId = ""
+			inputObj.ownershipTokenAttributes = [""]
+			inputObj.ownershipTokenQuantity = [""]
+			inputObj.controlTokenId = ""
+			inputObj.controlTokenAttributes = [""]
+			inputObj.controlTokenQuantity = [""]
+			inputObj.identityRecoveryIdList = [""]
+			inputObj.recoveryCondition = ""
+			inputObj.yesVotesRequiredToPass = ""
+			inputObj.delegateeIdList = [""]
+			inputObj.delegateeTokenQuantity = [""]
 		}
 		return inputObj;
 	}
@@ -649,8 +672,9 @@ class MyGatekeeper extends React.Component {
 	}
 
 	prepareUniqueIdAttrs() {
-		var newArr = [],
-			labels = this.getLabelValues();
+		let newArr = [];
+		let labels = this.getLabelValues();
+
 		for (var i = 0; i < labels.length; i++) {
 			var tmpArr = [];
 			for (var key in labels[i]) {
@@ -662,6 +686,25 @@ class MyGatekeeper extends React.Component {
 			}
 			newArr.push(tmpArr);
 		}
+
+		let selected_asset = this.state.currentAsset;
+		let bigchainTrxnID;
+		if (selected_asset != "") {
+			let assetDetails = [];
+			console.log("currentAsset: " + selected_asset);
+			this.state.owned_assets.forEach(function (asset, index) {
+				if (selected_asset == asset.asset_id) {
+					bigchainTrxnID = asset.asset_bigchainID
+				}
+			})
+			assetDetails.push("bigchainID");
+			assetDetails.push(keccak_256(bigchainTrxnID));
+			assetDetails.push(bigchainTrxnID);
+			console.log("assetDetails: " + assetDetails);
+			newArr.push(assetDetails);
+		}
+
+
 		return newArr;
 	}
 
@@ -728,9 +771,9 @@ class MyGatekeeper extends React.Component {
 		//this.setState({signature: signature1})
 
 		let COID_controllers = this.state.control_id
-		console.log("coid controllers... " + COID_controllers + "\n length: " + COID_controllers.length)
+		console.log("coid controllers... " + COID_controllers + "\n length: " + COID_controllers.length);
 
-		console.log(json)
+		console.log("JSON: " + JSON.stringify(json));
 		$.ajax({
 			url: twinUrl + 'request_new_COID',
 			type: 'POST',
@@ -891,7 +934,10 @@ class MyGatekeeper extends React.Component {
 
 			const suggestions = that.state.names.filter((name) => {
 				console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
-				return name.toLowerCase().slice(0, inputLength) === inputValue
+				console.log(inputValue);
+				var re = new RegExp(inputValue, "i");
+				return (Boolean(name.slice(0, inputLength).search(re) + 1))
+				//return (name.toLowerCase().slice(0, inputLength) === inputValue  || name.toUpperCase().slice(0, inputLength) === inputValue)
 			})
 
 			var value = String(that.state.value[Number(passed.id)]) || "";
@@ -922,9 +968,12 @@ class MyGatekeeper extends React.Component {
 					getSuggestionValue={(suggestion) => suggestion}
 					renderSuggestion={(suggestion) => <span>{suggestion}</span>}
 					inputProps={inputProps}
-					onSuggestionSelected={(e, { suggestion }) => {
-						console.log("SELECTED: " + suggestion)
-						addTag(suggestion)
+					onSuggestionSelected={(e, { suggestion, method }) => {
+						console.log("SELECTED: " + method)
+						if (method == 'click') {
+							addTag(suggestion)
+							that.state.value[passed.id] = "";
+						}
 					}}
 					onSuggestionsClearRequested={() => { }}
 					onSuggestionsFetchRequested={() => { }}
@@ -990,18 +1039,24 @@ class MyGatekeeper extends React.Component {
 				<div id="CoreIdentityContainer">
 					<h1>Create Asset or Device Identity</h1>
 					<form method="POST" id="register" role="form">
-						<label>
-							Is ICA:
-					<input
-								value="isICA"
-								name="isICA"
-								type="checkbox"
-								checked={this.state.isICA}
-								onChange={this.checkboxChange}
-								defaultChecked={false} />
-						</label>
 						<div className="form-group">
-							<label htmlFor="unique_id">Enter Unique ID Attributes</label>
+							<label htmlFor="assetID">Name Your Asset. For example, 'My Diploma'.</label>
+							<TagsInput {...basicAttrs} value={this.state.assetID} onChange={(e) => { this.onFieldChange("assetID", e) }} />
+						</div>
+						<div className="form-group">
+							<label>
+								Request is an identity claim:
+								<input
+									value="isICA"
+									name="isICA"
+									type="checkbox"
+									checked={this.state.isICA}
+									onChange={this.checkboxChange}
+									defaultChecked={false} />
+							</label>
+						</div>
+						<div className="form-group">
+							<label htmlFor="unique_id">Enter Unique Attributes</label>
 							{this.state.inputs.map(input => <UniqueIDAttributesForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
 						</div>
 						<div className="form-group">
@@ -1013,14 +1068,6 @@ class MyGatekeeper extends React.Component {
 							</div>
 						</div>
 						<div className="form-group">
-							<label htmlFor="assetID">Name Your Asset. For example, 'My Diploma'.</label>
-							<TagsInput {...basicAttrs} value={this.state.assetID} onChange={(e) => { this.onFieldChange("assetID", e) }} />
-						</div>
-						<div className="form-group">
-							<label htmlFor="owner_token_id">Enter Ownership Token Description. For example, 'Spencer tokens'.</label>
-							<TagsInput {...basicAttrs} value={this.state.owner_token_desc} onChange={(e) => { this.onFieldChange("owner_token_desc", e) }} />
-						</div>
-						<div className="form-group">
 							<label htmlFor="owner_dist">Enter Owners and their ownership token(s).</label>
 							{this.state.inputs_ownership.map((input, i) =>
 								<div className="form-group col-md-12">
@@ -1028,8 +1075,8 @@ class MyGatekeeper extends React.Component {
 										<table className="table table-striped table-hover" style={style}>
 											<tbody>
 												<tr>
-													<th><b>Public Key of Owner</b></th>
-													<th><b>Owner Token Quantity</b></th>
+													<th><b>Owner</b></th>
+													<th><b>Token Quantity</b></th>
 												</tr>
 												<tr>
 													<td><TagsInput {...this.state.suggest_attrs2[i]} maxTags={1} renderInput={autocompleteRenderInput} className="form-control col-md-4" type="text" value={this.state.owner_id[i]} onChange={(e) => { this.onFieldChange2("owner_id," + i, e) }} />
@@ -1053,8 +1100,8 @@ class MyGatekeeper extends React.Component {
 							</div>
 						</div>
 						<div className="form-group">
-							<label htmlFor="control_token_id">Enter Control Token Description. For example, 'Spencer tokens'.</label>
-							<TagsInput {...basicAttrs} value={this.state.control_token_desc} onChange={(e) => { this.onFieldChange("control_token_desc", e) }} />
+							<label htmlFor="owner_token_id">Enter Owner Token Description. For example, 'Spencer's tokens'.</label>
+							<TagsInput {...basicAttrs} value={this.state.owner_token_desc} onChange={(e) => { this.onFieldChange("owner_token_desc", e) }} />
 						</div>
 						<div className="form-group">
 							<label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
@@ -1064,8 +1111,8 @@ class MyGatekeeper extends React.Component {
 										<table className="table table-striped table-hover" style={style}>
 											<tbody>
 												<tr>
-													<th><b>Public Key of Controller</b></th>
-													<th><b>Control Token Quantity</b></th>
+													<th><b>Controller</b></th>
+													<th><b>Token Quantity</b></th>
 												</tr>
 												<tr>
 													<td><TagsInput {...this.state.suggest_attrs[i]} maxTags={1} renderInput={autocompleteRenderInput} className="form-control col-md-4" type="text" value={this.state.control_id[i]} onChange={(e) => { this.onFieldChange2("control_id," + i, e) }} />
@@ -1089,16 +1136,20 @@ class MyGatekeeper extends React.Component {
 							</div>
 						</div>
 						<div className="form-group">
-							<label htmlFor="recovery_id">Recovery IDs (public keys of individuals who will attest to lost/stolen identity)</label>
+							<label htmlFor="control_token_id">Enter Control Token Description. For example, 'Spencer's tokens'.</label>
+							<TagsInput {...basicAttrs} value={this.state.control_token_desc} onChange={(e) => { this.onFieldChange("control_token_desc", e) }} />
+						</div>
+						<div className="form-group">
+							<label htmlFor="recovery_id">Identity Recovery: trusted identities who will attest that your identity has been lost or stolen</label>
 							<TagsInput {...inputAttrs2} renderInput={autocompleteRenderInput} value={this.state.recovery_id} onChange={(e) => { this.onFieldChange("recovery_id", e) }} />
 						</div>
 						<div className="form-group">
-							<label>Recovery Condition (# of digital signatures of recovery ID owners needed to recover identity)</label>
+							<label>Recovery Condition (# of trusted individuals required to initiate your identity recovery)</label>
 							<input name="recoveryCondition" className="form-control col-md-4" type="text" placeholder="Recovery Condition" />/>
 					</div>
 
 						<div className="form-group">
-							<label htmlFor="validators">Validators (public keys of the accounts which will verify this identity/asset)</label>
+							<label htmlFor="validators">Attestors (individuals who will very the authenticity of this identity/asset)</label>
 							<TagsInput {...inputAttrs4} maxTags={10} renderInput={autocompleteRenderInput} value={this.state.validators} onChange={(e) => { this.onFieldChange("validators", e) }} />
 						</div>
 						<div className="form-group">
@@ -1119,19 +1170,43 @@ class MyGatekeeper extends React.Component {
 				<div id="CoreIdentityContainer">
 					<h1>Create Asset or Device Identity</h1>
 					<form method="POST" id="register" role="form">
-						<label>
-							Is ICA:
-							<input
-								value="isICA"
-								name="isICA"
-								type="checkbox"
-								checked={this.state.isICA}
-								onChange={this.checkboxChange}
-								defaultChecked={true}
-							/>
-						</label>
 						<div className="form-group">
-							<label htmlFor="unique_id">Enter Unique ID Attributes</label>
+							<label htmlFor="assetID">Name Your Asset. For example, 'My Diploma'.</label>
+							<TagsInput {...basicAttrs} value={this.state.assetID} onChange={(e) => { this.onFieldChange("assetID", e) }} />
+						</div>
+						<div className="form-group">
+							<label>
+								Request is an identity claim:
+								<input
+									value="isICA"
+									name="isICA"
+									type="checkbox"
+									checked={this.state.isICA}
+									onChange={this.checkboxChange}
+									defaultChecked={true} />
+							</label>
+						</div>
+
+						<div className="form-group">
+							<h5><b>Select asset to which this claim will reference:</b></h5>
+							<select id="assetSelect" className="selectpicker show-tick" value={this.state.currentAsset} onChange={this.pickerChange}>
+								<option selected value="">--- Please select ---</option>
+								<optgroup label="Owned Assets">
+									{(() => {
+										if (this.state.owned_assets.length > 0) {
+											return this.state.owned_assets.map((asset, i) => {
+												//let val = label.split(',') //get rid of the .json
+												return <option key={i} value={asset.asset_id}>{asset.asset_id}</option>
+											})
+										}
+										else { return <option>No Owned Assets</option> }
+									})(this)}
+								</optgroup>
+							</select>
+						</div>
+
+						<div className="form-group">
+							<label htmlFor="unique_id">Enter Unique Attributes</label>
 							{this.state.inputs.map(input => <UniqueIDAttributesForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
 						</div>
 						<div className="form-group">
@@ -1143,11 +1218,7 @@ class MyGatekeeper extends React.Component {
 							</div>
 						</div>
 						<div className="form-group">
-							<label htmlFor="assetID">Name Your Asset. For example, 'My Diploma'.</label>
-							<TagsInput {...basicAttrs} value={this.state.assetID} onChange={(e) => { this.onFieldChange("assetID", e) }} />
-						</div>
-						<div className="form-group">
-							<label htmlFor="validators">Validators (public keys of the accounts which will verify this identity/asset)</label>
+							<label htmlFor="validators">Attestors (individuals who will very the authenticity of this identity/asset)</label>
 							<TagsInput {...inputAttrs4} maxTags={10} renderInput={autocompleteRenderInput} value={this.state.validators} onChange={(e) => { this.onFieldChange("validators", e) }} />
 						</div>
 						<div className="form-group">
@@ -1155,7 +1226,7 @@ class MyGatekeeper extends React.Component {
 								<br />
 								<input className="form-control" ref="signature" type="hidden" value={this.state.signature} />
 								<input type="hidden" name="pubkey" ref="pubKey" value={localStorage.getItem("pubKey")} />
-								<button className="btn btn-primary" data-loading-text="Submit Identity" name="submit-form" type="button" onClick={this.submitCoid.bind(this)}>Submit Identity</button>
+								<button className="btn btn-primary" data-loading-text="Submit Identity" name="submit-form" type="button" onClick={this.submitCoid.bind(this)}>Submit</button>
 							</div>
 						</div>
 					</form>

@@ -13,15 +13,16 @@ class Menu extends React.Component {
 			<div className="col-sm-3 col-md-2 sidebar">
 				<ul className="nav nav-pills nav-stacked">
 					<li><Link to='/home' activeClassName="active">Home</Link></li>
-					<li><Link to='/upload' activeClassName="active">Upload Keys</Link></li>
-					{prop.loggedin ? <li><Link to='/tovote' activeClassName="active">Vote</Link></li> : ''}
+					<li><Link to='/upload' activeClassName="active">Login</Link></li>
+					{prop.loggedin ? <li><Link to='/tovote' activeClassName="active">Attestations</Link></li> : ''}
+					{prop.loggedin ? <li><Link to='/Attestations' activeClassName="active">ICA Attestations</Link></li> : ''}
 					{prop.loggedin ? <li><Link to='/notifications' activeClassName="active">Notifications</Link></li> : ''}
 					{/*prop.loggedin ? <li><Link to='/register' activeClassName="active">Name Register</Link></li> : ''*/}
 					{prop.loggedin ? <li><Link to='/identity' activeClassName="active"><b>Create Core Identity</b></Link></li> : ''}
 					{prop.loggedin ? <li><Link to='/myGatekeeper' activeClassName="active">My Gatekeeper</Link></li> : ''}
-					{prop.loggedin ? <li><Link to='/assets' activeClassName="active">Assets</Link></li> : ''}
+					{prop.loggedin ? <li><Link to='/assets' activeClassName="active">My Assets</Link></li> : ''}
 					{prop.loggedin ? <li><Link to='/docs' activeClassName="active">My Documents</Link></li> : ''}
-					{prop.loggedin ? <li><Link to='/mycoreidentity' activeClassName="active">COID Utility</Link></li> : ''}
+					{prop.loggedin ? <li><Link to='/mycoreidentity' activeClassName="active">Manage Identities and Assets</Link></li> : ''}
 				</ul>
 			</div>
 		);

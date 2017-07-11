@@ -1,53 +1,14 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router';
 import TagsInput from 'react-tagsinput';
-import UploadIpfsFile from './UploadIpfsFile.jsx'
-var crypto = require('crypto');
-var secp256k1 = require('secp256k1');
-var keccak_256 = require('js-sha3').keccak_256;
+import UploadIpfsFile from './UploadIpfsFile.jsx';
+import UniqueIDAttributeForm from './IdentityFederation/UniqueIDAttributeForm.jsx';
+//var crypto = require('crypto');
+const secp256k1 = require('secp256k1');
+const keccak_256 = require('js-sha3').keccak_256;
 
 //********************************************************
-//********************************************************
-class AttributeForm extends React.Component {
 
-    constructor(props) {
-        super(props)
-        this.state = {
-            tmpFile: '',
-            showModal: false,
-        }
-        this.maxAttributes = this.props.max
-    }
-
-    handleShowModal(e) {
-        this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-    }
-
-    handleHideModal() {
-        this.setState({ showModal: false });
-    }
-
-    render() {
-        console.log("attribute form props: " + JSON.stringify(this.props))
-
-        var style = {
-            fontSize: '12.5px'
-        }
-        return (
-            <div className="form-group col-md-12" style={style}>
-                <div className="col-md-10">
-                    <label htmlFor="unique_id_attrs"> Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research". </label>
-                    <input name={'label-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Descriptor" />
-                </div>
-                <div className="col-md-2">
-                    <button style={style} type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn btn-warning pull-right">
-                        <span className="glyphicon glyphicon-upload"></span>Upload File
-                    </button>
-                </div>
-            </div>
-        );
-    }
-};
 //********************************************************
 //********************************************************
 class TokenDistributionForm extends React.Component {
@@ -84,6 +45,7 @@ class TokenDistributionForm extends React.Component {
 //********************************************************
 //********************************************************
 class Asset extends React.Component {
+    
     constructor(props) {
         super(props)
         this.state = {
@@ -131,38 +93,6 @@ class Asset extends React.Component {
         var multipleValues = {};
         multipleValues[inputField] = e;
         this.setState(multipleValues);
-    }
-    //*****************************************************************************
-    //if the asset in scope is 'MyCOID', we cannot add additional owners
-    assetType_check() {
-        // let asset_id = this.props.asset.asset_id
-        // console.log("assetID.. " + asset_id)
-
-        // let own = document.getElementById("OWNERSHIP");
-        // let ctrl = document.getElementById("controllers");
-        // let recovery = document.getElementById("recovery");
-        // let dele = document.getElementById("delegations");
-
-        // if (asset_id == "MyCOID")
-        // { own.style.display = 'none'; }
-        // else
-        // { own.style.display = 'block'; }
-
-        // let storage = Array(localStorage.getItem("owned_assets"))
-        // storage = JSON.parse(storage); //now storage is an object
-        // console.log("typeof storage: " + typeof(storage));
-
-        // storage.forEach(function(element) {
-        //     if(asset_id = element.asset_id && element.asset_type == 2){
-        //         console.log("found")
-        //         ctrl.style.display = 'none';
-        //         recovery.style.display = 'none';
-        //         dele.style.display = 'none';
-        //     }
-        //     //console.log("element: " + JSON.stringify(element))
-        // })
-
-
     }
     //*****************************************************************************
     //Passed as a prop to DimensionAttributeForm
@@ -666,8 +596,6 @@ class Asset extends React.Component {
 
         let prop = this.props.asset.asset_name;
 
-        //onClick={this.assetType_check.bind(this)}
-
         return (
             <div id="SubmitContainer">
                 <b>{this.props.asset.asset_id}</b><br />
@@ -721,7 +649,7 @@ class Asset extends React.Component {
                             </table>
                             <div className="form-group">
                                 <label htmlFor="unique_id">Enter Unique ID Attributes:</label>
-                                {this.state.inputs.map(input => <AttributeForm handleShowModal={this.handleShowModal.bind(this)} max="10" key={input} labelref={input} />)}
+                                {this.state.inputs.map(input => <UniqueIDAttributeForm type="MyCOID" handleShowModal={this.handleShowModal.bind(this)} max="10" key={input} labelref={input} />)}
                             </div>
                             <div className="col-md-offset-6 col-md-6 ">
                                 <button type="button" className="btn btn-info pull-right" style={style} onClick={this.appendInput.bind(this)}>

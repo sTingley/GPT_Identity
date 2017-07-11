@@ -1,6 +1,6 @@
 import React from 'react';
 import DayPicker from "react-day-picker";
-var crypto = require('crypto');
+//var crypto = require('crypto');
 var secp256k1 = require('secp256k1');
 var keccak_256 = require('js-sha3').keccak_256;
 function hex_to_ascii(str1) {

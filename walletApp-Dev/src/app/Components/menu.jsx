@@ -1,14 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router';
+
 class Menu extends React.Component {
+
 	constructor(props) {
 		super(props);
-		this.state = {
-			userLoggedIn: this.props.loggedin
-		}
+		// this.state = {
+		// 	userLoggedIn: this.props.loggedin
+		// }
 	}
 	render() {
-		var prop = this.props;
+		let prop = this.props;
 		return (
 			<div className="col-sm-3 col-md-2 sidebar">
 				<ul className="nav nav-pills nav-stacked">

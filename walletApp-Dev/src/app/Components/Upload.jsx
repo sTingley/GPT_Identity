@@ -14,6 +14,7 @@ class UploadKeyStore extends React.Component {
 		this.uploadFile = this.uploadFile.bind(this);
 	}
 
+	//puts the users keys into local storage
 	createStorage(pubKey, private_key) {
 		localStorage.setItem("pubKey", pubKey);
 		localStorage.setItem("privKey", private_key);
@@ -22,6 +23,7 @@ class UploadKeyStore extends React.Component {
 		localStorage.setItem("timestamp", now.getTime());
 	}
 
+	//set the users local storage and log them in
 	uploadFile(e) {
 		e.preventDefault();
 		var file = e.target.files.value;
@@ -39,7 +41,6 @@ class UploadKeyStore extends React.Component {
 			alert("Unknown file format ! We support only JSON");
 		}
 
-
 		//set contacts upon key upload; Replace hardcodede pubKey with uploaded key later
 		$.ajax({
 			url: twinUrl + "readContacts/" + '03a066efbb37f5fabfab05bf4a65e0dc376d0e3fb1c3d930d7f5ec6da3ac5bc237',
@@ -52,8 +53,7 @@ class UploadKeyStore extends React.Component {
 					names.push(resp.data.contacts[i].contactName);
 					keys.push(resp.data.contacts[i].pubKey);
 				}
-				// console.log(names);
-				// console.log(keys);
+
 				localStorage.setItem("contactNames", names);
 				localStorage.setItem("contactPubKeys", keys);
 				console.log("LS contactNames: " + localStorage.getItem("contactNames"));

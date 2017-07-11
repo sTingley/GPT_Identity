@@ -1,18 +1,9 @@
 import React from 'react';
 import DayPicker from "react-day-picker";
-
-var crypto = require('crypto');
-var secp256k1 = require('secp256k1');
-var keccak_256 = require('js-sha3').keccak_256;
-
-function hex_to_ascii(str1) {
-	var hex = str1.toString();
-	var str = [];
-	for (var n = 0; n < hex.length; n += 1) {
-		str.push(String.fromCharCode(parseInt(hex.substr(n, 2), 16)));
-	}
-	return str;
-}
+//var crypto = require('crypto');
+const secp256k1 = require('secp256k1');
+const keccak_256 = require('js-sha3').keccak_256;
+const style = { fontSize: '12.5px' };
 
 class ModalWin extends React.Component {
 
@@ -24,56 +15,48 @@ class ModalWin extends React.Component {
 			selectedDay: new Date() //for signature expiration
 		};
 	}
-
+	//*****************************************************************************
+	//*****************************************************************************
+    //takes in a msg/json and returns a signature (needed for requests)
+    getSignature(msg) {
+        console.log("creating signature, signing msg: \n" + JSON.stringify(msg))
+		//get private key from local storage
+        var privKey = localStorage.getItem("privKey")
+		//make private key hex buffer
+        var privKey1 = new Buffer(privKey, "hex");
+        var msg_hash = keccak_256(JSON.stringify(msg));
+        var msg_hash_buffer = new Buffer(msg_hash, "hex")
+        let signature = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1))
+        signature = JSON.parse(signature).signature;
+        signature = JSON.stringify(signature);
+        signature = JSON.parse(signature).data;
+        signature = new Buffer(signature, "hex");
+        signature = signature.toString("hex");
+        return signature
+    }
+	//*****************************************************************************
+	//*****************************************************************************
 	submitHandler(e) {
 		e.preventDefault();
 		var ele = $(e.target);
 
-		//get private key from local storage
-		var privKey = localStorage.getItem("privKey");
-
-		//make private key hex buffer
-		var privKey1 = new Buffer(privKey, "hex");
-
-		//message is "vote_transaction"
-		var msg = "vote_transaction"
-
-		//get hash of message
-		var msg_hash = keccak_256(msg);
-
-		//make msg_hash a hex buffer
-		var msg_hash_buffer = new Buffer(msg_hash, "hex");
-
-		//sign the message
-		var signature1 = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1))
-
-		//get json object with key "signature"
-		signature1 = JSON.parse(signature1).signature;
-		signature1 = JSON.stringify(signature1);
-
-		//get json object with key "data" in side the json object with key "signature"
-		signature1 = JSON.parse(signature1).data;
-
-		//make the signature a buffer, then a string, to emit the commas
-		signature1 = new Buffer(signature1, "hex");
-		signature1 = signature1.toString("hex");
-
-		//log for testing
-		console.log("sig" + signature1)
-		console.log(typeof (signature1))
-
 		let day = this.state.selectedDay;
 		let sigExpire = day.getTime() / 1000;
 
+		//NOTE: signature not yet in JSON object
 		var json = {
 			"txnDesc": "sampleDesc",
-			"signature": signature1,
-			"msg": msg_hash_buffer.toString("hex"),
 			"publicKey": localStorage.getItem("pubKey"),
 			"proposalID": this.state.proposal.proposal_id,
 			"vote": parseInt(ele.attr("data-val")),
 			"sigExpire": sigExpire
 		};
+
+		let signature = this.getSignature(json);
+		var msg_hash = keccak_256(JSON.stringify(json));
+        var msg_hash_buffer = new Buffer(msg_hash, "hex");
+        json.msg = msg_hash_buffer.toString("hex");
+		json.signature = signature;
 
 		$.ajax({
 			url: twinUrl + 'voteonCOIDproposal',
@@ -94,16 +77,13 @@ class ModalWin extends React.Component {
 						}
 					});
 
-				} else {
-					//alert("Unable to submit your vote. Please try again later");
 				}
 			}
 		});
 	}
-
-
+	//*****************************************************************************
+	//*****************************************************************************
 	componentDidMount() {
-
 		var _this = this;
 		let propType = this.state.proposal.propType;
 		console.log("propType: " + propType);
@@ -141,31 +121,159 @@ class ModalWin extends React.Component {
 
 				$("#proposalDetails").modal('show');
 				$("#proposalDetails").on('hidden.bs.modal', _this.props.hideHandler);
-
-				let standardAsset = document.getElementById("standardAsset");
-				let KYC = document.getElementById("KYC");
-
-				if (propType == 2) {
-					KYC.style.display = 'block';
-					standardAsset.style.display = 'none';
-				} else {
-					KYC.style.display = 'none';
-				}
-
 			}//end success
 		});
 	}
 
-
+	//*****************************************************************************
+	//renders a normal asset/coid proposal
+	//*****************************************************************************
+	renderStandardAsset(){
+		return(
+			<tbody>
+				<tr>
+					<td>Proposal ID</td>
+					<td>{this.state.proposal.proposal_id}</td>
+				</tr>
+				<tr>
+					<td colSpan="2"><b>Official IDs</b></td>
+				</tr>
+				{(() => {
+					var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+					if (!$.isEmptyObject(this.state.proposal_data)) {
+						return this.state.proposal_data.uniqueIdAttributes.map((ids, i) => {
+							return (
+								<tr key={i}>
+									<td>{ids[0]}</td>
+									<td><p>File hash: {ids[2]}</p><p>IPFS hash: <a target="_blank" href={ipfs_url + "/" + ids[1]}>{ids[1]}</a></p></td>
+								</tr>
+							)
+						});
+					} else { return <tr><td colSpan="2">No Ids found</td></tr> }
+				})(this)}
+				<tr>
+					<td>Ownership ID</td>
+					<td>{this.state.proposal_data.ownershipId}</td>
+				</tr>
+				<tr>
+					<td>Ownership ID List</td>
+					<td>
+						{(() => {
+							if (!$.isEmptyObject(this.state.proposal_data)) {
+								return this.state.proposal_data.ownerIdList.map((ids, i) => {
+									return <p key={i}> {this.state.proposal_data.ownerIdList[i]}</p>
+								})
+							}
+							else {
+								return <p>No Ids found</p>
+							}
+						})(this)}
+					</td>
+				</tr>
+				<tr>
+					<td>Ownership Token ID</td>
+					<td><p> {this.state.proposal_data.ownershipTokenId}</p></td>
+				</tr>
+				<tr>
+					<td>Ownership Token Description</td>
+					<td><p>{this.state.proposal_data.ownershipTokenAttributes}</p></td>
+				</tr>
+				<tr>
+					<td>Ownership Token Quantity</td>
+					<td><p> {this.state.proposal_data.ownershipTokenQuantity}</p></td>
+				</tr>
+				<tr>
+					<td>Control ID</td>
+					<td><p> {this.state.proposal_data.controlId}</p></td>
+				</tr>
+				<tr>
+					<td>Control ID List</td>
+					<td>{(() => {
+						if (!$.isEmptyObject(this.state.proposal_data)) {
+							return this.state.proposal_data.controlIdList.map((ids, i) => {
+								return <p key={i}> {this.state.proposal_data.controlIdList[i]}</p>
+							})
+						}
+					})(this)}
+					</td>
+				</tr>
+				<tr>
+					<td>Control Token ID</td>
+					<td> <p> {this.state.proposal_data.controlTokenId}</p></td>
+				</tr>
+				<tr>
+					<td>Control Token Description</td>
+					<td><p>{this.state.proposal_data.controlTokenAttributes}</p></td>
+				</tr>
+				<tr>
+					<td>Control Token Quantity</td>
+					<td><p> {this.state.proposal_data.controlTokenQuantity}</p></td>
+				</tr>
+				<tr>
+					<td>Recovery IDs</td>
+					<td>{(() => {
+						if (!$.isEmptyObject(this.state.proposal_data)) {
+							return this.state.proposal_data.identityRecoveryIdList.map((ids, i) => {
+								return <p key={i}> {this.state.proposal_data.identityRecoveryIdList[i]}</p>
+							})
+						}
+					})(this)}
+					</td>
+				</tr>
+				<tr>
+					<td>Recovery Condition</td>
+					<td> <p> {this.state.proposal_data.recoveryCondition}</p></td>
+				</tr>
+				<tr>
+					<td>Vote Description</td>
+					<td><textarea className="form-control"></textarea></td>
+				</tr>
+			</tbody>
+		)
+	}
+	//*****************************************************************************
+	//renders an ICA proposal which gives ability to set an expiration
+	//*****************************************************************************
+	renderICA(){
+		return(
+			<tbody>
+				<tr>
+					<td>Proposal ID</td>
+					<td>{this.state.proposal.proposal_id}</td>
+				</tr>
+				<tr>
+					<td colSpan="2"><b>Official IDs</b></td>
+				</tr>
+				{(() => {
+					var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+					if (!$.isEmptyObject(this.state.proposal_data)) {
+						return this.state.proposal_data.uniqueIdAttributes.map((ids, i) => {
+							return (
+								<tr key={i}>
+									<td>{ids[0]}</td>
+									<td><p>File hash: {ids[2]}</p><p>IPFS hash: <a target="_blank" href={ipfs_url + "/" + ids[1]}>{ids[1]}</a></p></td>
+								</tr>
+							)
+						});
+					} else { return <tr><td colSpan="2">No Ids found</td></tr> }
+				})(this)}
+				<tr>
+					<td>Signature Expiration:</td>
+					<td>
+						<DayPicker
+							disabledDays={{ daysOfWeek: [0] }}
+							onDayClick={day => this.state.selectedDay = day}
+						/>
+					</td>
+				</tr>
+			</tbody>
+		)
+	}
+	//*****************************************************************************
+	//*****************************************************************************
 	render() {
-		var prop = this.state.proposal;
+		let _this = this;
 
-		//{"type":"proposal","proposal_id":"AAC312616FFE818CA093C9B34BB58DB26AFA7287C0B3DB689F9AAD337BE8C5B1",
-		//"message":"You have been selected to vote on the proposal.","read_status":false,"time":1496256497368,
-		//"gatekeeperAddr":"0000000000000000000000000000000000000000","isHuman":true}
-		var style = {
-			fontSize: '12.5px'
-		}
 		return (
 			<div className="modal fade" id="proposalDetails" tabIndex="-1" role="dialog">
 
@@ -177,158 +285,10 @@ class ModalWin extends React.Component {
 							<h4 className="modal-title" id="asset">COID Proposal Details</h4>
 						</div>
 
-						<div id="standardAsset" className="modal-body">
+						<div className="modal-body">
 							<table className="table table-striped table-hover" style={style}>
-								<tbody>
-									<tr>
-										<td>Proposal ID</td>
-										<td>{prop.proposal_id}</td>
-									</tr>
-									<tr>
-										<td colSpan="2"><b>Official IDs</b></td>
-									</tr>
-									{(() => {
-										var ipfs_url = "http://10.101.114.231:8080/ipfs/";
-										if (!$.isEmptyObject(this.state.proposal_data)) {
-											return this.state.proposal_data.uniqueIdAttributes.map((ids, i) => {
-												return (
-													<tr key={i}>
-														<td>{ids[0]}</td>
-														<td><p>File hash: {ids[2]}</p><p>IPFS hash: <a target="_blank" href={ipfs_url + "/" + ids[1]}>{ids[1]}</a></p></td>
-													</tr>
-												)
-											});
-
-										} else {
-											return <tr><td colSpan="2">No Ids found</td></tr>
-										}
-									})(this)}
-
-									<tr>
-										<td>Ownership ID</td>
-
-										<td>{this.state.proposal_data.ownershipId}</td>
-									</tr>
-									<tr>
-										<td>Ownership ID List</td>
-										<td>
-											{(() => {
-												if (!$.isEmptyObject(this.state.proposal_data)) {
-													return this.state.proposal_data.ownerIdList.map((ids, i) => {
-														return <p key={i}> {this.state.proposal_data.ownerIdList[i]}</p>
-													})
-												}
-												else {
-													return <p>No Ids found</p>
-												}
-											})(this)}
-										</td>
-
-									</tr>
-
-									<tr>
-										<td>Ownership Token ID</td>
-										<td><p> {this.state.proposal_data.ownershipTokenId}</p></td>
-									</tr>
-									<tr>
-										<td>Ownership Token Description</td>
-										<td><p>{this.state.proposal_data.ownershipTokenAttributes}</p></td>
-									</tr>
-									<tr>
-										<td>Ownership Token Quantity</td>
-										<td><p> {this.state.proposal_data.ownershipTokenQuantity}</p></td>
-									</tr>
-
-
-
-									<tr>
-										<td>Control ID</td>
-										<td><p> {this.state.proposal_data.controlId}</p></td>
-									</tr>
-									<tr>
-										<td>Control ID List</td>
-										<td>{(() => {
-											if (!$.isEmptyObject(this.state.proposal_data)) {
-												return this.state.proposal_data.controlIdList.map((ids, i) => {
-													return <p key={i}> {this.state.proposal_data.controlIdList[i]}</p>
-												})
-											}
-										})(this)}
-										</td>
-									</tr>
-									<tr>
-										<td>Control Token ID</td>
-										<td> <p> {this.state.proposal_data.controlTokenId}</p></td>
-									</tr>
-									<tr>
-										<td>Control Token Description</td>
-										<td><p>{this.state.proposal_data.controlTokenAttributes}</p></td>
-									</tr>
-									<tr>
-										<td>Control Token Quantity</td>
-										<td><p> {this.state.proposal_data.controlTokenQuantity}</p></td>
-									</tr>
-									<tr>
-										<td>Recovery IDs</td>
-										<td>{(() => {
-											if (!$.isEmptyObject(this.state.proposal_data)) {
-												return this.state.proposal_data.identityRecoveryIdList.map((ids, i) => {
-													return <p key={i}> {this.state.proposal_data.identityRecoveryIdList[i]}</p>
-												})
-											}
-										})(this)}
-										</td>
-									</tr>
-
-									<tr>
-										<td>Recovery Condition</td>
-										<td> <p> {this.state.proposal_data.recoveryCondition}</p></td>
-									</tr>
-									<tr>
-										<td>Vote Description</td>
-										<td><textarea className="form-control"></textarea></td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-
-						<div id="KYC" className="modal-body">
-							<table className="table table-striped table-hover" style={style}>
-								<tbody>
-									<tr>
-										<td>Proposal ID</td>
-										<td>{prop.proposal_id}</td>
-									</tr>
-									<tr>
-										<td colSpan="2"><b>Official IDs</b></td>
-									</tr>
-									{(() => {
-										var ipfs_url = "http://10.101.114.231:8080/ipfs/";
-										if (!$.isEmptyObject(this.state.proposal_data)) {
-											return this.state.proposal_data.uniqueIdAttributes.map((ids, i) => {
-												return (
-													<tr key={i}>
-														<td>{ids[0]}</td>
-														<td><p>File hash: {ids[2]}</p><p>IPFS hash: <a target="_blank" href={ipfs_url + "/" + ids[1]}>{ids[1]}</a></p></td>
-													</tr>
-												)
-											});
-
-										} else {
-											return <tr><td colSpan="2">No Ids found</td></tr>
-										}
-									})(this)}
-									<tr>
-										<td>Signature Expiration:</td>
-										<td>
-											<DayPicker
-												disabledDays={{ daysOfWeek: [0] }}
-												onDayClick={day => this.state.selectedDay = day}
-											/>
-										</td>
-									</tr>
-
-								</tbody>
+								{this.state.proposal.propType == 0 ? this.renderStandardAsset() : null}
+								{this.state.proposal.propType == 2 ? this.renderICA() : null}
 							</table>
 						</div>
 
@@ -339,8 +299,6 @@ class ModalWin extends React.Component {
 					</div>
 				</div>
 			</div>
-
-
 		)
 	}
 };
@@ -371,9 +329,7 @@ class ToVote extends React.Component {
 			success: function (result) {
 				console.log("result: " + JSON.stringify((result)));
 				if (typeof (result) != "object") {
-					//if(true){
 					var data = JSON.parse(result);
-					console.log("TOVOTE needs else brackets?" + localStorage.getItem("pubKey"));
 				} else {
 					var data = result;
 					var test = JSON.parse((result.data));
@@ -381,7 +337,6 @@ class ToVote extends React.Component {
 					console.log(test[0].type);
 				}
 				this.setState({ coid: test });
-				console.log("ToVote state: " + JSON.stringify(this.state))
 				console.log("result: " + JSON.stringify((result.data)));
 			}.bind(this)
 		});
@@ -395,10 +350,6 @@ class ToVote extends React.Component {
 	dataHandler(index) {
 		return this.state.coid[index];
 	}
-
-	// getActiveData() {
-	// 	return this.state.activeProposal;
-	// }
 
 	showHandler(e) {
 		e.preventDefault();
@@ -431,13 +382,7 @@ class ToVote extends React.Component {
 										</tr>
 									);
 								});
-							} else {
-								return (<tr>
-									<td>
-										<p>No data to act upon !</p>
-									</td>
-								</tr>);
-							}
+							} else { return (<tr><td><p>No data to act upon !</p></td></tr>); }
 						})(this)}
 					</tbody>
 				</table>

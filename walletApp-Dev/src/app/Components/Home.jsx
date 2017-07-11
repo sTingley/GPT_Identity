@@ -7,7 +7,7 @@ class DownloadFile extends React.Component{
 		super(props);
 		this.state = {
 			download_url: props.params[1],
-			pwd: props.params[0],
+			//pwd: props.params[0],
 			pub_key: props.params[2]
 		};
 	}

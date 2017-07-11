@@ -2,278 +2,10 @@ import React from 'react';
 import TagsInput from 'react-tagsinput';
 import Autosuggest from 'react-autosuggest'
 import { keccak_256 } from 'js-sha3';
-var crypto = require('crypto');
+import UploadIpfsFile from '../UploadIpfsFile.jsx';
+import UniqueIDAttributeForm from './UniqueIDAttributeForm.jsx';
+//var crypto = require('crypto');
 var secp256k1 = require('secp256k1');
-
-//TODO : Namespace validation
-//TODO:
-//CONTROLLERS need to be able to upload documents---LATER
-
-class UploadIpfsFile extends React.Component {
-
-	constructor(props) {
-		super(props);
-		this.state = {
-			docs: {},
-			pubKey: props.pubKey,
-			selected: '0',
-			files: ''
-		};
-		this.inputChangeHandler = this.inputChangeHandler.bind(this);
-	}
-
-	componentDidMount() {
-		$.ajax({
-			url: twinUrl + "ipfs/alldocs/" + this.state.pubKey,
-			dataType: 'json',
-			cache: false,
-			success: function (resp) {
-				this.setState({ docs: resp.data.documents });
-			}.bind(this),
-			error: function (xhr, status, err) {
-				console.error(this.props.url, status, err.toString());
-			}.bind(this)
-		});
-
-		$("#CoreIdentityContainer .modal").modal('show');
-		$("#CoreIdentityContainer .modal").on('hidden.bs.modal', this.props.handleHideModal);
-	}
-
-	uploadHandler(data, additionalParams) {
-		var params = {
-			url: twinUrl + "ipfs/upload",
-			type: 'POST',
-			data: data,
-			cache: false,
-			processData: false,
-			contentType: false,
-		};
-		$.extend(params, additionalParams);
-		$.ajax(params);
-	}
-
-	fileHandler(e) {
-		e.preventDefault();
-		if (this.state.selected != "0") {
-			var hash, fileHash;
-			this.props.dataHandler(this.state.selected);
-			$("button.close").trigger("click");
-		} else {
-			if (this.state.files.size > 0) {
-				var fileInput = $("input[name=newdoc]");
-				var fData = new FormData();
-				fData.append("user_pubkey", this.state.pubKey);
-				$.each(fileInput[0].files, function (key, value) {
-					fData.append(key, value);
-				});
-				var _this = this;
-				var callbacks = {
-					beforeSend: (xhr) => {
-						$("button[name=uploadsubmit]").button('loading');
-						$("button.close").hide();
-					},
-					success: function (resp) {
-						if (resp.uploded && resp.uploded.length > 0) {
-							var filedata = resp.uploded[0].hash + "|" + resp.uploded[0].file_hash;
-							//data handler forms JSON object
-							this.props.dataHandler(filedata);
-							$("button.close").trigger("click");
-						}
-					}.bind(this),
-					complete: () => {
-						$("button[name=uploadsubmit]").button('reset');
-						$("button.close").show();
-					}
-				};
-				this.uploadHandler(fData, callbacks);
-			}
-		}
-	}
-
-	inputChangeHandler(e) {
-		if (e.target.tagName == "SELECT") {
-			this.setState({ selected: e.target.value });
-		} else
-			this.setState({ files: e.target.files[0] });
-	}
-
-	render() {
-		var center = {
-			textAlign: 'center'
-		};
-		return (
-			<div className="modal fade">
-				<div className="modal-dialog">
-					<div className="modal-content">
-						<div className="modal-header">
-							<button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-							<h4 className="modal-title">Upload Document</h4>
-						</div>
-						<div className="modal-body">
-							<form>
-								<div className="form-group">
-									<label htmlFor="get-hash">Choose from documents</label>
-									<select className="form-control" onChange={this.inputChangeHandler}>
-										<option value="0">Select Document</option>
-										{(() => {
-											if (this.state.docs && this.state.docs.length > 0) {
-												var i = 0;
-												return this.state.docs.map((obj) => {
-													i++;
-													var optsVal = obj.hash + "|" + obj.file_hash;
-													return <option value={optsVal} key={i}>{obj.filename}</option>
-												});
-											} else {
-												return <option value="0">-- Empty --</option>
-											}
-										})()}
-									</select>
-								</div>
-								<p style={center}>(or)</p>
-								<div className="form-group">
-									<label htmlFor="documents">Upload Document</label>
-									<input type="file" className="form-control" name="newdoc" onChange={this.inputChangeHandler} />
-								</div>
-							</form>
-						</div>
-						<div className="modal-footer">
-							<button type="button" data-loading-text="Processing..." name="uploadsubmit" className="btn btn-success" onClick={this.fileHandler.bind(this)}>Submit</button>
-						</div>
-					</div>
-				</div>
-			</div>
-		)
-	}
-};
-
-//form where we can add additional uniqueIDAttrs
-class UniqueIDAttributesForm extends React.Component {
-
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			file_attrs: [],
-			inputs: ['input-0'],
-			tmpFile: '',
-			showModal: false,
-			pubKey: localStorage.getItem("pubKey")
-		};
-	}
-
-	handleShowModal(e) {
-		this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-	}
-
-	handleHideModal() {
-		this.setState({ showModal: false });
-	}
-
-	render() {
-
-		return (
-			<div className="form-group col-md-12">
-				<div className="col-md-10">
-					<label htmlFor="unique_id_attrs"> Unique Identfiers e.g. Serial Numbers, MAC Addresses, Vehicle Identitfication Numbers</label>
-					<input name={'label-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Label" />
-					<button type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn btn-sm btn-warning pull-right"><span className="glyphicon glyphicon-upload"></span>Upload File</button>
-				</div>
-			</div>
-		);
-	}
-
-};
-
-class ControlTokenDistributionForm extends React.Component {
-
-	constructor(props) {
-		super(props)
-		// this.state = {
-		// 	controltoken_quantity: [],
-		// 	controltoken_list: [],
-		// 	showModal: false
-		// };
-		//this.maxUniqAttr = 10;
-		//this.onFieldChange = this.onFieldChange.bind(this);
-		//this.handleHideModal = this.handleHideModal.bind(this);
-	}
-	// handleShowModal(e) {
-	// 	this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-	// }
-
-	// handleHideModal() {
-	// 	this.setState({ showModal: false });
-	// }
-	render() {
-		var style = {
-			fontSize: '12.5px'
-		}
-		return (
-			<div className="form-group col-md-12">
-				<div className="col-md-10">
-					<table className="table table-striped table-hover" style={style}>
-						<tbody>
-							<tr>
-								<th><b>Controller</b></th>
-								<th><b>Token Quantity</b></th>
-							</tr>
-							<tr>
-								<td><input name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Public Key of Controller" /></td>
-								<td><input name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Control Token Quantity" /></td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		);
-	}
-};
-
-class OwnerTokenDistributionForm extends React.Component {
-
-	constructor(props) {
-		super(props)
-		// this.state = {
-		// 	ownertoken_quantity: [],
-		// 	ownertoken_list: [],
-		// 	showModal: false
-		// };
-
-		// this.maxUniqAttr = 10;
-		// this.onFieldChange = this.onFieldChange.bind(this);
-		// this.handleHideModal = this.handleHideModal.bind(this);
-	}
-	// handleShowModal(e) {
-	// 	this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-	// }
-
-	// handleHideModal() {
-	// 	this.setState({ showModal: false });
-	// }
-	render() {
-		var style = {
-			fontSize: '12.5px'
-		}
-		return (
-			<div className="form-group col-md-12">
-				<div className="col-md-10">
-					<table className="table table-striped table-hover" style={style}>
-						<tbody>
-							<tr>
-								<th><b>Owner</b></th>
-								<th><b>Token Quantity</b></th>
-							</tr>
-							<tr>
-								<td><input name={'label2-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Public Key of Owner" /></td>
-								<td><input name={'label2-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Ownership Token Quantity" /></td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		);
-	}
-};
 
 class MyGatekeeper extends React.Component {
 	constructor(props) {
@@ -828,7 +560,7 @@ class MyGatekeeper extends React.Component {
 		this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
 	}
 
-	//used in uniqueIdAttributesForm
+	//used in uniqueIdAttributeForm
 	appendInput() {
 		var inputLen = this.state.inputs.length;
 		if (inputLen < this.maxUniqAttr) {
@@ -891,6 +623,15 @@ class MyGatekeeper extends React.Component {
 		arr[Number(id)] = newValue;
 		this.setState({ value: arr });
 	};
+
+
+	renderNormalAsset(){
+
+	}
+
+	renderICA(){
+		
+	}
 
 
 	render() {
@@ -1036,7 +777,7 @@ class MyGatekeeper extends React.Component {
 		console.log("\n\nICA:  " + this.state.isICA);
 		if (this.state.isICA == false) {
 			return (
-				<div id="CoreIdentityContainer">
+				<div id="SubmitContainer">
 					<h1>Create Asset or Device Identity</h1>
 					<form method="POST" id="register" role="form">
 						<div className="form-group">
@@ -1057,84 +798,73 @@ class MyGatekeeper extends React.Component {
 						</div>
 						<div className="form-group">
 							<label htmlFor="unique_id">Enter Unique Attributes</label>
-							{this.state.inputs.map(input => <UniqueIDAttributesForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+							{this.state.inputs.map(input => <UniqueIDAttributeForm type="MyGK" handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
 						</div>
-						<div className="form-group">
-							<div className="col-md-offset-6 col-md-6 ">
-								<p></p>
-								<button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
-									<span className="glyphicon glyphicon-plus"></span>Add More
+
+						<div className="col-md-offset-4 col-md-6">
+							<button type="button" className="btn-sm btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
+								<span className="glyphicon glyphicon-plus"></span>Add More
 							</button>
-							</div>
 						</div>
+
 						<div className="form-group">
 							<label htmlFor="owner_dist">Enter Owners and their ownership token(s).</label>
 							{this.state.inputs_ownership.map((input, i) =>
-								<div className="form-group col-md-12">
-									<div className="col-md-10">
-										<table className="table table-striped table-hover" style={style}>
-											<tbody>
-												<tr>
-													<th><b>Owner</b></th>
-													<th><b>Token Quantity</b></th>
-												</tr>
-												<tr>
-													<td><TagsInput {...this.state.suggest_attrs2[i]} maxTags={1} renderInput={autocompleteRenderInput} className="form-control col-md-4" type="text" value={this.state.owner_id[i]} onChange={(e) => { this.onFieldChange2("owner_id," + i, e) }} />
-													</td>
-													<td><TagsInput {...basicAttrs} maxTags={1} className="form-control col-md-4" type="text" value={this.state.owner_token_quantity[i]} onChange={(e) => { this.onFieldChange2("owner_token_quantity," + i, e) }} /></td>
-												</tr>
-											</tbody>
-										</table>
-
-									</div>
+								<div className="col-md-10">
+									<table className="table table-striped table-hover" style={style}>
+										<tbody>
+											<tr>
+												<th><b>Owner</b></th>
+												<th><b>Token Quantity</b></th>
+											</tr>
+											<tr>
+												<td><TagsInput {...this.state.suggest_attrs2[i]} maxTags={1} renderInput={autocompleteRenderInput} className="form-control col-md-4" type="text" value={this.state.owner_id[i]} onChange={(e) => { this.onFieldChange2("owner_id," + i, e) }} />
+												</td>
+												<td><TagsInput {...basicAttrs} maxTags={1} className="form-control col-md-4" type="text" value={this.state.owner_token_quantity[i]} onChange={(e) => { this.onFieldChange2("owner_token_quantity," + i, e) }} /></td>
+											</tr>
+										</tbody>
+									</table>
 								</div>
-
 							)}
 						</div>
-						<div className="form-group">
-							<div className="col-md-offset-6 col-md-6 ">
-								<p></p>
-								<button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInputOwners.bind(this)}>
-									<span className="glyphicon glyphicon-plus"></span>Add More
+
+						<div className="col-md-offset-4 col-md-6">
+							<button type="button" className="btn-sm btn-info pull-right" style={syle} onClick={this.appendInputOwners.bind(this)}>
+								<span className="glyphicon glyphicon-plus"></span>Add More
 							</button>
-							</div>
 						</div>
 						<div className="form-group">
 							<label htmlFor="owner_token_id">Enter Owner Token Description. For example, 'Spencer's tokens'.</label>
 							<TagsInput {...basicAttrs} value={this.state.owner_token_desc} onChange={(e) => { this.onFieldChange("owner_token_desc", e) }} />
 						</div>
+						
 						<div className="form-group">
 							<label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
 							{this.state.inputs_control.map((input, i) =>
-								<div className="form-group col-md-12">
-									<div className="col-md-10">
-										<table className="table table-striped table-hover" style={style}>
-											<tbody>
-												<tr>
-													<th><b>Controller</b></th>
-													<th><b>Token Quantity</b></th>
-												</tr>
-												<tr>
-													<td><TagsInput {...this.state.suggest_attrs[i]} maxTags={1} renderInput={autocompleteRenderInput} className="form-control col-md-4" type="text" value={this.state.control_id[i]} onChange={(e) => { this.onFieldChange2("control_id," + i, e) }} />
-													</td>
-													<td><TagsInput {...basicAttrs} maxTags={1} className="form-control col-md-4" type="text" value={this.state.control_token_quantity[i]} onChange={(e) => { this.onFieldChange2("control_token_quantity," + i, e) }} /></td>
-												</tr>
-											</tbody>
-										</table>
-
-									</div>
-								</div>
-
+								<div className="col-md-10">
+									<table className="table table-striped table-hover" style={style}>
+										<tbody>
+											<tr>
+												<th><b>Controller</b></th>
+												<th><b>Token Quantity</b></th>
+											</tr>
+											<tr>
+												<td><TagsInput {...this.state.suggest_attrs[i]} maxTags={1} renderInput={autocompleteRenderInput} className="form-control col-md-4" type="text" value={this.state.control_id[i]} onChange={(e) => { this.onFieldChange2("control_id," + i, e) }} />
+												</td>
+												<td><TagsInput {...basicAttrs} maxTags={1} className="form-control col-md-4" type="text" value={this.state.control_token_quantity[i]} onChange={(e) => { this.onFieldChange2("control_token_quantity," + i, e) }} /></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>	
 							)}
 						</div>
-						<div className="form-group">
-							<div className="col-md-offset-6 col-md-6 ">
-								<p></p>
-								<button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInputControllers.bind(this)}>
-									<span className="glyphicon glyphicon-plus"></span>Add More
+
+						<div className="col-md-offset-4 col-md-6">
+							<button type="button" className="btn-sm btn-info pull-right" style={syle} onClick={this.appendInputControllers.bind(this)}>
+								<span className="glyphicon glyphicon-plus"></span>Add More
 							</button>
-							</div>
 						</div>
+
 						<div className="form-group">
 							<label htmlFor="control_token_id">Enter Control Token Description. For example, 'Spencer's tokens'.</label>
 							<TagsInput {...basicAttrs} value={this.state.control_token_desc} onChange={(e) => { this.onFieldChange("control_token_desc", e) }} />
@@ -1166,73 +896,74 @@ class MyGatekeeper extends React.Component {
 			);
 		} //end if
 		else {
+
+			//this.renderICA();
 			return (
-				<div id="CoreIdentityContainer">
-					<h1>Create Asset or Device Identity</h1>
-					<form method="POST" id="register" role="form">
-						<div className="form-group">
-							<label htmlFor="assetID">Name Your Asset. For example, 'My Diploma'.</label>
-							<TagsInput {...basicAttrs} value={this.state.assetID} onChange={(e) => { this.onFieldChange("assetID", e) }} />
-						</div>
-						<div className="form-group">
-							<label>
-								Request is an identity claim:
-								<input
-									value="isICA"
-									name="isICA"
-									type="checkbox"
-									checked={this.state.isICA}
-									onChange={this.checkboxChange}
-									defaultChecked={true} />
-							</label>
-						</div>
+			<div id="SubmitContainer">
+				<h1>Create Asset or Device Identity</h1>
+				<form method="POST" id="register" role="form">
+					<div className="form-group">
+						<label htmlFor="assetID">Name Your Asset. For example, 'My Diploma'.</label>
+						<TagsInput {...basicAttrs} value={this.state.assetID} onChange={(e) => { this.onFieldChange("assetID", e) }} />
+					</div>
+					<div className="form-group">
+						<label>
+							Request is an identity claim:
+							<input
+								value="isICA"
+								name="isICA"
+								type="checkbox"
+								checked={this.state.isICA}
+								onChange={this.checkboxChange}
+								defaultChecked={true} />
+						</label>
+					</div>
+					<div className="form-group">
+						<h5><b>Select asset to which this claim will reference:</b></h5>
+						<select id="assetSelect" className="selectpicker show-tick" value={this.state.currentAsset} onChange={this.pickerChange}>
+							<option selected value="">--- Please select ---</option>
+							<optgroup label="Owned Assets">
+								{(() => {
+									if (this.state.owned_assets.length > 0) {
+										return this.state.owned_assets.map((asset, i) => {
+											//let val = label.split(',') //get rid of the .json
+											return <option key={i} value={asset.asset_id}>{asset.asset_id}</option>
+										})
+									}
+									else { return <option>No Owned Assets</option> }
+								})(this)}
+							</optgroup>
+						</select>
+					</div>
 
-						<div className="form-group">
-							<h5><b>Select asset to which this claim will reference:</b></h5>
-							<select id="assetSelect" className="selectpicker show-tick" value={this.state.currentAsset} onChange={this.pickerChange}>
-								<option selected value="">--- Please select ---</option>
-								<optgroup label="Owned Assets">
-									{(() => {
-										if (this.state.owned_assets.length > 0) {
-											return this.state.owned_assets.map((asset, i) => {
-												//let val = label.split(',') //get rid of the .json
-												return <option key={i} value={asset.asset_id}>{asset.asset_id}</option>
-											})
-										}
-										else { return <option>No Owned Assets</option> }
-									})(this)}
-								</optgroup>
-							</select>
+					<div className="form-group">
+						<label htmlFor="unique_id">Enter Unique Attributes</label>
+						{this.state.inputs.map(input => <UniqueIDAttributeForm type="MyGK" handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+					</div>
+					<div className="form-group">
+						<div className="col-md-offset-6 col-md-6 ">
+							<p></p>
+							<button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
+								<span className="glyphicon glyphicon-plus"></span>Add More
+						</button>
 						</div>
-
-						<div className="form-group">
-							<label htmlFor="unique_id">Enter Unique Attributes</label>
-							{this.state.inputs.map(input => <UniqueIDAttributesForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+					</div>
+					<div className="form-group">
+						<label htmlFor="validators">Attestors (individuals who will very the authenticity of this identity/asset)</label>
+						<TagsInput {...inputAttrs4} maxTags={10} renderInput={autocompleteRenderInput} value={this.state.validators} onChange={(e) => { this.onFieldChange("validators", e) }} />
+					</div>
+					<div className="form-group">
+						<div className="col-sm-6">
+							<br />
+							<input className="form-control" ref="signature" type="hidden" value={this.state.signature} />
+							<input type="hidden" name="pubkey" ref="pubKey" value={localStorage.getItem("pubKey")} />
+							<button className="btn btn-primary" data-loading-text="Submit Identity" name="submit-form" type="button" onClick={this.submitCoid.bind(this)}>Submit</button>
 						</div>
-						<div className="form-group">
-							<div className="col-md-offset-6 col-md-6 ">
-								<p></p>
-								<button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
-									<span className="glyphicon glyphicon-plus"></span>Add More
-							</button>
-							</div>
-						</div>
-						<div className="form-group">
-							<label htmlFor="validators">Attestors (individuals who will very the authenticity of this identity/asset)</label>
-							<TagsInput {...inputAttrs4} maxTags={10} renderInput={autocompleteRenderInput} value={this.state.validators} onChange={(e) => { this.onFieldChange("validators", e) }} />
-						</div>
-						<div className="form-group">
-							<div className="col-sm-6">
-								<br />
-								<input className="form-control" ref="signature" type="hidden" value={this.state.signature} />
-								<input type="hidden" name="pubkey" ref="pubKey" value={localStorage.getItem("pubKey")} />
-								<button className="btn btn-primary" data-loading-text="Submit Identity" name="submit-form" type="button" onClick={this.submitCoid.bind(this)}>Submit</button>
-							</div>
-						</div>
-					</form>
-					{this.state.showModal ? <UploadIpfsFile pubKey={this.state.pubKey} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}
-				</div>
-			);
+					</div>
+				</form>
+				{this.state.showModal ? <UploadIpfsFile pubKey={this.state.pubKey} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}
+			</div>
+		)
 		}
 
 

@@ -1,8 +1,8 @@
 //******************************************************************************
 // CLIENT SIDE CRYPTO
-var crypto = require('crypto');
-var secp256k1 = require('secp256k1');
-var keccak_256 = require('js-sha3').keccak_256;
+const crypto = require('crypto');
+const secp256k1 = require('secp256k1');
+const keccak_256 = require('js-sha3').keccak_256;
 
 var wallet = function(){
   this.password = "";

@@ -1,159 +1,19 @@
 import React, { Component } from 'react';
 import TagsInput from 'react-tagsinput';
-import UploadIpfsFile from './UploadIpfsFile.jsx';
-import DayPicker from "react-day-picker";
+import UploadIpfsFile from '../UploadIpfsFile.jsx';
+import DimensionAttributeForm from './DimensionAttributeForm.jsx';
+import DimensionDelegationForm from './DimensionDelegationForm.jsx';
 import Autosuggest from 'react-autosuggest';
 
-//import TokenDistributionFrom from "./FORMS/TokenDistributionForm.jsx";
-
-let secp256k1 = require('secp256k1');
-let keccak_256 = require('js-sha3').keccak_256;
+const secp256k1 = require('secp256k1');
+const keccak_256 = require('js-sha3').keccak_256;
 const pubKey = localStorage.getItem("pubKey");
 
 /*
 CLASSES:
-    DimensionDelegationForm: (for adding delegations and tokens)
-    DimensionAttributeForm: (for uploading files for desc/attr pairs)
     DimensionForm: (rendered when we click an owned or controlled dimension)
     IdentityDimensions: PARENT CLASS
 */
-
-class DimensionAttributeForm extends React.Component {
-
-    constructor(props) {
-        super(props)
-        this.maxDelegations = this.props.max
-        this.selectPrivacy = this.selectPrivacy.bind(this);
-    }
-
-    //*****************************************************************************
-    //chosen from the select dropdown 'selectPrivacy'
-    selectPrivacy(e) {
-        console.log("e.target.value" + e.target.value);
-        if (e.target.value == "Public") {
-            console.log("this one is public ");
-        }
-        else {
-            //Private
-            //this.setState({addingICA: false})
-            //here we need to push a 1 for private into an 
-        }
-    }
-
-    render() {
-        //console.log("dimensionform props...\n" + JSON.stringify(this.props));
-        return (
-            <div className="form-group col-md-12">
-                <div className="col-md-10">
-                    <label htmlFor="unique_id_attrs"> Persona Descriptors e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research". </label>
-                    <input name={'label-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Descriptor" />
-                    <div className="form-group">
-                        <label> Descriptor privacy: </label>
-                        <select id="selectPrivacy" onChange={this.selectPrivacy}>
-                            <option value="selectVisibility">--- Please select ---</option>
-                            <option value="Public">Public</option>
-                            <option value="Private">Private</option>
-                        </select>
-                    </div>
-                    <button type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn btn-warning pull-right"><span className="glyphicon glyphicon-upload"></span>Upload File</button>
-                </div>
-            </div>
-        );
-    }
-};
-
-class DimensionDelegationForm extends React.Component {
-
-    constructor(props) {
-        super(props)
-        //{"max":"10","labelref":"input1-1"}
-        this.state = {
-
-            selectedDay: new Date(),
-            showCalendar: false
-        };
-
-        this.maxDelegations = this.props.max;
-        this.changeExpiration = this.changeExpiration.bind(this);
-        this.selectDay = this.selectDay.bind(this);
-
-        // MOVE THIS TO THE PART WHERE WE GET THE VALUES !!!!! !!!!! !!!!! !!!!! !!!!!
-        //let day = this.state.selectedDay;
-        //let sigExpire = day.getTime() / 1000;
-    }
-
-    changeExpiration() {
-        let expirations = document.getElementById("expireSelect-" + this.props.labelref);
-        if (expirations.selectedIndex == 1) {
-            this.setState({ showCalendar: true });
-        }
-        else { this.setState({ showCalendar: false }) }
-    }
-
-    //this function writes the expirations in local storage...
-    //remember to remove them when creating a dimension/adding a delegation!!!
-    selectDay(day) {
-        this.state.selectedDay = day;
-        day = day.getTime() / 1000;
-        localStorage.setItem("expiration-" + this.props.labelref, day);
-    }
-
-    render() {
-        var style = { fontSize: '12.5px' }
-        var basicAttrs = {
-            addKeys: [13, 188],	// Enter and comma
-            inputProps: {
-                placeholder: "Control Token Quantity",
-                style: { width: '50%' }
-            }
-        };
-
-        return (
-            <div className="form-group col-md-12">
-                <div className="col-md-10">
-                    <table className="table table-striped table-hover" style={style}>
-                        <tbody>
-                            <tr>
-                                <th><b>Delegatee</b></th>
-                                <th><b># of Tokens</b></th>
-                            </tr>
-                            <tr>
-                                <td><TagsInput {...this.props.attr} maxTags={1} className="form-control col-md-4" type="text" renderInput={this.props.autocompleteRenderInput} value={this.props.deleValue} onChange={this.props.passedFunction} /></td>
-                                <td><TagsInput {...basicAttrs} maxTags={1} name={'delegatee-' + this.props.labelref} className="form-control col-md-4" type="text" value={this.props.deleToken} onChange={this.props.passedFunction2} /></td>
-                            </tr>
-                            <tr>
-                                <td><b>Will the sharing expire?</b></td>
-                                <td>
-                                    <select id={'expireSelect-' + this.props.labelref} onChange={this.changeExpiration}>
-                                        <option value="selectOption">--- Please select ---</option>
-                                        <option value="Yes">Yes</option>
-                                        <option value="No">No</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    {(() => {
-                                        if (this.state.showCalendar == true) {
-                                            return (
-                                                <DayPicker
-                                                    ref={'expiration-' + this.props.labelref}
-                                                    name={'expiration-' + this.props.labelref}
-                                                    disabledDays={{ daysOfWeek: [0] }}
-                                                    onDayClick={day => this.selectDay(day)}
-                                                />
-                                            )
-                                        }
-                                    })(this)}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        );
-    }
-};
 
 class DimensionForm extends Component {
 
@@ -176,13 +36,27 @@ class DimensionForm extends Component {
             tmpFile: '',
             showModal: false,
             //******************************************************************************************* */
-            //pubkey: localStorage.getItem("pubKey"),
 
             inputs_controllers: ['inputCtrl-0'], //dimension controllers and their tokens
             controllers_pubkeys: [],
             controllers_tokens: [],
+            control_list: [],
 
-            delegations: ['input1-0'] //COME BACK TO THIS!!!!!!!!!!
+            delegations: ['input1-0'], //COME BACK TO THIS!!!!!!!!!!
+            deleValue: [[]],
+            deleToken: [[]],
+            suggest_attrs: [{
+                addKeys: [13, 188], // Enter and comma
+                inputProps: {
+                    placeholder: "use ENTER to add values",
+                    style: { width: '30%' },
+                    id: "1"
+                }
+            }],
+
+            names: localStorage.getItem("contactNames").split(','),
+            keys: localStorage.getItem("contactPubKeys").split(','),
+            value: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
         };
 
         this.addICA = this.addICA.bind(this);
@@ -225,6 +99,7 @@ class DimensionForm extends Component {
         signature = signature.toString("hex");
         return signature
     }
+
 
     componentWillMount() {
 
@@ -738,6 +613,95 @@ class DimensionForm extends Component {
         // let arrayOfDelegations = [];
         let delegations = dim.delegations;
 
+
+                $('div.react-autosuggest__container').css("display", "inline");
+        var that = this;
+
+        function autocompleteRenderInput({ addTag, props }) {
+
+            var passed = JSON.stringify(arguments[0]);
+            console.log("passed: " + passed + JSON.stringify(arguments[1]));
+            passed = JSON.parse(passed);
+
+            const handleOnChange = (e, { newValue, method }) => {
+                console.log("handleonchange params: " + e + "   " + newValue + "   " + method + "   " + passed.id);
+                if (method === 'enter' || method === 'click') {
+                    that.state.value[passed.id] = "";
+                    e.preventDefault()
+                } else {
+                    that.onChange(e, { newValue }, passed.id)
+                }
+            }
+            const handleKeyPress = (event) => {
+                console.log('enter press here! ' + event.key)
+                if (event.key == 'Enter') {
+                    event.preventDefault()
+                    addTag(that.state.value[passed.id])
+                    that.state.value[passed.id] = "";
+                    console.log('current tags: ' + that.state.tags)
+                }
+            }
+
+            const renderInputComponent = inputProps => (
+                <input {...inputProps} />
+            );
+            var inputValue = that.state.value[Number(passed.id)] || "";
+            if (inputValue == 'undefined') { inputValue = ""; }
+            var inputLength = inputValue.length || 0
+
+            const suggestions = that.state.names.filter((name) => {
+                //console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
+                //console.log(inputValue);
+                var re = new RegExp(inputValue, "i");
+                return (Boolean(name.slice(0, inputLength).search(re) + 1))
+                //return (name.toLowerCase().slice(0, inputLength) === inputValue  || name.toUpperCase().slice(0, inputLength) === inputValue)
+            })
+            ///////////////////////////////////////
+
+
+
+            var value = String(that.state.value[Number(passed.id)]) || "";
+            if (value == 'undefined') { value = ""; }
+            //const suggestions = that.state.suggestions;
+            console.log("passed ID: " + passed.id);
+            console.log("suggestions: " + suggestions);
+            console.log("value: " + value);
+            const inputProps = {
+                placeholder: passed.placeholder,
+                value,
+                style: {
+                    width: '30%',
+                    height: '100%',
+                    display: "initial"
+                },
+                onChange: handleOnChange,
+                onKeyPress: handleKeyPress,
+                className: "react-tagsinput-input",
+                id: passed.id
+            };
+            return (
+                <Autosuggest
+                    id={passed.id}
+                    ref={passed.ref}
+                    suggestions={suggestions}
+                    shouldRenderSuggestions={(value) => value.length > 0}
+                    getSuggestionValue={(suggestion) => suggestion}
+                    renderSuggestion={(suggestion) => <span>{suggestion}</span>}
+                    inputProps={inputProps}
+                    onSuggestionSelected={(e, { suggestion, method }) => {
+                        console.log("SELECTED: " + method)
+                        if (method == 'click') {
+                            addTag(suggestion)
+                            that.state.value[passed.id] = "";
+                        }
+                    }}
+                    onSuggestionsClearRequested={() => { }}
+                    onSuggestionsFetchRequested={() => { }}
+                    renderInputComponent={renderInputComponent}
+                />
+            )
+        }
+
         // Object.keys(delegations).forEach(key => {
         //     delegationArray.push(delegations[key].owner),
         //         delegationArray.push(delegations[key].delegatee),
@@ -925,9 +889,10 @@ class DimensionForm extends Component {
                         <div role="tabpanel" className="tab-pane" id="controllers">
 
                             <form method="POST" id="add_controller" role="form">
-                                <div className="form-group" id="TokenDistributionForm">
-                                    <label htmlFor="unique_id">Enter Persona Controllers. Note: core identity controllers will automatiically be controllers of the persona:</label>
-                                    {this.state.inputs_controllers.map(input => <TokenDistributionFrom handleShowModal={this.handleShowModal.bind(this)} max="10" key={input} labelref={input} />)}
+
+                                <div className="form-group">
+                                    <label htmlFor="control_dist">Enter additional persona controllers. Note: Core Identity controllers will automatically be controllers of the persona.</label>
+                                    <TagsInput maxTags={10} renderInput={autocompleteRenderInput} value={this.state.control_list} onChange={(e) => { this.onFieldChange("control_list", e) }} />
                                 </div>
 
                                 <div className="form-group" id="controllers_dimension_btn">
@@ -953,7 +918,8 @@ class DimensionForm extends Component {
                                     <tr>
                                         <td>
                                             <label htmlFor="control_dist">with whom would you like to share your persona and how many times should that person be able to access?</label>
-                                            {this.state.delegations.map(input => <DimensionDelegationForm max="10" key={input} labelref={input} />)}
+                                            {this.state.delegations.map((input, i) =>
+                                            <DimensionDelegationForm attr={this.state.suggest_attrs[i]} max="10" key={input} labelref={input} autocompleteRenderInput={autocompleteRenderInput} deleValue={this.state.deleValue[i]} deleToken={this.state.deleToken[i]} passedFunction={(e) => { this.onFieldChange2("deleValue," + i, e) }} passedFunction2={(e) => { this.onFieldChange2("deleToken," + i, e) }} />)}
                                         </td>
                                     </tr>
                                     <tr>
@@ -1344,6 +1310,22 @@ class IdentityDimensions extends Component {
             }
             attrs.push(tmpArr);
         }
+
+
+        let descrPrivacy = [];
+
+        $.each($("select[name^='privacy-']"), function (obj) {
+            console.log("we got into the select name")
+            var value = $.trim($(this).val());
+            console.log("Value: " + value);
+            if (value.length > 0) {
+                descrPrivacy.push(value);
+            }
+        });
+
+        console.log("privacy Array: " + descrPrivacy);
+
+
         var objArray = [];
         for (var i = 0; i < attrs.length; i++) {
             let obj = {}
@@ -1355,7 +1337,7 @@ class IdentityDimensions extends Component {
             console.log("objArray: " + JSON.stringify(objArray))
         }
 
-        let passBigchainObj = document.getElementById("passAsset");
+        let passBigchainObj = document.getElementById("passBigchainID");
         if (passBigchainObj.selectedIndex == 0) {
             alert('select one answer');
         }
@@ -1402,19 +1384,6 @@ class IdentityDimensions extends Component {
         });
         return labelVals;
         //returns an object array: [{"delegatee-input1-0":"pubkey"},{"delegatee-input1-0":"2"}
-    }
-    //*****************************************************************************
-    getDelegationExpirationValues() {
-        let value;
-        let expirations = document.getElementsByName('expiration-')
-        // console.log("tpyeof expirations: " + typeof (expirations));
-        // console.log("expirations: " + expirations);
-
-        $.each($("DayPicker[name^='expiration-']"), function (obj) {
-            value = $.trim($(this).name);
-            console.log("day picker value: " + value);
-        })
-        return value;
     }
     //*****************************************************************************
     //prepare the delegations object array
@@ -1512,14 +1481,6 @@ class IdentityDimensions extends Component {
             var newInput1 = `input1-${inputLen}`;
             this.setState({ delegations: this.state.delegations.concat([newInput1]) });
         }
-        // var inputLen = this.state.delegations.length;
-        // if (inputLen < 10) {
-        //     var newInput1 = `input1-${inputLen}`;
-        //     this.setState({ delegations: this.state.delegations.concat([newInput1]) });
-        // }
-
-        // let value = this.getDelegationExpirationValues();
-        // console.log("got value: " + value);
     }
     //*****************************************************************************
     addController() {
@@ -1664,59 +1625,59 @@ class IdentityDimensions extends Component {
         //*************************************************************************
         console.log("JSON: " + JSON.stringify(json));
 
-        $.ajax({
-            type: "POST",
-            url: twinUrl + 'dimensions/CreateDimension',
-            data: json,
-            success: function (result) {
-                //returns (bool success, bytes32 callerHash, address test)
-                var data = result;
-                if ($.type(result) != "object") {
-                    data = JSON.parseJSON(result)
-                }
-                console.log("response createDimenson: " + JSON.stringify(data))
-            }.bind(this),
-            complete: function () {
-                // do something
-                //ST: HERE WE COULD WRITE DIMENSIONS INTO COID JSON?
-                $.ajax({
-                    url: twinUrl + 'getAsset',
-                    type: 'POST',
-                    data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": theAsset.asset_id + ".json" },
-                    success: function (res) {
-                        console.log("response from getAsset: " + res)
-                        console.log("response from getAsset: " + JSON.stringify(res))
-                        if (res.dimensions) { }
-                        else {
-                            res.dimensions = [];
-                        }
-                        //this.state.iDimensions[REPLACEME].dimensions = this.state.iDimensions[REPLACEME].dimensions || [];
-                        var dim = {};
-                        dim.dimensionName = json.dimensionName;
-                        dim.descriptor = "bigchainID";
-                        dim.flag = 0;
-                        dim.Id = "";
-                        //this.state.iDimensions[REPLACEME].dimensions.push(dim);
-                        res.dimensions.push(dim);
-                        var sendMe = {};
-                        sendMe.flag = 0; //owned asset
-                        sendMe.fileName = theAsset.asset_id + ".json";
-                        sendMe.pubKey = keccak_256(localStorage.getItem("pubKey"));
-                        sendMe.updateFlag = 0;
-                        sendMe.data = res;
-                        console.log("response edited:\n" + JSON.stringify(res))
-                        $.ajax({
-                            url: twinUrl + 'setAsset',
-                            type: 'POST',
-                            data: sendMe,
-                            success: function (res) {
-                                console.log("response from setAsset:\n" + JSON.stringify(res))
-                            }
-                        })// end setasset
-                    }
-                })//end getasset
-            },
-        })
+        // $.ajax({
+        //     type: "POST",
+        //     url: twinUrl + 'dimensions/CreateDimension',
+        //     data: json,
+        //     success: function (result) {
+        //         //returns (bool success, bytes32 callerHash, address test)
+        //         var data = result;
+        //         if ($.type(result) != "object") {
+        //             data = JSON.parseJSON(result)
+        //         }
+        //         console.log("response createDimenson: " + JSON.stringify(data))
+        //     }.bind(this),
+        //     complete: function () {
+        //         // do something
+        //         //ST: HERE WE COULD WRITE DIMENSIONS INTO COID JSON?
+        //         $.ajax({
+        //             url: twinUrl + 'getAsset',
+        //             type: 'POST',
+        //             data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": theAsset.asset_id + ".json" },
+        //             success: function (res) {
+        //                 console.log("response from getAsset: " + res)
+        //                 console.log("response from getAsset: " + JSON.stringify(res))
+        //                 if (res.dimensions) { }
+        //                 else {
+        //                     res.dimensions = [];
+        //                 }
+        //                 //this.state.iDimensions[REPLACEME].dimensions = this.state.iDimensions[REPLACEME].dimensions || [];
+        //                 var dim = {};
+        //                 dim.dimensionName = json.dimensionName;
+        //                 dim.descriptor = "bigchainID";
+        //                 dim.flag = 0;
+        //                 dim.Id = "";
+        //                 //this.state.iDimensions[REPLACEME].dimensions.push(dim);
+        //                 res.dimensions.push(dim);
+        //                 var sendMe = {};
+        //                 sendMe.flag = 0; //owned asset
+        //                 sendMe.fileName = theAsset.asset_id + ".json";
+        //                 sendMe.pubKey = keccak_256(localStorage.getItem("pubKey"));
+        //                 sendMe.updateFlag = 0;
+        //                 sendMe.data = res;
+        //                 console.log("response edited:\n" + JSON.stringify(res))
+        //                 $.ajax({
+        //                     url: twinUrl + 'setAsset',
+        //                     type: 'POST',
+        //                     data: sendMe,
+        //                     success: function (res) {
+        //                         console.log("response from setAsset:\n" + JSON.stringify(res))
+        //                     }
+        //                 })// end setasset
+        //             }
+        //         })//end getasset
+        //     },
+        // })
 
     }//end creationDimension
     //*****************************************************************************
@@ -1922,8 +1883,8 @@ class IdentityDimensions extends Component {
                                     </div>
 
                                     <div className="form-group">
-                                        <label>Is this persona for sharing attested identity claims with others?</label>
-                                        <select id="passAsset">
+                                        <label>Is this persona for sharing attested identity claims (stored in BigchainDB) with others?</label>
+                                        <select id="passBigchainID">
                                             <option value="selectOption">--- Please select ---</option>
                                             <option value="Yes">Yes</option>
                                             <option value="No">No</option>

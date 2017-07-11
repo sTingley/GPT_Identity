@@ -2,84 +2,12 @@ import React from 'react';
 import TagsInput from 'react-tagsinput';
 import Autosuggest from 'react-autosuggest'
 import { keccak_256 } from 'js-sha3';
-import UploadIpfsFile from './UploadIpfsFile.jsx'
-var crypto = require('crypto');
+import UploadIpfsFile from '../UploadIpfsFile.jsx';
+import UniqueIDAttributeForm from './UniqueIDAttributeForm.jsx'
+
+//var crypto = require('crypto');
 var secp256k1 = require('secp256k1');
-
-//TODO : Namespace validation 
-
 var _this;
-//form where we can add addtional labels (uniqueIDAttrs)
-class UniqueIDAttributesForm extends React.Component {
-
-	constructor(props) {
-		super(props);
-		this.state = {
-			tmpFile: '',
-			showModal: false
-		};
-
-	}
-
-	handleShowModal(e) {
-		this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-	}
-
-	handleHideModal() {
-		this.setState({ showModal: false });
-	}
-
-	render() {
-
-		return (
-			<div className="form-group col-md-12">
-				<div className="col-md-10">
-					<label htmlFor="unique_id_attrs"> Official IDs e.g. SSN, Passport, Driver's License, Digital retinal scans and/or digital fingerprints </label>
-					<input name={'label-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Label" />
-					<button type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn btn-sm btn-warning pull-right"><span className="glyphicon glyphicon-upload"></span>Upload File</button>
-				</div></div>
-		);
-	}
-
-};
-
-class TokenDistributionForm extends React.Component {
-
-	constructor(props) {
-		super(props)
-		// this.state = {
-		// 	controltoken_quantity: [],
-		// 	controltoken_list: [],
-		// 	showModal: false
-		// };
-	}
-
-	render() {
-		var style = {
-			fontSize: '12.5px'
-		}
-		return (
-			<div className="form-group col-md-12">
-				<div className="col-md-10">
-					<table className="table table-striped table-hover" style={style}>
-						<tbody>
-							<tr>
-								<th><b>Controller</b></th>
-								<th><b>Token Quantity</b></th>
-							</tr>
-							<tr>
-								<td><TagsInput {..._this.inputAttrs3} renderInput={_this.autocompleteRenderInput} name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" value={_this.state.control_token_id} onChange={(e) => { this.onFieldChange("control_token_id", e) }} />
-								</td>
-								<td><TagsInput {..._this.inputAttrs3} renderInput={_this.autocompleteRenderInput} name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" value={_this.state.control_token_quantity} onChange={(e) => { this.onFieldChange("control_token_quantity", e) }} /></td>
-							</tr>
-						</tbody>
-					</table>
-
-				</div>
-			</div>
-		);
-	}
-};
 
 class CoreIdentity extends React.Component {
 
@@ -639,15 +567,12 @@ class CoreIdentity extends React.Component {
 				<form method="POST" id="register" role="form">
 					<div className="form-group">
 						<label htmlFor="unique_id">Enter Unique Attributes. The first Attribute has to be name (first, last). Then add any official identification such as SSN or national ID number(s). Make sure to add the supporting file(s) through "Upload File".</label>
-						{this.state.inputs.map(input => <UniqueIDAttributesForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+						{this.state.inputs.map(input => <UniqueIDAttributeForm type="IDF" handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
 					</div>
-					<div className="form-group">
-						<div className="col-md-offset-6 col-md-6 ">
-							<p></p>
-							<button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
-								<span className="glyphicon glyphicon-plus"></span>Add More
-							</button>
-						</div>
+					<div className="col-md-offset-4 col-md-6">
+						<button type="button" className="btn-sm btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
+							<span className="glyphicon glyphicon-plus"></span>Add More
+						</button>
 					</div>
 					<div className="form-group">
 						<label htmlFor="owner_id">Enter Owners. Only one owner for an individual (self).</label>
@@ -662,9 +587,8 @@ class CoreIdentity extends React.Component {
 						<TagsInput {...basicAttrs} maxTags={1} value={this.state.owner_token_quantity} onChange={(e) => { this.onFieldChange("owner_token_quantity", e) }} />
 					</div>
 					<div className="form-group">
-						<label htmlFor="control_dist">Enter Controllers.</label>
+						<label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
 						{this.state.inputs_name.map((input, i) =>
-							<div className="form-group col-md-12">
 								<div className="col-md-10">
 									<table className="table table-striped table-hover" style={style}>
 										<tbody>
@@ -679,19 +603,13 @@ class CoreIdentity extends React.Component {
 											</tr>
 										</tbody>
 									</table>
-
 								</div>
-							</div>
-
 						)}
 					</div>
-					<div className="form-group">
-						<div className="col-md-offset-6 col-md-6 ">
-							<p></p>
-							<button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInput2.bind(this)}>
-								<span className="glyphicon glyphicon-plus"></span>Add More
-							</button>
-						</div>
+					<div className="form-group col-md-offset-4 col-md-6">
+						<button type="button" className="btn-sm btn-info pull-right" style={syle} onClick={this.appendInput2.bind(this)}>
+							<span className="glyphicon glyphicon-plus"></span>Add More
+						</button>
 					</div>
 					<div className="form-group">
 						<label htmlFor="control_token_id">Enter Control Token Description. For example, 'Spencer's tokens'.</label>

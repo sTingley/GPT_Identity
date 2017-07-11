@@ -1,7 +1,8 @@
 import React from 'react';
-var keccak_256 = require('js-sha3').keccak_256;
+const keccak_256 = require('js-sha3').keccak_256;
 
 class Notifications extends React.Component {
+	
 	constructor(props){
 		super(props);
 			//coid=proposals

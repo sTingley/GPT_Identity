@@ -8,7 +8,7 @@ import DayPicker from "react-day-picker";
 
 //import { Router, Route, IndexRedirect, hashHistory } from 'react-router';
 
-var crypto = require('crypto');
+//var crypto = require('crypto');
 var secp256k1 = require('secp256k1');
 var keccak_256 = require('js-sha3').keccak_256;
 
@@ -21,6 +21,8 @@ class Modal extends Component {
 		this.pubKey = localStorage.getItem("pubKey");
 		this.privKey = localStorage.getItem("privKey");
 		this.tags = new AssetTags(this.pubKey, props.asset.asset_id);
+		this.names = localStorage.getItem("contactNames").split(',');
+		this.keys = localStorage.getItem("contactPubKeys").split(',');
 		this.state = {
 
 			//added for identityDimension tab-pane
@@ -163,35 +165,35 @@ class Modal extends Component {
 	}
 
 	bigchainGet(attr) {
-        //e.preventDefault();
-        var txID = attr;//req.body.bigchainID;
-        console.log(txID);
-        console.log("BIGCHAINGET ONCLICK");
-        //var formdata = req.body;
-        //BIGCHAIN ENDPOINT:
-        var bigchainServer = 'http://10.101.114.230:5000'
-        var endpoint = '/getTransaction/' + txID;
-        $.ajax({
-            method: 'GET',
-            url: bigchainServer + endpoint,
-            headers: { 'Access-Control-Allow-Origin': '*' },
-            crossDomain: true,
-            dataType: 'json',
-            contentType: 'application/json',
-            cache: false,
-            success: function (resp) {
-                //the response is body -- send that
-                console.log(resp)
-                var full_data = resp
-                var short_data = resp.asset.data.Coid_Data;
-                console.log("short data is..." + short_data.ownershipId)
-                console.log(JSON.stringify(full_data))
-                console.log(JSON.stringify(short_data))
-                var something = window.open("data:text/json," + encodeURIComponent(JSON.stringify(short_data)), "_blank");
-                something.focus();
-            }
-        });
-    }
+		//e.preventDefault();
+		var txID = attr;//req.body.bigchainID;
+		console.log(txID);
+		console.log("BIGCHAINGET ONCLICK");
+		//var formdata = req.body;
+		//BIGCHAIN ENDPOINT:
+		var bigchainServer = 'http://10.101.114.230:5000'
+		var endpoint = '/getTransaction/' + txID;
+		$.ajax({
+			method: 'GET',
+			url: bigchainServer + endpoint,
+			headers: { 'Access-Control-Allow-Origin': '*' },
+			crossDomain: true,
+			dataType: 'json',
+			contentType: 'application/json',
+			cache: false,
+			success: function (resp) {
+				//the response is body -- send that
+				console.log(resp)
+				var full_data = resp
+				var short_data = resp.asset.data.Coid_Data;
+				console.log("short data is..." + short_data.ownershipId)
+				console.log(JSON.stringify(full_data))
+				console.log(JSON.stringify(short_data))
+				var something = window.open("data:text/json," + encodeURIComponent(JSON.stringify(short_data)), "_blank");
+				something.focus();
+			}
+		});
+	}
 
 
 	render() {
@@ -201,7 +203,57 @@ class Modal extends Component {
 		var _this = this;
 
 		var prop = this.props.asset.asset_details;
+		var hashedKeys = [];
+		for (var i = 0; i < this.keys.length; i++) {
+			hashedKeys[i] = keccak_256(this.keys[i]);
+		}
+
+		var oIndex = hashedKeys.indexOf(prop.ownershipId);
+		if (oIndex >= 0) {
+			prop.ownershipId = this.names[oIndex];
+		}
+		var cIndex = hashedKeys.indexOf(prop.controlId);
+		if (cIndex >= 0) {
+			prop.controlId = this.names[cIndex];
+		}
+
+		for (var x = 0; x < prop.ownerIdList.length; x++) {
+			var index = hashedKeys.indexOf(prop.ownerIdList[x]);
+			if (index >= 0) {
+				prop.ownerIdList[x] = this.names[index];
+				console.log("\n\nCHANGED: " + prop.ownerIdList[x]);
+			}
+		}
+
+		for (var x = 0; x < prop.controlIdList.length; x++) {
+			var index = hashedKeys.indexOf(prop.controlIdList[x]);
+			if (index >= 0) {
+				prop.controlIdList[x] = this.names[index];
+				console.log("\n\nCHANGED: " + prop.controlIdList[x]);
+			}
+		}
+
+		for (var x = 0; x < prop.identityRecoveryIdList.length; x++) {
+			var index = hashedKeys.indexOf(prop.identityRecoveryIdList[x]);
+			if (index >= 0) {
+				prop.identityRecoveryIdList[x] = this.names[index];
+				console.log("\n\nCHANGED: " + prop.identityRecoveryIdList[x]);
+			}
+		}
+
+		if (prop.validatorSigs) {
+			for (var x = 0; x < prop.validatorSigs.length; x++) {
+				var index = this.keys.indexOf(prop.validatorSigs[x][2]);
+				if (index >= 0) {
+					prop.validatorSigs[x][2] = this.names[index];
+					console.log("\n\nCHANGED: " + prop.validatorSigs[x][2]);
+				}
+			}
+		}
+
 		console.log("asset_details.. " + JSON.stringify(prop));
+		console.log("names: " + this.names)
+		console.log("keys: " + this.keys);
 		var style = {
 			fontSize: '12.5px'
 		}
@@ -471,7 +523,7 @@ class Modal extends Component {
 																<tr key={i}>
 																	<td></td>
 																	<td>
-																		<p>Public Key: {ids[2]}</p>
+																		<p>Attestor: {ids[2]}</p>
 																		<p>Signature: {ids[1]}</p>
 																		<p>Expiration: {String(new Date(Number(ids[3]) * 1000))}</p>
 																	</td>
@@ -528,6 +580,8 @@ class Dims extends Component {
 		this.pubKey = localStorage.getItem("pubKey");
 		this.privKey = localStorage.getItem("privKey");
 		this.tags = new AssetTags(this.pubKey, props.dimension.dimension_id);
+		this.names = localStorage.getItem("contactNames").split(',');
+		this.keys = localStorage.getItem("contactPubKeys").split(',');
 		this.state = {
 
 			asset_class: this.tags.getAssetData("classes"),
@@ -627,21 +681,21 @@ class Dims extends Component {
 	}
 
 	//*****************************************************************************
-    //takes in a msg/json and returns a signature (needed for requests)
-    getSignature(msg) {
-        console.log("creating signature, signing msg: \n" + JSON.stringify(msg))
-        var privKey = localStorage.getItem("privKey")
-        var privKey1 = new Buffer(privKey, "hex");
-        var msg_hash = keccak_256(JSON.stringify(msg));
-        var msg_hash_buffer = new Buffer(msg_hash, "hex")
-        let signature = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1))
-        signature = JSON.parse(signature).signature;
-        signature = JSON.stringify(signature);
-        signature = JSON.parse(signature).data;
-        signature = new Buffer(signature, "hex");
-        signature = signature.toString("hex");
-        return signature
-    }
+	//takes in a msg/json and returns a signature (needed for requests)
+	getSignature(msg) {
+		console.log("creating signature, signing msg: \n" + JSON.stringify(msg))
+		var privKey = localStorage.getItem("privKey")
+		var privKey1 = new Buffer(privKey, "hex");
+		var msg_hash = keccak_256(JSON.stringify(msg));
+		var msg_hash_buffer = new Buffer(msg_hash, "hex")
+		let signature = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1))
+		signature = JSON.parse(signature).signature;
+		signature = JSON.stringify(signature);
+		signature = JSON.parse(signature).data;
+		signature = new Buffer(signature, "hex");
+		signature = signature.toString("hex");
+		return signature
+	}
 
 	signICA(e) {
 		//e.preventDefault();
@@ -655,9 +709,9 @@ class Dims extends Component {
 		console.log("dataArray: " + dataArray);
 		let txID;
 
-		for(var i=0; i<dataArray.length; i++){
-			if(String(dataArray[i]).split(",")[1].charAt(0) != "Q"){
-				txID=String(dataArray[i]).split(",");
+		for (var i = 0; i < dataArray.length; i++) {
+			if (String(dataArray[i]).split(",")[1].charAt(0) != "Q") {
+				txID = String(dataArray[i]).split(",");
 				txID = txID[1]
 			}
 		}
@@ -671,9 +725,9 @@ class Dims extends Component {
 
 		var signature = this.getSignature(json);
 		var msg_hash = keccak_256(JSON.stringify(json));
-        var msg_hash_buffer = new Buffer(msg_hash, "hex");
-        json.msg = msg_hash_buffer.toString("hex");
-        json.sig = signature;
+		var msg_hash_buffer = new Buffer(msg_hash, "hex");
+		json.msg = msg_hash_buffer.toString("hex");
+		json.sig = signature;
 
 		console.log("attestICA JSON: " + JSON.stringify(json));
 
@@ -695,7 +749,7 @@ class Dims extends Component {
 	}
 
 
-	selectDay(day){
+	selectDay(day) {
 		console.log("selected day: " + day);
 	}
 
@@ -783,6 +837,19 @@ class Dims extends Component {
 	render() {
 
 		var prop = this.props.dimension
+
+		var hashedKeys = [];
+		for (var i = 0; i < this.keys.length; i++) {
+			hashedKeys[i] = keccak_256(this.keys[i]);
+		}
+
+		for (var x = 0; x < prop.dimension_details.owners.length; x++) {
+			var index = hashedKeys.indexOf(prop.dimension_details.owners[x]);
+			if (index >= 0) {
+				prop.dimension_details.owners[x] = this.names[index];
+				console.log("\n\nCHANGED: " + prop.dimension_details.owners[x]);
+			}
+		}
 
 		console.log("dimension(props): " + JSON.stringify(prop))
 

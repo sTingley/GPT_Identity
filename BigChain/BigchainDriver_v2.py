@@ -51,6 +51,8 @@ def hashIt(input):
         input = bytes(input, 'utf-8')
         hash_object = hashlib.sha256(input)
         hex_dig = hash_object.hexdigest()
+        print('hex dig ')
+        print(hex_dig)
         return hex_dig
 
 #DEBUG: print(hashIt('hi'))
@@ -254,6 +256,7 @@ def get_keys():
 #flag: 0 means input is bigchain keys; 1 means input is eris
 @app.route('/transaction', methods = ['POST'])
 def transaction():
+        print('transaction')
         input = request.get_json(force=True)
         pubTo = str(input['PubTo'])
         pubFrom =str(input['PubFrom'])
@@ -278,8 +281,81 @@ def transaction():
 
 
 
+@app.route('/transfer', methods = ['POST'])
+def transfer():
+        print('transfer')
+        input = request.get_json(force=True)
+        toPubKey = str(input['toPubKey'])
+        fromPubKey = str(input['fromPubKey'])
+        txID = str(input['txid'])
+        flag = int(input['flag'])
+
+        creation_tx = bdb.transactions.retrieve(txID)
+
+        pubTo = keyPointerManagement(toPubKey, flag)
+        privFrom = privKeyPointerManagement(fromPubKey,flag)
+
+        transfer_asset = {
+                'id': creation_tx['id']
+        }
+
+        output_index = 0
+        output = creation_tx['outputs'][output_index]
+
+        transfer_input = {
+                'fulfillment': output['condition']['details'],
+                'fulfills': {
+                        'output_index': output_index,
+                        'transaction_id': creation_tx['id'],
+                },
+                'owners_before': output['public_keys']
+        }
+
+        prepared_transfer_tx = bdb.transactions.prepare(
+                operation='TRANSFER',
+                asset=transfer_asset,
+                inputs=transfer_input,
+                recipients=pubTo
+        )
+
+        fulfilled_transfer_tx = bdb.transactions.fulfill(
+                prepared_transfer_tx,
+                private_keys=privFrom
+        )
+
+        sent_transfer_tx = bdb.transactions.send(fulfilled_transfer_tx)
+
+        print(fulfilled_transfer_tx)
+        return flask.jsonify(**fulfilled_transfer_tx)
 
 
+#POST: transfer bigchain keypair to different wallet keypair
+#INPUT (JSON)
+#pubFrom: the public key of the owner of the asset
+#pubTo: the public key of the new owner of the asset
+@app.route('/transferFile', methods = ['POST'])
+def transferFile():
+        input = request.get_json(force=True)
+        toPubKey = str(input['toPubKey'])
+        fromPubKey =str(input['fromPubKey'])
+
+        fromPubKey = hashIt(fromPubKey)
+        toPubKey = hashIt(toPubKey)
+        print("--------transfer-file--------")
+        print(fromPubKey)
+        print(toPubKey)
+
+        #name of directory
+        theDir = '/home/demoadmin/DriverFiles'
+
+        #combine file name to directory
+        name_of_file = fromPubKey + ".txt"
+        name_of_new_file = toPubKey + ".txt"
+        completeName = os.path.join(theDir, name_of_file)
+        new_completeName = os.path.join(theDir, name_of_new_file)
+
+        os.rename(completeName, new_completeName)
+        return 'true'
 
 
 #POST: Add a transaction
@@ -298,16 +374,16 @@ def add_data_2(pub1,flag):
                 operation='CREATE',
                 signers=pub,
                 asset=digital_asset_payload,
-                metadata=new_dict
+		metadata=new_dict
         )
 
         fulfilled_creation_tx = bdb.transactions.fulfill(
                 tx, private_keys=priv)
 
         sent_creation_tx = bdb.transactions.send(fulfilled_creation_tx)
-
+        
         print('addData endpoint hit'+ str(digital_asset_payload['metadata']));
-#       print('Payload\n' + digital_asset_payload);
+#	print('Payload\n' + digital_asset_payload);
         return flask.jsonify(**fulfilled_creation_tx)
 
 

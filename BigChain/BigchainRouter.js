@@ -9,7 +9,7 @@ var app = require("express")();
 var bodyParser = require('body-parser');
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 
 //for interaction with the bigchain driver
@@ -28,16 +28,14 @@ var secp256k1 = require('secp256k1')
 
 
 //ED25519 VERIFICATION FUNCTION:
-function EDVerify(msg,signature,pubKey)
-{
+function EDVerify(msg, signature, pubKey) {
     var logme = ed25519.Verify(new Buffer(msg), new Buffer(signature, "hex"), new Buffer(pubKey, "hex"))
     return logme;
 }
 
 
 //SECP VERIFICATION FUNCTION:
-function SECPVerify(msg, signature, pubKey)
-{
+function SECPVerify(msg, signature, pubKey) {
     msg = new Buffer(msg, "hex");
     signature = new Buffer(signature, "hex");
     pubKey = new Buffer(pubKey, "hex");
@@ -48,13 +46,11 @@ function SECPVerify(msg, signature, pubKey)
 
 
 //THIS WILL BE USED IN THE POST REQUEST:
-var QRValidator = function()
-{
+var QRValidator = function () {
     var self = this;
 
     //MAIN FUNCTION:
-    this.validate = function(formdata,bigchainResponse,bigchainResponseFull,body,callback)
-    {
+    this.validate = function (formdata, bigchainResponse, bigchainResponseFull, body, callback) {
         //PARSE DATA
         console.log(bigchainResponse.uniqueId)
 
@@ -86,11 +82,11 @@ var QRValidator = function()
         var sigs = bigchainResponseFull.transaction.asset.data.validator_signatures;
 
         console.log(sigs)
-        var condition0 = self.timeCheck(formdata.timestamp,msg);
-        var condition1 = self.checkSig(msg,signature,pubKey);
-        var condition2 = self.compareHash(providedHash,body);
-        var condition3 = self.compareIDS(uniqueID_formdata,ownershipID_formdata,uniqueID,ownershipID);
-        var condition4 = self.bigchainVerify(msgBigchain,sigBigchain,pubKeyBigchain,QRpubKey);
+        var condition0 = self.timeCheck(formdata.timestamp, msg);
+        var condition1 = self.checkSig(msg, signature, pubKey);
+        var condition2 = self.compareHash(providedHash, body);
+        var condition3 = self.compareIDS(uniqueID_formdata, ownershipID_formdata, uniqueID, ownershipID);
+        var condition4 = self.bigchainVerify(msgBigchain, sigBigchain, pubKeyBigchain, QRpubKey);
         var condition5 = self.ValidatorValidation(sigs);
 
         //debugging:
@@ -109,8 +105,7 @@ var QRValidator = function()
     //HELPER FUNCTIONS:
 
     //0. CHECK TIME AND TIME HASH
-    this.timeCheck = function(timestamp,msg)
-    {
+    this.timeCheck = function (timestamp, msg) {
         var sync = true;
 
         var QRdate = new Date(timestamp);
@@ -125,8 +120,7 @@ var QRValidator = function()
         var check = (msg == keccak_256(timestamp))
         check = check && (Math.abs(currentdate.getTime() - QRdate.getTime()) < 30000)
         sync = false;
-        while(sync)
-        {
+        while (sync) {
             require('deasync').sleep(100);
         }
 
@@ -135,61 +129,52 @@ var QRValidator = function()
     }
 
     //1. CHECK DIGITAL SIGNATURE:
-    this.checkSig = function(msg,signature,pubKey)
-    {
-        return SECPVerify(msg,signature,pubKey)
+    this.checkSig = function (msg, signature, pubKey) {
+        return SECPVerify(msg, signature, pubKey)
     }
 
     //2. COMPARSE HASH SUPPLIED VS. BIGCHAIN HASH:
-    this.compareHash = function(providedHash, calculateFromResponse)
-    {
+    this.compareHash = function (providedHash, calculateFromResponse) {
         return (keccak_256(calculateFromResponse) == providedHash)
     }
 
     //3. CHECK OWNERSHIP AND UNIQUE IDS:
-    this.compareIDS = function(uniqueID_formdata,ownershipID_formdata,uniqueID,ownershipID)
-    {
+    this.compareIDS = function (uniqueID_formdata, ownershipID_formdata, uniqueID, ownershipID) {
         return ((uniqueID_formdata == uniqueID) && (ownershipID_formdata == ownershipID))
     }
 
     //4. CHECK SIGNATURE FROM BIGCHAIN OF REQUESTER, MAKE SURE IS SAME AS QR PUBKEY:
-    this.bigchainVerify = function(msg,signature,pubKey,QRpubKey)
-    {
-        return ((SECPVerify(msg,signature,pubKey)) && (QRpubKey == pubKey))
+    this.bigchainVerify = function (msg, signature, pubKey, QRpubKey) {
+        return ((SECPVerify(msg, signature, pubKey)) && (QRpubKey == pubKey))
     }
 
     //5. VALIDATE DIGITAL SIGNATURES OF COID VALIDATORS FROM BIGCHAIN DATA
-    this.ValidatorValidation = function(sigs)
-    {
+    this.ValidatorValidation = function (sigs) {
 
         var sync = true;
 
         var result = true;
         console.log("sigs is: " + sigs)
-        for(let i = 0; i < sigs.length; i+=1)
-        {
-           console.log("length of sigs is: " + sigs.length)
-           //order i is sig, i+1 is msg, i+2 is pubkey
-           var msg = sigs[i][0];
-           var signature = sigs[i][1];
-           var pubKey = sigs[i][2];
+        for (let i = 0; i < sigs.length; i += 1) {
+            console.log("length of sigs is: " + sigs.length)
+            //order i is sig, i+1 is msg, i+2 is pubkey
+            var msg = sigs[i][0];
+            var signature = sigs[i][1];
+            var pubKey = sigs[i][2];
 
-           if(signature != "") //make sure the validator voted
-           {
-               if(!SECPVerify(msg,signature,pubKey))
-               {
-                   result = false;
-               }
-           }
-           else
-           {
+            if (signature != "") //make sure the validator voted
+            {
+                if (!SECPVerify(msg, signature, pubKey)) {
+                    result = false;
+                }
+            }
+            else {
                 console.log("empty sig")
-           }
+            }
         }
 
         sync = false;
-        while(sync)
-        {
+        while (sync) {
             require('deasync').sleep(100);
         }
 
@@ -200,8 +185,7 @@ var QRValidator = function()
 
 
 //POST REQUEST FOR QR VALIDATION:
-app.post("/QRValidation",function(req,res)
-{
+app.post("/QRValidation", function (req, res) {
 
     console.log(req.body)
     var txID = req.body.bigchainID;
@@ -221,9 +205,8 @@ app.post("/QRValidation",function(req,res)
         {
             'Content-Type': 'application/json'
         }
-        },
-        function (error, response, body)
-        {
+    },
+        function (error, response, body) {
             //the response is body -- send that
             console.log(body)
             var full_data = JSON.parse(body)
@@ -234,15 +217,12 @@ app.post("/QRValidation",function(req,res)
 
             var validator = new QRValidator();
 
-            validator.validate(formdata,short_data,full_data,body,function(result)
-            {
-                if(result)
-                {
-                        res.json({"Result":"1"});
+            validator.validate(formdata, short_data, full_data, body, function (result) {
+                if (result) {
+                    res.json({ "Result": "1" });
                 }
-                else
-                {
-                        res.json({"Result":"0"});
+                else {
+                    res.json({ "Result": "0" });
                 }
             })
 

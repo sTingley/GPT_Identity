@@ -51,7 +51,7 @@ var BallotCtrl =
                                 "time": timestamp,
                                 "gatekeeperAddr": params.gatekeeperAddr,
                                 "isHuman": params.isHuman,
-                                "propType": params.propType
+				"propType": params.propType
 
                         };
                 };
@@ -124,3 +124,5 @@ var BallotCtrl =
         }
 }
 module.exports = BallotCtrl;
+
+

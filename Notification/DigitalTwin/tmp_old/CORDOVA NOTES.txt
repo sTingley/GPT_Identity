@@ -1,0 +1,28 @@
+- npm install -g cordova
+
+- cordova platform add android
+
+IF WE ARE USING AN EMULATOR
+- cordova build android
+
+IF WE ARE USING A REAL DEVICE,
+- cordova run android
+
+************************************************
+END SETUP
+************************************************
+
+Config.xml file:
+
+widget			This is the app reverse domain value that we specified when creating the app.
+name			The name of the app that we specified when creating the app.
+description		Description for the app.
+author			Author of the app.
+content			The app's starting page. It is placed inside the www directory.
+plugin			The plugins that are currently installed.
+access			Used to control access to external domains. Default origin value is set to * which means that access is allowed to any domain. This value will not allow some specific URLs to be opened toprotect information.
+allow-intent	Allows specific URLs to ask the app to open. For example, <allow-intent href = "tel:*" /> will allow tel: links to open the dialer.
+platform		The platforms for building the app.
+
+
+<content src="index.html" />

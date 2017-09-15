@@ -200,7 +200,7 @@ var AssetCtrl =
         //updateFlag (0 = new, 1 = update)
         //data -- only input for a write
         //keys,values -- only input for an update
-        //PUBKEY NEED TO BE ENCRYPTED BEFORE SENDING
+	//PUBKEY NEED TO BE ENCRYPTED BEFORE SENDING
         setAsset: function (req, res) {
             //get public key
             var pubKey = req.body.pubKey;
@@ -262,15 +262,18 @@ var AssetCtrl =
 
                 //debugging
                 console.log("Testing, File Pulled up: " + JSON.stringify(fileContent));
-
+		console.log("# of keys: "+keys.length)
+		console.log("# of values: "+values.length)
                 for (var i = 0; i < keys.length; i++) {
                     var name = keys[i];
                     var val = values[i];
 
                     fileContent[name] = val;
+		    console.log("name: "+name+"  value: "+val);
                 }
 
                 fs.writeFileSync(fileName, cryptoEncr.encrypt(JSON.stringify(fileContent)));
+		res.json({ "Msg": "Asset updated successfully" });
 
             }
             else //this is a creation

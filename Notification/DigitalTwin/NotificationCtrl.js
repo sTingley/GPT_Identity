@@ -35,12 +35,12 @@ var NotificationCtrl =
 
                 //debugging
                 console.log("Message is: " + message);
-                console.log("pubkey is: "+params.pubKey);
+		console.log("pubkey is: "+params.pubKey);
 
                 if(!params.pubKey) res.status(400).json({"Error": "Invalid input parameters"});
 
                 var fileName = PATH + params.pubKey.toUpperCase() + notify_suffix + ".json";
-                console.log("File name is: "+fileName);
+		console.log("File name is: "+fileName);
                 var timestamp = Number(new Date());
                 var cryptoEncr = new Crypto({pubKey: params.pubKey});
                 var dataFormat = () => {
@@ -51,8 +51,7 @@ var NotificationCtrl =
                                 "read_status": false,
                                 "time": timestamp,
                                 "gatekeeperAddr": params.gatekeeperAddr,
-                                "isHuman": params.isHuman,
-                                "propType": params.propType
+                                "isHuman": params.isHuman
 
                         };
                 };
@@ -109,14 +108,14 @@ var NotificationCtrl =
                // console.log('hash of pubkey: ' + keccak_256(param.pubKey).toUpperCase())
                 var fileName = PATH + param.pubKey.toUpperCase() + notify_suffix + ".json";
                 var cryptoDecr = new Crypto({pubKey: param.pubKey});
-                console.log(fs.existsSync(fileName)+" trying to read: " +fileName);
+		console.log(fs.existsSync(fileName)+" trying to read: " +fileName);
                 if(param.pubKey && fs.existsSync(fileName)){
                 console.log('inside if condition (file exists)')
                         fs.readFile(fileName, 'utf8', function(err, data){
                                 if(err) res.status(400).json({"Error": "Unable to read notifications"});
-                                        console.log("error is: " + err)
+					console.log("error is: " + err)
                                         //console.log(JSON.parse(cryptoDecr.decrypt(data)))
-                                        console.log(JSON.stringify((data)))
+					console.log(JSON.stringify((data)))
                                         res.json({'data': (cryptoDecr.decrypt(data))});
                         });
                 } else {

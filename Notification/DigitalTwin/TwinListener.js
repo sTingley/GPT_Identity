@@ -4,18 +4,20 @@ var app = require('express')(),
         bodyParser = require('body-parser'),
         fileUpload = require('express-fileupload'),
         NotificationCtrl = require('./NotificationCtrl.js'),
-        BallotCtrl = require('./ballotCtrl.js'),
+	BallotCtrl = require('./ballotCtrl.js'),
         http = require('http'),
         expiredNotification = require('./expiredNotification.js'),
         IPFS = require('./ipfs.js'),
         TwinConfig = require('./TwinConfig.json'),
         IdentityDimensionCtrl = require('./IdentityDimensionCtrl.js'),
-        contactCtrl = require('./contactsCtrl.js'),
+	contactCtrl = require('./contactsCtrl.js'),
+	IcaSigCtrl = require('./IcaSigCtrl.js'),
+	RecoveryCtrl = require('./RecoveryCtrl.js'),
         AssetCtrl = require('./AssetCtrl.js');
 
 // for parsing application/json
 app.use(bodyParser.json());
-
+var fs = require('fs-extra')
 // for parsing application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -100,7 +102,27 @@ app.post('/setDimension', IdentityDimensionCtrl.setDimension);
 app.post('/deleteDimension', IdentityDimensionCtrl.deleteDimension);
 // <- <- <- END ASSET FUNCTIONS <- <- <-
 
+// -> -> -> START Signature Revocation FUNCTIONS -> -> ->
+var proxyIca = getConfiguration(TwinConfig.ICA_CONFIG.TARGET, '/signature/revokeIca', TwinConfig.ICA_CONFIG.ENDPOINT, '/signature/revokeIca');
+app.use('/signature/revokeIca', proxy(proxyIca))
+var proxyIca = getConfiguration(TwinConfig.ICA_CONFIG.TARGET, '/signature/attestIca', TwinConfig.ICA_CONFIG.ENDPOINT2, '/signature/attestIca');
+app.use('/signature/attestIca', proxy(proxyIca))
 
+app.post('/signature/writeAttestation', IcaSigCtrl.writeAttestation);
+app.get('/signature/readAttestation/:pubKey', IcaSigCtrl.fetchAttestation);
+// <- <- <- END Signature Revocation FUNCTIONS <- <- <-
+
+// -> -> -> START Recovery FUNCTIONS -> -> ->
+app.post('/recovery/writeRecovery', RecoveryCtrl.writeRecovery);
+app.get('/recovery/readRecovery/:pubKey', RecoveryCtrl.fetchRecovery);
+app.post('/recovery/transferRecovery', RecoveryCtrl.transferRecovery);
+app.post('/recovery/deleteRecovery', RecoveryCtrl.deleteRecovery);
+var proxyRecov = getConfiguration(TwinConfig.RECOV_CONFIG.TARGET, '/recovery/startRecoveryBallot', TwinConfig.RECOV_CONFIG.ENDPOINT, '/recovery/startRecoveryBallot');
+app.use('/recovery/startRecoveryBallot', proxy(proxyRecov))
+//app.post('recovery/writeWalletFile', RecoveryCtrl.writeWalletFile);
+app.post('/recovery/cleanMyTwin/:pubKey',RecoveryCtrl.cleanMyTwin);
+
+// <- <- <- END Recovery FUNCTIONS <- <- <-
 
 // -> -> -> START IPFS FUNCTIONS -> -> ->
 app.post('/ipfs/upload', IPFS.uploadFile);
@@ -112,9 +134,14 @@ app.get('/ipfs/getfile/:hash', IPFS.getUrl);
 app.post('/ipfs/validateFiles', IPFS.getHashFromIpfsFile);
 // <- <- <- END IPFS FUNCTIONS <- <- <-
 
-
-
-
+var proxyBigChain = getConfiguration(TwinConfig.BIGCHAIN_CONFIG.TARGET, '/bigchain/preRequest', TwinConfig.BIGCHAIN_CONFIG.ENDPOINT, '/bigchain/preRequest');
+app.use('/bigchain/preRequest', proxy(proxyBigChain))
+var proxyBigChainGet = getConfiguration(TwinConfig.BIGCHAIN_CONFIG.TARGET, '/bigchain/getRequest', TwinConfig.BIGCHAIN_CONFIG.ENDPOINT2, '/bigchain/getRequest');
+app.use('/bigchain/getRequest', proxy(proxyBigChainGet))
+var proxyBigChainTransfer = getConfiguration(TwinConfig.BIGCHAIN_CONFIG.TARGET, '/bigchain/transferRequest', TwinConfig.BIGCHAIN_CONFIG.ENDPOINT3, '/bigchain/transferRequest');
+app.use('/bigchain/transferRequest', proxy(proxyBigChainTransfer))
+var proxyBigChainTransferFile = getConfiguration(TwinConfig.BIGCHAIN_CONFIG.TARGET, '/bigchain/transferFileRequest', TwinConfig.BIGCHAIN_CONFIG.ENDPOINT4, '/bigchain/transferFileRequest');
+app.use('/bigchain/transferFileRequest', proxy(proxyBigChainTransferFile))
 
 var obj2 = { "dimensionType": "personal", "ID": "6678", "attr_list": [["val 1", "1914a856d46130819450f48a3cbf060cf01ce323021494a82fb8fec4eba7149d"], ["val 2", "a560b6d35e21c780b0f1d153849fc811aa4d7b35af9955329cb29f8237cf473f"]], "flag": [1, 1] }
 //var obj3 = {"dimensionType": "photography",  "ID": "4538", "attr_list": [["senior photos", "QmdpXUXTa3WrZMuQr3tK3dsPXkAxY3BdLyBqu4YspS5Kuz"], ["my wedding", "QmStt2BEa2Z994ppJrqW3aZjW43Qco3fatRcE3HUjjUheT"]], "flag": [0,1,1] }

@@ -322,6 +322,7 @@ var IPFS = {
 	getAllFiles: function (req, res) {
 		console.log("hit getAllFiles, params: " + req.params)
 		var param = req.params;
+		console.log("pubkey: " + param.pubKey);
 		var fileName = JSONPath + param.pubKey + suffix + ".json";
 		var cryptoDecr = new cryptoCtr({ pubKey: param.pubKey });
 		if (param.pubKey && fs.existsSync(fileName)) {

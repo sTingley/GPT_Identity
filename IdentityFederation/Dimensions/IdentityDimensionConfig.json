@@ -3,6 +3,7 @@
     "CreateDimension": "CreateDimension",
     "RemoveDimension": "RemoveDimension",
     "addEntry": "addEntry",
+    "readEntry": "readEntry",
     "removeEntry": "removeEntry",
     "updateEntry": "updateEntry",
     "getDimensionAddress": "getDimensionAddress",
@@ -12,5 +13,5 @@
     "removeController": "removeController",
     "spendTokens": "spendTokens",
     "delegateeAmount": "delegateeAmount",
-    "addController": "addController"
+    "addController": "addDimController"
 }

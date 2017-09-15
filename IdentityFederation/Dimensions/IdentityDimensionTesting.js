@@ -20,14 +20,14 @@ var erisC = require('eris-contracts');
 
 
 function string2Bin ( str ) {
-    return str.split("").map( function( val ) {
-        return val.charCodeAt( 0 );
+    return str.split("").map( function( val ) { 
+        return val.charCodeAt( 0 ); 
     } );
 }
 
 
 var IdentityDimensionControl = function(contractAddress) {
-
+   
     //get the contract:
     this.chain = 'primaryAccount'
     this.erisdburl = chainConfig.chainURL
@@ -44,10 +44,10 @@ var IdentityDimensionControl = function(contractAddress) {
 
     this.testing = function(valA,valB,valC,valD,valE,valF,callback)
     {
-        self.contract.testing(valA,valB,valC,valD,valE,valF,function(error,result)
-        {
-                callback(error,result);
-        })
+	self.contract.testing(valA,valB,valC,valD,valE,valF,function(error,result)
+	{
+		callback(error,result);
+	})
     }
 
     //first function:
@@ -56,8 +56,8 @@ var IdentityDimensionControl = function(contractAddress) {
 
         var pubKey = formdata.pubKey;
         var coidAddr = formdata.coidAddr;
-        console.log("SHA3 of PUBKEY: " + keccak_256(pubKey));
-        console.log("COID ADDRESS: "+coidAddr);
+	console.log("SHA3 of PUBKEY: " + keccak_256(pubKey));	
+	console.log("COID ADDRESS: "+coidAddr);
 
         self.contract.IdentityDimensionControlInstantiation(coidAddr, function(error,result)
         {
@@ -114,23 +114,23 @@ var IdentityDimensionControl = function(contractAddress) {
     //result is the boolean success from the contract
     this.addEntry = function(formdata,callback)
     {
-
-
-        //var vars=web3.toHex(formdata.vars);
+	
+	
+	//var vars=web3.toHex(formdata.vars);
         var pubKey = formdata.pubKey;
         var type = web3.toHex(String(formdata.type));
         var ID = web3.toHex(String(formdata.ID));
         var attribute = web3.toHex(String(formdata.attribute));
         var descriptor = web3.toHex(String(formdata.descriptor));
         var flag = formdata.flag;
-        console.log("add entry public key: " + pubKey)
-        var pubKey1 = web3.toHex(String(pubKey));
+	console.log("add entry public key: " + pubKey)
+	var pubKey1 = web3.toHex(String(pubKey));
 
-        console.log("PUBKEY :"+pubKey1);
-        console.log("TYPE :"+type);
-        console.log("ID :"+ID);
-        console.log("DESCRIPTOR :"+descriptor);
-        console.log("ATTRIBUTE :"+attribute);
+	console.log("PUBKEY :"+pubKey1);
+	console.log("TYPE :"+type);
+	console.log("ID :"+ID);
+	console.log("DESCRIPTOR :"+descriptor);
+	console.log("ATTRIBUTE :"+attribute);
 
         self.contract.addEntry(pubKey1,type,ID,descriptor,attribute,flag,function(error,result)
         {
@@ -189,7 +189,7 @@ var IdentityDimensionControl = function(contractAddress) {
     {
         var type = web3.toHex(String(formdata.type));
         var ID = web3.toHex(String(formdata.ID));
-        console.log("TYPE: "+type);
+	console.log("TYPE: "+type);
 
         self.contract.getPublicDescriptors(type,ID,function(error,result)
         {
@@ -288,7 +288,7 @@ var InstantiationData = {"coidAddr": coidAddress, "pubKey": "a1"}
 
 dimension.testing("a1","a2","a3","a4","a5",3,function(error,result)
 {
-        console.log("result from testing: " + result);
+	console.log("result from testing: " + result);
 })
 
 setTimeout(function()

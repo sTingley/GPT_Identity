@@ -41,7 +41,7 @@ var response;
 //continuous listening for requestMade event
 contract.requestMade(
     function (error, result) {
-        //do nothing, we never want the event listening to stop
+        //do nothing, we never want the event listening to stop    
     },
     function (error, result) {
         //check if in progress
@@ -56,7 +56,7 @@ contract.requestMade(
 //continuous listening for CallbackReady event
 contract.CallbackReady(
     function (error, result) {
-        //do nothing, we never want the event listening to stop
+        //do nothing, we never want the event listening to stop    
     },
     function (error, result) {
         //check if in progress
@@ -130,7 +130,6 @@ function verify(msg, signature, pubKey) {
     pubKey = new Buffer(pubKey, "hex");
     var verified = secp256k1.verify(msg, signature, pubKey)
     return verified;
-
 }
 
 

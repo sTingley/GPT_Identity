@@ -1,12 +1,11 @@
-
 jobs:
 
-- name: ControlToken
+- name: Utils
   job:
     deploy:
-      contract: ControlToken.sol
+      contract: Utils.sol
       wait: true
-
+      save: true
 
 - name: OwnershipToken
   job:
@@ -14,11 +13,20 @@ jobs:
       contract: OwnershipToken.sol
       wait: true
 
+
+- name: ControlToken
+  job:
+    deploy:
+      contract: ControlToken.sol
+      wait: true
+
 - name: CoreIdentity
   job:
     deploy:
       contract: CoreIdentity.sol
+      libraries: Utils:$Utils
       wait: true
+      save: true
 
 - name: ballot
   job:
@@ -26,15 +34,45 @@ jobs:
       contract: ballot.sol
       wait: true
 
-
 - name: MyGateKeeper
   job:
     deploy:
       contract: MyGatekeeper.sol
+      libraries: Utils:$Utils
       wait: true
+      save: true
 
 - name: GateKeeper
   job:
     deploy:
       contract: GateKeeper.sol
+      libraries: Utils:$Utils
       wait: true
+
+- name: IdentityDimension
+  job:
+    deploy:
+      contract: IdentityDimension.sol
+      wait: true
+
+
+- name: IdentityDimensionControlToken
+  job:
+    deploy:
+      contract: IdentityDimensionControlToken.sol
+      wait: true
+
+- name: IdentityDimensionControl
+  job:
+    deploy:
+      contract: IdentityDimensionControl.sol
+      wait: true
+      save: true
+
+- name: Recovery
+  job:
+    deploy:
+      contract: Recovery.sol
+      wait: true
+      save: true
+

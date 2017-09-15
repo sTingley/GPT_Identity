@@ -1,27 +1,35 @@
 import "CoreIdentity.sol";
 import "ballot.sol";
 import "Dao.sol";
-//import "coidGateKeeper.sol";
 import "IdentityDimensionControl.sol";
 
-contract MyGateKeeper
-{
+contract MyGateKeeper {
+
+    //ResultIsReady function creates contracts
+    CoreIdentity MyCoidIdentity;
+    IdentityDimensionControl dimensionControl;
+
+    //defined globally to save memory in ResultIsReady
+    address coidIdentityAddr;
+    address dimensionCtrlAddr;
 
     bytes32[10] validatorsToVote; // randomly selected validators from the DAO list
+    address recoveryAddr = 0x0;
+    uint public counter = 0;
 
+    //MyGatekeeper.js listens for this event and inspects the results to know whether or not to create a COID and IdentityDimensionControl contract
     event resultReady(bytes32 proposalId, bool result, string resultMessage, address coidGKAddr, address coidAddr, address dimensionCtrlAddr, uint blockNumberVal, bytes32 blockHashVal, bytes32 blockchainIdVal, uint timestamp);
+    //MyGatekeeper.js listens for this event and inspects the results to know whether or not to create an identity claim asset
     event resultReadyKYC(bytes32 proposalId, bool result, string resultMessage, address coidGKAddr, address coidAddr, address dimensionCtrlAddr, uint blockNumberVal, bytes32 blockHashVal, bytes32 blockchainIdVal, uint timestamp);
-    event proposalDeleted(string notify); // notify user if the proposal got deleted after experation
+    //notify user if the proposal got deleted after experation
+    event proposalDeleted(string notify);
 
-
-    struct UniqueId
-    {
+    struct UniqueId {
         bytes32 uniqueId;
         string[10] uniqueIdAttributes_name;
         bytes32[10] uniqueIdAttributes_filehashvalue;
         string[10] uniqueIdAttributes_IPFSFileHash;
     }
-
     struct OwnershipId {
         bytes32 ownershipId;
         bytes32[10] ownerIdList;
@@ -45,21 +53,15 @@ contract MyGateKeeper
         uint recoveryCondition;
 
     }
-    //Struct to store key and signature of COID requester as proof of submission.
-    struct IdentityAcct
-    {
-
-        string pubkey;  // hash of pubkey, for security
-        string signature;
-        string message; // hash of message
-
+    struct IdentityAcct {
+        string pubkey;  // hash of pubkey
+        string signature; //generated inside wallet
+        string message; //hash of message
     }
 
-    //COID struct to combine all sub structs into one COID data structure.
-    //AF: If we use this structure as a submission for the BigChain payload, then we need to include -- BlockchainID, Blockhash (of block holding COID data). This serves as authentication stamp from the originating blockchain for BigChain
-
-    struct CoidData
-    {
+    /*COID struct to combine all sub structs into one COID data structure.
+    blockChainId, blockHash (of block holding COID data) serve as authentication stamp from the originating blockchain for BigChain*/
+    struct CoidData {
         UniqueId myUniqueID;
         OwnershipId myOwnershipID;
         ControlId myControlID;
@@ -67,18 +69,14 @@ contract MyGateKeeper
         ControlTokenId myControlTokenID;
         IdentityRecoveryIdList myIdentityRecoveryIdList;
         IdentityAcct myIdentityAcct;
-        // ValidatorSignatures validatorSignatures;
         bytes32 blockHash;
         bytes32 blockChainId;
     }
 
-    struct Proposal
-    {
-        // Instantiate CoidData Structure
+    //hold all submitted identity data
+    struct Proposal {
         CoidData coidData;
-
-        uint time;  //timestamp
-
+        uint time;
         bool coid_requester_check;
         bool unique_ID_check;
         bool ownership_ID_check;
@@ -87,13 +85,10 @@ contract MyGateKeeper
         bool control_token_check;
         bool recovery_check;
         bool coidproposal_check;
-
-        bytes32 requester; // the hash of public key which is going to be used in set functions
-        // to check if the requester has valid access
-
-        uint yesVotesRequiredToPass;
-        uint numberOfVoters;
-        bool isHuman;
+        bytes32 requester; //hash of wallet public key
+        uint yesVotesRequiredToPass; //consensus condition
+        uint numberOfVoters; //3 validators for COID creation
+        bool isHuman; //true for initial COID
         uint propType;
     }
 
@@ -115,65 +110,86 @@ contract MyGateKeeper
     // The proposal Id is mapped with struct Proposal
     mapping(bytes32 => Proposal) proposals;
 
+    mapping(uint => bytes32) proposalIdList;
+
     mapping(bytes32 => bool) calledBefore;
 
-    address chairperson = 0x8FD9F2E375387D7AC3DBF53B1E727B9C63053943;
+    address chairperson;
+    
+    modifier onlyBy(address _account) {
+        if (_account != chairperson) throw;
+        _
+    }
 
-    //This sets the Eris account that deployed the gatekeeper contract as the chairperson of a proposal
+    modifier requesterMatches(string _pubkey, bytes32 _proposalId) {
+        if (sha3(_pubkey) != proposals[_proposalId].requester) throw;
+        _
+    }
+
+    modifier accessCheck(address caller) {
+        if(sha3(caller) != sha3(chairperson)) throw;
+        _
+    }
+
+    /*This sets the Eris account that deployed the gatekeeper contract as the chairperson of a proposal
+    tx.origin because this contract is created inside a Gatekeeper.sol function..*/
     function MyGateKeeper() {
-       //  chairperson = msg.sender;
+       chairperson = tx.origin;
     }
 
 
     //debugging the uniqueIdList
-    function debugIt(uint i) returns (bytes32 val)
-    {
+    function debugIt(uint i) returns (bytes32 val) {
         val = uniqueIdList[i];
     }
 
     //function to determine update route
-    function setPropType(bytes32 proposalId, uint propType) returns (uint success)
-    {
-        if (msg.sender == chairperson){
-            proposals[proposalId].propType = propType;
-        }
+    function setPropType(bytes32 proposalId, uint propType) onlyBy(msg.sender) returns (uint success) {
+
+        proposals[proposalId].propType = propType;
+
         if (proposals[proposalId].propType != 0){
             success =  proposals[proposalId].propType;
         }
-
     }
 
     //function to determine update route
-    function getPropType(bytes32 proposalId) returns (uint)
-    {
+    function getPropType(bytes32 proposalId) returns (uint) {
         return (proposals[proposalId].propType);
     }
 
-    // Set coid requster of the Coid proposal
-    //AF: Changed types to account for updated types in structs. Added if function to ensure only chairperson calls contract
-    //This is going be to be used by gatekepper app to set up coid requster info including
-    // pubkey, messagehash, and signature(hash) of the coide requester
+    function initalizeRecovery(bytes32 proposalId) onlyBy(msg.sender) {
+        //here we need to decide what to send as input...
+    }
 
-    function setCoidRequester(string pubkeyVal, bytes32 proposalId, string signatureVal, string messageVal) returns (bool result)
-    {
-        if (msg.sender == chairperson) {
+    // atStage(Stages.Recovery) transitionNext
+    function getRecoveryAddress(bytes32 pubKey) returns (address) {
+        return (recoveryAddr);
+    }
 
-            proposals[proposalId].coidData.myIdentityAcct.signature = signatureVal;
-            proposals[proposalId].coidData.myIdentityAcct.pubkey = pubkeyVal;
-            proposals[proposalId].coidData.myIdentityAcct.message = messageVal;
-            proposals[proposalId].requester = sha3(pubkeyVal);
+    function setRecoveryAddress(address RecoveryAddress){
+        //atStage(Stages.Active)
+        recoveryAddr = RecoveryAddress;
+    }
 
-            //Store pubkey and signature struct IdentityAuditTrail in order to track based on based on proposalId
-            myIdentityAuditTrail[proposalId].pubkey = pubkeyVal;
-            myIdentityAuditTrail[proposalId].message = messageVal;
-            myIdentityAuditTrail[proposalId].sig = signatureVal;
+    /*Set coid requster of the Coid proposal
+    This is going be to be used by gatekepper app to set up coid requster info including
+    pubkey, messagehash, and signature(hash) of the coid requester*/
+    function setCoidRequester(string pubkeyVal, bytes32 proposalId, string signatureVal, string messageVal)
+    onlyBy(msg.sender) returns (bool result) {
 
-            proposals[proposalId].coid_requester_check = true;
-
-            result = proposals[proposalId].coid_requester_check;
-        }
-        else { result = false; }
-
+        proposals[proposalId].coidData.myIdentityAcct.signature = signatureVal;
+        proposals[proposalId].coidData.myIdentityAcct.pubkey = pubkeyVal;
+        proposals[proposalId].coidData.myIdentityAcct.message = messageVal;
+        proposals[proposalId].requester = sha3(pubkeyVal);
+        //Store pubkey and signature struct IdentityAuditTrail in order to track based on based on proposalId
+        myIdentityAuditTrail[proposalId].pubkey = pubkeyVal;
+        myIdentityAuditTrail[proposalId].message = messageVal;
+        myIdentityAuditTrail[proposalId].sig = signatureVal;
+        proposals[proposalId].coid_requester_check = true;
+        proposalIdList[counter] = proposalId;
+        counter = counter + 1;
+        result = proposals[proposalId].coid_requester_check;
     }
 
 
@@ -184,460 +200,298 @@ contract MyGateKeeper
         bytes32 uniqueIdVal,
         string uniqueIdAttributes_nameVal,
         bytes32 uniqueIdAttributes_filehashvalueVal,
-        string uniqueIdAttributes_IPFSFileHashVal, uint index) returns (bool result)
-    {
+        string uniqueIdAttributes_IPFSFileHashVal, uint index)
+        onlyBy(msg.sender) requesterMatches(requesterVal, proposalId) returns (bool result) {
+        
+        if (proposals[proposalId].coid_requester_check == true) {
+            
+            proposals[proposalId].coidData.myUniqueID.uniqueId = uniqueIdVal;
+            proposals[proposalId].coidData.myUniqueID.uniqueIdAttributes_name[index] = uniqueIdAttributes_nameVal;
+            proposals[proposalId].coidData.myUniqueID.uniqueIdAttributes_filehashvalue[index] = uniqueIdAttributes_filehashvalueVal;
+            proposals[proposalId].coidData.myUniqueID.uniqueIdAttributes_IPFSFileHash[index] = uniqueIdAttributes_IPFSFileHashVal;
+            
+            //Store uniqueId into IdentityAuditTrail in order to audit (we set pubkey, sig, msg in setCoidRequester)
+            myIdentityAuditTrail[proposalId].uniqueId = uniqueIdVal;
+            proposals[proposalId].unique_ID_check = true;
+            result = proposals[proposalId].unique_ID_check;
 
-        if (msg.sender == chairperson) {
-
-            if (sha3(requesterVal) == proposals[proposalId].requester && proposals[proposalId].coid_requester_check == true) {
-
-                proposals[proposalId].coidData.myUniqueID.uniqueId = uniqueIdVal;
-
-                proposals[proposalId].coidData.myUniqueID.uniqueIdAttributes_name[index] = uniqueIdAttributes_nameVal;
-                proposals[proposalId].coidData.myUniqueID.uniqueIdAttributes_filehashvalue[index] = uniqueIdAttributes_filehashvalueVal;
-                proposals[proposalId].coidData.myUniqueID.uniqueIdAttributes_IPFSFileHash[index] = uniqueIdAttributes_IPFSFileHashVal;
-
-                //Store uniqueId into IdentityAuditTrail in oder to track
-
-                myIdentityAuditTrail[proposalId].uniqueId = uniqueIdVal;
-
-                proposals[proposalId].unique_ID_check = true;
-
-                result = proposals[proposalId].unique_ID_check;
-            }
-            else { result = false; }
-        }
-        else { result = false; }
+        } else {result = false;}
     }
 
     //AF: Update types and msg.sender condition
-    function setmyOwnershipID(string requesterVal, bytes32 proposalId, bytes32 ownershipIdVal, bytes32[10] ownerIdListVal) returns (bool result)
-    {
+    function setmyOwnershipID(string requesterVal, bytes32 proposalId, bytes32 ownershipIdVal, bytes32[10] ownerIdListVal)
+    onlyBy(msg.sender) requesterMatches(requesterVal, proposalId) returns (bool result) {
 
-        if (msg.sender == chairperson) {
+        if (proposals[proposalId].unique_ID_check == true) {
+            proposals[proposalId].coidData.myOwnershipID.ownershipId = ownershipIdVal;
+            proposals[proposalId].coidData.myOwnershipID.ownerIdList = ownerIdListVal;
+            proposals[proposalId].ownership_ID_check = true;
+            result = proposals[proposalId].ownership_ID_check;
 
-            if (sha3(requesterVal) == proposals[proposalId].requester && proposals[proposalId].unique_ID_check == true) {
-
-                proposals[proposalId].coidData.myOwnershipID.ownershipId = ownershipIdVal;
-
-                proposals[proposalId].coidData.myOwnershipID.ownerIdList = ownerIdListVal;
-
-                proposals[proposalId].ownership_ID_check = true;
-
-                result = proposals[proposalId].ownership_ID_check;
-            }
-            else { result = false; }
-        }
-        else { result = false; }
+        } else { result = false; }
     }
 
     //AF: update type and if condition for msg.sender
-    function setmyControlID(string requesterVal, bytes32 proposalId, bytes32 controlIdVal, bytes32[10] controlIdListVal) returns (bool result)
-    {
+    function setmyControlID(string requesterVal, bytes32 proposalId, bytes32 controlIdVal, bytes32[10] controlIdListVal)
+    onlyBy(msg.sender) requesterMatches(requesterVal, proposalId) returns (bool result) {
 
+        if (proposals[proposalId].ownership_ID_check == true) {
+            proposals[proposalId].coidData.myControlID.controlId = controlIdVal;
+            proposals[proposalId].coidData.myControlID.controlIdList = controlIdListVal;
+            proposals[proposalId].control_ID_check = true;
+            result = proposals[proposalId].control_ID_check;
 
-        if (msg.sender == chairperson) {
-
-            if (sha3(requesterVal) == proposals[proposalId].requester && proposals[proposalId].ownership_ID_check == true) {
-
-                proposals[proposalId].coidData.myControlID.controlId = controlIdVal;
-                proposals[proposalId].coidData.myControlID.controlIdList = controlIdListVal;
-
-                proposals[proposalId].control_ID_check = true;
-
-                result = proposals[proposalId].control_ID_check;
-            }
-            else { result = false; }
-        }
-        else { result = false; }
+        } else { result = false; }
     }
 
     //AF: Update types and condition on msg.sender
-    function setmyOwnershipTokenID(string requesterVal, bytes32 proposalId, bytes32 ownershipTokenIdVal, string ownershipTokenAttributesVal, uint[10] ownershipTokenQuantityVal) returns (bool result)
-    {
+    function setmyOwnershipTokenID(string requesterVal, bytes32 proposalId, bytes32 ownershipTokenIdVal, string ownershipTokenAttributesVal, uint[10] ownershipTokenQuantityVal)
+    onlyBy(msg.sender) requesterMatches(requesterVal, proposalId) returns (bool result) {
 
-        if (msg.sender == chairperson) {
+        if (proposals[proposalId].control_ID_check == true) {
+            proposals[proposalId].coidData.myOwnershipTokenID.ownershipTokenId = ownershipTokenIdVal;
+            proposals[proposalId].coidData.myOwnershipTokenID.ownershipTokenQuantity = ownershipTokenQuantityVal;
+            proposals[proposalId].coidData.myOwnershipTokenID.ownershipTokenAttributes = ownershipTokenAttributesVal;
+            proposals[proposalId].ownership_token_check = true;
+            result = proposals[proposalId].ownership_token_check;
 
-            //if(proposals[proposalId].isHuman = true){
-            //for(uint i=0; i< ownershipTokenQuantityVal.length(); i++){
-            //if (ownershipTokenQuantityVal[i] != 0) {throw;}
-            //}
-
-            if (sha3(requesterVal) == proposals[proposalId].requester && proposals[proposalId].control_ID_check == true) {
-                proposals[proposalId].coidData.myOwnershipTokenID.ownershipTokenId = ownershipTokenIdVal;
-                proposals[proposalId].coidData.myOwnershipTokenID.ownershipTokenQuantity = ownershipTokenQuantityVal;
-                proposals[proposalId].coidData.myOwnershipTokenID.ownershipTokenAttributes = ownershipTokenAttributesVal;
-                proposals[proposalId].ownership_token_check = true;
-
-                result = proposals[proposalId].ownership_token_check;
-            } //end sha3
-            else { result = false; }
-            //}//end isHuman
-        }
-        else { result = false; }
+        } else { result = false; }
     }
 
     //AF: change types and condition for msg.sender
-    function setmyControlTokenID(string requesterVal, bytes32 proposalId, bytes32 controlTokenIdVal, string controlTokenAttributesVal, uint[10] controlTokenQuantityVal) returns (bool result)
-    {
+    function setmyControlTokenID(string requesterVal, bytes32 proposalId, bytes32 controlTokenIdVal, string controlTokenAttributesVal, uint[10] controlTokenQuantityVal)
+    onlyBy(msg.sender) requesterMatches(requesterVal, proposalId) returns (bool result) {
 
-        if (msg.sender == chairperson) {
+        if (proposals[proposalId].ownership_token_check == true) {
+            proposals[proposalId].coidData.myControlTokenID.controlTokenId = controlTokenIdVal;
+            proposals[proposalId].coidData.myControlTokenID.controlTokenQuantity = controlTokenQuantityVal;
+            proposals[proposalId].coidData.myControlTokenID.controlTokenAttributes = controlTokenAttributesVal;
+            proposals[proposalId].control_token_check = true;
+            result = proposals[proposalId].control_token_check;
 
-            //if(proposals[proposalId].isHuman = true){
-            //for(uint i=0; i< controlTokenQuantityVal.length(); i++){
-            //if (controlTokenQuantityVal[i] != 0) {throw;}
-            //}
+        } else { result = false; }
 
-            if (sha3(requesterVal) == proposals[proposalId].requester && proposals[proposalId].ownership_token_check == true) {
-                proposals[proposalId].coidData.myControlTokenID.controlTokenId = controlTokenIdVal;
-                proposals[proposalId].coidData.myControlTokenID.controlTokenQuantity = controlTokenQuantityVal;
-                proposals[proposalId].coidData.myControlTokenID.controlTokenAttributes = controlTokenAttributesVal;
-                proposals[proposalId].control_token_check = true;
-
-                result = proposals[proposalId].control_token_check;
-            } //end sha3
-            else { result = false; }
-            //}//end ishuman
-        }
-        else { result = false; }
     }
 
 
     //AF: change types and condition for msg.sender
-    function setmyIdentityRecoveryIdList(string requesterVal, bytes32 proposalId, bytes32[10] identityRecoveryIdListVal, uint recoveryConditionVal) returns (bool result)
-    {
+    function setmyIdentityRecoveryIdList(string requesterVal, bytes32 proposalId, bytes32[10] identityRecoveryIdListVal, uint recoveryConditionVal)
+    onlyBy(msg.sender) requesterMatches(requesterVal, proposalId) returns (bool result) {
 
-        if (msg.sender == chairperson) {
+        if (proposals[proposalId].control_token_check == true) {
+            proposals[proposalId].coidData.myIdentityRecoveryIdList.recoveryCondition = recoveryConditionVal;
+            proposals[proposalId].coidData.myIdentityRecoveryIdList.identityRecoveryIdList = identityRecoveryIdListVal;
+            proposals[proposalId].recovery_check = true;
+            result = proposals[proposalId].recovery_check;
 
-            if (sha3(requesterVal) == proposals[proposalId].requester && proposals[proposalId].control_token_check == true) {
-                proposals[proposalId].coidData.myIdentityRecoveryIdList.recoveryCondition = recoveryConditionVal;
-                proposals[proposalId].coidData.myIdentityRecoveryIdList.identityRecoveryIdList = identityRecoveryIdListVal;
-                proposals[proposalId].recovery_check = true;
-
-                result = proposals[proposalId].recovery_check;
-            }
-            else { result = false; }
-        }
-        else { result = false; }
+        } else { result = false; }
     }
-
 
     // This is going to be used by the gatekeeper contract to submit the COID proposal
     // true if the coidproposal has been initiated, flse, if the
-    function initiateCoidProposalSubmission(address ballotAddr, bytes32 proposalId, uint yesVotesRequiredToPass, bool isHuman, address myGKaddr, uint propType) returns (bool result)
-    {
-
-        if (msg.sender == chairperson)  // the chairperson == gatekeeper
-        {
+    function initiateCoidProposalSubmission(address ballotAddr, bytes32 proposalId, uint yesVotesRequiredToPass, bool isHuman, address myGKaddr, uint propType)
+    onlyBy(msg.sender) returns (bool result) {
 
             calledBefore[proposals[proposalId].requester] = true;
-
             proposals[proposalId].yesVotesRequiredToPass = yesVotesRequiredToPass;
             proposals[proposalId].numberOfVoters = validatorsToVote.length;
             proposals[proposalId].isHuman = isHuman;
 
-            Ballot B = Ballot(ballotAddr); // Instantiate the ballot contract, and allows it to talk to the ballot contract
-
-            // Send the proposal to ballot contract with proposalId, numbers of voters for that proposal and yesVotesRequiredToPass
-            B.setMyProposalID(proposalId, validatorsToVote.length, yesVotesRequiredToPass, isHuman, myGKaddr, propType); // trigger the event COIDRequest in ballot.sol
-
-            proposals[proposalId].coidproposal_check = true;
-
-            result = proposals[proposalId].coidproposal_check;
-        }
-        else { result = false; }
-    }
-
-    // The validators signatures are not provided by the user but ballot contract
-    //AF: The message sender is no longer the chairperson but the ballot contract address!!
-
-    // This function is called by the owner of ballot contract which is ballot app
-    // Because the owner of the ballot contract and the owner of the gatekeeper contract are the same
-    // So when we check the msg.sender it can use the chairperson
-    //AF: function no longer required
-    //function setValidatorSignatures(bytes32 proposalId, bytes32[10] validatorsAddrVal, bytes32[10] validatorSigVal, bytes32[10] validatorMsgVal) {
-    //    if (msg.sender == chairperson)
-
-    //  {
-    //    proposals[proposalId].coidData.validatorSignatures.validatorsAddr = validatorsAddrVal;
-    //  proposals[proposalId].coidData.validatorSignatures.validatorSig = validatorSigVal;
-    //    proposals[proposalId].coidData.validatorSignatures.validatorMsg = validatorMsgVal;
-
-    //  }
-    //  else {
-    //      throw;
-    //  }
-
-    // }
-
-
-    //COID Data retrieval functions used from gatekeper.js
-
-    //AF: updated types and outputs based on struct changes
-    function getmyUniqueID(bytes32 proposalId, string requesterVal, uint index) returns (bool result, bytes32 uniqueIdRet, string uniqueIdAttributes_nameRet,
-        bytes32 uniqueIdAttributes_filehashvalueRet,
-        string uniqueIdAttributes_IPFSFileHashRet, uint indexs)
-    {
-        result = false;
-        if (sha3(requesterVal) == proposals[proposalId].requester || msg.sender == chairperson) // only requster and gatekeeper have access
-        // to get functions
-        {
-            uniqueIdRet = proposals[proposalId].coidData.myUniqueID.uniqueId;
-            uniqueIdAttributes_nameRet = proposals[proposalId].coidData.myUniqueID.uniqueIdAttributes_name[index];
-            uniqueIdAttributes_filehashvalueRet = proposals[proposalId].coidData.myUniqueID.uniqueIdAttributes_filehashvalue[index];
-            uniqueIdAttributes_IPFSFileHashRet = proposals[proposalId].coidData.myUniqueID.uniqueIdAttributes_IPFSFileHash[index];
-
-            result = true;
-        }
-    }
-
-    //AF: Updated type for requesterVal
-    function getmyOwnershipID(bytes32 proposalId, string requesterVal) returns (bool result, bytes32 ownershipIdRet, bytes32[10] ownerIdListRet)
-
-    {
-
-        if (sha3(requesterVal) == proposals[proposalId].requester || msg.sender == chairperson) {
-            ownershipIdRet = proposals[proposalId].coidData.myOwnershipID.ownershipId;
-            ownerIdListRet = proposals[proposalId].coidData.myOwnershipID.ownerIdList;
-            result = true;
-        }
-        else {
-            result = false;
-        }
-    }
-
-    //AF: Updated type for requesterVal
-    function getmyControlID(bytes32 proposalId, string requesterVal) returns (bool result, bytes32 controlIdRet, bytes32[10] controlIdListRet)
-    {
-        if (sha3(requesterVal) == proposals[proposalId].requester || msg.sender == chairperson) {
-            controlIdRet = proposals[proposalId].coidData.myControlID.controlId;
-            controlIdListRet = proposals[proposalId].coidData.myControlID.controlIdList;
-            result = true;
-        }
-        else {
-            result = false;
-        }
-    }
-
-    //AF: Updated type for requesterVal
-    function getmyOwnershipTokenID(bytes32 proposalId, string requesterVal) returns (bool result, bytes32 ownershipTokenIdRet, string ownershipTokenAttributesRet, uint[10] ownershipTokenQuantityRet)
-
-    {
-        if (sha3(requesterVal) == proposals[proposalId].requester || msg.sender == chairperson) {
-            ownershipTokenIdRet = proposals[proposalId].coidData.myOwnershipTokenID.ownershipTokenId;
-            ownershipTokenAttributesRet = proposals[proposalId].coidData.myOwnershipTokenID.ownershipTokenAttributes;
-            ownershipTokenQuantityRet = proposals[proposalId].coidData.myOwnershipTokenID.ownershipTokenQuantity;
-            result = true;
-        }
-        else {
-            result = false;
-        }
-    }
-
-
-    //AF: Updated type for requesterVal
-    function getmyControlTokenID(bytes32 proposalId, string requesterVal) returns (bool result, bytes32 controlTokenIdRet, string controlTokenAttributesRet, uint[10] controlTokenQuantityRet)
-    {
-
-        if (sha3(requesterVal) == proposals[proposalId].requester || msg.sender == chairperson) {
-            controlTokenIdRet = proposals[proposalId].coidData.myControlTokenID.controlTokenId;
-            controlTokenAttributesRet = proposals[proposalId].coidData.myControlTokenID.controlTokenAttributes;
-            controlTokenQuantityRet = proposals[proposalId].coidData.myControlTokenID.controlTokenQuantity;
-            result = true;
-        }
-        else {
-            result = false;
-        }
-    }
-
-    //AF: Updated type for requesterVal
-    function getmyIdentityRecoveryIdList(bytes32 proposalId, string requesterVal) returns (bool result, bytes32[10] identityRecoveryIdListRet, uint recoveryConditionRet)
-    {
-        if (sha3(requesterVal) == proposals[proposalId].requester || msg.sender == chairperson) {
-            identityRecoveryIdListRet = proposals[proposalId].coidData.myIdentityRecoveryIdList.identityRecoveryIdList;
-            recoveryConditionRet = proposals[proposalId].coidData.myIdentityRecoveryIdList.recoveryCondition;
-            result = true;
-        }
-        else {
-            result = false;
-        }
-    }
-
-
-    //Check if the uniqueID is unique
-    //AF: This function is used by the gatekeeper app to check if the proporsal ID is unique, right?
-
-    // This function is used by gatekeeper app to check if the coid uniqueID is unique
-    function isUnique(bytes32 uniqueIdVal) returns (bool isUniqueRet)
-    {
-        isUniqueRet = true;
-
-        if (uniqueIdList.length > 0) {
-            for (uint i = 0; i < uniqueIdList.length; i++ )
-            {
-                if (uniqueIdVal == uniqueIdList[i]) {
-                    isUniqueRet = false;
-                }
-
+            Ballot B = Ballot(ballotAddr);
+            //setMyProposalID will trigger the event notifyValidator in ballot.sol
+            result = B.setMyProposalID(proposalId, validatorsToVote.length, yesVotesRequiredToPass, isHuman, myGKaddr, propType);
+            if (result) {
+                proposals[proposalId].coidproposal_check = true;
             }
-        }
 
-        if (isUniqueRet) {
-            // Store uniqueId into the array uniqueIdList[]
-            uniqueIdList.push(uniqueIdVal);// if the uniqueID is unique Id is unique, then add to the uniqueID list
-        }
-        return isUniqueRet;
+    }
+
+    /*COID Data retrieval functions used in ballot.js
+        NOTE: We will call the ballot method
+                isValidatorPresent before we call these!
+    *//////////////////////////////////////////////////////
+
+    function getmyUniqueID(bytes32 proposalId, uint index) onlyBy(msg.sender)
+    returns (bool result, bytes32 uniqueIdRet, string uniqueIdAttributes_nameRet,
+    bytes32 uniqueIdAttributes_filehashvalueRet, string uniqueIdAttributes_IPFSFileHashRet, uint indexs) {
+
+        result = false;
+        uniqueIdRet = proposals[proposalId].coidData.myUniqueID.uniqueId;
+        uniqueIdAttributes_nameRet = proposals[proposalId].coidData.myUniqueID.uniqueIdAttributes_name[index];
+        uniqueIdAttributes_filehashvalueRet = proposals[proposalId].coidData.myUniqueID.uniqueIdAttributes_filehashvalue[index];
+        uniqueIdAttributes_IPFSFileHashRet = proposals[proposalId].coidData.myUniqueID.uniqueIdAttributes_IPFSFileHash[index];
+        result = true;
+    }
+
+    function getmyOwnershipID(bytes32 proposalId) onlyBy(msg.sender)
+    returns (bool result, bytes32 ownershipIdRet, bytes32[10] ownerIdListRet) {
+
+        result = false;
+        ownershipIdRet = proposals[proposalId].coidData.myOwnershipID.ownershipId;
+        ownerIdListRet = proposals[proposalId].coidData.myOwnershipID.ownerIdList;
+        result = true;
+    }
+
+    function getmyControlID(bytes32 proposalId) onlyBy(msg.sender)
+    returns (bool result, bytes32 controlIdRet, bytes32[10] controlIdListRet) {
+
+        result = false;
+        controlIdRet = proposals[proposalId].coidData.myControlID.controlId;
+        controlIdListRet = proposals[proposalId].coidData.myControlID.controlIdList;
+        result = true;
+    }
+
+    function getmyOwnershipTokenID(bytes32 proposalId) onlyBy(msg.sender)
+    returns (bool result, bytes32 ownershipTokenIdRet, string ownershipTokenAttributesRet, uint[10] ownershipTokenQuantityRet) {
+
+        result = false;
+        ownershipTokenIdRet = proposals[proposalId].coidData.myOwnershipTokenID.ownershipTokenId;
+        ownershipTokenAttributesRet = proposals[proposalId].coidData.myOwnershipTokenID.ownershipTokenAttributes;
+        ownershipTokenQuantityRet = proposals[proposalId].coidData.myOwnershipTokenID.ownershipTokenQuantity;
+        result = true;
+    }
+
+    function getmyControlTokenID(bytes32 proposalId) onlyBy(msg.sender)
+    returns (bool result, bytes32 controlTokenIdRet, string controlTokenAttributesRet, uint[10] controlTokenQuantityRet) {
+
+        result = false;
+        controlTokenIdRet = proposals[proposalId].coidData.myControlTokenID.controlTokenId;
+        controlTokenAttributesRet = proposals[proposalId].coidData.myControlTokenID.controlTokenAttributes;
+        controlTokenQuantityRet = proposals[proposalId].coidData.myControlTokenID.controlTokenQuantity;
+        result = true;
+    }
+
+    function getmyIdentityRecoveryIdList(bytes32 proposalId) onlyBy(msg.sender)
+    returns (bool result, bytes32[10] identityRecoveryIdListRet, uint recoveryConditionRet) {
+
+        result = false;
+        identityRecoveryIdListRet = proposals[proposalId].coidData.myIdentityRecoveryIdList.identityRecoveryIdList;
+        recoveryConditionRet = proposals[proposalId].coidData.myIdentityRecoveryIdList.recoveryCondition;
+        result = true;
     }
 
     // To get pubkey and uniqueId and sig based on specifica proposal Id
-    function getmyIdentityAuditTrail(bytes32 proposalId) constant returns (string pubkeyRet, bytes32 uniqueIdRet, string sigRet, string messageRet)
-    {
+    function getmyIdentityAuditTrail(bytes32 proposalId) returns (string pubkeyRet, bytes32 uniqueIdRet, string sigRet, string messageRet) {
+
         pubkeyRet = myIdentityAuditTrail[proposalId].pubkey;
         uniqueIdRet = myIdentityAuditTrail[proposalId].uniqueId;
         messageRet = myIdentityAuditTrail[proposalId].message;
         sigRet = myIdentityAuditTrail[proposalId].sig;
-
     }
 
-    IdentityDimensionControl dimensionControl;
-
-    function createDimensionControl() returns (address)
-    {
-
-        if (msg.sender == chairperson) {
-            dimensionControl = new IdentityDimensionControl();
-        }
-        else {
-            throw;
-        }
-        return dimensionControl;
+    function setmyIdentityAuditTrail(bytes32 proposalId,string pubkeyRet, bytes32 uniqueIdRet, string sigRet, string messageRet){
+        myIdentityAuditTrail[proposalId].pubkey = pubkeyRet;
+        myIdentityAuditTrail[proposalId].uniqueId = uniqueIdRet;
+        myIdentityAuditTrail[proposalId].message = messageRet;
+        myIdentityAuditTrail[proposalId].sig = sigRet;
     }
 
+    // This function is used by gatekeeper app to check if the coid uniqueID is unique
+    function isUnique(bytes32 uniqueIdVal) returns (bool isUniqueRet) {
 
-    //AF: This function is called by the gatekeeper contract right? so what msg.sender == address(this
+        isUniqueRet = true;
 
-    //This function is called by ballot app(which is the owner of the ballot contract)
-    //Because the owner of ballot contract and gatekeeper contract are the same, so we can still use
-    // if(msg.sender == chairperson) to check if the function actor has right to call the function
-    function ResultIsReady(bool resultVal, bytes32 proposalId, bytes32 blockchainId) {
+        for (uint i = 0; i < uniqueIdList.length; i++) {
+            if (uniqueIdVal == uniqueIdList[i]) {
+                isUniqueRet = false;
+            }
+        }
+
+        if (isUniqueRet) {
+            // Store uniqueId if it is unique
+            uniqueIdList.push(uniqueIdVal);
+        }
+    }
+
+    //ST: this needs added security
+    function getProposalIdByIndex(uint index) returns(bytes32 propId){
+        propId = proposalIdList[index];
+    }
+
+    /*GET VOTING RESULT---
+    This function is called by the gatekeeper app after catching ballot event, 'resultIsReadyIDF'.
+    The owner of ballot contract and gatekeeper contract are the same, so we can still use onlyBy(chairperson)
+    modifer. This function fires its own events depending on resultVal.*/
+    function ResultIsReady(bool resultVal, bytes32 proposalId, bytes32 blockchainId) onlyBy(chairperson) {
 
         bool result;
-        //address coidGKAddr;
-        address coidIdentityAddr;
-        address dimensionCtrlAddr;
         uint blockNumber;
         uint n = 2;
+        result = resultVal;
 
-        if (msg.sender == chairperson)  // only IDF gateKeeper has right to call this function
-        {
-            result = resultVal;
-            if (result == true) {
-                // Trigger the event to notify the user the result
+        if (result == true) {
+            coidIdentityAddr = createCOID(proposalId);
+            dimensionCtrlAddr = createDimensionControl();
 
-                coidIdentityAddr = createCOID(proposalId);
+            proposals[proposalId].coidData.blockChainId = blockchainId;
+            proposals[proposalId].coidData.blockHash = 0x0;
 
-                //coidGKAddr = 0x0;
+            //later make into just 'if' statements
+            if(proposals[proposalId].propType == n) {
+                resultReadyKYC(proposalId, result, "Your KYC has been integrated.", 0x0, coidIdentityAddr, dimensionCtrlAddr, blockNumber, proposals[proposalId].coidData.blockHash, blockchainId, now);
 
-                dimensionCtrlAddr = createDimensionControl();
-
-                //COIDgatekeeper(coidGKAddr);
-
-                proposals[proposalId].coidData.blockChainId = blockchainId;
-
-                proposals[proposalId].coidData.blockHash = 0x0;
-
-               //later make into just 'if' statements
-                if(proposals[proposalId].propType == n){
-                    resultReadyKYC(proposalId, result, "Your KYC has been integrated.", 0x0, coidIdentityAddr, dimensionCtrlAddr, blockNumber, proposals[proposalId].coidData.blockHash, blockchainId, now);
-                }
-                else{
-                    resultReady(proposalId, result, "Your identity has been integrated.", 0x0, coidIdentityAddr, dimensionCtrlAddr, proposals[proposalId].propType, proposals[proposalId].coidData.blockHash, blockchainId, now);
-                }
+            } else {
+                resultReady(proposalId, result, "Your identity has been integrated.", 0x0, coidIdentityAddr, dimensionCtrlAddr, proposals[proposalId].propType, proposals[proposalId].coidData.blockHash, blockchainId, now);
             }
-            else {
-                if(proposals[proposalId].propType == n){
-                    //dont make coid
-                    resultReadyKYC(proposalId, result, "Sorry, your KYC was rejected.", 0x0, 0x0, 0x0, 0x0, 0x0, 0X0, now);
-                }
-                else{
-                    resultReady(proposalId, result, "Sorry, your identity was rejected.", 0x0, 0x0, 0x0, 0x0, 0x0, 0X0, now);
-                }
 
+        } else { //dont make coid
+
+            if (proposals[proposalId].propType == n) {
+                resultReadyKYC(proposalId, result, "Sorry, your KYC was rejected.", 0x0, 0x0, 0x0, 0x0, 0x0, 0X0, now);
+            } else {
+                resultReady(proposalId, result, "Sorry, your identity was rejected.", 0x0, 0x0, 0x0, 0x0, 0x0, 0X0, now);
             }
-        }
-        else {
-            throw;
+
         }
 
+        coidIdentityAddr = 0x0;
+        dimensionCtrlAddr = 0x0;
     }
 
-    CoreIdentity MyCoidIdentity;
 
-
-    function createCOID(bytes32 proposalId) returns (address)
-    {
-
-        if (msg.sender == chairperson)  // only IDF gateKeeper has right to call this function
-        {
-            MyCoidIdentity = new CoreIdentity();
-
-        }
-        else {
-
-            throw;
-        }
+    /*CREATE COID, DIMENSIONCONTROL, MYGATEKEEPER contracts
+    *//////////////////////////////////////////////////////
+    function createCOID(bytes32 proposalId) onlyBy(chairperson) returns (address) {
+        MyCoidIdentity = new CoreIdentity();
         return MyCoidIdentity;
     }
 
-    //set validators
-    function setValidators(bytes32 proposalId, bytes32[10] validators, address ballotAddr) {
-        if (msg.sender == chairperson) {
-            uint total;
-            bool stop;
-            uint random;
-
-            for (uint p = 0; p < validators.length; p++)
-            {
-                validatorsToVote[p] = validators[p];
-            }
-
-            // Has been added here
-            Ballot B = Ballot(ballotAddr);
-
-            B.addSelectedValidator(proposalId, validatorsToVote);
-
-        }
-        else {
-            throw;
-        }
+    function createDimensionControl() onlyBy(chairperson) returns (address) {
+        dimensionControl = new IdentityDimensionControl();
+        return dimensionControl;
     }
 
+    function setValidators(bytes32 proposalId, bytes32[10] validators, address ballotAddr) onlyBy(chairperson) {
 
-    function giveRightToVote(bytes32 proposalId, address ballotAddr) {
+        uint total;
+        bool stop;
+        uint random;
 
-        if (msg.sender == chairperson) // Only the gatekeeper has access to give voting rights to validators
-        {
-            Ballot B = Ballot(ballotAddr);
-
-            uint i;
-            for (i = 0; i < validatorsToVote.length; i++) {
-                B.giveRightToVote(proposalId, validatorsToVote[i]); // Send validator to ballot contract one by one
-            }
+        for (uint p = 0; p < validators.length; p++) {
+            validatorsToVote[p] = validators[p];
         }
-        else {
-            throw;
-        }
+
+        Ballot B = Ballot(ballotAddr);
+        //this function will internall call giveRightToVote
+        B.addSelectedValidator(proposalId, validatorsToVote);
     }
 
+    // function giveRightToVote(bytes32 proposalId, address ballotAddr) onlyBy(chairperson) {
+    //     Ballot B = Ballot(ballotAddr);
+    //     for (uint i = 0; i < validatorsToVote.length; i++) {
+    //         B.giveRightToVote(proposalId, validatorsToVote[i]); // Send validator to ballot contract one by one
+    //     }
+    // }
 
-    // will be called by the gatekeeper.js
-    // If the proposal is created, expired, or denied user will recieve a notification
-    function deleteProposal(bytes32 proposalId) {
+    //If the proposal is created, expired, or denied the proposal data should be deleted
+    function deleteProposal(bytes32 proposalId) onlyBy(chairperson) {
 
-        if (msg.sender == chairperson) {
-            // delete all data from coidData struct
-            delete proposals[proposalId];
-            proposalDeleted("Your COID request has either expired or been rejected and the associated data is deleted.");
-        }
+        delete proposals[proposalId];
+        proposalDeleted("Your COID request has either expired or been rejected and the associated data is deleted.");
+    }
+
+    //kills the contract
+    function kill() accessCheck(msg.sender) {
+        suicide(this);
     }
 }

@@ -113,7 +113,7 @@ var revokeIcaFile = function (pubKey, proposalId) {
         });
 };
 
-var attestIcaFile = function (pubKey, proposalId, message, timestamp, gatekeeperAddr, sigExpire, txid) {
+var attestIcaFile = function (pubKey, proposalId, message, timestamp, gatekeeperAddr, sigExpire, txid, assetId) {
 
     superAgent.post(twinUrl + "/signature/writeAttestation")
         .send({
@@ -125,7 +125,8 @@ var attestIcaFile = function (pubKey, proposalId, message, timestamp, gatekeeper
             "gatekeeperAddr": gatekeeperAddr,
             "isHuman": false,
             "sigExpire": sigExpire,
-            "txid": txid
+            "txid": txid,
+            "assetId": assetId
         })
         .set('Accept', 'application/json')
         .end((err, res) => {
@@ -164,6 +165,48 @@ var updateDimensionEntry = function (formdata, callback) {
             }
         });
 }
+
+
+var bcPreRequest = function (pubKey, proposalId, data, blockNumber, blockHashVal, blockchainID, timestamp, validatorSigs, serviceSig, bigchainID, bigchainHash, callback) {
+    console.log("params:\n" + pubKey);
+    superAgent.post(twinUrl + "/bigchain/preRequest")
+        .send({
+            "pubKey": pubKey,
+            "proposalId": proposalId,
+            "data": JSON.stringify(data),
+            "blockNumber": blockNumber,
+            "blockHashVal": blockHashVal,
+            "blockchainID": blockchainID,
+            "timestamp": timestamp,
+            "validatorSigs": validatorSigs,
+            "serviceSig": serviceSig,
+            "bigchainID": bigchainID,
+            "bigchainHash": bigchainHash
+        })
+        .set('Accept', 'application/json')
+        .end((err, res) => {
+            if (res.status == 200) {
+                console.log("Bigchain message sent successfully");
+                callback(res.body.result, res.body.theId, res.body.theHash);
+            }
+        });
+};
+
+var bcGetRequest = function (pubKey, txid, callback) {
+    console.log("params:\n" + pubKey);
+    superAgent.post(twinUrl + "/bigchain/getRequest")
+        .send({
+            "pubKey": pubKey,
+            "txid": txid
+        })
+        .set('Accept', 'application/json')
+        .end((err, res) => {
+            if (res.status == 200) {
+                console.log("Bigchain Get successfully recieved:\n" + JSON.parse(res.text).getResult.response);
+                callback(JSON.parse(res.text).getResult, res.text.getId, res.text.getHash);
+            }
+        });
+};
 
 
 var updateAttestations = function (txid) {
@@ -422,7 +465,8 @@ app.post("/revokeIca", function (req, res) {
     var isValid = revoker.verifyIt(formdata);
     if (isValid) {
         console.log("Is valid value: " + (isValid == "true"))
-        revoker.bigchainGet(formdata.txid, function (getResult, getId, getHash) {
+        //revoker.bigchainGet(formdata.txid, function (getResult, getId, getHash) {
+        bcGetRequest(formdata.pubKey, formdata.txid, function (getResult, getId, getHash) {
             console.log("\nbigchainGet finished\n")
             console.log("getresult: " + getResult)
             getResult = JSON.parse(JSON.parse(getResult).response);
@@ -438,7 +482,8 @@ app.post("/revokeIca", function (req, res) {
                 console.log("revocationSignatures: " + results.revocationSignatures);
                 //getResult.asset.data.Coid_Data.revocationSignatures = data.revocationSignatures;
                 var timestamp = Number(new Date().getTime()) / 1000;
-                revoker.bigchainPost(getResult.asset.data.proposalID, results, results.coidGKAddress, results.coidAddr, results.dimensionCtrlAddr, results.blockNumber, results.blockHash, results.blockchainID, timestamp, results.validatorSigs, getResult.asset.data.gatekeeperSig, function (postResult, theId, theHash) {
+                //revoker.bigchainPost(getResult.asset.data.proposalID, results, results.coidGKAddress, results.coidAddr, results.dimensionCtrlAddr, results.blockNumber, results.blockHash, results.blockchainID, timestamp, results.validatorSigs, getResult.asset.data.gatekeeperSig, function (postResult, theId, theHash) {
+                bcPreRequest(results.pubKey,getResult.asset.data.proposalID, results, results.blockNumber, results.blockHashVal, results.blockchainID, timestamp, results.validatorSigs, getResult.asset.data.gatekeeperSig, results.bigchainID, results.bigchainHash, function (result, theId, theHash) {
                     console.log("\nbigchainPost finished\n")
                     //(pubKey, assetID, txnID, txnHash, revokeSig)
                     writeToOwner(results.pubKey, results.assetID, theId, theHash, results.revocationSignatures.toString(), function () {
@@ -504,7 +549,8 @@ app.post("/attestIca", function (req, res) {
     var isValid = revoker.verifyIt(formdata);
     if (isValid) {
         console.log("Is valid value: " + (isValid == "true"))
-        revoker.bigchainGet(formdata.txid, function (getResult, getId, getHash) {
+        //revoker.bigchainGet(formdata.txid, function (getResult, getId, getHash) {
+        bcGetRequest(formdata.pubKey, formdata.txid, function (getResult, getId, getHash) {
             console.log("\nbigchainGet finished\n")
             console.log("getresult: " + getResult)
             getResult = JSON.parse(JSON.parse(getResult).response);
@@ -523,11 +569,12 @@ app.post("/attestIca", function (req, res) {
                 var timestamp = Number(new Date().getTime()) / 1000;
                 console.log("propID: " + getResult.asset.data.proposalID);
 
-                revoker.bigchainPost(getResult.asset.data.proposalID, results, results.coidGKAddress, results.coidAddr, results.dimensionCtrlAddr, results.blockNumber, results.blockHash, results.blockchainID, timestamp, results.validatorSigs, getResult.asset.data.gatekeeperSig, function (postResult, theId, theHash) {
-                    console.log("\nbigchainPost finished\n")
+                //revoker.bigchainPost(getResult.asset.data.proposalID, results, results.coidGKAddress, results.coidAddr, results.dimensionCtrlAddr, results.blockNumber, results.blockHash, results.blockchainID, timestamp, results.validatorSigs, getResult.asset.data.gatekeeperSig, function (postResult, theId, theHash) {
+                bcPreRequest(results.pubKey,getResult.asset.data.proposalID, results, results.blockNumber, results.blockHashVal, results.blockchainID, timestamp, results.validatorSigs, getResult.asset.data.gatekeeperSig, results.bigchainID, results.bigchainHash, function (result, theId, theHash) {
+                     console.log("\nbigchainPost finished\n")
                     //(pubKey, assetID, txnID, txnHash, revokeSig)
                     writeToOwner2(results.pubKey, results.assetID, theId, theHash, results.validatorSigs, function () {
-                        attestIcaFile(formdata.pubKey, getResult.asset.data.proposalID, "signature added", timestamp, results.gatekeeperAddr, formdata.expiration, theId)
+                        attestIcaFile(formdata.pubKey, getResult.asset.data.proposalID, "signature added", timestamp, results.gatekeeperAddr, formdata.expiration, theId, results.assetID)
                         console.log("\nAttestinging ICA Complete\n")
                         console.log("Signature " + vSig + " has been added\n");
                         if (results.dimensions) {
@@ -547,7 +594,7 @@ app.post("/attestIca", function (req, res) {
                                 if (form.descriptor != "") {
                                     updateDimensionEntry(form, function () { })
                                 }
-                                if (k == results.dimensions.length - 1) {
+                                if (k >= results.dimensions.length - 1) {
                                     res.send("Signatures have been added");
                                 }
 
@@ -570,3 +617,4 @@ app.listen(3004, function () {
     console.log("Connected to contract http://10.101.114.231:1337/rpc");
     console.log("Listening on port 3004");
 });
+

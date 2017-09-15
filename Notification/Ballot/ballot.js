@@ -6,7 +6,7 @@
 
 
 var chainConfig = require('/home/demoadmin/.eris/ErisChainConfig.json');
-
+var keccak_256 = require('js-sha3').keccak_256;
 var app = require("express")();
 var request = require("superagent");
 var erisC = require('eris-contracts');
@@ -42,7 +42,49 @@ var ballotApp = function () {
     this.accountData = require("./accounts.json");
     this.contractMgr = erisC.newContractManagerDev(this.erisdburl, chainConfig[this.chain]);
     this.ballotContract = this.contractMgr.newContractFactory(this.erisAbi).at(this.contractAddress);
-    //console.log(this.ballotContract);
+
+    //verification contract (oraclizer)
+    this.VerificationAddress = require('/home/demoadmin/.eris/apps/VerifyOraclizerEthereum/wallet2/epm.json').deployStorageK;
+    this.VerificationAbi = JSON.parse(fs.readFileSync('/home/demoadmin/.eris/apps/VerifyOraclizerEthereum/wallet2/abi/' + this.VerificationAddress, 'utf8'))
+    this.VerificationContract = this.contractMgr.newContractFactory(this.VerificationAbi).at(this.VerificationAddress)
+    this.ErisAddress = chainConfig[this.chain].address;
+
+    //use this to have the ballotApp scope inside functions
+    var _this = this;
+
+    //for verification
+    this.verifyIt = function (formdata) {
+        var msg = formdata.msg;
+        var sig = formdata.signature;
+        var pubKey = formdata.publicKey;
+        var sync = true;
+        var isValidResult = false;
+        console.log("you have reached verifyIt internal function")
+        console.log(msg)
+        console.log(sig)
+        console.log(pubKey)
+        _this.VerificationContract.VerificationQuery(msg, sig, pubKey, function (error, result) {
+
+            var elEvento;
+
+            _this.VerificationContract.CallbackReady(function (error, result) { elEvento = result; }, function (error, result) {
+                if (_this.ErisAddress = result.args.addr) {
+                    _this.VerificationContract.myCallback(function (error, result) {
+
+                        elEvento.stop();
+                        console.log("Received response from VerifyIt :" + result + "...if that says false, you should not be able to Result0,etc.!!!");
+                        isValidResult = result;
+                        sync = false;
+                    })//end myCallback
+
+                }
+            })  //end CallbackReady.once
+
+        })//end VerificationQuery
+
+        while (sync) { require('deasync').sleep(100); }
+        return isValidResult;
+    } //end verifyIt
 
     this.ballotContract.proposalExpired(
         function (error, result)
@@ -59,9 +101,9 @@ var ballotApp = function () {
             .send(inputs)
             .set('Accept', 'application/json')
             .end((err, res) => {
-                if (err){console.log("/ballot/writeNotify error: " + err)}
-               // if (res.status == 200) {
-                    // do something
+                if (err) { console.log("/ballot/writeNotify error: " + err) }
+                // if (res.status == 200) {
+                // do something
                 //}
             });
     };
@@ -106,6 +148,25 @@ var ballotApp = function () {
             });
     };
 
+    this.createIcaSigNotification = function (validator, proposalId, sigExpire) {
+
+        request.post(this.twinUrl + "/signature/writeAttestation")
+            .send({
+                "pubKey": keccak_256(validator).toUpperCase(),
+                "proposalID": proposalId,
+                "isHuman": false,
+                "gatekeeperAddr": "",
+                "sigExpire": sigExpire,
+                "message": "ICA has been attested"
+            })
+            .set('Accept', 'application/json')
+            .end((err, res) => {
+                //if (res.status == 200) {
+                console.log("ICA message sent successfully");
+                //}
+            });
+    };
+
     this.f1 = function () {
         var filter = this.ballotContract.TestEvent();
         filter.watch(callbackFun());
@@ -114,8 +175,6 @@ var ballotApp = function () {
     function callbackFun() {
         console.log("inside test event watcher");
     }
-
-    var _this = this;
 
     this.ballotContract.notifyValidator(function (error, result) {
         //do nothing with event, continuously listen.
@@ -134,7 +193,7 @@ var ballotApp = function () {
 
         console.log("isHuman val: " + isHuman);
         console.log("address is: " + address);
-        _this.createNotification({ "pubKey": validator, "proposalID": proposal, "message": "You have been selected to vote on the proposal.", "isHuman":isHuman, "gatekeeperAddr": address, "propType": propType });
+        _this.createNotification({ "pubKey": validator, "proposalID": proposal, "message": "You have been selected to vote on the proposal.", "isHuman": isHuman, "gatekeeperAddr": address, "propType": propType });
         _this.createProposalPendingNotification(validator, proposal);
         console.log("pass on err check: ballot contract notify event");
     })
@@ -150,8 +209,8 @@ app.use(bodyParser.json());
 // for parsing application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
 app.post("/vote", function (req, res) {
+
     console.log("request body ", req.body)
     var msg = req.body.msg;
     var signature = req.body.signature;
@@ -160,6 +219,7 @@ app.post("/vote", function (req, res) {
     var vote = parseInt(req.body.vote);
     var txnDesc = req.body.txnDesc;
     var sigExpire = req.body.sigExpire || 0;
+    var propType = parseInt(req.body.propType);
     //var currentDate = new Date();
     //currentDate = parseInt(currentDate.getTime()) / 1000;
     //currentDate = currentDate + sigExpire
@@ -170,41 +230,27 @@ app.post("/vote", function (req, res) {
     console.log(vote + " is vote")
     console.log(msg + " is msg")
     console.log(sigExpire + " is sigExpire");
-    //console.log(currentDate + " is the expiiration date");
+    console.log(propType + " is propType");
 
-    //Commenting this block to skip verification & bigchain
+    var isValid = ballot.verifyIt(req.body);
 
-    /*this.verifyIt(msg, signature, publicKey, function(result)
-    {
-        if(result == true)
-        {
-            //they are able to vote
-            ballot.ballotContract.vote(txnDesc, proposalID,vote,publicKey,function(error,result)
-            {
-                console.log("This is result from ballot contract for your vote: " + JSON.stringify(result));
-                //write into bigchainDB if they were able to vote:
-                if(result == true)
-                {
-                    this.bigchainIt(proposalID, signature, publicKey, msg, function(error,result)
-                    {
-                        bigchainTransactions.push(result);
-                    })
-                }
-            })
-        }
-    })*/
-
-
-    ballot.ballotContract.vote(proposalID, vote, publicKey, msg, signature, sigExpire, function (error, result) {
-        if (error) {
-            res.json({ "status": "failed", "msg": "Error on submitting vote", "proposal_id": proposalID });
-            console.log("Error on submitting vote proposal ID : " + proposalID, error);
-        } else {
-            res.json({ "status": "Ok", "proposalID": proposalID, "msg": result });
-            console.log("You voted " + vote);
-            console.log("this is the result of your vote acceptance: " + result[0]);
-        }
-    });
+    if (isValid) {
+        console.log("voter's vote has been verified by oraclizer")
+        ballot.ballotContract.vote(proposalID, vote, publicKey, msg, signature, sigExpire, function (error, result) {
+            if (error) {
+                res.json({ "status": "failed", "msg": "Error on submitting vote", "proposal_id": proposalID });
+                console.log("Error on submitting vote proposal ID : " + proposalID, error);
+            } else {
+                res.json({ "status": "Ok", "proposalID": proposalID, "msg": result });
+                console.log("You voted " + vote);
+                console.log("this is the result of your vote acceptance: " + result[0]);
+                // if( (vote == 2 || vote =='2') && (propType == 2 || propType == "2") ){
+                //    ballot.createIcaSigNotification(publicKey, proposalID, sigExpire);
+                //   console.log("Attestation Recorded")
+                //}
+            }
+        });
+    }
 
 })
 
@@ -216,24 +262,32 @@ app.post("/vote", function (req, res) {
 //TODO: Add Verification
 app.post("/getCoidData", function (req, res) {
 
+    console.log("ballot addr: " + ballot.ballotContract.address)
     console.log("ISHUMAN VALUE: " + req.body.isHuman);
     console.log(req.body)
-    if(req.body.isHuman == true || req.body.isHuman == "true")
-    {
-        retrieveData(gateKeeper, function (result) {
-            res.json(result);
-        });
-    }
-    else
-    {
-        console.log("inside the else statement -- isHuman false")
-        var theAddr = req.body.gatekeeperAddr;
-        var myGK = contractMgr.newContractFactory(myGK_Abi).at(theAddr);
 
-        retrieveData(myGK, function (result) {
-            res.json(result);
-        });
-    }
+    ballot.ballotContract.isValidatorPresent(req.body.proposalId, keccak_256(req.body.publicKey), function (err, success) {
+        if (err) { console.log("isValidatorPresent error: " + err) }
+        if (success) {
+            console.log("isValidatorPresent: " + success)
+            if (req.body.isHuman == true || req.body.isHuman == "true") {
+
+                retrieveData(gateKeeper, function (result) {
+                    res.json(result);
+                });
+
+            } else {
+                console.log("inside the else statement -- isHuman false")
+                var theAddr = req.body.gatekeeperAddr;
+                var myGK = contractMgr.newContractFactory(myGK_Abi).at(theAddr);
+
+                retrieveData(myGK, function (result) {
+                    res.json(result);
+                });
+            }
+        }
+    })
+
 
     function retrieveData(theContract, callback) {
 
@@ -289,7 +343,8 @@ app.post("/getCoidData", function (req, res) {
         for (let i = 0; i < 10; i++) {
             console.log("roposalId is: " + proposalId);
             console.log("requesterVal is: " + requesterVal);
-            gateKeeper.getmyUniqueID(proposalId, requesterVal, i, function (error, result) {
+            //bytes32 proposalId, bytes32 validator, uint index, address bal
+            gateKeeper.getmyUniqueID(proposalId, i, function (error, result) {
                 // Throws an error if result is empty
                 // Changes by Arun
 
@@ -328,7 +383,7 @@ app.post("/getCoidData", function (req, res) {
 
 
         //CONTRACT RETURNS: bool result, bytes32 ownershipIdRet, bytes32[10] ownerIdListRet)
-        gateKeeper.getmyOwnershipID(proposalId, requesterVal, function (error, result) {
+        gateKeeper.getmyOwnershipID(proposalId, function (error, result) {
 
             if (error) {
                 console.log("Error on getmyOwnershipID ", error);
@@ -345,7 +400,7 @@ app.post("/getCoidData", function (req, res) {
 
         //CONTRACT RETURNS: bool result, bytes32 ownershipTokenIdRet, bytes32[10] ownershipTokenAttributesRet, uint ownershipTokenQuantityRet
         setTimeout(function () {
-            gateKeeper.getmyOwnershipTokenID(proposalId, requesterVal, function (error, result) {
+            gateKeeper.getmyOwnershipTokenID(proposalId, function (error, result) {
                 if (error) {
                     console.log("Error on getmyOwnershipTokenID ", error);
                     err_detected = true;
@@ -365,7 +420,7 @@ app.post("/getCoidData", function (req, res) {
 
 
         //CONTRACT RETURNS: bool result, bytes32 controlIdRet, bytes32[10] controlIdListRet
-        gateKeeper.getmyControlID(proposalId, requesterVal, function (error, result) {
+        gateKeeper.getmyControlID(proposalId, function (error, result) {
             if (error) {
                 console.log("Error on getmyControlID ", error);
                 err_detected = true;
@@ -380,7 +435,7 @@ app.post("/getCoidData", function (req, res) {
         //CONTRACT RETURNS: bool result, bytes32 controlTokenIdRet, bytes32[10] controlTokenAttributesRet, uint controlTokenQuantityRet
         //brief delay for asynch
         setTimeout(function () {
-            gateKeeper.getmyControlTokenID(proposalId, requesterVal, function (error, result) {
+            gateKeeper.getmyControlTokenID(proposalId, function (error, result) {
                 if (error) {
                     console.log("Error on getmyControlTokenID ", error);
                     err_detected = true;
@@ -399,7 +454,7 @@ app.post("/getCoidData", function (req, res) {
         }, 6000)
 
         //CONTRACT RETURNS: bool result, bytes32[10] identityRecoveryIdListRet, uint recoveryConditionRet
-        gateKeeper.getmyIdentityRecoveryIdList(proposalId, requesterVal, function (error, result) {
+        gateKeeper.getmyIdentityRecoveryIdList(proposalId, function (error, result) {
             if (error) {
                 console.log("Error on getmyIdentityRecoveryIdList ", error);
                 err_detected = true;
@@ -413,9 +468,9 @@ app.post("/getCoidData", function (req, res) {
         })
 
         //CONTRACT RETURNS: string pubkeyRet,bytes32 uniqueIdRet, string sigRet, string messageRet
-        gateKeeper.getmyIdentityAuditTrail(proposalId, function (error, result) {
+        gateKeeper.getmyIdentityAuditTrail(proposalId, requesterVal, function (error, result) {
             if (error) {
-                console.log("Error on getmyIdentityRecoveryIdList ", error);
+                console.log("Error on getmyIdentityAuditTrail ", error);
                 err_detected = true;
             } else if (Array.isArray(result)) {
                 response.msg = result[3];

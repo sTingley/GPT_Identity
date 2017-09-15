@@ -5,7 +5,6 @@ var http = require('http')
 
 var chainConfig = require('/home/demoadmin/.eris/ErisChainConfig.json')
 
-
 //Set up addresses for deployed contracts
 var address_Dao = require('./epm.json').Dao
 // Set up abis for deployed contracts

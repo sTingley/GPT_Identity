@@ -1,11 +1,12 @@
-contract Utils
+library Utils
 {
 
-uint index;
-bool hasEmpty;
+function Utils(){}
 
 function AtoSubsetOfB(bytes32[10] arrayA, bytes32[10] arrayB) returns (bytes32[10] rayA, bytes32[10] rayB)
 {
+	uint index;
+	bool hasEmpty;
         bool testIt;
         for(uint i = 0; i < arrayA.length; i++)
         {
@@ -64,3 +65,4 @@ function firstEmptyIndex(bytes32[10] myArray) returns (uint index, bool hasEmpty
 
 
 }
+

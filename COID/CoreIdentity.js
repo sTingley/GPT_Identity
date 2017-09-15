@@ -101,11 +101,11 @@ console.log("startCoid: " + result);
 
 contract.delegate(A1,D1,1,function(error,result)
 {
-        console.log("delegate: " + result);
-        //contract.spendMyTokens(D1,1,function(error,result)
-        //{
-        //      console.log("spend token: " + result);
-        //})
+	console.log("delegate: " + result);
+	//contract.spendMyTokens(D1,1,function(error,result)
+	//{
+	//	console.log("spend token: " + result);
+	//})
 })
 
 

@@ -13,5 +13,6 @@
     "removeOwner": "removeOwner",
     "giveTokens": "giveTokens",
     "getControllerList": "getControllerList",
-    "getControllerTokens": "getControllerTokens"
+    "getControllerTokens": "getControllerTokens",
+    "addRecoveryID":"addRecoveryID"
 }

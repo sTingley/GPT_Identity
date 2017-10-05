@@ -71,45 +71,49 @@
 	
 	var _Home2 = _interopRequireDefault(_Home);
 	
-	var _NameRegister = __webpack_require__(/*! ./Components/NameRegister.jsx */ 326);
+	var _NameRegister = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./Components/NameRegister.jsx\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _NameRegister2 = _interopRequireDefault(_NameRegister);
 	
-	var _CoreIdentityForm = __webpack_require__(/*! ./Components/CoreIdentityForm.jsx */ 327);
+	var _CoreIdentityForm = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./Components/CoreIdentityForm.jsx\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _CoreIdentityForm2 = _interopRequireDefault(_CoreIdentityForm);
 	
-	var _Upload = __webpack_require__(/*! ./Components/Upload.jsx */ 351);
+	var _Upload = __webpack_require__(/*! ./Components/Upload.jsx */ 326);
 	
 	var _Upload2 = _interopRequireDefault(_Upload);
 	
-	var _ToVote = __webpack_require__(/*! ./Components/ToVote.jsx */ 352);
+	var _ToVote = __webpack_require__(/*! ./Components/ToVote.jsx */ 327);
 	
 	var _ToVote2 = _interopRequireDefault(_ToVote);
 	
-	var _Notifications = __webpack_require__(/*! ./Components/Notifications.jsx */ 368);
+	var _Notifications = __webpack_require__(/*! ./Components/Notifications.jsx */ 328);
 	
 	var _Notifications2 = _interopRequireDefault(_Notifications);
 	
-	var _Assets = __webpack_require__(/*! ./Components/Assets.jsx */ 369);
+	var _Assets = __webpack_require__(/*! ./Components/Assets.jsx */ 329);
 	
 	var _Assets2 = _interopRequireDefault(_Assets);
 	
-	var _MyCOID = __webpack_require__(/*! ./Components/MyCOID.jsx */ 381);
+	var _MyCOID = __webpack_require__(/*! ./Components/MyCOID.jsx */ 342);
 	
 	var _MyCOID2 = _interopRequireDefault(_MyCOID);
 	
-	var _IdentityDimension = __webpack_require__(/*! ./Components/IdentityDimension.jsx */ 382);
+	var _IdentityDimension = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./Components/IdentityDimension.jsx\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _IdentityDimension2 = _interopRequireDefault(_IdentityDimension);
 	
-	var _Documents = __webpack_require__(/*! ./Components/Documents.jsx */ 383);
+	var _Documents = __webpack_require__(/*! ./Components/Documents.jsx */ 345);
 	
 	var _Documents2 = _interopRequireDefault(_Documents);
 	
-	var _MyGateKeeper = __webpack_require__(/*! ./Components/MyGateKeeper.jsx */ 384);
+	var _MyGateKeeper = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./Components/MyGateKeeper.jsx\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _MyGateKeeper2 = _interopRequireDefault(_MyGateKeeper);
+	
+	var _Attestations = __webpack_require__(/*! ./Components/Attestations.jsx */ 346);
+	
+	var _Attestations2 = _interopRequireDefault(_Attestations);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -214,7 +218,8 @@
 			_react2.default.createElement(_reactRouter.Route, { path: 'docs', component: _Documents2.default, onEnter: validateLogin }),
 			_react2.default.createElement(_reactRouter.Route, { path: 'myGateKeeper', component: _MyGateKeeper2.default, onEnter: validateLogin }),
 			_react2.default.createElement(_reactRouter.Route, { path: 'mycoreidentity', component: _MyCOID2.default, onEnter: validateLogin }),
-			_react2.default.createElement(_reactRouter.Route, { path: 'identitydimension', component: _IdentityDimension2.default, onEnter: validateLogin })
+			_react2.default.createElement(_reactRouter.Route, { path: 'identitydimension', component: _IdentityDimension2.default, onEnter: validateLogin }),
+			_react2.default.createElement(_reactRouter.Route, { path: 'Attestations', component: _Attestations2.default, onEnter: validateLogin })
 		)
 	), document.getElementById('app'));
 
@@ -1242,14 +1247,6 @@
 	  var source = null;
 	
 	  if (config != null) {
-	    if (process.env.NODE_ENV !== 'production') {
-	      process.env.NODE_ENV !== 'production' ? warning(
-	      /* eslint-disable no-proto */
-	      config.__proto__ == null || config.__proto__ === Object.prototype,
-	      /* eslint-enable no-proto */
-	      'React.createElement(...): Expected props argument to be a plain object. ' + 'Properties defined in its prototype chain will be ignored.') : void 0;
-	    }
-	
 	    if (hasValidRef(config)) {
 	      ref = config.ref;
 	    }
@@ -1350,14 +1347,6 @@
 	  var owner = element._owner;
 	
 	  if (config != null) {
-	    if (process.env.NODE_ENV !== 'production') {
-	      process.env.NODE_ENV !== 'production' ? warning(
-	      /* eslint-disable no-proto */
-	      config.__proto__ == null || config.__proto__ === Object.prototype,
-	      /* eslint-enable no-proto */
-	      'React.cloneElement(...): Expected props argument to be a plain object. ' + 'Properties defined in its prototype chain will be ignored.') : void 0;
-	    }
-	
 	    if (hasValidRef(config)) {
 	      // Silently steal the ref from the parent.
 	      ref = config.ref;
@@ -4460,7 +4449,7 @@
 	
 	'use strict';
 	
-	module.exports = '15.3.1';
+	module.exports = '15.3.2';
 
 /***/ },
 /* 33 */
@@ -5466,8 +5455,10 @@
 	function getFallbackBeforeInputChars(topLevelType, nativeEvent) {
 	  // If we are currently composing (IME) and using a fallback to do so,
 	  // try to extract the composed characters from the fallback object.
+	  // If composition event is available, we extract a string only at
+	  // compositionevent, otherwise extract it at fallback events.
 	  if (currentComposition) {
-	    if (topLevelType === topLevelTypes.topCompositionEnd || isFallbackCompositionEnd(topLevelType, nativeEvent)) {
+	    if (topLevelType === topLevelTypes.topCompositionEnd || !canUseCompositionEvent && isFallbackCompositionEnd(topLevelType, nativeEvent)) {
 	      var chars = currentComposition.getData();
 	      FallbackCompositionState.release(currentComposition);
 	      currentComposition = null;
@@ -7115,7 +7106,8 @@
 	
 	    if (event.preventDefault) {
 	      event.preventDefault();
-	    } else {
+	    } else if (typeof event.returnValue !== 'unknown') {
+	      // eslint-disable-line valid-typeof
 	      event.returnValue = false;
 	    }
 	    this.isDefaultPrevented = emptyFunction.thatReturnsTrue;
@@ -7378,7 +7370,7 @@
 	var doesChangeEventBubble = false;
 	if (ExecutionEnvironment.canUseDOM) {
 	  // See `handleChange` comment below
-	  doesChangeEventBubble = isEventSupported('change') && (!('documentMode' in document) || document.documentMode > 8);
+	  doesChangeEventBubble = isEventSupported('change') && (!document.documentMode || document.documentMode > 8);
 	}
 	
 	function manualDispatchChangeEvent(nativeEvent) {
@@ -7444,7 +7436,7 @@
 	  // deleting text, so we ignore its input events.
 	  // IE10+ fire input events to often, such when a placeholder
 	  // changes or when an input with a placeholder is focused.
-	  isInputEventSupported = isEventSupported('input') && (!('documentMode' in document) || document.documentMode > 11);
+	  isInputEventSupported = isEventSupported('input') && (!document.documentMode || document.documentMode > 11);
 	}
 	
 	/**
@@ -8697,12 +8689,6 @@
 	    endLifeCycleTimer(debugID, timerType);
 	    emitEvent('onEndLifeCycleTimer', debugID, timerType);
 	  },
-	  onError: function (debugID) {
-	    if (currentTimerDebugID != null) {
-	      endLifeCycleTimer(currentTimerDebugID, currentTimerType);
-	    }
-	    emitEvent('onError', debugID);
-	  },
 	  onBeginProcessingChildContext: function () {
 	    emitEvent('onBeginProcessingChildContext');
 	  },
@@ -9824,6 +9810,8 @@
 	    allowFullScreen: HAS_BOOLEAN_VALUE,
 	    allowTransparency: 0,
 	    alt: 0,
+	    // specifies target context for links with `preload` type
+	    as: 0,
 	    async: HAS_BOOLEAN_VALUE,
 	    autoComplete: 0,
 	    // autoFocus is polyfilled/normalized by AutoFocusUtils
@@ -9904,6 +9892,7 @@
 	    optimum: 0,
 	    pattern: 0,
 	    placeholder: 0,
+	    playsInline: HAS_BOOLEAN_VALUE,
 	    poster: 0,
 	    preload: 0,
 	    profile: 0,
@@ -10441,9 +10430,9 @@
 	  if (node.namespaceURI === DOMNamespaces.svg && !('innerHTML' in node)) {
 	    reusableSVGContainer = reusableSVGContainer || document.createElement('div');
 	    reusableSVGContainer.innerHTML = '<svg>' + html + '</svg>';
-	    var newNodes = reusableSVGContainer.firstChild.childNodes;
-	    for (var i = 0; i < newNodes.length; i++) {
-	      node.appendChild(newNodes[i]);
+	    var svgNode = reusableSVGContainer.firstChild;
+	    while (svgNode.firstChild) {
+	      node.appendChild(svgNode.firstChild);
 	    }
 	  } else {
 	    node.innerHTML = html;
@@ -11401,9 +11390,9 @@
 	  ReactDOMOption.postMountWrapper(inst);
 	}
 	
-	var setContentChildForInstrumentation = emptyFunction;
+	var setAndValidateContentChildDev = emptyFunction;
 	if (process.env.NODE_ENV !== 'production') {
-	  setContentChildForInstrumentation = function (content) {
+	  setAndValidateContentChildDev = function (content) {
 	    var hasExistingContent = this._contentDebugID != null;
 	    var debugID = this._debugID;
 	    // This ID represents the inlined child that has no backing instance:
@@ -11417,6 +11406,7 @@
 	      return;
 	    }
 	
+	    validateDOMNesting(null, String(content), this, this._ancestorInfo);
 	    this._contentDebugID = contentDebugID;
 	    if (hasExistingContent) {
 	      ReactInstrumentation.debugTool.onBeforeUpdateComponent(contentDebugID, content);
@@ -11591,7 +11581,7 @@
 	  this._flags = 0;
 	  if (process.env.NODE_ENV !== 'production') {
 	    this._ancestorInfo = null;
-	    setContentChildForInstrumentation.call(this, null);
+	    setAndValidateContentChildDev.call(this, null);
 	  }
 	}
 	
@@ -11691,7 +11681,7 @@
 	      if (parentInfo) {
 	        // parentInfo should always be present except for the top-level
 	        // component when server rendering
-	        validateDOMNesting(this._tag, this, parentInfo);
+	        validateDOMNesting(this._tag, null, this, parentInfo);
 	      }
 	      this._ancestorInfo = validateDOMNesting.updatedAncestorInfo(parentInfo, this._tag, this);
 	    }
@@ -11860,7 +11850,7 @@
 	        // TODO: Validate that text is allowed as a child of this node
 	        ret = escapeTextContentForBrowser(contentToUse);
 	        if (process.env.NODE_ENV !== 'production') {
-	          setContentChildForInstrumentation.call(this, contentToUse);
+	          setAndValidateContentChildDev.call(this, contentToUse);
 	        }
 	      } else if (childrenToUse != null) {
 	        var mountImages = this.mountChildren(childrenToUse, transaction, context);
@@ -11897,7 +11887,7 @@
 	      if (contentToUse != null) {
 	        // TODO: Validate that text is allowed as a child of this node
 	        if (process.env.NODE_ENV !== 'production') {
-	          setContentChildForInstrumentation.call(this, contentToUse);
+	          setAndValidateContentChildDev.call(this, contentToUse);
 	        }
 	        DOMLazyTree.queueText(lazyTree, contentToUse);
 	      } else if (childrenToUse != null) {
@@ -12129,7 +12119,7 @@
 	      if (lastContent !== nextContent) {
 	        this.updateTextContent('' + nextContent);
 	        if (process.env.NODE_ENV !== 'production') {
-	          setContentChildForInstrumentation.call(this, nextContent);
+	          setAndValidateContentChildDev.call(this, nextContent);
 	        }
 	      }
 	    } else if (nextHtml != null) {
@@ -12141,7 +12131,7 @@
 	      }
 	    } else if (nextChildren != null) {
 	      if (process.env.NODE_ENV !== 'production') {
-	        setContentChildForInstrumentation.call(this, null);
+	        setAndValidateContentChildDev.call(this, null);
 	      }
 	
 	      this.updateChildren(nextChildren, transaction, context);
@@ -12196,7 +12186,7 @@
 	    this._wrapperState = null;
 	
 	    if (process.env.NODE_ENV !== 'production') {
-	      setContentChildForInstrumentation.call(this, null);
+	      setAndValidateContentChildDev.call(this, null);
 	    }
 	  },
 	
@@ -13508,6 +13498,19 @@
 	  },
 	
 	  /**
+	   * Protect against document.createEvent() returning null
+	   * Some popup blocker extensions appear to do this:
+	   * https://github.com/facebook/react/issues/6887
+	   */
+	  supportsEventPageXY: function () {
+	    if (!document.createEvent) {
+	      return false;
+	    }
+	    var ev = document.createEvent('MouseEvent');
+	    return ev != null && 'pageX' in ev;
+	  },
+	
+	  /**
 	   * Listens to window scroll and resize events. We cache scroll values so that
 	   * application code can access them without triggering reflows.
 	   *
@@ -13520,7 +13523,7 @@
 	   */
 	  ensureScrollValueMonitoring: function () {
 	    if (hasEventPageXY === undefined) {
-	      hasEventPageXY = document.createEvent && 'pageX' in document.createEvent('MouseEvent');
+	      hasEventPageXY = ReactBrowserEventEmitter.supportsEventPageXY();
 	    }
 	    if (!hasEventPageXY && !isMonitoringScrollValue) {
 	      var refresh = ViewportMetrics.refreshScrollValues;
@@ -13821,7 +13824,7 @@
 	
 	function isControlled(props) {
 	  var usesChecked = props.type === 'checkbox' || props.type === 'radio';
-	  return usesChecked ? props.checked !== undefined : props.value !== undefined;
+	  return usesChecked ? props.checked != null : props.value != null;
 	}
 	
 	/**
@@ -15624,34 +15627,29 @@
 	  }
 	}
 	
-	function invokeComponentDidMountWithTimer() {
-	  var publicInstance = this._instance;
-	  if (this._debugID !== 0) {
-	    ReactInstrumentation.debugTool.onBeginLifeCycleTimer(this._debugID, 'componentDidMount');
-	  }
-	  publicInstance.componentDidMount();
-	  if (this._debugID !== 0) {
-	    ReactInstrumentation.debugTool.onEndLifeCycleTimer(this._debugID, 'componentDidMount');
-	  }
-	}
-	
-	function invokeComponentDidUpdateWithTimer(prevProps, prevState, prevContext) {
-	  var publicInstance = this._instance;
-	  if (this._debugID !== 0) {
-	    ReactInstrumentation.debugTool.onBeginLifeCycleTimer(this._debugID, 'componentDidUpdate');
-	  }
-	  publicInstance.componentDidUpdate(prevProps, prevState, prevContext);
-	  if (this._debugID !== 0) {
-	    ReactInstrumentation.debugTool.onEndLifeCycleTimer(this._debugID, 'componentDidUpdate');
-	  }
-	}
-	
 	function shouldConstruct(Component) {
 	  return !!(Component.prototype && Component.prototype.isReactComponent);
 	}
 	
 	function isPureComponent(Component) {
 	  return !!(Component.prototype && Component.prototype.isPureReactComponent);
+	}
+	
+	// Separated into a function to contain deoptimizations caused by try/finally.
+	function measureLifeCyclePerf(fn, debugID, timerType) {
+	  if (debugID === 0) {
+	    // Top-level wrappers (see ReactMount) and empty components (see
+	    // ReactDOMEmptyComponent) are invisible to hooks and devtools.
+	    // Both are implementation details that should go away in the future.
+	    return fn();
+	  }
+	
+	  ReactInstrumentation.debugTool.onBeginLifeCycleTimer(debugID, timerType);
+	  try {
+	    return fn();
+	  } finally {
+	    ReactInstrumentation.debugTool.onEndLifeCycleTimer(debugID, timerType);
+	  }
 	}
 	
 	/**
@@ -15745,6 +15743,8 @@
 	   * @internal
 	   */
 	  mountComponent: function (transaction, hostParent, hostContainerInfo, context) {
+	    var _this = this;
+	
 	    this._context = context;
 	    this._mountOrder = nextMountID++;
 	    this._hostParent = hostParent;
@@ -15834,7 +15834,11 @@
 	
 	    if (inst.componentDidMount) {
 	      if (process.env.NODE_ENV !== 'production') {
-	        transaction.getReactMountReady().enqueue(invokeComponentDidMountWithTimer, this);
+	        transaction.getReactMountReady().enqueue(function () {
+	          measureLifeCyclePerf(function () {
+	            return inst.componentDidMount();
+	          }, _this._debugID, 'componentDidMount');
+	        });
 	      } else {
 	        transaction.getReactMountReady().enqueue(inst.componentDidMount, inst);
 	      }
@@ -15858,35 +15862,26 @@
 	
 	  _constructComponentWithoutOwner: function (doConstruct, publicProps, publicContext, updateQueue) {
 	    var Component = this._currentElement.type;
-	    var instanceOrElement;
+	
 	    if (doConstruct) {
 	      if (process.env.NODE_ENV !== 'production') {
-	        if (this._debugID !== 0) {
-	          ReactInstrumentation.debugTool.onBeginLifeCycleTimer(this._debugID, 'ctor');
-	        }
-	      }
-	      instanceOrElement = new Component(publicProps, publicContext, updateQueue);
-	      if (process.env.NODE_ENV !== 'production') {
-	        if (this._debugID !== 0) {
-	          ReactInstrumentation.debugTool.onEndLifeCycleTimer(this._debugID, 'ctor');
-	        }
-	      }
-	    } else {
-	      // This can still be an instance in case of factory components
-	      // but we'll count this as time spent rendering as the more common case.
-	      if (process.env.NODE_ENV !== 'production') {
-	        if (this._debugID !== 0) {
-	          ReactInstrumentation.debugTool.onBeginLifeCycleTimer(this._debugID, 'render');
-	        }
-	      }
-	      instanceOrElement = Component(publicProps, publicContext, updateQueue);
-	      if (process.env.NODE_ENV !== 'production') {
-	        if (this._debugID !== 0) {
-	          ReactInstrumentation.debugTool.onEndLifeCycleTimer(this._debugID, 'render');
-	        }
+	        return measureLifeCyclePerf(function () {
+	          return new Component(publicProps, publicContext, updateQueue);
+	        }, this._debugID, 'ctor');
+	      } else {
+	        return new Component(publicProps, publicContext, updateQueue);
 	      }
 	    }
-	    return instanceOrElement;
+	
+	    // This can still be an instance in case of factory components
+	    // but we'll count this as time spent rendering as the more common case.
+	    if (process.env.NODE_ENV !== 'production') {
+	      return measureLifeCyclePerf(function () {
+	        return Component(publicProps, publicContext, updateQueue);
+	      }, this._debugID, 'render');
+	    } else {
+	      return Component(publicProps, publicContext, updateQueue);
+	    }
 	  },
 	
 	  performInitialMountWithErrorHandling: function (renderedElement, hostParent, hostContainerInfo, transaction, context) {
@@ -15895,11 +15890,6 @@
 	    try {
 	      markup = this.performInitialMount(renderedElement, hostParent, hostContainerInfo, transaction, context);
 	    } catch (e) {
-	      if (process.env.NODE_ENV !== 'production') {
-	        if (this._debugID !== 0) {
-	          ReactInstrumentation.debugTool.onError();
-	        }
-	      }
 	      // Roll back to checkpoint, handle error (which may add items to the transaction), and take a new checkpoint
 	      transaction.rollback(checkpoint);
 	      this._instance.unstable_handleError(e);
@@ -15920,17 +15910,19 @@
 	
 	  performInitialMount: function (renderedElement, hostParent, hostContainerInfo, transaction, context) {
 	    var inst = this._instance;
+	
+	    var debugID = 0;
+	    if (process.env.NODE_ENV !== 'production') {
+	      debugID = this._debugID;
+	    }
+	
 	    if (inst.componentWillMount) {
 	      if (process.env.NODE_ENV !== 'production') {
-	        if (this._debugID !== 0) {
-	          ReactInstrumentation.debugTool.onBeginLifeCycleTimer(this._debugID, 'componentWillMount');
-	        }
-	      }
-	      inst.componentWillMount();
-	      if (process.env.NODE_ENV !== 'production') {
-	        if (this._debugID !== 0) {
-	          ReactInstrumentation.debugTool.onEndLifeCycleTimer(this._debugID, 'componentWillMount');
-	        }
+	        measureLifeCyclePerf(function () {
+	          return inst.componentWillMount();
+	        }, debugID, 'componentWillMount');
+	      } else {
+	        inst.componentWillMount();
 	      }
 	      // When mounting, calls to `setState` by `componentWillMount` will set
 	      // `this._pendingStateQueue` without triggering a re-render.
@@ -15950,15 +15942,12 @@
 	    );
 	    this._renderedComponent = child;
 	
-	    var selfDebugID = 0;
-	    if (process.env.NODE_ENV !== 'production') {
-	      selfDebugID = this._debugID;
-	    }
-	    var markup = ReactReconciler.mountComponent(child, transaction, hostParent, hostContainerInfo, this._processChildContext(context), selfDebugID);
+	    var markup = ReactReconciler.mountComponent(child, transaction, hostParent, hostContainerInfo, this._processChildContext(context), debugID);
 	
 	    if (process.env.NODE_ENV !== 'production') {
-	      if (this._debugID !== 0) {
-	        ReactInstrumentation.debugTool.onSetChildren(this._debugID, child._debugID !== 0 ? [child._debugID] : []);
+	      if (debugID !== 0) {
+	        var childDebugIDs = child._debugID !== 0 ? [child._debugID] : [];
+	        ReactInstrumentation.debugTool.onSetChildren(debugID, childDebugIDs);
 	      }
 	    }
 	
@@ -15979,24 +15968,22 @@
 	    if (!this._renderedComponent) {
 	      return;
 	    }
+	
 	    var inst = this._instance;
 	
 	    if (inst.componentWillUnmount && !inst._calledComponentWillUnmount) {
 	      inst._calledComponentWillUnmount = true;
-	      if (process.env.NODE_ENV !== 'production') {
-	        if (this._debugID !== 0) {
-	          ReactInstrumentation.debugTool.onBeginLifeCycleTimer(this._debugID, 'componentWillUnmount');
-	        }
-	      }
+	
 	      if (safely) {
 	        var name = this.getName() + '.componentWillUnmount()';
 	        ReactErrorUtils.invokeGuardedCallback(name, inst.componentWillUnmount.bind(inst));
 	      } else {
-	        inst.componentWillUnmount();
-	      }
-	      if (process.env.NODE_ENV !== 'production') {
-	        if (this._debugID !== 0) {
-	          ReactInstrumentation.debugTool.onEndLifeCycleTimer(this._debugID, 'componentWillUnmount');
+	        if (process.env.NODE_ENV !== 'production') {
+	          measureLifeCyclePerf(function () {
+	            return inst.componentWillUnmount();
+	          }, this._debugID, 'componentWillUnmount');
+	        } else {
+	          inst.componentWillUnmount();
 	        }
 	      }
 	    }
@@ -16083,13 +16070,21 @@
 	  _processChildContext: function (currentContext) {
 	    var Component = this._currentElement.type;
 	    var inst = this._instance;
-	    if (process.env.NODE_ENV !== 'production') {
-	      ReactInstrumentation.debugTool.onBeginProcessingChildContext();
+	    var childContext;
+	
+	    if (inst.getChildContext) {
+	      if (process.env.NODE_ENV !== 'production') {
+	        ReactInstrumentation.debugTool.onBeginProcessingChildContext();
+	        try {
+	          childContext = inst.getChildContext();
+	        } finally {
+	          ReactInstrumentation.debugTool.onEndProcessingChildContext();
+	        }
+	      } else {
+	        childContext = inst.getChildContext();
+	      }
 	    }
-	    var childContext = inst.getChildContext && inst.getChildContext();
-	    if (process.env.NODE_ENV !== 'production') {
-	      ReactInstrumentation.debugTool.onEndProcessingChildContext();
-	    }
+	
 	    if (childContext) {
 	      !(typeof Component.childContextTypes === 'object') ? process.env.NODE_ENV !== 'production' ? invariant(false, '%s.getChildContext(): childContextTypes must be defined in order to use getChildContext().', this.getName() || 'ReactCompositeComponent') : _prodInvariant('107', this.getName() || 'ReactCompositeComponent') : void 0;
 	      if (process.env.NODE_ENV !== 'production') {
@@ -16184,15 +16179,11 @@
 	    // immediately reconciled instead of waiting for the next batch.
 	    if (willReceive && inst.componentWillReceiveProps) {
 	      if (process.env.NODE_ENV !== 'production') {
-	        if (this._debugID !== 0) {
-	          ReactInstrumentation.debugTool.onBeginLifeCycleTimer(this._debugID, 'componentWillReceiveProps');
-	        }
-	      }
-	      inst.componentWillReceiveProps(nextProps, nextContext);
-	      if (process.env.NODE_ENV !== 'production') {
-	        if (this._debugID !== 0) {
-	          ReactInstrumentation.debugTool.onEndLifeCycleTimer(this._debugID, 'componentWillReceiveProps');
-	        }
+	        measureLifeCyclePerf(function () {
+	          return inst.componentWillReceiveProps(nextProps, nextContext);
+	        }, this._debugID, 'componentWillReceiveProps');
+	      } else {
+	        inst.componentWillReceiveProps(nextProps, nextContext);
 	      }
 	    }
 	
@@ -16202,15 +16193,11 @@
 	    if (!this._pendingForceUpdate) {
 	      if (inst.shouldComponentUpdate) {
 	        if (process.env.NODE_ENV !== 'production') {
-	          if (this._debugID !== 0) {
-	            ReactInstrumentation.debugTool.onBeginLifeCycleTimer(this._debugID, 'shouldComponentUpdate');
-	          }
-	        }
-	        shouldUpdate = inst.shouldComponentUpdate(nextProps, nextState, nextContext);
-	        if (process.env.NODE_ENV !== 'production') {
-	          if (this._debugID !== 0) {
-	            ReactInstrumentation.debugTool.onEndLifeCycleTimer(this._debugID, 'shouldComponentUpdate');
-	          }
+	          shouldUpdate = measureLifeCyclePerf(function () {
+	            return inst.shouldComponentUpdate(nextProps, nextState, nextContext);
+	          }, this._debugID, 'shouldComponentUpdate');
+	        } else {
+	          shouldUpdate = inst.shouldComponentUpdate(nextProps, nextState, nextContext);
 	        }
 	      } else {
 	        if (this._compositeType === CompositeTypes.PureClass) {
@@ -16276,6 +16263,8 @@
 	   * @private
 	   */
 	  _performComponentUpdate: function (nextElement, nextProps, nextState, nextContext, transaction, unmaskedContext) {
+	    var _this2 = this;
+	
 	    var inst = this._instance;
 	
 	    var hasComponentDidUpdate = Boolean(inst.componentDidUpdate);
@@ -16290,15 +16279,11 @@
 	
 	    if (inst.componentWillUpdate) {
 	      if (process.env.NODE_ENV !== 'production') {
-	        if (this._debugID !== 0) {
-	          ReactInstrumentation.debugTool.onBeginLifeCycleTimer(this._debugID, 'componentWillUpdate');
-	        }
-	      }
-	      inst.componentWillUpdate(nextProps, nextState, nextContext);
-	      if (process.env.NODE_ENV !== 'production') {
-	        if (this._debugID !== 0) {
-	          ReactInstrumentation.debugTool.onEndLifeCycleTimer(this._debugID, 'componentWillUpdate');
-	        }
+	        measureLifeCyclePerf(function () {
+	          return inst.componentWillUpdate(nextProps, nextState, nextContext);
+	        }, this._debugID, 'componentWillUpdate');
+	      } else {
+	        inst.componentWillUpdate(nextProps, nextState, nextContext);
 	      }
 	    }
 	
@@ -16312,7 +16297,9 @@
 	
 	    if (hasComponentDidUpdate) {
 	      if (process.env.NODE_ENV !== 'production') {
-	        transaction.getReactMountReady().enqueue(invokeComponentDidUpdateWithTimer.bind(this, prevProps, prevState, prevContext), this);
+	        transaction.getReactMountReady().enqueue(function () {
+	          measureLifeCyclePerf(inst.componentDidUpdate.bind(inst, prevProps, prevState, prevContext), _this2._debugID, 'componentDidUpdate');
+	        });
 	      } else {
 	        transaction.getReactMountReady().enqueue(inst.componentDidUpdate.bind(inst, prevProps, prevState, prevContext), inst);
 	      }
@@ -16329,6 +16316,12 @@
 	    var prevComponentInstance = this._renderedComponent;
 	    var prevRenderedElement = prevComponentInstance._currentElement;
 	    var nextRenderedElement = this._renderValidatedComponent();
+	
+	    var debugID = 0;
+	    if (process.env.NODE_ENV !== 'production') {
+	      debugID = this._debugID;
+	    }
+	
 	    if (shouldUpdateReactComponent(prevRenderedElement, nextRenderedElement)) {
 	      ReactReconciler.receiveComponent(prevComponentInstance, nextRenderedElement, transaction, this._processChildContext(context));
 	    } else {
@@ -16341,15 +16334,12 @@
 	      );
 	      this._renderedComponent = child;
 	
-	      var selfDebugID = 0;
-	      if (process.env.NODE_ENV !== 'production') {
-	        selfDebugID = this._debugID;
-	      }
-	      var nextMarkup = ReactReconciler.mountComponent(child, transaction, this._hostParent, this._hostContainerInfo, this._processChildContext(context), selfDebugID);
+	      var nextMarkup = ReactReconciler.mountComponent(child, transaction, this._hostParent, this._hostContainerInfo, this._processChildContext(context), debugID);
 	
 	      if (process.env.NODE_ENV !== 'production') {
-	        if (this._debugID !== 0) {
-	          ReactInstrumentation.debugTool.onSetChildren(this._debugID, child._debugID !== 0 ? [child._debugID] : []);
+	        if (debugID !== 0) {
+	          var childDebugIDs = child._debugID !== 0 ? [child._debugID] : [];
+	          ReactInstrumentation.debugTool.onSetChildren(debugID, childDebugIDs);
 	        }
 	      }
 	
@@ -16371,17 +16361,14 @@
 	   */
 	  _renderValidatedComponentWithoutOwnerOrContext: function () {
 	    var inst = this._instance;
+	    var renderedComponent;
 	
 	    if (process.env.NODE_ENV !== 'production') {
-	      if (this._debugID !== 0) {
-	        ReactInstrumentation.debugTool.onBeginLifeCycleTimer(this._debugID, 'render');
-	      }
-	    }
-	    var renderedComponent = inst.render();
-	    if (process.env.NODE_ENV !== 'production') {
-	      if (this._debugID !== 0) {
-	        ReactInstrumentation.debugTool.onEndLifeCycleTimer(this._debugID, 'render');
-	      }
+	      renderedComponent = measureLifeCyclePerf(function () {
+	        return inst.render();
+	      }, this._debugID, 'render');
+	    } else {
+	      renderedComponent = inst.render();
 	    }
 	
 	    if (process.env.NODE_ENV !== 'production') {
@@ -16432,7 +16419,7 @@
 	    var publicComponentInstance = component.getPublicInstance();
 	    if (process.env.NODE_ENV !== 'production') {
 	      var componentName = component && component.getName ? component.getName() : 'a component';
-	      process.env.NODE_ENV !== 'production' ? warning(publicComponentInstance != null, 'Stateless function components cannot be given refs ' + '(See ref "%s" in %s created by %s). ' + 'Attempts to access this ref will fail.', ref, componentName, this.getName()) : void 0;
+	      process.env.NODE_ENV !== 'production' ? warning(publicComponentInstance != null || component._compositeType !== CompositeTypes.StatelessFunctional, 'Stateless function components cannot be given refs ' + '(See ref "%s" in %s created by %s). ' + 'Attempts to access this ref will fail.', ref, componentName, this.getName()) : void 0;
 	    }
 	    var refs = inst.refs === emptyObject ? inst.refs = {} : inst.refs;
 	    refs[ref] = publicComponentInstance;
@@ -17653,10 +17640,15 @@
 	
 	  var didWarn = {};
 	
-	  validateDOMNesting = function (childTag, childInstance, ancestorInfo) {
+	  validateDOMNesting = function (childTag, childText, childInstance, ancestorInfo) {
 	    ancestorInfo = ancestorInfo || emptyAncestorInfo;
 	    var parentInfo = ancestorInfo.current;
 	    var parentTag = parentInfo && parentInfo.tag;
+	
+	    if (childText != null) {
+	      process.env.NODE_ENV !== 'production' ? warning(childTag == null, 'validateDOMNesting: when childText is passed, childTag should be null') : void 0;
+	      childTag = '#text';
+	    }
 	
 	    var invalidParent = isTagValidWithParent(childTag, parentTag) ? null : parentInfo;
 	    var invalidAncestor = invalidParent ? null : findInvalidAncestorForTag(childTag, ancestorInfo);
@@ -17705,7 +17697,15 @@
 	      didWarn[warnKey] = true;
 	
 	      var tagDisplayName = childTag;
-	      if (childTag !== '#text') {
+	      var whitespaceInfo = '';
+	      if (childTag === '#text') {
+	        if (/\S/.test(childText)) {
+	          tagDisplayName = 'Text nodes';
+	        } else {
+	          tagDisplayName = 'Whitespace text nodes';
+	          whitespaceInfo = ' Make sure you don\'t have any extra whitespace between tags on ' + 'each line of your source code.';
+	        }
+	      } else {
 	        tagDisplayName = '<' + childTag + '>';
 	      }
 	
@@ -17714,7 +17714,7 @@
 	        if (ancestorTag === 'table' && childTag === 'tr') {
 	          info += ' Add a <tbody> to your code to match the DOM tree generated by ' + 'the browser.';
 	        }
-	        process.env.NODE_ENV !== 'production' ? warning(false, 'validateDOMNesting(...): %s cannot appear as a child of <%s>. ' + 'See %s.%s', tagDisplayName, ancestorTag, ownerInfo, info) : void 0;
+	        process.env.NODE_ENV !== 'production' ? warning(false, 'validateDOMNesting(...): %s cannot appear as a child of <%s>.%s ' + 'See %s.%s', tagDisplayName, ancestorTag, whitespaceInfo, ownerInfo, info) : void 0;
 	      } else {
 	        process.env.NODE_ENV !== 'production' ? warning(false, 'validateDOMNesting(...): %s cannot appear as a descendant of ' + '<%s>. See %s.', tagDisplayName, ancestorTag, ownerInfo) : void 0;
 	      }
@@ -18030,7 +18030,7 @@
 	      if (parentInfo) {
 	        // parentInfo should always be present except for the top-level
 	        // component when server rendering
-	        validateDOMNesting('#text', this, parentInfo);
+	        validateDOMNesting(null, this._stringText, this, parentInfo);
 	      }
 	    }
 	
@@ -19668,7 +19668,7 @@
 	      bubbled: keyOf({ onSelect: null }),
 	      captured: keyOf({ onSelectCapture: null })
 	    },
-	    dependencies: [topLevelTypes.topBlur, topLevelTypes.topContextMenu, topLevelTypes.topFocus, topLevelTypes.topKeyDown, topLevelTypes.topMouseDown, topLevelTypes.topMouseUp, topLevelTypes.topSelectionChange]
+	    dependencies: [topLevelTypes.topBlur, topLevelTypes.topContextMenu, topLevelTypes.topFocus, topLevelTypes.topKeyDown, topLevelTypes.topKeyUp, topLevelTypes.topMouseDown, topLevelTypes.topMouseUp, topLevelTypes.topSelectionChange]
 	  }
 	};
 	
@@ -24805,8 +24805,6 @@
 	
 	var _routerWarning2 = _interopRequireDefault(_routerWarning);
 	
-	var _Actions = __webpack_require__(/*! history/lib/Actions */ 184);
-	
 	var _computeChangedRoutes2 = __webpack_require__(/*! ./computeChangedRoutes */ 202);
 	
 	var _computeChangedRoutes3 = _interopRequireDefault(_computeChangedRoutes2);
@@ -24853,10 +24851,6 @@
 	    }
 	
 	    return (0, _isActive3.default)(location, indexOnly, state.location, state.routes, state.params);
-	  }
-	
-	  function createLocationFromRedirectInfo(location) {
-	    return history.createLocation(location, _Actions.REPLACE);
 	  }
 	
 	  var partialNextState = void 0;
@@ -24916,7 +24910,7 @@
 	    }
 	
 	    function handleErrorOrRedirect(error, redirectInfo) {
-	      if (error) callback(error);else callback(null, createLocationFromRedirectInfo(redirectInfo));
+	      if (error) callback(error);else callback(null, redirectInfo);
 	    }
 	  }
 	
@@ -27139,6 +27133,8 @@
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
+	var _Actions = __webpack_require__(/*! history/lib/Actions */ 184);
+	
 	var _invariant = __webpack_require__(/*! invariant */ 180);
 	
 	var _invariant2 = _interopRequireDefault(_invariant);
@@ -27197,7 +27193,7 @@
 	  history = (0, _RouterUtils.createRoutingHistory)(history, transitionManager);
 	
 	  transitionManager.match(location, function (error, redirectLocation, nextState) {
-	    callback(error, redirectLocation, nextState && _extends({}, nextState, {
+	    callback(error, redirectLocation && router.createLocation(redirectLocation, _Actions.REPLACE), nextState && _extends({}, nextState, {
 	      history: history,
 	      router: router,
 	      matchContext: { history: history, transitionManager: transitionManager, router: router }
@@ -27982,12 +27978,10 @@
 		function Menu(props) {
 			_classCallCheck(this, Menu);
 	
-			var _this = _possibleConstructorReturn(this, (Menu.__proto__ || Object.getPrototypeOf(Menu)).call(this, props));
-	
-			_this.state = {
-				userLoggedIn: _this.props.loggedin
-			};
-			return _this;
+			return _possibleConstructorReturn(this, (Menu.__proto__ || Object.getPrototypeOf(Menu)).call(this, props));
+			// this.state = {
+			// 	userLoggedIn: this.props.loggedin
+			// }
 		}
 	
 		_createClass(Menu, [{
@@ -28015,7 +28009,7 @@
 							_react2.default.createElement(
 								_reactRouter.Link,
 								{ to: '/upload', activeClassName: 'active' },
-								'Upload Keys'
+								'Login'
 							)
 						),
 						prop.loggedin ? _react2.default.createElement(
@@ -28024,7 +28018,16 @@
 							_react2.default.createElement(
 								_reactRouter.Link,
 								{ to: '/tovote', activeClassName: 'active' },
-								'Vote'
+								'Attestations'
+							)
+						) : '',
+						prop.loggedin ? _react2.default.createElement(
+							'li',
+							null,
+							_react2.default.createElement(
+								_reactRouter.Link,
+								{ to: '/Attestations', activeClassName: 'active' },
+								'ICA Attestations'
 							)
 						) : '',
 						prop.loggedin ? _react2.default.createElement(
@@ -28064,7 +28067,7 @@
 							_react2.default.createElement(
 								_reactRouter.Link,
 								{ to: '/assets', activeClassName: 'active' },
-								'Assets'
+								'My Assets'
 							)
 						) : '',
 						prop.loggedin ? _react2.default.createElement(
@@ -28082,7 +28085,7 @@
 							_react2.default.createElement(
 								_reactRouter.Link,
 								{ to: '/mycoreidentity', activeClassName: 'active' },
-								'COID Utility'
+								'Manage Identities and Assets'
 							)
 						) : ''
 					)
@@ -28335,7 +28338,7 @@
 	
 			_this.state = {
 				download_url: props.params[1],
-				pwd: props.params[0],
+				//pwd: props.params[0],
 				pub_key: props.params[2]
 			};
 			return _this;
@@ -41284,10 +41287,11 @@
 		"_args": [
 			[
 				{
-					"name": "elliptic",
 					"raw": "elliptic@^6.2.3",
-					"rawSpec": "^6.2.3",
 					"scope": null,
+					"escapedName": "elliptic",
+					"name": "elliptic",
+					"rawSpec": "^6.2.3",
 					"spec": ">=6.2.3 <7.0.0",
 					"type": "range"
 				},
@@ -41295,40 +41299,41 @@
 			]
 		],
 		"_from": "elliptic@>=6.2.3 <7.0.0",
-		"_id": "elliptic@6.3.1",
+		"_id": "elliptic@6.3.2",
 		"_inCache": true,
 		"_installable": true,
 		"_location": "/elliptic",
-		"_nodeVersion": "6.0.0",
+		"_nodeVersion": "6.3.0",
 		"_npmOperationalInternal": {
 			"host": "packages-16-east.internal.npmjs.com",
-			"tmp": "tmp/elliptic-6.3.1.tgz_1465921413402_0.5202967382501811"
+			"tmp": "tmp/elliptic-6.3.2.tgz_1473938837205_0.3108903462998569"
 		},
 		"_npmUser": {
-			"email": "fedor@indutny.com",
-			"name": "indutny"
+			"name": "indutny",
+			"email": "fedor@indutny.com"
 		},
-		"_npmVersion": "3.8.6",
+		"_npmVersion": "3.10.3",
 		"_phantomChildren": {},
 		"_requested": {
-			"name": "elliptic",
 			"raw": "elliptic@^6.2.3",
-			"rawSpec": "^6.2.3",
 			"scope": null,
+			"escapedName": "elliptic",
+			"name": "elliptic",
+			"rawSpec": "^6.2.3",
 			"spec": ">=6.2.3 <7.0.0",
 			"type": "range"
 		},
 		"_requiredBy": [
 			"/secp256k1"
 		],
-		"_resolved": "http://registry.npmjs.org/elliptic/-/elliptic-6.3.1.tgz",
-		"_shasum": "17781f2109ab0ec686b146bdcff5d2e8c6aeceda",
+		"_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.3.2.tgz",
+		"_shasum": "e4c81e0829cf0a65ab70e998b8232723b5c1bc48",
 		"_shrinkwrap": null,
 		"_spec": "elliptic@^6.2.3",
 		"_where": "C:\\Users\\1070933\\Desktop\\GPT_Identity\\walletApp-Dev\\node_modules\\secp256k1",
 		"author": {
-			"email": "fedor@indutny.com",
-			"name": "Fedor Indutny"
+			"name": "Fedor Indutny",
+			"email": "fedor@indutny.com"
 		},
 		"bugs": {
 			"url": "https://github.com/indutny/elliptic/issues"
@@ -41357,13 +41362,13 @@
 		},
 		"directories": {},
 		"dist": {
-			"shasum": "17781f2109ab0ec686b146bdcff5d2e8c6aeceda",
-			"tarball": "https://registry.npmjs.org/elliptic/-/elliptic-6.3.1.tgz"
+			"shasum": "e4c81e0829cf0a65ab70e998b8232723b5c1bc48",
+			"tarball": "https://registry.npmjs.org/elliptic/-/elliptic-6.3.2.tgz"
 		},
 		"files": [
 			"lib"
 		],
-		"gitHead": "c53f5cf3d832c0073eb4a4ed423a464cbce68f3e",
+		"gitHead": "cbace4683a4a548dc0306ef36756151a20299cd5",
 		"homepage": "https://github.com/indutny/elliptic",
 		"keywords": [
 			"EC",
@@ -41375,8 +41380,8 @@
 		"main": "lib/elliptic.js",
 		"maintainers": [
 			{
-				"email": "fedor@indutny.com",
-				"name": "indutny"
+				"name": "indutny",
+				"email": "fedor@indutny.com"
 			}
 		],
 		"name": "elliptic",
@@ -41394,7 +41399,7 @@
 			"unit": "istanbul test _mocha --reporter=spec test/index.js",
 			"version": "grunt dist && git add dist/"
 		},
-		"version": "6.3.1"
+		"version": "6.3.2"
 	};
 
 /***/ },
@@ -46148,12 +46153,13 @@
 	  else
 	    r = this.curve.pointFromX(r, isYOdd);
 	
-	  var eNeg = n.sub(e);
+	  var rInv = signature.r.invm(n);
+	  var s1 = n.sub(e).mul(rInv).umod(n);
+	  var s2 = s.mul(rInv).umod(n);
 	
 	  // 1.6.1 Compute Q = r^-1 (sR -  eG)
 	  //               Q = r^-1 (sR + -eG)
-	  var rInv = signature.r.invm(n);
-	  return this.g.mulAdd(eNeg, r, s).mul(rInv);
+	  return this.g.mulAdd(s1, r, s2);
 	};
 	
 	EC.prototype.getKeyRecoveryParam = function(e, signature, Q, enc) {
@@ -47226,9 +47232,9 @@
 
 /***/ },
 /* 326 */
-/*!*********************************************!*\
-  !*** ./src/app/Components/NameRegister.jsx ***!
-  \*********************************************/
+/*!***************************************!*\
+  !*** ./src/app/Components/Upload.jsx ***!
+  \***************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -47251,112 +47257,157 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	//TODO: IMPLEMENT ONCE WE HAVE NAME REGISTRY
-	//RIGHT NOW THIS COMPONENT IS COMMENTED OUT ON menu.jsx
+	var UploadKeyStore = function (_React$Component) {
+		_inherits(UploadKeyStore, _React$Component);
 	
-	var NameRegister = function (_React$Component) {
-		_inherits(NameRegister, _React$Component);
+		function UploadKeyStore(props) {
+			_classCallCheck(this, UploadKeyStore);
 	
-		function NameRegister() {
-			_classCallCheck(this, NameRegister);
+			var _this = _possibleConstructorReturn(this, (UploadKeyStore.__proto__ || Object.getPrototypeOf(UploadKeyStore)).call(this, props));
 	
-			return _possibleConstructorReturn(this, (NameRegister.__proto__ || Object.getPrototypeOf(NameRegister)).apply(this, arguments));
+			_this.url = twinUrl + "ballot/readNotify/";
+			_this.state = {
+				pubKey: "",
+				fileread: false,
+				contacts: []
+			};
+	
+			_this.uploadFile = _this.uploadFile.bind(_this);
+			return _this;
 		}
 	
-		_createClass(NameRegister, [{
+		//puts the users keys into local storage
+	
+	
+		_createClass(UploadKeyStore, [{
+			key: "createStorage",
+			value: function createStorage(pubKey, private_key) {
+				localStorage.setItem("pubKey", pubKey);
+				localStorage.setItem("privKey", private_key);
+				var now = new Date();
+				now.setMinutes(now.getMinutes() + 30);
+				localStorage.setItem("timestamp", now.getTime());
+			}
+	
+			//set the users local storage and log them in
+	
+		}, {
+			key: "uploadFile",
+			value: function uploadFile(e) {
+				e.preventDefault();
+				var file = e.target.files.value;
+				var fileType = file.split('.').pop();
+				if (fileType == "json") {
+					var reader = new FileReader();
+					reader.onload = function (event) {
+						var obj = JSON.parse(event.target.result);
+						this.createStorage(obj.public_key, obj.private_key);
+						this.setState({ pubKey: obj.public_key, priKey: obj.private_key, fileread: true });
+						this.props.loginHandler(this.state);
+					}.bind(this);
+					reader.readAsText(e.target.files.files[0]);
+				} else {
+					alert("Unknown file format ! We support only JSON");
+				}
+	
+				//set contacts upon key upload; Replace hardcodede pubKey with uploaded key later
+				$.ajax({
+					url: twinUrl + "readContacts/" + '03a066efbb37f5fabfab05bf4a65e0dc376d0e3fb1c3d930d7f5ec6da3ac5bc237',
+					dataType: 'json',
+					cache: false,
+					success: function (resp) {
+						var names = [];
+						var keys = [];
+						for (var i = 0; i < resp.data.contacts.length; i++) {
+							names.push(resp.data.contacts[i].contactName);
+							keys.push(resp.data.contacts[i].pubKey);
+						}
+	
+						localStorage.setItem("contactNames", names);
+						localStorage.setItem("contactPubKeys", keys);
+						console.log("LS contactNames: " + localStorage.getItem("contactNames"));
+					}.bind(this)
+				});
+			}
+		}, {
 			key: "render",
 			value: function render() {
+				var cssClass = 'hidden';
+				if (this.state.fileread) cssClass = 'show';
 				return _react2.default.createElement(
 					"div",
-					{ id: "NameRegisterContainer" },
+					{ className: "panel panel-default" },
 					_react2.default.createElement(
-						"h1",
-						null,
-						"Name Register"
+						"div",
+						{ className: "panel-heading" },
+						_react2.default.createElement(
+							"strong",
+							null,
+							"Upload Key Store File"
+						),
+						" ",
+						_react2.default.createElement(
+							"small",
+							null,
+							"JSON(.json) file format only supported"
+						)
 					),
 					_react2.default.createElement(
-						"form",
-						{ method: "POST", id: "register", role: "form" },
+						"div",
+						{ className: "panel-body" },
 						_react2.default.createElement(
-							"div",
-							{ className: "form-group" },
-							_react2.default.createElement(
-								"label",
-								{ htmlFor: "publickey" },
-								"Public Key"
-							),
-							_react2.default.createElement("input", { className: "form-control", id: "publickey", type: "text", name: "publickey" })
+							"h4",
+							null,
+							"Select key file from your computer to login"
 						),
 						_react2.default.createElement(
-							"div",
-							{ className: "form-group" },
+							"form",
+							{ action: "", method: "post", encType: "multipart/form-data", id: "js-upload-form", onSubmit: this.uploadFile },
 							_react2.default.createElement(
-								"label",
-								{ htmlFor: "signature" },
-								"Signature"
-							),
-							_react2.default.createElement("input", { className: "form-control", id: "signature", type: "text", name: "signature" })
+								"div",
+								{ className: "form-inline" },
+								_react2.default.createElement(
+									"div",
+									{ className: "form-group" },
+									_react2.default.createElement("input", { type: "file", name: "files", id: "js-upload-files" })
+								),
+								_react2.default.createElement(
+									"button",
+									{ type: "submit", className: "btn btn-sm btn-primary", id: "js-upload-submit" },
+									"UPLOAD"
+								)
+							)
 						),
+						_react2.default.createElement("br", null),
 						_react2.default.createElement(
 							"div",
-							{ className: "form-group" },
+							{ className: cssClass },
 							_react2.default.createElement(
-								"label",
-								{ htmlFor: "datathree" },
-								"Message"
-							),
-							_react2.default.createElement("input", { className: "form-control", id: "datathree", type: "text", name: "message" })
-						),
-						_react2.default.createElement(
-							"div",
-							{ className: "form-group" },
-							_react2.default.createElement(
-								"label",
-								{ htmlFor: "message" },
-								"Input"
-							),
-							_react2.default.createElement("input", { className: "form-control", id: "message", type: "text", name: "input" })
-						),
-						_react2.default.createElement(
-							"div",
-							{ className: "form-group" },
-							_react2.default.createElement(
-								"label",
-								{ htmlFor: "address" },
-								"Address"
-							),
-							_react2.default.createElement("input", { className: "form-control", id: "address", type: "text", name: "address" })
-						),
-						_react2.default.createElement(
-							"div",
-							{ className: "form-group" },
-							_react2.default.createElement(
-								"label",
-								{ htmlFor: "name" },
-								"Name"
-							),
-							_react2.default.createElement("input", { className: "form-control", id: "name", type: "text", name: "name" })
-						),
-						_react2.default.createElement(
-							"button",
-							{ className: "btn btn-primary", type: "submit" },
-							"Submit"
+								"p",
+								null,
+								_react2.default.createElement(
+									"b",
+									null,
+									"Public Key : "
+								),
+								this.state.pubKey
+							)
 						)
 					)
 				);
 			}
 		}]);
 	
-		return NameRegister;
+		return UploadKeyStore;
 	}(_react2.default.Component);
 	
-	exports.default = NameRegister;
+	exports.default = UploadKeyStore;
 
 /***/ },
 /* 327 */
-/*!*************************************************!*\
-  !*** ./src/app/Components/CoreIdentityForm.jsx ***!
-  \*************************************************/
+/*!***************************************!*\
+  !*** ./src/app/Components/ToVote.jsx ***!
+  \***************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
@@ -47367,9 +47418,863 @@
 	
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactDayPicker = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"react-day-picker\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+	
+	var _reactDayPicker2 = _interopRequireDefault(_reactDayPicker);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	//var crypto = require('crypto');
+	var secp256k1 = __webpack_require__(/*! secp256k1 */ 261);
+	var keccak_256 = __webpack_require__(/*! js-sha3 */ 325).keccak_256;
+	var style = { fontSize: '12.5px' };
+	
+	var ModalWin = function (_React$Component) {
+		_inherits(ModalWin, _React$Component);
+	
+		function ModalWin(props) {
+			_classCallCheck(this, ModalWin);
+	
+			var _this2 = _possibleConstructorReturn(this, (ModalWin.__proto__ || Object.getPrototypeOf(ModalWin)).call(this, props));
+	
+			_this2.state = {
+				proposal: _this2.props.dataHandler,
+				proposal_data: {},
+				selectedDay: new Date() //for signature expiration
+			};
+			return _this2;
+		}
+		//*****************************************************************************
+		//*****************************************************************************
+		//takes in a msg/json and returns a signature (needed for requests)
+	
+	
+		_createClass(ModalWin, [{
+			key: 'getSignature',
+			value: function getSignature(msg) {
+				console.log("creating signature, signing msg: \n" + JSON.stringify(msg));
+				//get private key from local storage
+				var privKey = localStorage.getItem("privKey");
+				//make private key hex buffer
+				var privKey1 = new Buffer(privKey, "hex");
+				var msg_hash = keccak_256(JSON.stringify(msg));
+				var msg_hash_buffer = new Buffer(msg_hash, "hex");
+				var signature = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1));
+				signature = JSON.parse(signature).signature;
+				signature = JSON.stringify(signature);
+				signature = JSON.parse(signature).data;
+				signature = new Buffer(signature, "hex");
+				signature = signature.toString("hex");
+				return signature;
+			}
+			//*****************************************************************************
+			//*****************************************************************************
+	
+		}, {
+			key: 'submitHandler',
+			value: function submitHandler(e) {
+				e.preventDefault();
+				var ele = $(e.target);
+	
+				var day = this.state.selectedDay;
+				var sigExpire = day.getTime() / 1000;
+	
+				//NOTE: signature not yet in JSON object
+				var json = {
+					"txnDesc": "sampleDesc",
+					"publicKey": localStorage.getItem("pubKey"),
+					"proposalID": this.state.proposal.proposal_id,
+					"vote": parseInt(ele.attr("data-val")),
+					"sigExpire": sigExpire
+				};
+	
+				var signature = this.getSignature(json);
+				var msg_hash = keccak_256(JSON.stringify(json));
+				var msg_hash_buffer = new Buffer(msg_hash, "hex");
+				json.msg = msg_hash_buffer.toString("hex");
+				json.signature = signature;
+	
+				$.ajax({
+					url: twinUrl + 'voteonCOIDproposal',
+					type: 'POST',
+					data: json,
+					success: function success(res) {
+						if (res.status == "Ok" && res.msg == "true") {
+							var proposalID = this.state.proposal.proposal_id;
+							$.ajax({
+								url: twinUrl + proposalID + "/" + localStorage.getItem("pubKey"),
+								type: 'GET',
+								complete: function complete(xhr) {
+									//alert("vote successfully submitted");
+									window.location.reload();
+									_this.setState({
+										proposal_data: result
+									});
+								}
+							});
+						}
+					}
+				});
+			}
+			//*****************************************************************************
+			//*****************************************************************************
+	
+		}, {
+			key: 'componentDidMount',
+			value: function componentDidMount() {
+				var _this = this;
+				var propType = this.state.proposal.propType;
+				console.log("propType: " + propType);
+	
+				$.ajax({
+					type: "POST",
+					url: twinUrl + 'getCoidData',
+					data: {
+						"publicKey": localStorage.getItem("pubKey"),
+						"proposalId": this.state.proposal.proposal_id,
+						"gatekeeperAddr": this.state.proposal.gatekeeperAddr,
+						"isHuman": this.state.proposal.isHuman
+					}, //.bind(this)
+					success: function success(result) {
+						var fileValidation = true;
+						// Fill up data in Modal window
+						//data.publicKey
+						if ($.type(result) == "string") {
+							result = JSON.parse(result);
+						}
+						var ownerArray = [];
+						for (var i = 0; i < result.ownershipTokenQuantity.length; i++) {
+							var temp = [];
+							temp[0] = result.ownerIdList[i];
+							temp[1] = result.ownershipTokenQuantity[i];
+							ownerArray.push(temp);
+						}
+						result.ownerArray = ownerArray;
+						//console.log(result.ownerArray)
+						console.log('result of getCoidData' + JSON.stringify(result));
+	
+						_this.setState({
+							proposal_data: result
+						});
+	
+						$("#proposalDetails").modal('show');
+						$("#proposalDetails").on('hidden.bs.modal', _this.props.hideHandler);
+					} //end success
+				});
+			}
+	
+			//*****************************************************************************
+			//renders a normal asset/coid proposal
+			//*****************************************************************************
+	
+		}, {
+			key: 'renderStandardAsset',
+			value: function renderStandardAsset() {
+				var _this3 = this;
+	
+				return _react2.default.createElement(
+					'tbody',
+					null,
+					_react2.default.createElement(
+						'tr',
+						null,
+						_react2.default.createElement(
+							'td',
+							null,
+							'Proposal ID'
+						),
+						_react2.default.createElement(
+							'td',
+							null,
+							this.state.proposal.proposal_id
+						)
+					),
+					_react2.default.createElement(
+						'tr',
+						null,
+						_react2.default.createElement(
+							'td',
+							{ colSpan: '2' },
+							_react2.default.createElement(
+								'b',
+								null,
+								'Official IDs'
+							)
+						)
+					),
+					function () {
+						var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+						if (!$.isEmptyObject(_this3.state.proposal_data)) {
+							return _this3.state.proposal_data.uniqueIdAttributes.map(function (ids, i) {
+								return _react2.default.createElement(
+									'tr',
+									{ key: i },
+									_react2.default.createElement(
+										'td',
+										null,
+										ids[0]
+									),
+									_react2.default.createElement(
+										'td',
+										null,
+										_react2.default.createElement(
+											'p',
+											null,
+											'File hash: ',
+											ids[2]
+										),
+										_react2.default.createElement(
+											'p',
+											null,
+											'IPFS hash: ',
+											_react2.default.createElement(
+												'a',
+												{ target: '_blank', href: ipfs_url + "/" + ids[1] },
+												ids[1]
+											)
+										)
+									)
+								);
+							});
+						} else {
+							return _react2.default.createElement(
+								'tr',
+								null,
+								_react2.default.createElement(
+									'td',
+									{ colSpan: '2' },
+									'No Ids found'
+								)
+							);
+						}
+					}(this),
+					_react2.default.createElement(
+						'tr',
+						null,
+						_react2.default.createElement(
+							'td',
+							null,
+							'Ownership ID'
+						),
+						_react2.default.createElement(
+							'td',
+							null,
+							this.state.proposal_data.ownershipId
+						)
+					),
+					_react2.default.createElement(
+						'tr',
+						null,
+						_react2.default.createElement(
+							'td',
+							null,
+							'Ownership ID List'
+						),
+						_react2.default.createElement(
+							'td',
+							null,
+							function () {
+								if (!$.isEmptyObject(_this3.state.proposal_data)) {
+									return _this3.state.proposal_data.ownerIdList.map(function (ids, i) {
+										return _react2.default.createElement(
+											'p',
+											{ key: i },
+											' ',
+											_this3.state.proposal_data.ownerIdList[i]
+										);
+									});
+								} else {
+									return _react2.default.createElement(
+										'p',
+										null,
+										'No Ids found'
+									);
+								}
+							}(this)
+						)
+					),
+					_react2.default.createElement(
+						'tr',
+						null,
+						_react2.default.createElement(
+							'td',
+							null,
+							'Ownership Token ID'
+						),
+						_react2.default.createElement(
+							'td',
+							null,
+							_react2.default.createElement(
+								'p',
+								null,
+								' ',
+								this.state.proposal_data.ownershipTokenId
+							)
+						)
+					),
+					_react2.default.createElement(
+						'tr',
+						null,
+						_react2.default.createElement(
+							'td',
+							null,
+							'Ownership Token Description'
+						),
+						_react2.default.createElement(
+							'td',
+							null,
+							_react2.default.createElement(
+								'p',
+								null,
+								this.state.proposal_data.ownershipTokenAttributes
+							)
+						)
+					),
+					_react2.default.createElement(
+						'tr',
+						null,
+						_react2.default.createElement(
+							'td',
+							null,
+							'Ownership Token Quantity'
+						),
+						_react2.default.createElement(
+							'td',
+							null,
+							_react2.default.createElement(
+								'p',
+								null,
+								' ',
+								this.state.proposal_data.ownershipTokenQuantity
+							)
+						)
+					),
+					_react2.default.createElement(
+						'tr',
+						null,
+						_react2.default.createElement(
+							'td',
+							null,
+							'Control ID'
+						),
+						_react2.default.createElement(
+							'td',
+							null,
+							_react2.default.createElement(
+								'p',
+								null,
+								' ',
+								this.state.proposal_data.controlId
+							)
+						)
+					),
+					_react2.default.createElement(
+						'tr',
+						null,
+						_react2.default.createElement(
+							'td',
+							null,
+							'Control ID List'
+						),
+						_react2.default.createElement(
+							'td',
+							null,
+							function () {
+								if (!$.isEmptyObject(_this3.state.proposal_data)) {
+									return _this3.state.proposal_data.controlIdList.map(function (ids, i) {
+										return _react2.default.createElement(
+											'p',
+											{ key: i },
+											' ',
+											_this3.state.proposal_data.controlIdList[i]
+										);
+									});
+								}
+							}(this)
+						)
+					),
+					_react2.default.createElement(
+						'tr',
+						null,
+						_react2.default.createElement(
+							'td',
+							null,
+							'Control Token ID'
+						),
+						_react2.default.createElement(
+							'td',
+							null,
+							' ',
+							_react2.default.createElement(
+								'p',
+								null,
+								' ',
+								this.state.proposal_data.controlTokenId
+							)
+						)
+					),
+					_react2.default.createElement(
+						'tr',
+						null,
+						_react2.default.createElement(
+							'td',
+							null,
+							'Control Token Description'
+						),
+						_react2.default.createElement(
+							'td',
+							null,
+							_react2.default.createElement(
+								'p',
+								null,
+								this.state.proposal_data.controlTokenAttributes
+							)
+						)
+					),
+					_react2.default.createElement(
+						'tr',
+						null,
+						_react2.default.createElement(
+							'td',
+							null,
+							'Control Token Quantity'
+						),
+						_react2.default.createElement(
+							'td',
+							null,
+							_react2.default.createElement(
+								'p',
+								null,
+								' ',
+								this.state.proposal_data.controlTokenQuantity
+							)
+						)
+					),
+					_react2.default.createElement(
+						'tr',
+						null,
+						_react2.default.createElement(
+							'td',
+							null,
+							'Recovery IDs'
+						),
+						_react2.default.createElement(
+							'td',
+							null,
+							function () {
+								if (!$.isEmptyObject(_this3.state.proposal_data)) {
+									return _this3.state.proposal_data.identityRecoveryIdList.map(function (ids, i) {
+										return _react2.default.createElement(
+											'p',
+											{ key: i },
+											' ',
+											_this3.state.proposal_data.identityRecoveryIdList[i]
+										);
+									});
+								}
+							}(this)
+						)
+					),
+					_react2.default.createElement(
+						'tr',
+						null,
+						_react2.default.createElement(
+							'td',
+							null,
+							'Recovery Condition'
+						),
+						_react2.default.createElement(
+							'td',
+							null,
+							' ',
+							_react2.default.createElement(
+								'p',
+								null,
+								' ',
+								this.state.proposal_data.recoveryCondition
+							)
+						)
+					),
+					_react2.default.createElement(
+						'tr',
+						null,
+						_react2.default.createElement(
+							'td',
+							null,
+							'Vote Description'
+						),
+						_react2.default.createElement(
+							'td',
+							null,
+							_react2.default.createElement('textarea', { className: 'form-control' })
+						)
+					)
+				);
+			}
+			//*****************************************************************************
+			//renders an ICA proposal which gives ability to set an expiration
+			//*****************************************************************************
+	
+		}, {
+			key: 'renderICA',
+			value: function renderICA() {
+				var _this4 = this;
+	
+				return _react2.default.createElement(
+					'tbody',
+					null,
+					_react2.default.createElement(
+						'tr',
+						null,
+						_react2.default.createElement(
+							'td',
+							null,
+							'Proposal ID'
+						),
+						_react2.default.createElement(
+							'td',
+							null,
+							this.state.proposal.proposal_id
+						)
+					),
+					_react2.default.createElement(
+						'tr',
+						null,
+						_react2.default.createElement(
+							'td',
+							{ colSpan: '2' },
+							_react2.default.createElement(
+								'b',
+								null,
+								'Official IDs'
+							)
+						)
+					),
+					function () {
+						var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+						if (!$.isEmptyObject(_this4.state.proposal_data)) {
+							return _this4.state.proposal_data.uniqueIdAttributes.map(function (ids, i) {
+								return _react2.default.createElement(
+									'tr',
+									{ key: i },
+									_react2.default.createElement(
+										'td',
+										null,
+										ids[0]
+									),
+									_react2.default.createElement(
+										'td',
+										null,
+										_react2.default.createElement(
+											'p',
+											null,
+											'File hash: ',
+											ids[2]
+										),
+										_react2.default.createElement(
+											'p',
+											null,
+											'IPFS hash: ',
+											_react2.default.createElement(
+												'a',
+												{ target: '_blank', href: ipfs_url + "/" + ids[1] },
+												ids[1]
+											)
+										)
+									)
+								);
+							});
+						} else {
+							return _react2.default.createElement(
+								'tr',
+								null,
+								_react2.default.createElement(
+									'td',
+									{ colSpan: '2' },
+									'No Ids found'
+								)
+							);
+						}
+					}(this),
+					_react2.default.createElement(
+						'tr',
+						null,
+						_react2.default.createElement(
+							'td',
+							null,
+							'Signature Expiration:'
+						),
+						_react2.default.createElement(
+							'td',
+							null,
+							_react2.default.createElement(_reactDayPicker2.default, {
+								disabledDays: { daysOfWeek: [0] },
+								onDayClick: function onDayClick(day) {
+									return _this4.state.selectedDay = day;
+								}
+							})
+						)
+					)
+				);
+			}
+			//*****************************************************************************
+			//*****************************************************************************
+	
+		}, {
+			key: 'render',
+			value: function render() {
+				var _this = this;
+	
+				return _react2.default.createElement(
+					'div',
+					{ className: 'modal fade', id: 'proposalDetails', tabIndex: '-1', role: 'dialog' },
+					_react2.default.createElement(
+						'div',
+						{ className: 'modal-dialog modal-lg', role: 'document' },
+						_react2.default.createElement(
+							'div',
+							{ className: 'modal-content' },
+							_react2.default.createElement(
+								'div',
+								{ className: 'modal-header' },
+								_react2.default.createElement(
+									'button',
+									{ type: 'button', className: 'close', 'data-dismiss': 'modal', 'aria-label': 'Close' },
+									_react2.default.createElement(
+										'span',
+										{ 'aria-hidden': 'true' },
+										'×'
+									)
+								),
+								_react2.default.createElement(
+									'h4',
+									{ className: 'modal-title', id: 'asset' },
+									'COID Proposal Details'
+								)
+							),
+							_react2.default.createElement(
+								'div',
+								{ className: 'modal-body' },
+								_react2.default.createElement(
+									'table',
+									{ className: 'table table-striped table-hover', style: style },
+									this.state.proposal.propType == 0 ? this.renderStandardAsset() : null,
+									this.state.proposal.propType == 2 ? this.renderICA() : null
+								)
+							),
+							_react2.default.createElement(
+								'div',
+								{ className: 'modal-footer' },
+								_react2.default.createElement(
+									'button',
+									{ type: 'button', className: 'btn btn-primary', 'data-val': '2', onClick: this.submitHandler.bind(this) },
+									'Yes'
+								),
+								_react2.default.createElement(
+									'button',
+									{ type: 'button', className: 'btn btn-default', 'data-val': '1', onClick: this.submitHandler.bind(this) },
+									'No'
+								)
+							)
+						)
+					)
+				);
+			}
+		}]);
+	
+		return ModalWin;
+	}(_react2.default.Component);
+	
+	;
+	
+	var ToVote = function (_React$Component2) {
+		_inherits(ToVote, _React$Component2);
+	
+		function ToVote(props) {
+			_classCallCheck(this, ToVote);
+	
+			//coid=proposals
+			var _this5 = _possibleConstructorReturn(this, (ToVote.__proto__ || Object.getPrototypeOf(ToVote)).call(this, props));
+	
+			_this5.state = {
+				coid: [], //array of messages from DT
+				showDetails: false,
+				activeProposal: {}
+			};
+			_this5.showHandler = _this5.showHandler.bind(_this5);
+			return _this5;
+		}
+	
+		_createClass(ToVote, [{
+			key: 'getDateFormat',
+			value: function getDateFormat(timestamp) {
+				var d = new Date(timestamp);
+				return d.getMonth() + 1 + "/" + d.getDate() + "/" + d.getFullYear();
+			}
+		}, {
+			key: 'componentDidMount',
+			value: function componentDidMount() {
+				$.ajax({
+					url: twinUrl + "ballot/readNotify/" + keccak_256(localStorage.getItem("pubKey")).toUpperCase(),
+					dataType: 'json',
+					cache: false,
+					success: function (result) {
+						console.log("result: " + JSON.stringify(result));
+						if ((typeof result === 'undefined' ? 'undefined' : _typeof(result)) != "object") {
+							var data = JSON.parse(result);
+						} else {
+							var data = result;
+							var test = JSON.parse(result.data);
+							test = JSON.parse(JSON.stringify(test.messages));
+							console.log(test[0].type);
+						}
+						this.setState({ coid: test });
+						console.log("result: " + JSON.stringify(result.data));
+					}.bind(this)
+				});
+			}
+		}, {
+			key: 'hideHandler',
+			value: function hideHandler() {
+				this.setState({ showDetails: false });
+			}
+	
+			//assigns entire COID to activeProposal, 
+	
+		}, {
+			key: 'dataHandler',
+			value: function dataHandler(index) {
+				return this.state.coid[index];
+			}
+		}, {
+			key: 'showHandler',
+			value: function showHandler(e) {
+				e.preventDefault();
+				this.setState({
+					showDetails: true,
+					activeProposal: this.dataHandler($(e.target).attr('data-index'))
+				});
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				var _this6 = this;
+	
+				console.log("STATE: " + JSON.stringify(this.state));
+				var _that = this;
+				return _react2.default.createElement(
+					'div',
+					{ id: 'vote_container' },
+					_react2.default.createElement(
+						'h1',
+						null,
+						'Identity and Asset Proposals Pending for Your Action'
+					),
+					' ',
+					_react2.default.createElement('hr', null),
+					_react2.default.createElement(
+						'table',
+						{ className: 'table table-striped' },
+						_react2.default.createElement(
+							'tbody',
+							null,
+							function () {
+								if ($.isArray(_this6.state.coid) && _this6.state.coid.length > 0) {
+									return _this6.state.coid.map(function (el, i) {
+										return _react2.default.createElement(
+											'tr',
+											{ key: i },
+											_react2.default.createElement(
+												'td',
+												null,
+												_react2.default.createElement(
+													'div',
+													null,
+													_react2.default.createElement(
+														'b',
+														null,
+														'Proposal ID: '
+													),
+													el.proposal_id
+												),
+												_react2.default.createElement(
+													'div',
+													null,
+													_react2.default.createElement(
+														'b',
+														null,
+														'Published On: '
+													),
+													_that.getDateFormat(el.time)
+												)
+											),
+											_react2.default.createElement(
+												'td',
+												{ className: 'pull-right' },
+												_react2.default.createElement(
+													'button',
+													{ type: 'button', title: 'View proposal to vote', 'data-item': el, 'data-index': i, onClick: _that.showHandler, className: 'btn btn-primary' },
+													'View Proposal'
+												)
+											)
+										);
+									});
+								} else {
+									return _react2.default.createElement(
+										'tr',
+										null,
+										_react2.default.createElement(
+											'td',
+											null,
+											_react2.default.createElement(
+												'p',
+												null,
+												'No data to act upon !'
+											)
+										)
+									);
+								}
+							}(this)
+						)
+					),
+					this.state.showDetails ? _react2.default.createElement(ModalWin, { hideHandler: this.hideHandler.bind(this), dataHandler: this.state.activeProposal }) : null
+				);
+			}
+		}]);
+	
+		return ToVote;
+	}(_react2.default.Component);
+	
+	;
+	exports.default = ToVote;
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/buffer/index.js */ 239).Buffer))
+
+/***/ },
+/* 328 */
+/*!**********************************************!*\
+  !*** ./src/app/Components/Notifications.jsx ***!
+  \**********************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
@@ -47377,19 +48282,217 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _reactTagsinput = __webpack_require__(/*! react-tagsinput */ 328);
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var keccak_256 = __webpack_require__(/*! js-sha3 */ 325).keccak_256;
+	
+	var Notifications = function (_React$Component) {
+		_inherits(Notifications, _React$Component);
+	
+		function Notifications(props) {
+			_classCallCheck(this, Notifications);
+	
+			//coid=proposals
+			var _this = _possibleConstructorReturn(this, (Notifications.__proto__ || Object.getPrototypeOf(Notifications)).call(this, props));
+	
+			_this.state = { coid: [],
+				showDetails: false,
+				activeMessages: {}
+			};
+			_this.showHandler = _this.showHandler.bind(_this);
+			return _this;
+		}
+	
+		_createClass(Notifications, [{
+			key: 'getDateFormat',
+			value: function getDateFormat(timestamp) {
+				var d = new Date(timestamp);
+				return d.getMonth() + 1 + "/" + d.getDate() + "/" + d.getFullYear();
+			}
+		}, {
+			key: 'componentDidMount',
+			value: function componentDidMount() {
+				$.ajax({
+					url: twinUrl + "ballot/readNotify/" + keccak_256(localStorage.getItem("pubKey")).toUpperCase(),
+					dataType: 'json',
+					cache: false,
+					success: function (result) {
+						console.log("result: " + JSON.stringify(result));
+						if ((typeof result === 'undefined' ? 'undefined' : _typeof(result)) != "object") {
+							var data = JSON.parse(result);
+						} else {
+							var data = result;
+							var test = JSON.parse(result.data);
+							test = JSON.parse(JSON.stringify(test.messages));
+							console.log(test[0].type);
+						}
+						this.setState({ coid: test });
+						console.log("Notifications state: " + JSON.stringify(this.state));
+						console.log(typeof result === 'undefined' ? 'undefined' : _typeof(result));
+					}.bind(this)
+				});
+			}
+		}, {
+			key: 'hideHandler',
+			value: function hideHandler() {
+				this.setState({ showDetails: false });
+			}
+	
+			//assigns entire COID to activeMessages, 
+	
+		}, {
+			key: 'dataHandler',
+			value: function dataHandler(index) {
+				return this.state.coid[index];
+			}
+		}, {
+			key: 'getActiveData',
+			value: function getActiveData() {
+				return this.state.activeMessages;
+			}
+		}, {
+			key: 'showHandler',
+			value: function showHandler(e) {
+				e.preventDefault();
+				this.setState({
+					showDetails: true,
+					activeMessages: this.dataHandler($(e.target).attr('data-index'))
+				});
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				var _this2 = this;
+	
+				var _that = this;
+				return _react2.default.createElement(
+					'div',
+					{ id: 'notifications_container' },
+					_react2.default.createElement(
+						'h1',
+						null,
+						'Notifications'
+					),
+					' ',
+					_react2.default.createElement('hr', null),
+					_react2.default.createElement(
+						'table',
+						{ className: 'table table-striped' },
+						_react2.default.createElement(
+							'tbody',
+							null,
+							function () {
+								if ($.isArray(_this2.state.coid) && _this2.state.coid.length > 0) {
+									return _this2.state.coid.map(function (el, i) {
+										return _react2.default.createElement(
+											'tr',
+											{ key: i },
+											_react2.default.createElement(
+												'td',
+												null,
+												_react2.default.createElement(
+													'div',
+													null,
+													_react2.default.createElement(
+														'b',
+														null,
+														'Proposal ID: '
+													),
+													el.proposal_id
+												),
+												_react2.default.createElement(
+													'div',
+													null,
+													_react2.default.createElement(
+														'b',
+														null,
+														'Message: '
+													),
+													el.message
+												),
+												_react2.default.createElement(
+													'div',
+													null,
+													_react2.default.createElement(
+														'b',
+														null,
+														'Published On: '
+													),
+													_that.getDateFormat(el.time)
+												)
+											)
+										);
+									});
+								} else {
+									return _react2.default.createElement(
+										'tr',
+										null,
+										_react2.default.createElement(
+											'td',
+											null,
+											_react2.default.createElement(
+												'p',
+												null,
+												'No messages to show !'
+											)
+										)
+									);
+								}
+							}(this)
+						)
+					)
+				);
+			}
+		}]);
+	
+		return Notifications;
+	}(_react2.default.Component);
+	
+	;
+	exports.default = Notifications;
+
+/***/ },
+/* 329 */
+/*!***************************************!*\
+  !*** ./src/app/Components/Assets.jsx ***!
+  \***************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactRouter = __webpack_require__(/*! react-router */ 172);
+	
+	var _reactTagsinput = __webpack_require__(/*! react-tagsinput */ 330);
 	
 	var _reactTagsinput2 = _interopRequireDefault(_reactTagsinput);
 	
-	var _reactAutosuggest = __webpack_require__(/*! react-autosuggest */ 329);
+	var _qrcode = __webpack_require__(/*! qrcode.react */ 331);
 	
-	var _reactAutosuggest2 = _interopRequireDefault(_reactAutosuggest);
+	var _qrcode2 = _interopRequireDefault(_qrcode);
 	
-	var _jsSha = __webpack_require__(/*! js-sha3 */ 325);
+	var _classAndSubClass = __webpack_require__(/*! ./classAndSubClass.js */ 341);
 	
-	var _UploadIpfsFile = __webpack_require__(/*! ./UploadIpfsFile.jsx */ 350);
+	var _classAndSubClass2 = _interopRequireDefault(_classAndSubClass);
 	
-	var _UploadIpfsFile2 = _interopRequireDefault(_UploadIpfsFile);
+	var _reactDayPicker = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"react-day-picker\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+	
+	var _reactDayPicker2 = _interopRequireDefault(_reactDayPicker);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -47401,265 +48504,154 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var crypto = __webpack_require__(/*! crypto */ 243);
+	//import { Router, Route, IndexRedirect, hashHistory } from 'react-router';
+	
+	//var crypto = require('crypto');
 	var secp256k1 = __webpack_require__(/*! secp256k1 */ 261);
+	var keccak_256 = __webpack_require__(/*! js-sha3 */ 325).keccak_256;
 	
-	//TODO : Namespace validation 
+	// TODO: Static public/private keys has to be changed
 	
-	var _this;
-	//form where we can add addtional labels (uniqueIDAttrs)
+	var Modal = function (_Component) {
+		_inherits(Modal, _Component);
 	
-	var UniqueIDAttributesForm = function (_React$Component) {
-		_inherits(UniqueIDAttributesForm, _React$Component);
+		function Modal(props) {
+			_classCallCheck(this, Modal);
 	
-		function UniqueIDAttributesForm(props) {
-			_classCallCheck(this, UniqueIDAttributesForm);
+			var _this2 = _possibleConstructorReturn(this, (Modal.__proto__ || Object.getPrototypeOf(Modal)).call(this, props));
 	
-			var _this2 = _possibleConstructorReturn(this, (UniqueIDAttributesForm.__proto__ || Object.getPrototypeOf(UniqueIDAttributesForm)).call(this, props));
-	
+			_this2.pubKey = localStorage.getItem("pubKey");
+			_this2.privKey = localStorage.getItem("privKey");
+			_this2.tags = new _classAndSubClass2.default(_this2.pubKey, props.asset.asset_id);
+			_this2.names = localStorage.getItem("contactNames").split(',');
+			_this2.keys = localStorage.getItem("contactPubKeys").split(',');
 			_this2.state = {
-				tmpFile: '',
-				showModal: false
-			};
 	
+				//added for identityDimension tab-pane
+				inputs: ['input-0'],
+	
+				asset: props.asset || {},
+				asset_class: _this2.tags.getAssetData("classes"),
+				asset_subclass: _this2.tags.getAssetData("subclasses"),
+				qrCode_signature: {},
+	
+				qrCode_COID_device_relation: {},
+	
+				notCOID: true, //if the asset in view is MYCOID, we dont need second QR
+	
+				//used for identitydimension file upload
+				docs: {}
+	
+			};
+			_this2.handleClassChange = _this2.handleClassChange.bind(_this2);
+			_this2.handleSubClassChange = _this2.handleSubClassChange.bind(_this2);
+			_this2.maxUniqAttr = 10;
+			_this2.bigchainGet = _this2.bigchainGet.bind(_this2);
 			return _this2;
 		}
 	
-		_createClass(UniqueIDAttributesForm, [{
-			key: 'handleShowModal',
-			value: function handleShowModal(e) {
-				this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
+		_createClass(Modal, [{
+			key: 'handleClassChange',
+			value: function handleClassChange(tags) {
+				this.setState({ asset_class: tags });
+				this.tags.updateClasses(tags, this.props.asset.asset_id, "classes");
 			}
 		}, {
-			key: 'handleHideModal',
-			value: function handleHideModal() {
-				this.setState({ showModal: false });
+			key: 'handleSubClassChange',
+			value: function handleSubClassChange(tags) {
+				this.setState({ asset_subclass: tags });
+				this.tags.updateClasses(tags, this.props.asset.asset_id, "subclasses");
 			}
 		}, {
-			key: 'render',
-			value: function render() {
+			key: 'componentDidMount',
+			value: function componentDidMount() {
+				$("#assetDetails").modal('show');
+				$("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
 	
-				return _react2.default.createElement(
-					'div',
-					{ className: 'form-group col-md-12' },
-					_react2.default.createElement(
-						'div',
-						{ className: 'col-md-10' },
-						_react2.default.createElement(
-							'label',
-							{ htmlFor: 'unique_id_attrs' },
-							' Official IDs e.g. SSN, Passport, Driver\'s License, Digital retinal scans and/or digital fingerprints '
-						),
-						_react2.default.createElement('input', { name: 'label-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: 'Label' })
-					),
-					_react2.default.createElement(
-						'div',
-						{ className: 'col-md-2' },
-						_react2.default.createElement(
-							'button',
-							{ type: 'button', 'data-id': this.props.labelref, onClick: this.props.handleShowModal, className: 'btn btn-warning pull-right' },
-							_react2.default.createElement('span', { className: 'glyphicon glyphicon-upload' }),
-							'Upload File'
-						)
-					)
-				);
-			}
-		}]);
-	
-		return UniqueIDAttributesForm;
-	}(_react2.default.Component);
-	
-	;
-	
-	var TokenDistributionForm = function (_React$Component2) {
-		_inherits(TokenDistributionForm, _React$Component2);
-	
-		function TokenDistributionForm(props) {
-			_classCallCheck(this, TokenDistributionForm);
-	
-			return _possibleConstructorReturn(this, (TokenDistributionForm.__proto__ || Object.getPrototypeOf(TokenDistributionForm)).call(this, props));
-			// this.state = {
-			// 	controltoken_quantity: [],
-			// 	controltoken_list: [],
-			// 	showModal: false
-			// };
-		}
-	
-		_createClass(TokenDistributionForm, [{
-			key: 'render',
-			value: function render() {
-				var _this4 = this;
-	
-				var style = {
-					fontSize: '12.5px'
-				};
-				return _react2.default.createElement(
-					'div',
-					{ className: 'form-group col-md-12' },
-					_react2.default.createElement(
-						'div',
-						{ className: 'col-md-10' },
-						_react2.default.createElement(
-							'table',
-							{ className: 'table table-striped table-hover', style: style },
-							_react2.default.createElement(
-								'tbody',
-								null,
-								_react2.default.createElement(
-									'tr',
-									null,
-									_react2.default.createElement(
-										'th',
-										null,
-										_react2.default.createElement(
-											'b',
-											null,
-											'Public Key of Controller'
-										)
-									),
-									_react2.default.createElement(
-										'th',
-										null,
-										_react2.default.createElement(
-											'b',
-											null,
-											'Control Token Quantity'
-										)
-									)
-								),
-								_react2.default.createElement(
-									'tr',
-									null,
-									_react2.default.createElement(
-										'td',
-										null,
-										_react2.default.createElement(_reactTagsinput2.default, _extends({}, _this.inputAttrs3, { renderInput: _this.autocompleteRenderInput, name: 'label1-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', value: _this.state.control_token_id, onChange: function onChange(e) {
-												_this4.onFieldChange("control_token_id", e);
-											} }))
-									),
-									_react2.default.createElement(
-										'td',
-										null,
-										_react2.default.createElement(_reactTagsinput2.default, _extends({}, _this.inputAttrs3, { renderInput: _this.autocompleteRenderInput, name: 'label1-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', value: _this.state.control_token_quantity, onChange: function onChange(e) {
-												_this4.onFieldChange("control_token_quantity", e);
-											} }))
-									)
-								)
-							)
-						)
-					)
-				);
-			}
-		}]);
-	
-		return TokenDistributionForm;
-	}(_react2.default.Component);
-	
-	;
-	
-	var CoreIdentity = function (_React$Component3) {
-		_inherits(CoreIdentity, _React$Component3);
-	
-		function CoreIdentity(props) {
-			_classCallCheck(this, CoreIdentity);
-	
-			var _this5 = _possibleConstructorReturn(this, (CoreIdentity.__proto__ || Object.getPrototypeOf(CoreIdentity)).call(this, props));
-	
-			_this5.state = {
-				file_attrs: [],
-				inputs: ['input-0'], //removed input-1
-				inputs_name: ['input1-0'],
-				official_id: [], //first official ID is name (see identity spec v1.3)
-				owner_id: [],
-				control_id: [[]],
-				recovery_id: [],
-				//recoveryCondition: [],
-				isHuman: [],
-				owner_token_id: [],
-				owner_token_desc: [],
-				owner_token_quantity: [],
-				control_token_id: [],
-				control_token_desc: [],
-				control_token_quantity: [[]],
-				showModal: false,
-				tmpFile: '',
-				pubKey: localStorage.getItem("pubKey"),
-				privKey: localStorage.getItem("privKey"),
-				signature: '',
-				names: localStorage.getItem("contactNames").split(','),
-				keys: localStorage.getItem("contactPubKeys").split(','),
-				value: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-				suggest_attrs: [{
-					addKeys: [13, 188], // Enter and comma
-					inputProps: {
-						placeholder: "use ENTER to add values",
-						style: { width: '30%' },
-						id: "3"
-					}
-				}]
-			};
-			_this = _this5;
-			_this5.maxUniqAttr = 10;
-			_this5.onFieldChange = _this5.onFieldChange.bind(_this5);
-			_this5.onFieldChange2 = _this5.onFieldChange2.bind(_this5);
-			_this5.handleHideModal = _this5.handleHideModal.bind(_this5);
-			return _this5;
-		}
-	
-		_createClass(CoreIdentity, [{
-			key: 'onFieldChange',
-			value: function onFieldChange(inputField, e) {
-				var multipleValues = {};
-				//var pieces = inputField.split(",");
-				//var index = pieces[1];
-				//var variable = pieces[0];
-				//console.log("input field: "+variable+"   index: "+index);
-				if (inputField == "name" || inputField == "signature" || inputField == "message") {
-					this.setState(_defineProperty({}, inputField, e.target.value));
+				var asset_id = this.props.asset.asset_id;
+				if (asset_id == "MyCOID") {
+					this.setState({ notCOID: false });
 				} else {
-					multipleValues[inputField] = e;
-					//this.state[variable][Number(index)] = e;
-					//console.log("field value :"+variable[Number(index)]);
-					this.setState(multipleValues);
+					this.setState({ notCOID: true });
+				}
+	
+				var standardAsset = document.getElementById("standardAsset");
+				var KYC = document.getElementById("KYC");
+	
+				if (this.props.asset.asset_details.propType == 2) {
+					standardAsset.style.display = 'none';
+					KYC.style.display = 'block';
+				} else {
+					KYC.style.display = 'none';
+				}
+	
+				var prop = this.props.asset.asset_details;
+	
+				var theTime = new Date().toString();
+	
+				var qrCode_Object = JSON.stringify({
+					uniqueId: prop.uniqueId,
+					name: prop.uniqueIdAttributes[0],
+					ownershipId: prop.ownershipId,
+					bigchainID: prop.bigchainID,
+					bigchainHash: prop.bigchainHash,
+					endpoint: twinUrl + "validateQrCode"
+				});
+				console.log("**" + qrCode_Object);
+	
+				var qrCode_Object_hash = keccak_256(theTime);
+	
+				this.privKey = new Buffer(this.privKey, "hex");
+	
+				var qrCode_Object_hash_buffer = new Buffer(qrCode_Object_hash, "hex");
+	
+				var signature = JSON.stringify(secp256k1.sign(qrCode_Object_hash_buffer, this.privKey));
+				signature = JSON.parse(signature).signature;
+				signature = JSON.stringify(signature);
+				signature = JSON.parse(signature).data;
+				signature = new Buffer(signature, "hex");
+				signature = signature.toString("hex");
+				console.log("singature: " + signature);
+	
+				//***************************************************************************
+				//***************************************************************************
+	
+				var owners_sig = "348dba954726daeb583726cc1838aacbb2d69038438723987ec5a2223217dcca45bd22528f56eb8dd232ec2345de34243234bdd34124af34f454e7d6f5e7d545";
+	
+				var qrCode_owned_Object = JSON.stringify({
+					uniqueId: prop.uniqueId,
+					owner: prop.ownerIdList,
+					owner_signature: owners_sig,
+					asset_signature: signature,
+					bigchainID: prop.bigchainID,
+					bigchainHash: prop.bigchainHash
+				});
+	
+				var qrCode_owned_Object_hash = keccak_256(theTime);
+	
+				//***************************************************************************.
+				//***************************************************************************
+				//added second object for second qrCode
+	
+				this.setState({
+					qrCode_signature: { "msgHash": qrCode_Object_hash, "signature": signature, "timestamp": theTime },
+					qrCode_COID_device_relation: { "msgHash": qrCode_owned_Object_hash, "owners_sig": owners_sig, "timestamp": theTime }
+				});
+			}
+		}, {
+			key: 'appendInput',
+			value: function appendInput() {
+				console.log("hit append Input");
+				var inputLen = this.state.inputs.length;
+				if (inputLen < this.maxUniqAttr) {
+					var newInput = 'input-' + inputLen;
+					this.setState({ inputs: this.state.inputs.concat([newInput]) });
 				}
 			}
-		}, {
-			key: 'onFieldChange2',
-			value: function onFieldChange2(inputField, e) {
-				var multipleValues = {};
-				var pieces = inputField.split(",");
-				var index = pieces[1];
-				var variable = pieces[0];
-				console.log("input field: " + variable + "   index: " + index);
-				console.log("field value :" + this.state[variable][index]);
-				this.state[variable][Number(index)] = e;
-				console.log("field value :" + variable[Number(index)]);
-				multipleValues[variable] = this.state[variable];
-				this.setState(multipleValues);
-				console.log("state value :" + this.state[variable]);
-			}
-		}, {
-			key: 'getHash',
-			value: function getHash(input) {
-				var input = $.trim(input);
-				if (input) {
-					var hash = (0, _jsSha.keccak_256)(input);
-					return hash;
-				}
-				return input;
-			}
-		}, {
-			key: 'getFileDetails',
-			value: function getFileDetails(filedata) {
-				var obj = _defineProperty({}, this.state.tmpFile, filedata);
-				this.setState({ file_attrs: this.state.file_attrs.concat([obj]) });
-			}
-	
-			//used for uniqueID attributes
-	
 		}, {
 			key: 'getLabelValues',
 			value: function getLabelValues() {
+				console.log("hit getLabelValues");
 				var labelVals = [];
 				var _this = this;
 				$.each($("input[name^='label-']"), function (obj) {
@@ -47670,297 +48662,6 @@
 				});
 				return labelVals;
 			}
-	
-			//used in token form class for control token distribution list.. is called by appendInput2()
-	
-		}, {
-			key: 'getLabelValues1',
-			value: function getLabelValues1() {
-				var labelVals1 = [];
-				$.each($("input[name^='label1-']"), function (obj) {
-					var value = $.trim($(this).val());
-					if (value.length > 0) {
-						labelVals1.push(_defineProperty({}, $(this).attr('name').replace("label1-", ""), value));
-					}
-					console.log("obj: " + JSON.stringify(obj));
-				});
-				return labelVals1;
-			}
-	
-			//TODO:
-			//1)NEED TO DISTINGUISH COID for person or thing---DONE
-			//2)CONTROLLERS need to be able to upload documents---LATER
-	
-		}, {
-			key: 'prepareJsonToSubmit',
-			value: function prepareJsonToSubmit() {
-	
-				console.log("inside prepareJSONToSubmit..");
-				this.prepareControlTokenDistribution();
-	
-				console.log("before we call createHashAttribute on this.state.file_attrs..\n" + JSON.stringify(this.state.file_attrs));
-				console.log("we will call createHashAttribute, to get uniqueId: " + this.createHashAttribute(this.state.file_attrs));
-	
-				//replace any values that are not pubkeys, if they are in your contacts list
-				for (var x = 0; x < this.state.recovery_id.length; x++) {
-					var index = this.state.names.indexOf(this.state.recovery_id[x]);
-					if (index >= 0) {
-						this.state.recovery_id[x] = this.state.keys[index];
-					}
-				}
-				for (var x = 0; x < this.state.owner_id.length; x++) {
-					var index = this.state.names.indexOf(this.state.owner_id[x]);
-					if (index >= 0) {
-						this.state.owner_id[x] = this.state.keys[index];
-						console.log("CHANGED: " + this.state.owner_id[x]);
-					}
-				}
-				var tempArr = this.state.control_id.toString().split(',');
-				var tempArr2 = this.state.control_token_quantity.toString().split(',');
-				for (var x = 0; x < tempArr.length; x++) {
-					if (tempArr[x] == "") {
-						tempArr.splice(x, 1);
-						tempArr2.splice(x, 1);
-					}
-				}
-				this.state.control_id = tempArr;
-				this.state.control_token_quantity = tempArr2;
-	
-				console.log("tempArr: " + tempArr);
-				for (var x = 0; x < this.state.control_id.length; x++) {
-					var index = this.state.names.indexOf(this.state.control_id[x]);
-					if (index >= 0) {
-						this.state.control_id[x] = this.state.keys[index];
-					}
-				}
-				var inputObj = {
-					"pubKey": this.refs.pubKey.value,
-					//"sig": this.refs.signature.value,
-					//"msg": this.refs.message.value,
-	
-					"uniqueId": this.createHashAttribute(this.state.file_attrs),
-					"uniqueIdAttributes": this.prepareUniqueIdAttrs(),
-	
-					"ownershipId": this.createHashAttribute(this.state.owner_id), //calculated from ownerIDlist
-					"ownerIdList": this.valueIntoHash(this.state.owner_id),
-					"controlId": this.createHashAttribute(this.state.control_id),
-					"controlIdList": this.valueIntoHash(this.state.control_id),
-	
-					//calculated. should be one time hashing of ownershipTokenAttributes and ownership token quantity
-					"ownershipTokenId": this.getHash(this.joinValuesOwnership()),
-	
-					"ownershipTokenAttributes": this.state.owner_token_desc,
-					"ownershipTokenQuantity": this.state.owner_token_quantity,
-	
-					//calculated. should be one time hashing of controlTokenAttributes and control token quantity
-					"controlTokenId": this.getHash(this.joinValuesControl()),
-	
-					"controlTokenAttributes": this.state.control_token_desc,
-					"controlTokenQuantity": this.state.control_token_quantity,
-	
-					//pubkeys used for recovery in the event COID is lost or stolen			
-					"identityRecoveryIdList": this.valueIntoHash(this.state.recovery_id),
-					"recoveryCondition": $("input[name^='recoveryCondition']").val(),
-					"yesVotesRequiredToPass": 2, //needs to be taken out and hardcoded in app
-	
-					"isHuman": true,
-					"timestamp": "",
-					"assetID": "MyCOID",
-					"propType": 0,
-					"bigchainHash": "",
-					"bigchainID": "",
-					"coidAddr": "",
-					"gatekeeperAddr": "",
-					"dimensions": ""
-	
-				};
-				console.log("uniqueIDAttrs after prepare f'n: " + inputObj.uniqueIdAttributes);
-				return inputObj;
-			}
-		}, {
-			key: 'joinValuesOwnership',
-			value: function joinValuesOwnership() {
-				var value1 = this.state.owner_token_desc;
-				var value2 = this.state.owner_token_quantity;
-				var tempArr = [];
-				tempArr.push(value1);
-				tempArr.push(value2);
-				tempArr = tempArr.join();
-				return tempArr;
-			}
-		}, {
-			key: 'joinValuesControl',
-			value: function joinValuesControl() {
-				var value1 = this.state.control_token_desc;
-				var value2 = this.state.control_token_quantity;
-				var tempArr = [];
-				tempArr.push(value1);
-				tempArr.push(value2);
-				tempArr = tempArr.join();
-				return tempArr;
-			}
-		}, {
-			key: 'createHashAttribute',
-			value: function createHashAttribute(values) {
-				if ($.isArray(values) && values.length > 0) {
-					if ($.isPlainObject(values[0])) {
-						var str = "";
-						for (var i = 0; i < values.length; i++) {
-							for (var key in values[i]) {
-								var hash, filehash;
-	
-								var _values$i$key$split = values[i][key].split("|");
-	
-								var _values$i$key$split2 = _slicedToArray(_values$i$key$split, 2);
-	
-								hash = _values$i$key$split2[0];
-								filehash = _values$i$key$split2[1];
-	
-								if (values.length - 1 == i) str += hash;else str += hash + "|";
-							}
-						}
-						return this.getHash(str);
-	
-						//if only one value in 'values'
-					} else {
-						var valStr = values.join("|");
-						return this.getHash(valStr);
-					}
-				}
-				return '';
-			}
-	
-			//hashes arrays (no delimiter)
-	
-		}, {
-			key: 'valueIntoHash',
-			value: function valueIntoHash(values) {
-				var newArr = [];
-				var _this = this;
-				if ($.isArray(values)) {
-					values.map(function (value) {
-						newArr.push(_this.getHash(value));
-					});
-				};
-				return newArr;
-			}
-		}, {
-			key: 'prepareUniqueIdAttrs',
-			value: function prepareUniqueIdAttrs() {
-				var newArr = [],
-				    labels = this.getLabelValues();
-				for (var i = 0; i < labels.length; i++) {
-					var tmpArr = [];
-					for (var key in labels[i]) {
-						tmpArr.push(labels[i][key]);
-						var ipfsHash, fileHash;
-	
-						var _state$file_attrs$i$k = this.state.file_attrs[i][key].split("|");
-	
-						var _state$file_attrs$i$k2 = _slicedToArray(_state$file_attrs$i$k, 2);
-	
-						ipfsHash = _state$file_attrs$i$k2[0];
-						fileHash = _state$file_attrs$i$k2[1];
-	
-						tmpArr.push(fileHash);
-						tmpArr.push(ipfsHash);
-					}
-					newArr.push(tmpArr);
-				}
-				return newArr;
-			}
-		}, {
-			key: 'prepareControlTokenDistribution',
-			value: function prepareControlTokenDistribution() {
-				var labels = this.getLabelValues1();
-				for (var i = 0; i < labels.length; i += 2) {
-					for (var key in labels[i]) {
-						this.state.control_id.push(labels[i][key]);
-						this.state.control_token_quantity.push(labels[i + 1][key]);
-					}
-				}
-			}
-	
-			//hashing the pubkeys
-	
-		}, {
-			key: 'prepareTokenDistribution',
-			value: function prepareTokenDistribution(value) {
-				var tempArr = value;
-				for (var i = 0; i < tempArr.length; i += 2) {
-					tempArr[i] = this.getHash(tempArr[i]);
-				}
-				return tempArr;
-			}
-		}, {
-			key: 'submitCoid',
-			value: function submitCoid(e) {
-				e.preventDefault();
-				var json = this.prepareJsonToSubmit();
-				var privKey1 = new Buffer(this.state.privKey, "hex");
-				var msg_hash = (0, _jsSha.keccak_256)(JSON.stringify(json));
-				var msg_hash_buffer = new Buffer(msg_hash, "hex");
-				var signature1 = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1));
-	
-				signature1 = JSON.parse(signature1).signature;
-				signature1 = JSON.stringify(signature1);
-				signature1 = JSON.parse(signature1).data;
-				signature1 = new Buffer(signature1, "hex");
-				signature1 = signature1.toString("hex");
-	
-				console.log("sig" + signature1);
-				console.log(typeof signature1 === 'undefined' ? 'undefined' : _typeof(signature1));
-	
-				json.sig = signature1;
-				json.msg = msg_hash_buffer.toString("hex");
-	
-				var COID_controllers = this.state.control_id;
-				console.log("coid controllers... " + COID_controllers + "\n length: " + COID_controllers.length);
-	
-				console.log("requestCOID json: " + JSON.stringify(json));
-				$.ajax({
-					url: twinUrl + 'requestCOID',
-					type: 'POST',
-					data: json,
-					success: function (res) {
-						console.log(JSON.stringify(json));
-						var sendMe = {};
-						sendMe.flag = 0; //owned core identity
-						sendMe.fileName = "MyCOID.json";
-						sendMe.pubKey = (0, _jsSha.keccak_256)(localStorage.getItem("pubKey")).toUpperCase();
-						sendMe.updateFlag = 0; //new identity
-						sendMe.data = json;
-	
-						$.ajax({
-							url: twinUrl + 'setAsset',
-							type: 'POST',
-							data: sendMe,
-							success: function (res) {
-								console.log("response from setAsset: " + res);
-							}.bind(this)
-						});
-					}.bind(this),
-					complete: function () {
-						var sendMe = {};
-						sendMe.flag = 1; //controlled core identity
-						sendMe.fileName = "MyCOID.json"; //
-						sendMe.updateFlag = 0; //new identity
-						sendMe.data = json;
-						for (var i = 0; i < COID_controllers.length; i++) {
-							console.log("setting asset for controller, " + COID_controllers[i]);
-							sendMe.pubKey = (0, _jsSha.keccak_256)(COID_controllers[i]).toUpperCase();
-							$.ajax({
-								url: twinUrl + 'setAsset',
-								type: 'POST',
-								data: sendMe,
-								success: function success(res) {
-									console.log("response from setAsset: " + res);
-								}
-							});
-						}
-					}.bind(this)
-				});
-			}
 		}, {
 			key: 'handleHideModal',
 			value: function handleHideModal() {
@@ -47972,300 +48673,1515 @@
 				this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
 			}
 		}, {
+			key: 'bigchainGet',
+			value: function bigchainGet(attr) {
+				//e.preventDefault();
+				var txID = attr; //req.body.bigchainID;
+				console.log(txID);
+				console.log("BIGCHAINGET ONCLICK");
+				//var formdata = req.body;
+				//BIGCHAIN ENDPOINT:
+				var bigchainServer = 'http://10.101.114.230:5000';
+				var endpoint = '/getTransaction/' + txID;
+				$.ajax({
+					method: 'GET',
+					url: bigchainServer + endpoint,
+					headers: { 'Access-Control-Allow-Origin': '*' },
+					crossDomain: true,
+					dataType: 'json',
+					contentType: 'application/json',
+					cache: false,
+					success: function success(resp) {
+						//the response is body -- send that
+						console.log(resp);
+						var full_data = resp;
+						var short_data = resp.asset.data.Coid_Data;
+						console.log("short data is..." + short_data.ownershipId);
+						console.log(JSON.stringify(full_data));
+						console.log(JSON.stringify(short_data));
+						var something = window.open("data:text/json," + encodeURIComponent(JSON.stringify(short_data)), "_blank");
+						something.focus();
+					}
+				});
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				var _this3 = this;
+	
+				console.log("******" + JSON.stringify(this.state.qrCode_COID_device_relation));
+	
+				var _this = this;
+	
+				var prop = this.props.asset.asset_details;
+				var hashedKeys = [];
+				for (var i = 0; i < this.keys.length; i++) {
+					hashedKeys[i] = keccak_256(this.keys[i]);
+				}
+	
+				var oIndex = hashedKeys.indexOf(prop.ownershipId);
+				if (oIndex >= 0) {
+					prop.ownershipId = this.names[oIndex];
+				}
+				var cIndex = hashedKeys.indexOf(prop.controlId);
+				if (cIndex >= 0) {
+					prop.controlId = this.names[cIndex];
+				}
+	
+				for (var x = 0; x < prop.ownerIdList.length; x++) {
+					var index = hashedKeys.indexOf(prop.ownerIdList[x]);
+					if (index >= 0) {
+						prop.ownerIdList[x] = this.names[index];
+						console.log("\n\nCHANGED: " + prop.ownerIdList[x]);
+					}
+				}
+	
+				for (var x = 0; x < prop.controlIdList.length; x++) {
+					var index = hashedKeys.indexOf(prop.controlIdList[x]);
+					if (index >= 0) {
+						prop.controlIdList[x] = this.names[index];
+						console.log("\n\nCHANGED: " + prop.controlIdList[x]);
+					}
+				}
+	
+				for (var x = 0; x < prop.identityRecoveryIdList.length; x++) {
+					var index = hashedKeys.indexOf(prop.identityRecoveryIdList[x]);
+					if (index >= 0) {
+						prop.identityRecoveryIdList[x] = this.names[index];
+						console.log("\n\nCHANGED: " + prop.identityRecoveryIdList[x]);
+					}
+				}
+	
+				if (prop.validatorSigs) {
+					for (var x = 0; x < prop.validatorSigs.length; x++) {
+						var index = this.keys.indexOf(prop.validatorSigs[x][2]);
+						if (index >= 0) {
+							prop.validatorSigs[x][2] = this.names[index];
+							console.log("\n\nCHANGED: " + prop.validatorSigs[x][2]);
+						}
+					}
+				}
+	
+				console.log("asset_details.. " + JSON.stringify(prop));
+				console.log("names: " + this.names);
+				console.log("keys: " + this.keys);
+				var style = {
+					fontSize: '12.5px'
+				};
+	
+				var classInput = {
+					addKeys: [13, 188], // Enter and comma
+					value: this.state.asset_class,
+					onChange: this.handleClassChange,
+					inputProps: { placeholder: "" }
+				};
+				var subClassInput = {
+					addKeys: [13, 188], // Enter and comma
+					value: this.state.asset_subclass,
+					onChange: this.handleSubClassChange.bind(this),
+					inputProps: { placeholder: "" }
+				};
+	
+				//message hash is the hash of the elemets
+				var qrConfig = JSON.stringify({
+					pubKey: prop.pubKey,
+					//this.setState({qrCode_signature: {"msgHash": qrCode_Object_hash, "signature":signature}})
+					msgHash: this.state.qrCode_signature.msgHash,
+					sig: this.state.qrCode_signature.signature,
+					uniqueId: prop.uniqueId,
+					ownershipId: prop.ownershipId,
+					name: prop.uniqueIdAttributes[0][0],
+					bigchainID: prop.bigchainID,
+					bigchainHash: prop.bigchainHash,
+					timestamp: this.state.qrCode_signature.timestamp,
+					endpoint: twinUrl + "validateQrCode"
+				});
+	
+				var qrOwnedDevice = JSON.stringify({
+					pubKey: prop.pubkey,
+					msgHash: _this.state.qrCode_COID_device_relation.msgHash,
+					asset_sig: _this.state.qrCode_COID_device_relation.signature,
+					//need to make sure asset_sig is correct
+					owners_sig: _this.state.qrCode_COID_device_relation.owners_sig,
+					owner: prop.ownerIdList
+				});
+	
+				var qrStyle = {
+					maxWidth: "100%",
+					textAlign: "center"
+				};
+	
+				var syle = {
+					marginRight: '15px'
+				};
+	
+				var popUpWidth = {
+					width: '70%'
+				};
+	
+				return _react2.default.createElement(
+					'div',
+					{ className: 'modal fade', id: 'assetDetails', key: this.props.asset.asset_id, tabIndex: '-1', role: 'dialog', 'aria-labelledby': 'asset' },
+					_react2.default.createElement(
+						'div',
+						{ className: 'modal-dialog modal-lg', role: 'document', style: popUpWidth },
+						_react2.default.createElement(
+							'div',
+							{ className: 'modal-content' },
+							_react2.default.createElement(
+								'div',
+								{ className: 'modal-header' },
+								_react2.default.createElement(
+									'button',
+									{ type: 'button', className: 'close', 'data-dismiss': 'modal', 'aria-label': 'Close' },
+									_react2.default.createElement(
+										'span',
+										{ 'aria-hidden': 'true' },
+										'× '
+									)
+								),
+								_react2.default.createElement(
+									'ul',
+									{ className: 'nav nav-pills', role: 'tablist' },
+									_react2.default.createElement(
+										'li',
+										{ role: 'presentation', className: 'active' },
+										_react2.default.createElement(
+											'a',
+											{ href: '#asset_details', role: 'tab', 'data-toggle': 'tab' },
+											'Asset Details'
+										)
+									),
+									_react2.default.createElement(
+										'li',
+										{ role: 'presentation' },
+										_react2.default.createElement(
+											'a',
+											{ href: '#qrcode', role: 'tab', 'data-toggle': 'tab' },
+											'QR Code'
+										)
+									),
+									_react2.default.createElement(
+										'li',
+										{ role: 'presentation' },
+										_react2.default.createElement(
+											'a',
+											{ href: '#qrcode2', role: 'tab', 'data-toggle': 'tab' },
+											'Validate ownership'
+										)
+									)
+								)
+							),
+							_react2.default.createElement(
+								'div',
+								{ className: 'modal-body' },
+								_react2.default.createElement(
+									'div',
+									{ className: 'tab-content' },
+									_react2.default.createElement(
+										'div',
+										{ role: 'tabpanel', className: 'tab-pane active', id: 'asset_details' },
+										_react2.default.createElement(
+											'div',
+											{ id: 'standardAsset' },
+											_react2.default.createElement(
+												'table',
+												{ className: 'table table-striped table-hover', style: style },
+												_react2.default.createElement(
+													'tbody',
+													null,
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Asset Name'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															this.props.asset.asset_id
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Asset Class',
+															_react2.default.createElement(
+																'p',
+																{ className: 'text-info' },
+																'Use comma/enter to add class '
+															)
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(_reactTagsinput2.default, classInput)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Asset SubClass',
+															_react2.default.createElement(
+																'p',
+																{ className: 'text-info' },
+																'Use comma/enter to add sub class '
+															)
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(_reactTagsinput2.default, subClassInput)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'COID Contract address'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(
+																'p',
+																null,
+																_react2.default.createElement(
+																	'b',
+																	null,
+																	' ',
+																	prop.coidAddr,
+																	' '
+																)
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Gatekeeper Contract address'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(
+																'p',
+																null,
+																_react2.default.createElement(
+																	'b',
+																	null,
+																	' ',
+																	prop.gatekeeperAddr,
+																	' '
+																)
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Dimension Control address'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(
+																'p',
+																null,
+																_react2.default.createElement(
+																	'b',
+																	null,
+																	' ',
+																	prop.dimensionCtrlAddr,
+																	' '
+																)
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'BigchainDB Transaction ID'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(
+																'p',
+																null,
+																' ',
+																prop.bigchainID,
+																' '
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'BigchainDB Transaction Hash'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(
+																'p',
+																null,
+																' ',
+																prop.bigchainHash,
+																' '
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															{ colSpan: '2' },
+															_react2.default.createElement(
+																'b',
+																null,
+																'Official IDs'
+															)
+														)
+													),
+													function () {
+														var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+														if (!$.isEmptyObject(prop)) {
+															return prop.uniqueIdAttributes.map(function (ids, i) {
+																if (ids[2].charAt(0) == "Q") {
+																	return _react2.default.createElement(
+																		'tr',
+																		{ key: i },
+																		_react2.default.createElement(
+																			'td',
+																			null,
+																			ids[0]
+																		),
+																		_react2.default.createElement(
+																			'td',
+																			null,
+																			_react2.default.createElement(
+																				'p',
+																				null,
+																				'File hash: ',
+																				ids[1]
+																			),
+																			_react2.default.createElement(
+																				'p',
+																				null,
+																				'IPFS hash: ',
+																				_react2.default.createElement(
+																					'a',
+																					{ target: '_blank', href: ipfs_url + "/" + ids[2] },
+																					ids[2]
+																				)
+																			)
+																		)
+																	);
+																} else {
+																	return _react2.default.createElement(
+																		'tr',
+																		{ key: i },
+																		_react2.default.createElement(
+																			'td',
+																			null,
+																			ids[0]
+																		),
+																		_react2.default.createElement(
+																			'td',
+																			null,
+																			_react2.default.createElement(
+																				'p',
+																				null,
+																				'File hash: ',
+																				ids[1]
+																			),
+																			_react2.default.createElement(
+																				'p',
+																				null,
+																				'BigChain hash: ',
+																				_react2.default.createElement(
+																					'a',
+																					{ href: 'javascript:', onClick: function onClick(e) {
+																							_this3.bigchainGet(ids[2]);
+																						} },
+																					ids[2]
+																				)
+																			)
+																		)
+																	);
+																}
+															});
+														} else {
+															return _react2.default.createElement(
+																'tr',
+																null,
+																_react2.default.createElement(
+																	'td',
+																	{ colSpan: '2' },
+																	'No Ids found'
+																)
+															);
+														}
+													}(this),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Ownership Token Description'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(
+																'p',
+																null,
+																prop.ownershipTokenAttributes
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Ownership ID'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(
+																'p',
+																null,
+																' ',
+																prop.ownershipId
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Ownership ID List'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															function () {
+																if (!$.isEmptyObject(prop.ownerIdList)) {
+																	return prop.ownerIdList.map(function (ids, i) {
+																		return _react2.default.createElement(
+																			'p',
+																			{ key: i },
+																			' ',
+																			prop.ownerIdList[i]
+																		);
+																	});
+																}
+															}(this)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Ownership Token Quantity'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															function () {
+																if (!$.isEmptyObject(prop.ownershipTokenQuantity)) {
+																	return prop.ownershipTokenQuantity.map(function (ids, i) {
+																		return _react2.default.createElement(
+																			'p',
+																			{ key: i },
+																			' ',
+																			prop.ownershipTokenQuantity[i]
+																		);
+																	});
+																}
+															}(this)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Ownership Token ID'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(
+																'p',
+																null,
+																' ',
+																prop.ownershipTokenId
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Control Token Description'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(
+																'p',
+																null,
+																prop.controlTokenAttributes
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Control ID'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(
+																'p',
+																null,
+																' ',
+																prop.controlId
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Control ID List'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															function () {
+																if (!$.isEmptyObject(prop.controlIdList)) {
+																	return prop.controlIdList.map(function (ids, i) {
+																		return _react2.default.createElement(
+																			'p',
+																			{ key: i },
+																			' ',
+																			prop.controlIdList[i]
+																		);
+																	});
+																}
+															}(this)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Control Token Quantity'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															function () {
+																if (!$.isEmptyObject(prop.controlTokenQuantity)) {
+																	return prop.controlIdList.map(function (ids, i) {
+																		return _react2.default.createElement(
+																			'p',
+																			{ key: i },
+																			' ',
+																			prop.controlTokenQuantity[i]
+																		);
+																	});
+																}
+															}(this)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Control Token ID'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															' ',
+															_react2.default.createElement(
+																'p',
+																null,
+																' ',
+																prop.controlTokenId
+															)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Recovery IDs'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															function () {
+																if (!$.isEmptyObject(prop.identityRecoveryIdList)) {
+																	return prop.identityRecoveryIdList.map(function (ids, i) {
+																		return _react2.default.createElement(
+																			'p',
+																			{ key: i },
+																			' ',
+																			prop.identityRecoveryIdList[i]
+																		);
+																	});
+																}
+															}(this)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Recovery Condition'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															' ',
+															_react2.default.createElement(
+																'p',
+																null,
+																' ',
+																prop.recoveryCondition
+															)
+														)
+													)
+												)
+											)
+										),
+										_react2.default.createElement(
+											'div',
+											{ id: 'KYC' },
+											_react2.default.createElement(
+												'table',
+												{ className: 'table table-striped table-hover', style: style },
+												_react2.default.createElement(
+													'tbody',
+													null,
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Asset Name'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															this.props.asset.asset_id
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															{ colSpan: '2' },
+															_react2.default.createElement(
+																'b',
+																null,
+																'Official IDs'
+															)
+														)
+													),
+													function () {
+														var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+														if (!$.isEmptyObject(prop)) {
+															return prop.uniqueIdAttributes.map(function (ids, i) {
+																if (ids[2].charAt(0) == "Q") {
+																	return _react2.default.createElement(
+																		'tr',
+																		{ key: i },
+																		_react2.default.createElement(
+																			'td',
+																			null,
+																			ids[0]
+																		),
+																		_react2.default.createElement(
+																			'td',
+																			null,
+																			_react2.default.createElement(
+																				'p',
+																				null,
+																				'File hash: ',
+																				ids[1]
+																			),
+																			_react2.default.createElement(
+																				'p',
+																				null,
+																				'IPFS hash: ',
+																				_react2.default.createElement(
+																					'a',
+																					{ target: '_blank', href: ipfs_url + "/" + ids[2] },
+																					ids[2]
+																				)
+																			)
+																		)
+																	);
+																} else {
+																	return _react2.default.createElement(
+																		'tr',
+																		{ key: i },
+																		_react2.default.createElement(
+																			'td',
+																			null,
+																			ids[0]
+																		),
+																		_react2.default.createElement(
+																			'td',
+																			null,
+																			_react2.default.createElement(
+																				'p',
+																				null,
+																				'File hash: ',
+																				ids[1]
+																			),
+																			_react2.default.createElement(
+																				'p',
+																				null,
+																				'BigChain hash: ',
+																				_react2.default.createElement(
+																					'a',
+																					{ href: 'javascript:', onClick: function onClick(e) {
+																							_this3.bigchainGet(ids[2]);
+																						} },
+																					ids[2]
+																				)
+																			)
+																		)
+																	);
+																}
+															});
+														} else {
+															return _react2.default.createElement(
+																'tr',
+																null,
+																_react2.default.createElement(
+																	'td',
+																	{ colSpan: '2' },
+																	'No Ids found'
+																)
+															);
+														}
+													}(this),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															{ colSpan: '2' },
+															_react2.default.createElement(
+																'b',
+																null,
+																'Attestations'
+															)
+														)
+													),
+													function () {
+														var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+														if (!$.isEmptyObject(prop.validatorSigs)) {
+															return prop.validatorSigs.map(function (ids, i) {
+																return _react2.default.createElement(
+																	'tr',
+																	{ key: i },
+																	_react2.default.createElement('td', null),
+																	_react2.default.createElement(
+																		'td',
+																		null,
+																		_react2.default.createElement(
+																			'p',
+																			null,
+																			'Attestor: ',
+																			ids[2]
+																		),
+																		_react2.default.createElement(
+																			'p',
+																			null,
+																			'Signature: ',
+																			ids[1]
+																		),
+																		_react2.default.createElement(
+																			'p',
+																			null,
+																			'Expiration: ',
+																			String(new Date(Number(ids[3]) * 1000))
+																		)
+																	)
+																);
+															});
+														} else {
+															return _react2.default.createElement(
+																'tr',
+																null,
+																_react2.default.createElement(
+																	'td',
+																	{ colSpan: '2' },
+																	'No signatures found.'
+																)
+															);
+														}
+													}(this),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Asset Class',
+															_react2.default.createElement(
+																'p',
+																{ className: 'text-info' },
+																'Use comma/enter to add class '
+															)
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(_reactTagsinput2.default, classInput)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Asset SubClass',
+															_react2.default.createElement(
+																'p',
+																{ className: 'text-info' },
+																'Use comma/enter to add sub class '
+															)
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(_reactTagsinput2.default, subClassInput)
+														)
+													)
+												)
+											)
+										)
+									),
+									_react2.default.createElement(
+										'div',
+										{ role: 'tabpanel', className: 'tab-pane center-block', id: 'qrcode', style: qrStyle },
+										_react2.default.createElement(_qrcode2.default, { value: qrConfig, size: 200 })
+									),
+									_react2.default.createElement(
+										'div',
+										{ role: 'tabpanel', className: 'tab-pane center-block', id: 'qrcode2', style: qrStyle },
+										this.state.notCOID ? _react2.default.createElement(_qrcode2.default, { value: qrOwnedDevice, size: 200 }) : null
+									)
+								)
+							)
+						)
+					)
+				);
+			}
+		}]);
+	
+		return Modal;
+	}(_react.Component);
+	
+	Modal.propTypes = {
+		hideHandler: _react2.default.PropTypes.func.isRequired // hideHandler method must exists in parent component
+	};
+	
+	//**************************************************************************************************************** */
+	
+	var Dims = function (_Component2) {
+		_inherits(Dims, _Component2);
+	
+		function Dims(props) {
+			_classCallCheck(this, Dims);
+	
+			var _this4 = _possibleConstructorReturn(this, (Dims.__proto__ || Object.getPrototypeOf(Dims)).call(this, props));
+	
+			_this4.pubKey = localStorage.getItem("pubKey");
+			_this4.privKey = localStorage.getItem("privKey");
+			_this4.tags = new _classAndSubClass2.default(_this4.pubKey, props.dimension.dimension_id);
+			_this4.names = localStorage.getItem("contactNames").split(',');
+			_this4.keys = localStorage.getItem("contactPubKeys").split(',');
+			_this4.state = {
+	
+				asset_class: _this4.tags.getAssetData("classes"),
+				asset_subclass: _this4.tags.getAssetData("subclasses"),
+	
+				inputs: ['input-0'],
+	
+				dimension: props.dimension || {},
+	
+				dimensionDataArray: [],
+	
+				signICA: false
+	
+			};
+			_this4.handleClassChange = _this4.handleClassChange.bind(_this4);
+			_this4.handleSubClassChange = _this4.handleSubClassChange.bind(_this4);
+			_this4.maxUniqAttr = 10;
+			return _this4;
+		}
+	
+		_createClass(Dims, [{
+			key: 'handleClassChange',
+			value: function handleClassChange(tags) {
+				this.setState({ asset_class: tags });
+				this.tags.updateClasses(tags, this.props.dimension.dimension_id, "classes");
+			}
+		}, {
+			key: 'handleSubClassChange',
+			value: function handleSubClassChange(tags) {
+				this.setState({ asset_subclass: tags });
+				this.tags.updateClasses(tags, this.props.dimension.dimension_id, "subclasses");
+			}
+	
+			//get the data object array and putting it in one array (so we can use map function)
+	
+		}, {
+			key: 'componentWillMount',
+			value: function componentWillMount() {
+				var dataArray = [];
+				var data = this.props.dimension.dimension_details.data;
+				//{"descriptor":"jan_history","attribute":"QmTok8Hgi4CCYS3fkxS83XpRjHjfegQZNszU6ekSFFq65s","flag":0}
+				Object.keys(data).forEach(function (key) {
+					dataArray.push(data[key].descriptor);
+					dataArray.push(data[key].attribute);
+					dataArray.push(data[key].flag);
+				});
+				var arrayOfArrays = [];
+				for (var i = 0; i < data.length; i++) {
+					var element = [dataArray[3 * i + 0], dataArray[3 * i + 1], dataArray[3 * i + 2]]; /*, dataArray[4 * i + 3]*/
+					arrayOfArrays.push(element);
+				}
+				this.setState({ dimensionDataArray: arrayOfArrays });
+			}
+		}, {
+			key: 'componentDidMount',
+			value: function componentDidMount() {
+				$("#assetDetails").modal('show');
+				$("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
+	
+				var standardDim = document.getElementById("standardDim");
+				var ICA_Dim = document.getElementById("ICA_Dim");
+	
+				var prop = this.props.dimension.dimension_details;
+	
+				if (prop.propType == 2) {
+					standardDim.style.display = 'none';
+					ICA_Dim.style.display = 'block';
+				} else {
+					ICA_Dim.style.display = 'none';
+				}
+			}
+		}, {
 			key: 'appendInput',
 			value: function appendInput() {
+				console.log("hit append Input");
 				var inputLen = this.state.inputs.length;
 				if (inputLen < this.maxUniqAttr) {
 					var newInput = 'input-' + inputLen;
 					this.setState({ inputs: this.state.inputs.concat([newInput]) });
 				}
 			}
+		}, {
+			key: 'getLabelValues',
+			value: function getLabelValues() {
+				console.log("hit getLabelValues");
+				var labelVals = [];
+				var _this = this;
+				$.each($("input[name^='label-']"), function (obj) {
+					var value = $.trim($(this).val());
+					if (value.length > 0) {
+						labelVals.push(_defineProperty({}, $(this).attr('name').replace("label-", ""), value));
+					}
+				});
+				return labelVals;
+			}
+		}, {
+			key: 'handleHideModal',
+			value: function handleHideModal() {
+				this.setState({ showModal: false });
+			}
+		}, {
+			key: 'handleShowModal',
+			value: function handleShowModal(e) {
+				this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
+			}
 	
-			//used in tokendistrubtionform
+			//*****************************************************************************
+			//takes in a msg/json and returns a signature (needed for requests)
 	
 		}, {
-			key: 'appendInput2',
-			value: function appendInput2() {
-				console.log("input name: " + this.state.inputs_name);
-				this.state.control_id.push([]);
-				this.state.control_token_quantity.push([]);
-				console.log("control id: " + this.state.control_id);
-				var inputLen = this.state.inputs_name.length;
-				if (inputLen < this.maxUniqAttr) {
-					var newInput1 = 'input1-' + inputLen;
-					var theID = inputLen + 4;
-					console.log("theID: " + theID);
-					var Attrs = {
-						addKeys: [13, 188], // Enter and comma
-						inputProps: {
-							placeholder: "use ENTER to add values",
-							style: { width: '30%' },
-							id: theID.toString()
-						}
-					};
-					this.state.suggest_attrs.push(Attrs);
-					this.setState({ inputs_name: this.state.inputs_name.concat([newInput1]) });
+			key: 'getSignature',
+			value: function getSignature(msg) {
+				console.log("creating signature, signing msg: \n" + JSON.stringify(msg));
+				var privKey = localStorage.getItem("privKey");
+				var privKey1 = new Buffer(privKey, "hex");
+				var msg_hash = keccak_256(JSON.stringify(msg));
+				var msg_hash_buffer = new Buffer(msg_hash, "hex");
+				var signature = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1));
+				signature = JSON.parse(signature).signature;
+				signature = JSON.stringify(signature);
+				signature = JSON.parse(signature).data;
+				signature = new Buffer(signature, "hex");
+				signature = signature.toString("hex");
+				return signature;
+			}
+		}, {
+			key: 'signICA',
+			value: function signICA(e) {
+				//e.preventDefault();
+				this.state.signICA = true;
+	
+				var json = {};
+				json.pubKey = localStorage.getItem("pubKey");
+				//need transaction ID
+				//need bigchain ID (descriptor)
+				var dataArray = this.state.dimensionDataArray;
+				console.log("dataArray: " + dataArray);
+				var txID = void 0;
+	
+				for (var i = 0; i < dataArray.length; i++) {
+					if (String(dataArray[i]).split(",")[1].charAt(0) != "Q") {
+						txID = String(dataArray[i]).split(",");
+						txID = txID[1];
+					}
 				}
-			}
-		}, {
-			key: 'onChange',
-			value: function onChange(event, _ref, id) {
-				var newValue = _ref.newValue;
 	
-				console.log("onchange");
-				var arr = this.state.value;
-				console.log("state value:  " + this.state.value);
-				arr[Number(id)] = newValue;
-				this.setState({ value: arr });
+				//let txID = String(dataArray[0]).split(",");
+				console.log("txID: " + txID);
+				//txID = txID[1];
+				//console.log("now txID: " + txID);
+	
+				json.txid = txID;
+	
+				var signature = this.getSignature(json);
+				var msg_hash = keccak_256(JSON.stringify(json));
+				var msg_hash_buffer = new Buffer(msg_hash, "hex");
+				json.msg = msg_hash_buffer.toString("hex");
+				json.sig = signature;
+	
+				console.log("attestICA JSON: " + JSON.stringify(json));
+	
+				$.ajax({
+					type: "POST",
+					url: twinUrl + 'signature/attestIca',
+					data: json,
+					success: function success(result) {
+						var data = result;
+						if ($.type(result) != "object") {
+							console.log("not object");
+							//data = JSON.parseJSON(result)
+						}
+						console.log("repsonse sign ICA: " + JSON.stringify(data));
+					}
+				});
+	
+				//now need to set signICA back to false?
 			}
 		}, {
-			key: 'componentDidMount',
-			value: function componentDidMount() {}
+			key: 'selectDay',
+			value: function selectDay(day) {
+				console.log("selected day: " + day);
+			}
+	
+			//**********************************************************************************
+			//**********************************************************************************
+	
+		}, {
+			key: 'showAttrs',
+			value: function showAttrs(e) {
+				alert('If you continue, you will spend a token to read entries.');
+				e.preventDefault();
+				var ele = $(e.target);
+				var value = parseInt(ele.attr("data-val"));
+				console.log("got value.. " + value);
+				var prop = this.props.dimension;
+	
+				var json = {};
+				var dimensionName = prop.dimension_details.dimensionName;
+				var ID = "";
+				var descriptor = prop.dimension_details.data[value].descriptor;
+				console.log("descriptor: " + JSON.stringify(descriptor));
+	
+				var owners = prop.dimension_details.owners;
+				json.owners = owners;
+	
+				var pubKey = keccak_256(localStorage.getItem("pubKey"));
+				json.pubKey = pubKey;
+				json.dimensionName = dimensionName;
+				json.dimensionCtrlAddr = prop.dimension_details.dimensionCtrlAddr;
+				json.ID = ID;
+				json.descriptor = descriptor;
+	
+				console.log("JSON: " + JSON.stringify(json));
+	
+				var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+	
+				var delegations = prop.dimension_details.delegations;
+				console.log("delegations... " + JSON.stringify(delegations));
+				console.log(delegations[0].amount);
+	
+				$.ajax({
+					type: "POST",
+					url: twinUrl + 'dimensions/readEntry',
+					data: json,
+					success: function success(result) {
+						var data = result;
+						if ($.type(result) != "object") {
+							console.log("not object");
+							data = JSON.parseJSON(result);
+						}
+	
+						console.log("repsonse readEntry: " + JSON.stringify(data));
+						console.log("data.Result: " + data.Result);
+						if (data.Result.charAt(0) == "Q") {
+							window.open(ipfs_url + data.Result, '_blank');
+						} else {
+							var bigchainServer = 'http://10.101.114.230:5000';
+							var endpoint = '/getTransaction/' + data.Result;
+							$.ajax({
+								method: 'GET',
+								url: bigchainServer + endpoint,
+								headers: { 'Access-Control-Allow-Origin': '*' },
+								crossDomain: true,
+								dataType: 'json',
+								contentType: 'application/json',
+								cache: false,
+								success: function success(resp) {
+									//the response is body -- send that
+									console.log(resp);
+									var full_data = resp;
+									var short_data = resp.asset.data.Coid_Data;
+									console.log("short data is..." + short_data.ownershipId);
+									console.log(JSON.stringify(full_data));
+									console.log(JSON.stringify(short_data));
+									var something = window.open("data:text/json," + encodeURIComponent(JSON.stringify(short_data)), "_blank");
+									something.focus();
+								} //end success 
+							}); //end bigchain ajax
+						} //end else
+					}
+				});
+			}
 		}, {
 			key: 'render',
 			value: function render() {
-				var _this6 = this;
+				var _this5 = this;
 	
-				$('div.react-autosuggest__container').css("display", "inline");
-				var that = this;
+				var prop = this.props.dimension;
 	
-				function autocompleteRenderInput(_ref2) {
-					var addTag = _ref2.addTag;
-					var props = _ref2.props;
-	
-	
-					var passed = JSON.stringify(arguments[0]);
-					console.log("passed: " + passed + JSON.stringify(arguments[1]));
-					passed = JSON.parse(passed);
-	
-					var handleOnChange = function handleOnChange(e, _ref3) {
-						var newValue = _ref3.newValue;
-						var method = _ref3.method;
-	
-						console.log("handleonchange params: " + e + "   " + newValue + "   " + method + "   " + passed.id);
-						if (method === 'enter' || method === 'click') {
-							that.state.value[passed.id] = "";
-							e.preventDefault();
-						} else {
-							that.onChange(e, { newValue: newValue }, passed.id);
-						}
-					};
-					var handleKeyPress = function handleKeyPress(event) {
-						console.log('enter press here! ' + event.key);
-						if (event.key == 'Enter') {
-							event.preventDefault();
-							addTag(that.state.value[passed.id]);
-							that.state.value[passed.id] = "";
-							console.log('current tags: ' + that.state.tags);
-						}
-					};
-	
-					var renderInputComponent = function renderInputComponent(inputProps) {
-						return _react2.default.createElement('input', inputProps);
-					};
-					var inputValue = that.state.value[Number(passed.id)] || "";
-					if (inputValue == 'undefined') {
-						inputValue = "";
-					}
-					var inputLength = inputValue.length || 0;
-	
-					var suggestions = that.state.names.filter(function (name) {
-						console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
-						return name.toLowerCase().slice(0, inputLength) === inputValue;
-					});
-					///////////////////////////////////////
-	
-	
-					var value = String(that.state.value[Number(passed.id)]) || "";
-					if (value == 'undefined') {
-						value = "";
-					}
-					//const suggestions = that.state.suggestions;
-					console.log("passed ID: " + passed.id);
-					console.log("suggestions: " + suggestions);
-					console.log("value: " + value);
-					var inputProps = {
-						placeholder: passed.placeholder,
-						value: value,
-						style: {
-							width: '30%',
-							height: '100%',
-							display: "initial"
-						},
-						onChange: handleOnChange,
-						onKeyPress: handleKeyPress,
-						className: "react-tagsinput-input",
-						id: passed.id
-					};
-					return _react2.default.createElement(_reactAutosuggest2.default, {
-						id: passed.id,
-						ref: passed.ref,
-						suggestions: suggestions,
-						shouldRenderSuggestions: function shouldRenderSuggestions(value) {
-							return value.length > 0;
-						},
-						getSuggestionValue: function getSuggestionValue(suggestion) {
-							return suggestion;
-						},
-						renderSuggestion: function renderSuggestion(suggestion) {
-							return _react2.default.createElement(
-								'span',
-								null,
-								suggestion
-							);
-						},
-						inputProps: inputProps,
-						onSuggestionSelected: function onSuggestionSelected(e, _ref4) {
-							var suggestion = _ref4.suggestion;
-	
-							console.log("SELECTED: " + suggestion);
-							addTag(suggestion);
-						},
-						onSuggestionsClearRequested: function onSuggestionsClearRequested() {},
-						onSuggestionsFetchRequested: function onSuggestionsFetchRequested() {},
-						renderInputComponent: renderInputComponent
-					});
+				var hashedKeys = [];
+				for (var i = 0; i < this.keys.length; i++) {
+					hashedKeys[i] = keccak_256(this.keys[i]);
 				}
 	
-				var basicAttrs = {
-					addKeys: [13, 188], // Enter and comma
-					inputProps: {
-						placeholder: "use ENTER to add values",
-						style: { width: '30%' }
+				for (var x = 0; x < prop.dimension_details.owners.length; x++) {
+					var index = hashedKeys.indexOf(prop.dimension_details.owners[x]);
+					if (index >= 0) {
+						prop.dimension_details.owners[x] = this.names[index];
+						console.log("\n\nCHANGED: " + prop.dimension_details.owners[x]);
 					}
-				};
-				var inputAttrs = {
-					addKeys: [13, 188], // Enter and comma
-					inputProps: {
-						placeholder: "use ENTER to add values",
-						style: { width: '30%' },
-						id: "0"
-					}
-				};
-				var inputAttrs2 = {
-					addKeys: [13, 188], // Enter and comma
-					inputProps: {
-						placeholder: "use ENTER to add values",
-						style: { width: '30%' },
-						id: "1"
-					}
-				};
-				var inputAttrs3 = {
-					addKeys: [13, 188], // Enter and comma
-					inputProps: {
-						placeholder: "use ENTER to add values",
-						style: { width: '30%' },
-						id: "2"
-					}
-				};
-				var syle = {
-					marginRight: '15px'
-				};
+				}
+	
+				console.log("dimension(props): " + JSON.stringify(prop));
+	
+				var dataArray = this.state.dimensionDataArray;
+	
+				console.log("this.state... \n" + JSON.stringify(this.state));
+	
 				var style = {
 					fontSize: '12.5px'
 				};
 	
+				var classInput = {
+					addKeys: [13, 188], // Enter and comma
+					value: this.state.asset_class,
+					onChange: this.handleClassChange,
+					inputProps: { placeholder: "" }
+				};
+				var subClassInput = {
+					addKeys: [13, 188], // Enter and comma
+					value: this.state.asset_subclass,
+					onChange: this.handleSubClassChange.bind(this),
+					inputProps: { placeholder: "" }
+				};
+	
+				var qrStyle = {
+					maxWidth: "100%",
+					textAlign: "center"
+				};
+	
+				var syle = {
+					marginRight: '15px'
+				};
+	
 				return _react2.default.createElement(
 					'div',
-					{ id: 'SubmitContainer' },
+					{ className: 'modal fade', id: 'assetDetails', key: this.props.dimension.dimension_id, tabIndex: '-1', role: 'dialog', 'aria-labelledby': 'asset' },
 					_react2.default.createElement(
-						'h1',
-						null,
-						'Core Identity Submission Form'
-					),
-					_react2.default.createElement(
-						'form',
-						{ method: 'POST', id: 'register', role: 'form' },
+						'div',
+						{ className: 'modal-dialog modal-lg', role: 'document' },
 						_react2.default.createElement(
 							'div',
-							{ className: 'form-group' },
-							_react2.default.createElement(
-								'label',
-								{ htmlFor: 'unique_id' },
-								'Enter Unique ID Attributes. The first Attribute has to be name (first, last). Then add any official identification such as SSN or national ID number(s). Make sure to add the supporting file(s) through "Upload File".'
-							),
-							this.state.inputs.map(function (input) {
-								return _react2.default.createElement(UniqueIDAttributesForm, { handleShowModal: _this6.handleShowModal.bind(_this6), min: _this6.state.subform_cont, max: '10', key: input, labelref: input });
-							})
-						),
-						_react2.default.createElement(
-							'div',
-							{ className: 'form-group' },
+							{ className: 'modal-content' },
 							_react2.default.createElement(
 								'div',
-								{ className: 'col-md-offset-6 col-md-6 ' },
-								_react2.default.createElement('p', null),
+								{ className: 'modal-header' },
 								_react2.default.createElement(
 									'button',
-									{ type: 'button', className: 'btn btn-info pull-right', style: syle, onClick: this.appendInput.bind(this) },
-									_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
-									'Add More'
+									{ type: 'button', className: 'close', 'data-dismiss': 'modal', 'aria-label': 'Close' },
+									_react2.default.createElement(
+										'span',
+										{ 'aria-hidden': 'true' },
+										'× '
+									)
+								),
+								_react2.default.createElement(
+									'ul',
+									{ id: 'mytabs', className: 'nav nav-pills', role: 'tablist' },
+									_react2.default.createElement(
+										'li',
+										{ role: 'presentation', className: 'active' },
+										_react2.default.createElement(
+											'a',
+											{ href: '#asset_details', role: 'tab', 'data-toggle': 'tab' },
+											'Dimension Details'
+										)
+									),
+									_react2.default.createElement(
+										'li',
+										{ role: 'presentation' },
+										_react2.default.createElement(
+											'a',
+											{ href: '#show_descriptors', role: 'tab', 'data-toggle': 'tab' },
+											'Descriptors'
+										)
+									)
 								)
-							)
-						),
-						_react2.default.createElement(
-							'div',
-							{ className: 'form-group' },
-							_react2.default.createElement(
-								'label',
-								{ htmlFor: 'owner_token_id' },
-								'Enter Ownership Token Description. For example, \'Spencer tokens\'.'
 							),
-							_react2.default.createElement(_reactTagsinput2.default, _extends({}, basicAttrs, { maxTags: 1, value: this.state.owner_token_desc, onChange: function onChange(e) {
-									_this6.onFieldChange("owner_token_desc", e);
-								} }))
-						),
-						_react2.default.createElement(
-							'div',
-							{ className: 'form-group' },
 							_react2.default.createElement(
-								'label',
-								{ htmlFor: 'owner_id' },
-								'Enter Owner IDs. Owner IDs are the public keys of the identity owners. Only one owner for an individual (self).'
-							),
-							_react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs, { maxTags: 1, renderInput: autocompleteRenderInput, value: this.state.owner_id, onChange: function onChange(e) {
-									_this6.onFieldChange("owner_id", e);
-								} }))
-						),
-						_react2.default.createElement(
-							'div',
-							{ className: 'form-group' },
-							_react2.default.createElement(
-								'label',
-								{ htmlFor: 'owner_token_id' },
-								'Enter Ownership Token Quantity. For example, 1 token for an individual.'
-							),
-							_react2.default.createElement(_reactTagsinput2.default, _extends({}, basicAttrs, { maxTags: 1, value: this.state.owner_token_quantity, onChange: function onChange(e) {
-									_this6.onFieldChange("owner_token_quantity", e);
-								} }))
-						),
-						_react2.default.createElement(
-							'div',
-							{ className: 'form-group' },
-							_react2.default.createElement(
-								'label',
-								{ htmlFor: 'control_token_id' },
-								'Control Token ID Description. For example, \'Spencer tokens\'.'
-							),
-							_react2.default.createElement(_reactTagsinput2.default, _extends({}, basicAttrs, { maxTags: 1, value: this.state.control_token_desc, onChange: function onChange(e) {
-									_this6.onFieldChange("control_token_desc", e);
-								} }))
-						),
-						_react2.default.createElement(
-							'div',
-							{ className: 'form-group' },
-							_react2.default.createElement(
-								'label',
-								{ htmlFor: 'control_dist' },
-								'Enter Controllers and their control token(s).'
-							),
-							this.state.inputs_name.map(function (input, i) {
-								return _react2.default.createElement(
+								'div',
+								{ className: 'modal-body' },
+								_react2.default.createElement(
 									'div',
-									{ className: 'form-group col-md-12' },
+									{ className: 'tab-content' },
 									_react2.default.createElement(
 										'div',
-										{ className: 'col-md-10' },
+										{ role: 'tabpanel', className: 'tab-pane active', id: 'asset_details' },
+										_react2.default.createElement(
+											'div',
+											{ id: 'standardDim' },
+											_react2.default.createElement(
+												'table',
+												{ className: 'table table-striped table-hover', style: style },
+												_react2.default.createElement(
+													'tbody',
+													null,
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Dimension Name'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															prop.dimension_id
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Dimension Class',
+															_react2.default.createElement(
+																'p',
+																{ className: 'text-info' },
+																'Use comma/enter to add class '
+															)
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(_reactTagsinput2.default, classInput)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Dimension SubClass',
+															_react2.default.createElement(
+																'p',
+																{ className: 'text-info' },
+																'Use comma/enter to add sub class '
+															)
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(_reactTagsinput2.default, subClassInput)
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Dimension Contract address'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															_react2.default.createElement(
+																'p',
+																null,
+																_react2.default.createElement(
+																	'b',
+																	null,
+																	' ',
+																	prop.dimension_details.address,
+																	' '
+																)
+															)
+														)
+													)
+												)
+											)
+										),
+										_react2.default.createElement(
+											'div',
+											{ id: 'ICA_Dim' },
+											_react2.default.createElement(
+												'table',
+												{ className: 'table table-striped table-hover', style: style },
+												_react2.default.createElement(
+													'tbody',
+													null,
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Dimension Name'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															prop.dimension_id
+														)
+													),
+													_react2.default.createElement(
+														'tr',
+														null,
+														_react2.default.createElement(
+															'td',
+															null,
+															'Owner List'
+														),
+														_react2.default.createElement(
+															'td',
+															null,
+															function () {
+																if (!$.isEmptyObject(prop.dimension_details.owners)) {
+																	return prop.dimension_details.owners.map(function (ids, i) {
+																		return _react2.default.createElement(
+																			'p',
+																			{ key: i },
+																			ids
+																		);
+																	});
+																}
+															}(this)
+														)
+													)
+												)
+											),
+											_react2.default.createElement(
+												'button',
+												{ className: 'btn btn-success', onClick: function onClick(e) {
+														return _this5.signICA();
+													} },
+												'Sign Identity Claim'
+											)
+										),
+										this.state.signICA ? _react2.default.createElement(_reactDayPicker2.default, { disabledDays: { daysOfWeek: [0] }, onDayClick: function onDayClick(day) {
+												return _this5.selectDay(day);
+											} }) : null
+									),
+									_react2.default.createElement(
+										'div',
+										{ title: 'tabs', role: 'tabpanel', className: 'tab-pane center-block', id: 'show_descriptors' },
 										_react2.default.createElement(
 											'table',
 											{ className: 'table table-striped table-hover', style: style },
@@ -48276,116 +50192,572 @@
 													'tr',
 													null,
 													_react2.default.createElement(
-														'th',
-														null,
+														'td',
+														{ colSpan: '2' },
 														_react2.default.createElement(
 															'b',
 															null,
-															'Public Key of Controller'
-														)
-													),
-													_react2.default.createElement(
-														'th',
-														null,
-														_react2.default.createElement(
-															'b',
-															null,
-															'Control Token Quantity'
+															'Descriptors'
 														)
 													)
 												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														_react2.default.createElement(_reactTagsinput2.default, _extends({}, _this6.state.suggest_attrs[i], { maxTags: 1, renderInput: autocompleteRenderInput, className: 'form-control col-md-4', type: 'text', value: _this6.state.control_id[i], onChange: function onChange(e) {
-																_this6.onFieldChange2("control_id," + i, e);
-															} }))
-													),
-													_react2.default.createElement(
-														'td',
-														null,
-														_react2.default.createElement(_reactTagsinput2.default, _extends({}, basicAttrs, { maxTags: 1, className: 'form-control col-md-4', type: 'text', value: _this6.state.control_token_quantity[i], onChange: function onChange(e) {
-																_this6.onFieldChange2("control_token_quantity," + i, e);
-															} }))
-													)
-												)
+												function () {
+													if (dataArray.length > 0) {
+														return dataArray.map(function (attrs, i) {
+															//console.log("attrs[0]: " + attrs[0] + ", attrs[1]:" + attrs[1] + ", attrs[2]: " + attrs[2])
+															return _react2.default.createElement(
+																'tr',
+																{ key: i },
+																_react2.default.createElement(
+																	'td',
+																	null,
+																	attrs[0]
+																),
+																_react2.default.createElement(
+																	'td',
+																	null,
+																	_react2.default.createElement(
+																		'button',
+																		{ type: 'button', className: 'btn btn-primary btn-sm', 'data-val': i, onClick: _this5.showAttrs.bind(_this5) },
+																		'Spend Token'
+																	)
+																)
+															);
+														});
+													} else {
+														return _react2.default.createElement(
+															'tr',
+															null,
+															_react2.default.createElement(
+																'td',
+																{ colSpan: '2' },
+																'No descriptors found.'
+															)
+														);
+													}
+												}(this)
 											)
 										)
 									)
-								);
-							})
-						),
-						_react2.default.createElement(
-							'div',
-							{ className: 'form-group' },
-							_react2.default.createElement(
-								'div',
-								{ className: 'col-md-offset-6 col-md-6 ' },
-								_react2.default.createElement('p', null),
-								_react2.default.createElement(
-									'button',
-									{ type: 'button', className: 'btn btn-info pull-right', style: syle, onClick: this.appendInput2.bind(this) },
-									_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
-									'Add More'
-								)
-							)
-						),
-						_react2.default.createElement(
-							'div',
-							{ className: 'form-group' },
-							_react2.default.createElement(
-								'label',
-								null,
-								'Recovery IDs (public keys of individuals who will attest to lost/stolen identity)'
-							),
-							_react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs2, { renderInput: autocompleteRenderInput, value: this.state.recovery_id, onChange: function onChange(e) {
-									_this6.onFieldChange("recovery_id", e);
-								} }))
-						),
-						_react2.default.createElement(
-							'div',
-							{ className: 'form-group' },
-							_react2.default.createElement(
-								'label',
-								null,
-								'Recovery Condition (# of digital signatures of recovery ID owners needed to recover identity)'
-							),
-							_react2.default.createElement('input', { name: 'recoveryCondition', className: 'form-control col-md-4', type: 'text', placeholder: 'Label' }),
-							'/>'
-						),
-						_react2.default.createElement(
-							'div',
-							{ className: 'form-group' },
-							_react2.default.createElement(
-								'div',
-								{ className: 'col-sm-6' },
-								_react2.default.createElement('br', null),
-								_react2.default.createElement('input', { className: 'form-control', ref: 'signature', type: 'hidden', value: this.state.signature }),
-								_react2.default.createElement('input', { type: 'hidden', name: 'pubkey', ref: 'pubKey', value: localStorage.getItem("pubKey") }),
-								_react2.default.createElement(
-									'button',
-									{ className: 'btn btn-primary', 'data-loading-text': 'Submit Identity', name: 'submit-form', type: 'button', onClick: this.submitCoid.bind(this) },
-									'Submit Identity'
 								)
 							)
 						)
-					),
-					this.state.showModal ? _react2.default.createElement(_UploadIpfsFile2.default, { pubKey: this.state.pubKey, dataHandler: this.getFileDetails.bind(this), handleHideModal: this.handleHideModal }) : null
+					)
 				);
 			}
 		}]);
 	
-		return CoreIdentity;
-	}(_react2.default.Component);
+		return Dims;
+	}(_react.Component);
 	
-	exports.default = CoreIdentity;
+	Dims.propTypes = {
+		hideHandler: _react2.default.PropTypes.func.isRequired // hideHandler method must exists in parent component
+	};
+	
+	//																<td>Token Amount: 1</td>
+	
+	
+	var Assets = function (_Component3) {
+		_inherits(Assets, _Component3);
+	
+		function Assets(props) {
+			_classCallCheck(this, Assets);
+	
+			var _this6 = _possibleConstructorReturn(this, (Assets.__proto__ || Object.getPrototypeOf(Assets)).call(this, props));
+	
+			_this6.state = {
+				showDetails: false,
+				showDetails1: false, //set in dimensionHandler to render delegated data
+				wallet: { pubKey: localStorage.getItem("pubKey") },
+				own_assets: [],
+				controlled_assets: [],
+				delegated_assets: [],
+				delegated_dims: [],
+				active_asset: {},
+				show_only: []
+			};
+	
+			// event handlers must attached with current scope
+			_this6.assetHandler = _this6.assetHandler.bind(_this6);
+			_this6.dimensionHandler = _this6.dimensionHandler.bind(_this6);
+			_this6.hideHandler = _this6.hideHandler.bind(_this6);
+	
+			_this6.hideHandler1 = _this6.hideHandler1.bind(_this6);
+	
+			_this6.searchHandler = _this6.searchHandler.bind(_this6);
+			return _this6;
+		}
+	
+		//*******************************************************************************
+		//get all OWNED, CONTROLLED, DELEGATED assets & DELEGATED dimensions
+	
+	
+		_createClass(Assets, [{
+			key: 'componentWillMount',
+			value: function componentWillMount() {
+				// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
+				// -> -> -> START get OWNED assets -> -> ->
+				$.ajax({
+					type: "POST",
+					url: twinUrl + 'getOwnedAssets',
+					data: { "pubKey": localStorage.getItem("pubKey") },
+					success: function (result) {
+						var data = result;
+						if ($.type(result) != "object") {
+							data = JSON.parseJSON(result);
+						}
+	
+						//get the array:
+						data = data.data;
+	
+						//DEBUGGING:
+						//console.log("getOwnedAssets result: " + data);
+						var assetData = [];
+	
+						if (data.length > 0) {
+	
+							//loop through OWNED assets
+							for (var i = 0; i < data.length; i++) {
+								//AJAX each asset:
+								$.ajax({
+									type: "POST",
+									url: twinUrl + 'getAsset',
+									data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": data[i] },
+									success: function (result) {
+										var dataResult = result;
+										if ($.type(result) != "object") {
+											dataResult = JSON.parseJSON(result);
+										}
+	
+										//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
+										var theArray = this.state.own_assets;
+	
+										//console.log("length is: " + theArray.length)
+										//console.log(theArray)
+										//TODO: RENAME asset_name TO ASSET DETAILS
+										theArray[theArray.length] = {
+											asset_id: dataResult.assetID,
+											asset_details: dataResult
+										};
+										this.setState({ own_assets: theArray });
+	
+										assetData[assetData.length] = {
+											asset_id: dataResult.assetID,
+											asset_uniqueId: dataResult.uniqueId,
+											asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
+											asset_coidAddr: dataResult.coidAddr,
+											asset_gatekeeperAddr: dataResult.gatekeeperAddr,
+											asset_owners: dataResult.ownerIdList,
+											asset_controllers: dataResult.controlIdList,
+											asset_bigchainID: dataResult.bigchainID,
+											asset_type: dataResult.propType
+										};
+										localStorage.setItem("owned_assets", JSON.stringify(assetData));
+										//console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets))
+									}.bind(this),
+									complete: function complete() {}
+								});
+							} //end for
+						} //end if (data > 0)
+					}.bind(this)
+				});
+				// <- <- <- END get OWNED assets <- <- <-
+				// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
+				// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
+				// -> -> -> START get CONTROLLED assets -> -> ->
+				$.ajax({
+					type: "POST",
+					url: twinUrl + 'getControlledAssets',
+					data: { "pubKey": localStorage.getItem("pubKey") },
+					success: function (result) {
+						var data = result;
+						if ($.type(result) != "object") {
+							data = JSON.parseJSON(result);
+						}
+						console.log("got data: " + JSON.stringify(data));
+	
+						data = data.data;
+						console.log("Get Controlled Assets result: " + data);
+						var assetData = [];
+	
+						if (data.length > 0) {
+							//loop through OWNED assets
+							for (var i = 0; i < data.length; i++) {
+								//console.log("i is: " + i + " filename: " + data[i])
+								//AJAX each asset:
+								$.ajax({
+									type: "POST",
+									url: twinUrl + 'getAsset',
+									data: { "pubKey": localStorage.getItem("pubKey"), "flag": 1, "fileName": data[i] },
+									success: function (result) {
+										var dataResult = result;
+										if ($.type(result) != "object") {
+											dataResult = JSON.parseJSON(result);
+										}
+	
+										var theArray = this.state.controlled_assets;
+										//console.log("length is: " + theArray.length)
+										//console.log(JSON.stringify(theArray))
+	
+										theArray[theArray.length] = {
+											asset_id: dataResult.assetID,
+											asset_details: dataResult
+										};
+										this.setState({ controlled_assets: theArray });
+										//this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
+	
+										assetData[assetData.length] = {
+											asset_id: dataResult.assetID,
+											asset_uniqueId: dataResult.uniqueId,
+											asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
+											asset_coidAddr: dataResult.coidAddr,
+											asset_gatekeeperAddr: dataResult.gatekeeperAddr,
+											asset_owners: dataResult.ownerIdList,
+											asset_controllers: dataResult.controlIdList,
+											asset_bigchainID: dataResult.bigchainID,
+											asset_type: dataResult.propType
+										};
+										localStorage.setItem("controlled_assets", JSON.stringify(assetData));
+									}.bind(this),
+									complete: function complete() {}
+								});
+							} //end for
+						}
+					}.bind(this)
+				});
+				// <- <- <- END get CONTROLLED assets <- <- <-
+				// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
+				// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
+				// -> -> -> START get DELEGATED assets -> -> ->
+				$.ajax({
+					type: "POST",
+					url: twinUrl + 'getDelegatedAssets',
+					data: { "pubKey": localStorage.getItem("pubKey") },
+					success: function (result) {
+						var data = result;
+						if ($.type(result) != "object") {
+							data = JSON.parseJSON(result);
+						}
+	
+						data = data.data;
+						console.log("Get Delegated Assets result: " + data);
+	
+						if (data.length > 0) {
+							//loop through OWNED assets
+							for (var i = 0; i < data.length; i++) {
+								//AJAX each asset:
+								$.ajax({
+									type: "POST",
+									url: twinUrl + 'getAsset',
+									data: { "pubKey": localStorage.getItem("pubKey"), "flag": 2, "fileName": data[i] },
+									success: function (result) {
+										var dataResult = result;
+										if ($.type(result) != "object") {
+											dataResult = JSON.parseJSON(result);
+										}
+	
+										//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
+										var theArray1 = this.state.delegated_assets;
+	
+										theArray1[theArray1.length] = {
+											asset_id: dataResult.assetID,
+											asset_details: dataResult
+										};
+										this.setState({ delegated_assets: theArray1 });
+									}.bind(this),
+									complete: function complete() {}
+								});
+							} //end for
+						}
+					}.bind(this)
+				});
+				// <- <- <- END get CONTROLLED assets <- <- <-
+				// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
+				// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
+				// -> -> -> START get DELEGATED dimensions -> -> ->
+				$.ajax({
+					type: "POST",
+					url: twinUrl + 'getDelegatedDimensions',
+					data: { "pubKey": localStorage.getItem("pubKey") },
+					success: function (result) {
+						var data = result;
+						if ($.type(result) != "object") {
+							data = JSON.parseJSON(result);
+						}
+	
+						data = data.data;
+						console.log("getDelegatedDimensions: " + data);
+	
+						var PUBKEY = keccak_256(localStorage.getItem("pubKey"));
+	
+						//var delegatedDims = []
+	
+						if (data.length > 0) {
+							//loop through OWNED assets
+							for (var i = 0; i < data.length; i++) {
+								console.log("grabbing.. " + data[i]);
+								//AJAX each asset:
+								$.ajax({
+									type: "POST",
+									url: twinUrl + 'getDimension',
+									data: { "pubKey": PUBKEY, "flag": 2, "fileName": data[i] },
+									success: function (result) {
+										var dataResult = result;
+										if ($.type(result) != "object") {
+											console.log("result != object");
+											dataResult = JSON.parseJSON(result);
+										}
+	
+										var delegatedDims = this.state.delegated_dims;
+	
+										delegatedDims[delegatedDims.length] = {
+											dimension_id: dataResult.dimension.dimensionName,
+											dimension_details: dataResult.dimension
+										};
+										this.setState({ delegated_dims: delegatedDims });
+	
+										console.log("dataResult get Dimension: \n " + JSON.stringify(dataResult));
+										console.log("dimensionName: " + dataResult.dimension.dimensionName);
+									}.bind(this),
+									complete: function complete() {}
+								});
+							} //end for
+						}
+					}.bind(this)
+				});
+				// <- <- <- END get DELEGATED assets <- <- <-
+				// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
+			}
+		}, {
+			key: 'assetHandler',
+			value: function assetHandler(asset) {
+				var assetID = asset.asset_id;
+				if (assetID) {
+					this.setState({ showDetails: true, active_asset: asset });
+				}
+			}
+		}, {
+			key: 'dimensionHandler',
+			value: function dimensionHandler(dimension) {
+				console.log("dimension handler.. " + dimension);
+				var dimensionID = dimension.dimension_id;
+				if (dimensionID) {
+					console.log("dimensionID: " + dimensionID);
+					this.setState({ showDetails1: true, active_dimension: dimension });
+				}
+			}
+	
+			// Close Asset Details Window
+	
+		}, {
+			key: 'hideHandler',
+			value: function hideHandler() {
+				this.setState({ showDetails: false, active_asset: {} });
+			}
+		}, {
+			key: 'hideHandler1',
+			value: function hideHandler1() {
+				this.setState({ showDetails1: false, active_dimension: {} });
+			}
+		}, {
+			key: 'searchHandler',
+			value: function searchHandler(e) {
+				var str = e.target.value.trim();
+				var _this = this;
+				setTimeout(function () {
+					var data = JSON.parse(localStorage.getItem(_this.state.wallet.pubKey));
+					var indexed = [];
+					for (var assetID in data) {
+						var allTags = data[assetID].classes.concat(data[assetID].subclasses);
+						allTags.map(function (ele) {
+							if (ele.toLowerCase() == str.toLowerCase()) {
+								indexed.push(assetID);
+							}
+						});
+					}
+					_this.setState({ show_only: indexed });
+				}, 350);
+				if (!str.length) this.setState({ show_only: [] });
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				var _this7 = this;
+	
+				return _react2.default.createElement(
+					'div',
+					{ id: 'assets-container', className: 'assets' },
+					_react2.default.createElement(
+						'div',
+						{ className: 'row', id: 'search-bar' },
+						_react2.default.createElement(
+							'div',
+							{ className: 'col-md-6' },
+							_react2.default.createElement(
+								'h3',
+								{ className: 'margin0px' },
+								'Manage Assets'
+							),
+							_react2.default.createElement('hr', null),
+							_react2.default.createElement(
+								'p',
+								null,
+								_react2.default.createElement(
+									'b',
+									null,
+									'Public Key: '
+								),
+								this.state.wallet.pubKey
+							),
+							_react2.default.createElement('hr', null)
+						),
+						_react2.default.createElement(
+							'div',
+							{ className: 'col-md-6' },
+							_react2.default.createElement(
+								'form',
+								{ className: 'form-inline' },
+								_react2.default.createElement(
+									'div',
+									{ className: 'form-group pull-right' },
+									_react2.default.createElement(
+										'div',
+										{ className: 'input-group' },
+										_react2.default.createElement('input', { type: 'text', name: 'search-assets', id: 'search-assets', className: 'form-control', placeholder: 'Search Assets', onKeyUp: this.searchHandler }),
+										_react2.default.createElement(
+											'div',
+											{ className: 'input-group-addon' },
+											_react2.default.createElement('span', { className: 'glyphicon glyphicon-search' })
+										)
+									)
+								)
+							)
+						)
+					),
+					_react2.default.createElement('br', null),
+					_react2.default.createElement(
+						'div',
+						{ id: 'own-assets' },
+						_react2.default.createElement(
+							'h4',
+							null,
+							'My Owned Assets'
+						),
+						_react2.default.createElement('hr', null),
+						_react2.default.createElement(
+							'div',
+							{ className: 'owned-assets' },
+							_react2.default.createElement(
+								'div',
+								{ className: 'row assets' },
+								this.state.own_assets.map(function (asset, i) {
+									var cssClass = "btn btn-success";
+									if (_this7.state.show_only.length > 0) {
+										if (_this7.state.show_only.toString().indexOf(asset.asset_id.toString()) == -1) {
+											cssClass += " hidden";
+										} else cssClass.replace("hidden", "");
+									}
+									return _react2.default.createElement(
+										'button',
+										{ type: 'button', key: i, className: cssClass, onClick: function onClick() {
+												return _this7.assetHandler(asset);
+											} },
+										_react2.default.createElement('span', { className: 'glyphicon glyphicon-ok-circle' }),
+										asset.asset_id
+									);
+								})
+							)
+						)
+					),
+					_react2.default.createElement('br', null),
+					_react2.default.createElement(
+						'div',
+						{ id: 'controlled-assets' },
+						_react2.default.createElement(
+							'h4',
+							null,
+							'My Controlled Assets'
+						),
+						_react2.default.createElement('hr', null),
+						_react2.default.createElement(
+							'div',
+							{ className: 'controlled-assets' },
+							_react2.default.createElement(
+								'div',
+								{ className: 'row assets' },
+								this.state.controlled_assets.map(function (asset) {
+									var cssClass = "btn btn-info";
+									if (_this7.state.show_only.length > 0) {
+										if (_this7.state.show_only.toString().indexOf(asset.asset_id.toString()) >= 0) {
+											cssClass += " show";
+										} else cssClass += " hidden";
+									}
+									return _react2.default.createElement(
+										'button',
+										{ type: 'button', key: asset.asset_id, className: cssClass, onClick: function onClick() {
+												return _this7.assetHandler(asset);
+											} },
+										_react2.default.createElement('span', { className: 'glyphicon glyphicon-link' }),
+										asset.asset_id
+									);
+								})
+							)
+						)
+					),
+					_react2.default.createElement('br', null),
+					_react2.default.createElement(
+						'div',
+						{ id: 'delegated-assets' },
+						_react2.default.createElement(
+							'h4',
+							null,
+							'My Delegated Data'
+						),
+						_react2.default.createElement('hr', null),
+						_react2.default.createElement(
+							'div',
+							{ className: 'delegated-assets' },
+							_react2.default.createElement(
+								'div',
+								{ className: 'row assets' },
+								this.state.delegated_dims.map(function (dimension, i) {
+									var cssClass = "btn btn-danger";
+									if (_this7.state.show_only.length > 0) {
+										if (_this7.state.show_only.toString().indexOf(dimension.dimension_id.toString()) >= 0) {
+											cssClass += " show";
+										} else cssClass += " hidden";
+									}
+									return _react2.default.createElement(
+										'button',
+										{ type: 'button', key: i, className: cssClass, onClick: function onClick() {
+												return _this7.dimensionHandler(dimension);
+											} },
+										_react2.default.createElement('span', { className: 'glyphicon glyphicon-piggy-bank' }),
+										dimension.dimension_id
+									);
+								})
+							)
+						)
+					),
+					_react2.default.createElement('br', null),
+					this.state.showDetails ? _react2.default.createElement(Modal, { hideHandler: this.hideHandler, asset: this.state.active_asset }) : null,
+					this.state.showDetails1 ? _react2.default.createElement(Dims, { hideHandler: this.hideHandler1, dimension: this.state.active_dimension }) : null
+				);
+			}
+		}]);
+	
+		return Assets;
+	}(_react.Component);
+	
+	exports.default = Assets;
+	
+	// <form action="http://google.com">
+	// <input type="submit" value="Go to Google" />
+	// </form>
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/buffer/index.js */ 239).Buffer))
 
 /***/ },
-/* 328 */
+/* 330 */
 /*!**********************************************!*\
   !*** ./~/react-tagsinput/react-tagsinput.js ***!
   \**********************************************/
@@ -49001,8206 +51373,7 @@
 
 
 /***/ },
-/* 329 */
-/*!*******************************************!*\
-  !*** ./~/react-autosuggest/dist/index.js ***!
-  \*******************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	module.exports = __webpack_require__(/*! ./Autosuggest */ 330).default;
-
-/***/ },
-/* 330 */
-/*!*************************************************!*\
-  !*** ./~/react-autosuggest/dist/Autosuggest.js ***!
-  \*************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _propTypes = __webpack_require__(/*! prop-types */ 331);
-	
-	var _propTypes2 = _interopRequireDefault(_propTypes);
-	
-	var _arrays = __webpack_require__(/*! shallow-equal/arrays */ 339);
-	
-	var _arrays2 = _interopRequireDefault(_arrays);
-	
-	var _reactAutowhatever = __webpack_require__(/*! react-autowhatever */ 340);
-	
-	var _reactAutowhatever2 = _interopRequireDefault(_reactAutowhatever);
-	
-	var _theme = __webpack_require__(/*! ./theme */ 349);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var alwaysTrue = function alwaysTrue() {
-	  return true;
-	};
-	var defaultShouldRenderSuggestions = function defaultShouldRenderSuggestions(value) {
-	  return value.trim().length > 0;
-	};
-	var defaultRenderSuggestionsContainer = function defaultRenderSuggestionsContainer(_ref) {
-	  var containerProps = _ref.containerProps,
-	      children = _ref.children;
-	  return _react2.default.createElement(
-	    'div',
-	    containerProps,
-	    children
-	  );
-	};
-	
-	var Autosuggest = function (_Component) {
-	  _inherits(Autosuggest, _Component);
-	
-	  function Autosuggest(_ref2) {
-	    var alwaysRenderSuggestions = _ref2.alwaysRenderSuggestions;
-	
-	    _classCallCheck(this, Autosuggest);
-	
-	    var _this = _possibleConstructorReturn(this, (Autosuggest.__proto__ || Object.getPrototypeOf(Autosuggest)).call(this));
-	
-	    _initialiseProps.call(_this);
-	
-	    _this.state = {
-	      isFocused: false,
-	      isCollapsed: !alwaysRenderSuggestions,
-	      highlightedSectionIndex: null,
-	      highlightedSuggestionIndex: null,
-	      valueBeforeUpDown: null
-	    };
-	
-	    _this.justPressedUpDown = false;
-	    return _this;
-	  }
-	
-	  _createClass(Autosuggest, [{
-	    key: 'componentDidMount',
-	    value: function componentDidMount() {
-	      document.addEventListener('mousedown', this.onDocumentMouseDown);
-	
-	      this.input = this.autowhatever.input;
-	      this.suggestionsContainer = this.autowhatever.itemsContainer;
-	    }
-	  }, {
-	    key: 'componentWillReceiveProps',
-	    value: function componentWillReceiveProps(nextProps) {
-	      if ((0, _arrays2.default)(nextProps.suggestions, this.props.suggestions)) {
-	        if (nextProps.highlightFirstSuggestion && nextProps.suggestions.length > 0 && this.justPressedUpDown === false) {
-	          this.highlightFirstSuggestion();
-	        }
-	      } else {
-	        if (this.willRenderSuggestions(nextProps)) {
-	          if (nextProps.highlightFirstSuggestion) {
-	            this.highlightFirstSuggestion();
-	          }
-	
-	          if (this.state.isCollapsed && !this.justSelectedSuggestion) {
-	            this.revealSuggestions();
-	          }
-	        } else {
-	          this.resetHighlightedSuggestion();
-	        }
-	      }
-	    }
-	  }, {
-	    key: 'componentWillUnmount',
-	    value: function componentWillUnmount() {
-	      document.removeEventListener('mousedown', this.onDocumentMouseDown);
-	    }
-	  }, {
-	    key: 'updateHighlightedSuggestion',
-	    value: function updateHighlightedSuggestion(sectionIndex, suggestionIndex, prevValue) {
-	      this.setState(function (state) {
-	        var valueBeforeUpDown = state.valueBeforeUpDown;
-	
-	
-	        if (suggestionIndex === null) {
-	          valueBeforeUpDown = null;
-	        } else if (valueBeforeUpDown === null && typeof prevValue !== 'undefined') {
-	          valueBeforeUpDown = prevValue;
-	        }
-	
-	        return {
-	          highlightedSectionIndex: sectionIndex,
-	          highlightedSuggestionIndex: suggestionIndex,
-	          valueBeforeUpDown: valueBeforeUpDown
-	        };
-	      });
-	    }
-	  }, {
-	    key: 'resetHighlightedSuggestion',
-	    value: function resetHighlightedSuggestion() {
-	      var shouldResetValueBeforeUpDown = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-	
-	      this.setState(function (state) {
-	        var valueBeforeUpDown = state.valueBeforeUpDown;
-	
-	
-	        return {
-	          highlightedSectionIndex: null,
-	          highlightedSuggestionIndex: null,
-	          valueBeforeUpDown: shouldResetValueBeforeUpDown ? null : valueBeforeUpDown
-	        };
-	      });
-	    }
-	  }, {
-	    key: 'revealSuggestions',
-	    value: function revealSuggestions() {
-	      this.setState({
-	        isCollapsed: false
-	      });
-	    }
-	  }, {
-	    key: 'closeSuggestions',
-	    value: function closeSuggestions() {
-	      this.setState({
-	        highlightedSectionIndex: null,
-	        highlightedSuggestionIndex: null,
-	        valueBeforeUpDown: null,
-	        isCollapsed: true
-	      });
-	    }
-	  }, {
-	    key: 'getSuggestion',
-	    value: function getSuggestion(sectionIndex, suggestionIndex) {
-	      var _props = this.props,
-	          suggestions = _props.suggestions,
-	          multiSection = _props.multiSection,
-	          getSectionSuggestions = _props.getSectionSuggestions;
-	
-	
-	      if (multiSection) {
-	        return getSectionSuggestions(suggestions[sectionIndex])[suggestionIndex];
-	      }
-	
-	      return suggestions[suggestionIndex];
-	    }
-	  }, {
-	    key: 'getHighlightedSuggestion',
-	    value: function getHighlightedSuggestion() {
-	      var _state = this.state,
-	          highlightedSectionIndex = _state.highlightedSectionIndex,
-	          highlightedSuggestionIndex = _state.highlightedSuggestionIndex;
-	
-	
-	      if (highlightedSuggestionIndex === null) {
-	        return null;
-	      }
-	
-	      return this.getSuggestion(highlightedSectionIndex, highlightedSuggestionIndex);
-	    }
-	  }, {
-	    key: 'getSuggestionValueByIndex',
-	    value: function getSuggestionValueByIndex(sectionIndex, suggestionIndex) {
-	      var getSuggestionValue = this.props.getSuggestionValue;
-	
-	
-	      return getSuggestionValue(this.getSuggestion(sectionIndex, suggestionIndex));
-	    }
-	  }, {
-	    key: 'getSuggestionIndices',
-	    value: function getSuggestionIndices(suggestionElement) {
-	      var sectionIndex = suggestionElement.getAttribute('data-section-index');
-	      var suggestionIndex = suggestionElement.getAttribute('data-suggestion-index');
-	
-	      return {
-	        sectionIndex: typeof sectionIndex === 'string' ? parseInt(sectionIndex, 10) : null,
-	        suggestionIndex: parseInt(suggestionIndex, 10)
-	      };
-	    }
-	  }, {
-	    key: 'findSuggestionElement',
-	    value: function findSuggestionElement(startNode) {
-	      var node = startNode;
-	
-	      do {
-	        if (node.getAttribute('data-suggestion-index') !== null) {
-	          return node;
-	        }
-	
-	        node = node.parentNode;
-	      } while (node !== null);
-	
-	      console.error('Clicked element:', startNode); // eslint-disable-line no-console
-	      throw new Error('Couldn\'t find suggestion element');
-	    }
-	  }, {
-	    key: 'maybeCallOnChange',
-	    value: function maybeCallOnChange(event, newValue, method) {
-	      var _props$inputProps = this.props.inputProps,
-	          value = _props$inputProps.value,
-	          onChange = _props$inputProps.onChange;
-	
-	
-	      if (newValue !== value) {
-	        onChange(event, { newValue: newValue, method: method });
-	      }
-	    }
-	  }, {
-	    key: 'willRenderSuggestions',
-	    value: function willRenderSuggestions(props) {
-	      var suggestions = props.suggestions,
-	          inputProps = props.inputProps,
-	          shouldRenderSuggestions = props.shouldRenderSuggestions;
-	      var value = inputProps.value;
-	
-	
-	      return suggestions.length > 0 && shouldRenderSuggestions(value);
-	    }
-	  }, {
-	    key: 'getQuery',
-	    value: function getQuery() {
-	      var inputProps = this.props.inputProps;
-	      var value = inputProps.value;
-	      var valueBeforeUpDown = this.state.valueBeforeUpDown;
-	
-	
-	      return (valueBeforeUpDown || value).trim();
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      var _this2 = this;
-	
-	      var _props2 = this.props,
-	          suggestions = _props2.suggestions,
-	          renderInputComponent = _props2.renderInputComponent,
-	          onSuggestionsFetchRequested = _props2.onSuggestionsFetchRequested,
-	          renderSuggestion = _props2.renderSuggestion,
-	          inputProps = _props2.inputProps,
-	          multiSection = _props2.multiSection,
-	          renderSectionTitle = _props2.renderSectionTitle,
-	          id = _props2.id,
-	          getSectionSuggestions = _props2.getSectionSuggestions,
-	          theme = _props2.theme,
-	          getSuggestionValue = _props2.getSuggestionValue,
-	          alwaysRenderSuggestions = _props2.alwaysRenderSuggestions;
-	      var _state2 = this.state,
-	          isFocused = _state2.isFocused,
-	          isCollapsed = _state2.isCollapsed,
-	          highlightedSectionIndex = _state2.highlightedSectionIndex,
-	          highlightedSuggestionIndex = _state2.highlightedSuggestionIndex,
-	          valueBeforeUpDown = _state2.valueBeforeUpDown;
-	
-	      var shouldRenderSuggestions = alwaysRenderSuggestions ? alwaysTrue : this.props.shouldRenderSuggestions;
-	      var value = inputProps.value,
-	          _onFocus = inputProps.onFocus,
-	          _onKeyDown = inputProps.onKeyDown;
-	
-	      var willRenderSuggestions = this.willRenderSuggestions(this.props);
-	      var isOpen = alwaysRenderSuggestions || isFocused && !isCollapsed && willRenderSuggestions;
-	      var items = isOpen ? suggestions : [];
-	      var autowhateverInputProps = _extends({}, inputProps, {
-	        onFocus: function onFocus(event) {
-	          if (!_this2.justSelectedSuggestion && !_this2.justClickedOnSuggestionsContainer) {
-	            var shouldRender = shouldRenderSuggestions(value);
-	
-	            _this2.setState({
-	              isFocused: true,
-	              isCollapsed: !shouldRender
-	            });
-	
-	            _onFocus && _onFocus(event);
-	
-	            if (shouldRender) {
-	              onSuggestionsFetchRequested({ value: value });
-	            }
-	          }
-	        },
-	        onBlur: function onBlur(event) {
-	          if (_this2.justClickedOnSuggestionsContainer) {
-	            _this2.input.focus();
-	            return;
-	          }
-	
-	          _this2.blurEvent = event;
-	
-	          if (!_this2.justSelectedSuggestion) {
-	            _this2.onBlur();
-	            _this2.onSuggestionsClearRequested();
-	          }
-	        },
-	        onChange: function onChange(event) {
-	          var value = event.target.value;
-	
-	          var shouldRender = shouldRenderSuggestions(value);
-	
-	          _this2.maybeCallOnChange(event, value, 'type');
-	
-	          _this2.setState({
-	            highlightedSectionIndex: null,
-	            highlightedSuggestionIndex: null,
-	            valueBeforeUpDown: null,
-	            isCollapsed: !shouldRender
-	          });
-	
-	          if (shouldRender) {
-	            onSuggestionsFetchRequested({ value: value });
-	          } else {
-	            _this2.onSuggestionsClearRequested();
-	          }
-	        },
-	        onKeyDown: function onKeyDown(event, data) {
-	          switch (event.key) {
-	            case 'ArrowDown':
-	            case 'ArrowUp':
-	              if (isCollapsed) {
-	                if (shouldRenderSuggestions(value)) {
-	                  onSuggestionsFetchRequested({ value: value });
-	                  _this2.revealSuggestions();
-	                }
-	              } else if (suggestions.length > 0) {
-	                var newHighlightedSectionIndex = data.newHighlightedSectionIndex,
-	                    newHighlightedItemIndex = data.newHighlightedItemIndex;
-	
-	
-	                var newValue = void 0;
-	
-	                if (newHighlightedItemIndex === null) {
-	                  // valueBeforeUpDown can be null if, for example, user
-	                  // hovers on the first suggestion and then pressed Up.
-	                  // If that happens, use the original input value.
-	                  newValue = valueBeforeUpDown === null ? value : valueBeforeUpDown;
-	                } else {
-	                  newValue = _this2.getSuggestionValueByIndex(newHighlightedSectionIndex, newHighlightedItemIndex);
-	                }
-	
-	                _this2.updateHighlightedSuggestion(newHighlightedSectionIndex, newHighlightedItemIndex, value);
-	                _this2.maybeCallOnChange(event, newValue, event.key === 'ArrowDown' ? 'down' : 'up');
-	              }
-	
-	              event.preventDefault(); // Prevents the cursor from moving
-	
-	              _this2.justPressedUpDown = true;
-	
-	              setTimeout(function () {
-	                _this2.justPressedUpDown = false;
-	              });
-	
-	              break;
-	
-	            case 'Enter':
-	              {
-	                var highlightedSuggestion = _this2.getHighlightedSuggestion();
-	
-	                if (isOpen && !alwaysRenderSuggestions) {
-	                  _this2.closeSuggestions();
-	                }
-	
-	                if (highlightedSuggestion !== null) {
-	                  var _newValue = getSuggestionValue(highlightedSuggestion);
-	
-	                  _this2.maybeCallOnChange(event, _newValue, 'enter');
-	
-	                  _this2.onSuggestionSelected(event, {
-	                    suggestion: highlightedSuggestion,
-	                    suggestionValue: _newValue,
-	                    suggestionIndex: highlightedSuggestionIndex,
-	                    sectionIndex: highlightedSectionIndex,
-	                    method: 'enter'
-	                  });
-	
-	                  _this2.justSelectedSuggestion = true;
-	
-	                  setTimeout(function () {
-	                    _this2.justSelectedSuggestion = false;
-	                  });
-	                }
-	
-	                break;
-	              }
-	
-	            case 'Escape':
-	              {
-	                if (isOpen) {
-	                  // If input.type === 'search', the browser clears the input
-	                  // when Escape is pressed. We want to disable this default
-	                  // behaviour so that, when suggestions are shown, we just hide
-	                  // them, without clearing the input.
-	                  event.preventDefault();
-	                }
-	
-	                var willCloseSuggestions = isOpen && !alwaysRenderSuggestions;
-	
-	                if (valueBeforeUpDown === null) {
-	                  // Didn't interact with Up/Down
-	                  if (!willCloseSuggestions) {
-	                    var _newValue2 = '';
-	
-	                    _this2.maybeCallOnChange(event, _newValue2, 'escape');
-	
-	                    if (shouldRenderSuggestions(_newValue2)) {
-	                      onSuggestionsFetchRequested({ value: _newValue2 });
-	                    } else {
-	                      _this2.onSuggestionsClearRequested();
-	                    }
-	                  }
-	                } else {
-	                  // Interacted with Up/Down
-	                  _this2.maybeCallOnChange(event, valueBeforeUpDown, 'escape');
-	                }
-	
-	                if (willCloseSuggestions) {
-	                  _this2.onSuggestionsClearRequested();
-	                  _this2.closeSuggestions();
-	                } else {
-	                  _this2.resetHighlightedSuggestion();
-	                }
-	
-	                break;
-	              }
-	          }
-	
-	          _onKeyDown && _onKeyDown(event);
-	        }
-	      });
-	      var renderSuggestionData = {
-	        query: this.getQuery()
-	      };
-	
-	      return _react2.default.createElement(_reactAutowhatever2.default, {
-	        multiSection: multiSection,
-	        items: items,
-	        renderInputComponent: renderInputComponent,
-	        renderItemsContainer: this.renderSuggestionsContainer,
-	        renderItem: renderSuggestion,
-	        renderItemData: renderSuggestionData,
-	        renderSectionTitle: renderSectionTitle,
-	        getSectionItems: getSectionSuggestions,
-	        highlightedSectionIndex: highlightedSectionIndex,
-	        highlightedItemIndex: highlightedSuggestionIndex,
-	        inputProps: autowhateverInputProps,
-	        itemProps: this.itemProps,
-	        theme: (0, _theme.mapToAutowhateverTheme)(theme),
-	        id: id,
-	        ref: this.storeAutowhateverRef
-	      });
-	    }
-	  }]);
-	
-	  return Autosuggest;
-	}(_react.Component);
-	
-	Autosuggest.propTypes = {
-	  suggestions: _propTypes2.default.array.isRequired,
-	  onSuggestionsFetchRequested: function onSuggestionsFetchRequested(props, propName) {
-	    var onSuggestionsFetchRequested = props[propName];
-	
-	    if (typeof onSuggestionsFetchRequested !== 'function') {
-	      throw new Error('\'onSuggestionsFetchRequested\' must be implemented. See: https://github.com/moroshko/react-autosuggest#onSuggestionsFetchRequestedProp');
-	    }
-	  },
-	  onSuggestionsClearRequested: function onSuggestionsClearRequested(props, propName) {
-	    var onSuggestionsClearRequested = props[propName];
-	
-	    if (props.alwaysRenderSuggestions === false && typeof onSuggestionsClearRequested !== 'function') {
-	      throw new Error('\'onSuggestionsClearRequested\' must be implemented. See: https://github.com/moroshko/react-autosuggest#onSuggestionsClearRequestedProp');
-	    }
-	  },
-	  onSuggestionSelected: _propTypes2.default.func,
-	  renderInputComponent: _propTypes2.default.func,
-	  renderSuggestionsContainer: _propTypes2.default.func,
-	  getSuggestionValue: _propTypes2.default.func.isRequired,
-	  renderSuggestion: _propTypes2.default.func.isRequired,
-	  inputProps: function inputProps(props, propName) {
-	    var inputProps = props[propName];
-	
-	    if (!inputProps.hasOwnProperty('value')) {
-	      throw new Error('\'inputProps\' must have \'value\'.');
-	    }
-	
-	    if (!inputProps.hasOwnProperty('onChange')) {
-	      throw new Error('\'inputProps\' must have \'onChange\'.');
-	    }
-	  },
-	  shouldRenderSuggestions: _propTypes2.default.func,
-	  alwaysRenderSuggestions: _propTypes2.default.bool,
-	  multiSection: _propTypes2.default.bool,
-	  renderSectionTitle: function renderSectionTitle(props, propName) {
-	    var renderSectionTitle = props[propName];
-	
-	    if (props.multiSection === true && typeof renderSectionTitle !== 'function') {
-	      throw new Error('\'renderSectionTitle\' must be implemented. See: https://github.com/moroshko/react-autosuggest#renderSectionTitleProp');
-	    }
-	  },
-	  getSectionSuggestions: function getSectionSuggestions(props, propName) {
-	    var getSectionSuggestions = props[propName];
-	
-	    if (props.multiSection === true && typeof getSectionSuggestions !== 'function') {
-	      throw new Error('\'getSectionSuggestions\' must be implemented. See: https://github.com/moroshko/react-autosuggest#getSectionSuggestionsProp');
-	    }
-	  },
-	  focusInputOnSuggestionClick: _propTypes2.default.bool,
-	  highlightFirstSuggestion: _propTypes2.default.bool,
-	  theme: _propTypes2.default.object,
-	  id: _propTypes2.default.string
-	};
-	Autosuggest.defaultProps = {
-	  renderSuggestionsContainer: defaultRenderSuggestionsContainer,
-	  shouldRenderSuggestions: defaultShouldRenderSuggestions,
-	  alwaysRenderSuggestions: false,
-	  multiSection: false,
-	  focusInputOnSuggestionClick: true,
-	  highlightFirstSuggestion: false,
-	  theme: _theme.defaultTheme,
-	  id: '1'
-	};
-	
-	var _initialiseProps = function _initialiseProps() {
-	  var _this3 = this;
-	
-	  this.onDocumentMouseDown = function (event) {
-	    _this3.justClickedOnSuggestionsContainer = false;
-	
-	    var node = event.detail && event.detail.target || // This is for testing only. Please show me a better way to emulate this.
-	    event.target;
-	
-	    while (node !== null && node !== document) {
-	      if (node.getAttribute('data-suggestion-index') !== null) {
-	        // Suggestion was clicked
-	        return;
-	      }
-	
-	      if (node === _this3.suggestionsContainer) {
-	        // Something else inside suggestions container was clicked
-	        _this3.justClickedOnSuggestionsContainer = true;
-	        return;
-	      }
-	
-	      node = node.parentNode;
-	    }
-	  };
-	
-	  this.storeAutowhateverRef = function (autowhatever) {
-	    if (autowhatever !== null) {
-	      _this3.autowhatever = autowhatever;
-	    }
-	  };
-	
-	  this.onSuggestionMouseEnter = function (event, _ref3) {
-	    var sectionIndex = _ref3.sectionIndex,
-	        itemIndex = _ref3.itemIndex;
-	
-	    _this3.updateHighlightedSuggestion(sectionIndex, itemIndex);
-	  };
-	
-	  this.highlightFirstSuggestion = function () {
-	    _this3.updateHighlightedSuggestion(_this3.props.multiSection ? 0 : null, 0);
-	  };
-	
-	  this.onSuggestionMouseDown = function () {
-	    _this3.justSelectedSuggestion = true;
-	  };
-	
-	  this.onSuggestionsClearRequested = function () {
-	    var onSuggestionsClearRequested = _this3.props.onSuggestionsClearRequested;
-	
-	
-	    onSuggestionsClearRequested && onSuggestionsClearRequested();
-	  };
-	
-	  this.onSuggestionSelected = function (event, data) {
-	    var _props3 = _this3.props,
-	        alwaysRenderSuggestions = _props3.alwaysRenderSuggestions,
-	        onSuggestionSelected = _props3.onSuggestionSelected,
-	        onSuggestionsFetchRequested = _props3.onSuggestionsFetchRequested;
-	
-	
-	    onSuggestionSelected && onSuggestionSelected(event, data);
-	
-	    if (alwaysRenderSuggestions) {
-	      onSuggestionsFetchRequested({ value: data.suggestionValue });
-	    } else {
-	      _this3.onSuggestionsClearRequested();
-	    }
-	
-	    _this3.resetHighlightedSuggestion();
-	  };
-	
-	  this.onSuggestionClick = function (event) {
-	    var _props4 = _this3.props,
-	        alwaysRenderSuggestions = _props4.alwaysRenderSuggestions,
-	        focusInputOnSuggestionClick = _props4.focusInputOnSuggestionClick;
-	
-	    var _getSuggestionIndices = _this3.getSuggestionIndices(_this3.findSuggestionElement(event.target)),
-	        sectionIndex = _getSuggestionIndices.sectionIndex,
-	        suggestionIndex = _getSuggestionIndices.suggestionIndex;
-	
-	    var clickedSuggestion = _this3.getSuggestion(sectionIndex, suggestionIndex);
-	    var clickedSuggestionValue = _this3.props.getSuggestionValue(clickedSuggestion);
-	
-	    _this3.maybeCallOnChange(event, clickedSuggestionValue, 'click');
-	    _this3.onSuggestionSelected(event, {
-	      suggestion: clickedSuggestion,
-	      suggestionValue: clickedSuggestionValue,
-	      suggestionIndex: suggestionIndex,
-	      sectionIndex: sectionIndex,
-	      method: 'click'
-	    });
-	
-	    if (!alwaysRenderSuggestions) {
-	      _this3.closeSuggestions();
-	    }
-	
-	    if (focusInputOnSuggestionClick === true) {
-	      _this3.input.focus();
-	    } else {
-	      _this3.onBlur();
-	    }
-	
-	    setTimeout(function () {
-	      _this3.justSelectedSuggestion = false;
-	    });
-	  };
-	
-	  this.onBlur = function () {
-	    var _props5 = _this3.props,
-	        inputProps = _props5.inputProps,
-	        shouldRenderSuggestions = _props5.shouldRenderSuggestions;
-	    var value = inputProps.value,
-	        onBlur = inputProps.onBlur;
-	
-	    var highlightedSuggestion = _this3.getHighlightedSuggestion();
-	    var shouldRender = shouldRenderSuggestions(value);
-	
-	    _this3.setState({
-	      isFocused: false,
-	      highlightedSectionIndex: null,
-	      highlightedSuggestionIndex: null,
-	      valueBeforeUpDown: null,
-	      isCollapsed: !shouldRender
-	    });
-	
-	    onBlur && onBlur(_this3.blurEvent, { highlightedSuggestion: highlightedSuggestion });
-	  };
-	
-	  this.resetHighlightedSuggestionOnMouseLeave = function () {
-	    _this3.resetHighlightedSuggestion(false); // shouldResetValueBeforeUpDown
-	  };
-	
-	  this.itemProps = function (_ref4) {
-	    var sectionIndex = _ref4.sectionIndex,
-	        itemIndex = _ref4.itemIndex;
-	
-	    return {
-	      'data-section-index': sectionIndex,
-	      'data-suggestion-index': itemIndex,
-	      onMouseEnter: _this3.onSuggestionMouseEnter,
-	      onMouseLeave: _this3.resetHighlightedSuggestionOnMouseLeave,
-	      onMouseDown: _this3.onSuggestionMouseDown,
-	      onTouchStart: _this3.onSuggestionMouseDown, // Because on iOS `onMouseDown` is not triggered
-	      onClick: _this3.onSuggestionClick
-	    };
-	  };
-	
-	  this.renderSuggestionsContainer = function (_ref5) {
-	    var containerProps = _ref5.containerProps,
-	        children = _ref5.children;
-	    var renderSuggestionsContainer = _this3.props.renderSuggestionsContainer;
-	
-	
-	    return renderSuggestionsContainer({ containerProps: containerProps, children: children, query: _this3.getQuery() });
-	  };
-	};
-	
-	exports.default = Autosuggest;
-
-/***/ },
 /* 331 */
-/*!*******************************!*\
-  !*** ./~/prop-types/index.js ***!
-  \*******************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(process) {/**
-	 * Copyright 2013-present, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 */
-	
-	if (process.env.NODE_ENV !== 'production') {
-	  var REACT_ELEMENT_TYPE = (typeof Symbol === 'function' &&
-	    Symbol.for &&
-	    Symbol.for('react.element')) ||
-	    0xeac7;
-	
-	  var isValidElement = function(object) {
-	    return typeof object === 'object' &&
-	      object !== null &&
-	      object.$$typeof === REACT_ELEMENT_TYPE;
-	  };
-	
-	  // By explicitly using `prop-types` you are opting into new development behavior.
-	  // http://fb.me/prop-types-in-prod
-	  var throwOnDirectAccess = true;
-	  module.exports = __webpack_require__(/*! ./factoryWithTypeCheckers */ 332)(isValidElement, throwOnDirectAccess);
-	} else {
-	  // By explicitly using `prop-types` you are opting into new production behavior.
-	  // http://fb.me/prop-types-in-prod
-	  module.exports = __webpack_require__(/*! ./factoryWithThrowingShims */ 338)();
-	}
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/process/browser.js */ 3)))
-
-/***/ },
-/* 332 */
-/*!*************************************************!*\
-  !*** ./~/prop-types/factoryWithTypeCheckers.js ***!
-  \*************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(process) {/**
-	 * Copyright 2013-present, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 */
-	
-	'use strict';
-	
-	var emptyFunction = __webpack_require__(/*! fbjs/lib/emptyFunction */ 333);
-	var invariant = __webpack_require__(/*! fbjs/lib/invariant */ 334);
-	var warning = __webpack_require__(/*! fbjs/lib/warning */ 335);
-	
-	var ReactPropTypesSecret = __webpack_require__(/*! ./lib/ReactPropTypesSecret */ 336);
-	var checkPropTypes = __webpack_require__(/*! ./checkPropTypes */ 337);
-	
-	module.exports = function(isValidElement, throwOnDirectAccess) {
-	  /* global Symbol */
-	  var ITERATOR_SYMBOL = typeof Symbol === 'function' && Symbol.iterator;
-	  var FAUX_ITERATOR_SYMBOL = '@@iterator'; // Before Symbol spec.
-	
-	  /**
-	   * Returns the iterator method function contained on the iterable object.
-	   *
-	   * Be sure to invoke the function with the iterable as context:
-	   *
-	   *     var iteratorFn = getIteratorFn(myIterable);
-	   *     if (iteratorFn) {
-	   *       var iterator = iteratorFn.call(myIterable);
-	   *       ...
-	   *     }
-	   *
-	   * @param {?object} maybeIterable
-	   * @return {?function}
-	   */
-	  function getIteratorFn(maybeIterable) {
-	    var iteratorFn = maybeIterable && (ITERATOR_SYMBOL && maybeIterable[ITERATOR_SYMBOL] || maybeIterable[FAUX_ITERATOR_SYMBOL]);
-	    if (typeof iteratorFn === 'function') {
-	      return iteratorFn;
-	    }
-	  }
-	
-	  /**
-	   * Collection of methods that allow declaration and validation of props that are
-	   * supplied to React components. Example usage:
-	   *
-	   *   var Props = require('ReactPropTypes');
-	   *   var MyArticle = React.createClass({
-	   *     propTypes: {
-	   *       // An optional string prop named "description".
-	   *       description: Props.string,
-	   *
-	   *       // A required enum prop named "category".
-	   *       category: Props.oneOf(['News','Photos']).isRequired,
-	   *
-	   *       // A prop named "dialog" that requires an instance of Dialog.
-	   *       dialog: Props.instanceOf(Dialog).isRequired
-	   *     },
-	   *     render: function() { ... }
-	   *   });
-	   *
-	   * A more formal specification of how these methods are used:
-	   *
-	   *   type := array|bool|func|object|number|string|oneOf([...])|instanceOf(...)
-	   *   decl := ReactPropTypes.{type}(.isRequired)?
-	   *
-	   * Each and every declaration produces a function with the same signature. This
-	   * allows the creation of custom validation functions. For example:
-	   *
-	   *  var MyLink = React.createClass({
-	   *    propTypes: {
-	   *      // An optional string or URI prop named "href".
-	   *      href: function(props, propName, componentName) {
-	   *        var propValue = props[propName];
-	   *        if (propValue != null && typeof propValue !== 'string' &&
-	   *            !(propValue instanceof URI)) {
-	   *          return new Error(
-	   *            'Expected a string or an URI for ' + propName + ' in ' +
-	   *            componentName
-	   *          );
-	   *        }
-	   *      }
-	   *    },
-	   *    render: function() {...}
-	   *  });
-	   *
-	   * @internal
-	   */
-	
-	  var ANONYMOUS = '<<anonymous>>';
-	
-	  // Important!
-	  // Keep this list in sync with production version in `./factoryWithThrowingShims.js`.
-	  var ReactPropTypes = {
-	    array: createPrimitiveTypeChecker('array'),
-	    bool: createPrimitiveTypeChecker('boolean'),
-	    func: createPrimitiveTypeChecker('function'),
-	    number: createPrimitiveTypeChecker('number'),
-	    object: createPrimitiveTypeChecker('object'),
-	    string: createPrimitiveTypeChecker('string'),
-	    symbol: createPrimitiveTypeChecker('symbol'),
-	
-	    any: createAnyTypeChecker(),
-	    arrayOf: createArrayOfTypeChecker,
-	    element: createElementTypeChecker(),
-	    instanceOf: createInstanceTypeChecker,
-	    node: createNodeChecker(),
-	    objectOf: createObjectOfTypeChecker,
-	    oneOf: createEnumTypeChecker,
-	    oneOfType: createUnionTypeChecker,
-	    shape: createShapeTypeChecker
-	  };
-	
-	  /**
-	   * inlined Object.is polyfill to avoid requiring consumers ship their own
-	   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is
-	   */
-	  /*eslint-disable no-self-compare*/
-	  function is(x, y) {
-	    // SameValue algorithm
-	    if (x === y) {
-	      // Steps 1-5, 7-10
-	      // Steps 6.b-6.e: +0 != -0
-	      return x !== 0 || 1 / x === 1 / y;
-	    } else {
-	      // Step 6.a: NaN == NaN
-	      return x !== x && y !== y;
-	    }
-	  }
-	  /*eslint-enable no-self-compare*/
-	
-	  /**
-	   * We use an Error-like object for backward compatibility as people may call
-	   * PropTypes directly and inspect their output. However, we don't use real
-	   * Errors anymore. We don't inspect their stack anyway, and creating them
-	   * is prohibitively expensive if they are created too often, such as what
-	   * happens in oneOfType() for any type before the one that matched.
-	   */
-	  function PropTypeError(message) {
-	    this.message = message;
-	    this.stack = '';
-	  }
-	  // Make `instanceof Error` still work for returned errors.
-	  PropTypeError.prototype = Error.prototype;
-	
-	  function createChainableTypeChecker(validate) {
-	    if (process.env.NODE_ENV !== 'production') {
-	      var manualPropTypeCallCache = {};
-	      var manualPropTypeWarningCount = 0;
-	    }
-	    function checkType(isRequired, props, propName, componentName, location, propFullName, secret) {
-	      componentName = componentName || ANONYMOUS;
-	      propFullName = propFullName || propName;
-	
-	      if (secret !== ReactPropTypesSecret) {
-	        if (throwOnDirectAccess) {
-	          // New behavior only for users of `prop-types` package
-	          invariant(
-	            false,
-	            'Calling PropTypes validators directly is not supported by the `prop-types` package. ' +
-	            'Use `PropTypes.checkPropTypes()` to call them. ' +
-	            'Read more at http://fb.me/use-check-prop-types'
-	          );
-	        } else if (process.env.NODE_ENV !== 'production' && typeof console !== 'undefined') {
-	          // Old behavior for people using React.PropTypes
-	          var cacheKey = componentName + ':' + propName;
-	          if (
-	            !manualPropTypeCallCache[cacheKey] &&
-	            // Avoid spamming the console because they are often not actionable except for lib authors
-	            manualPropTypeWarningCount < 3
-	          ) {
-	            warning(
-	              false,
-	              'You are manually calling a React.PropTypes validation ' +
-	              'function for the `%s` prop on `%s`. This is deprecated ' +
-	              'and will throw in the standalone `prop-types` package. ' +
-	              'You may be seeing this warning due to a third-party PropTypes ' +
-	              'library. See https://fb.me/react-warning-dont-call-proptypes ' + 'for details.',
-	              propFullName,
-	              componentName
-	            );
-	            manualPropTypeCallCache[cacheKey] = true;
-	            manualPropTypeWarningCount++;
-	          }
-	        }
-	      }
-	      if (props[propName] == null) {
-	        if (isRequired) {
-	          if (props[propName] === null) {
-	            return new PropTypeError('The ' + location + ' `' + propFullName + '` is marked as required ' + ('in `' + componentName + '`, but its value is `null`.'));
-	          }
-	          return new PropTypeError('The ' + location + ' `' + propFullName + '` is marked as required in ' + ('`' + componentName + '`, but its value is `undefined`.'));
-	        }
-	        return null;
-	      } else {
-	        return validate(props, propName, componentName, location, propFullName);
-	      }
-	    }
-	
-	    var chainedCheckType = checkType.bind(null, false);
-	    chainedCheckType.isRequired = checkType.bind(null, true);
-	
-	    return chainedCheckType;
-	  }
-	
-	  function createPrimitiveTypeChecker(expectedType) {
-	    function validate(props, propName, componentName, location, propFullName, secret) {
-	      var propValue = props[propName];
-	      var propType = getPropType(propValue);
-	      if (propType !== expectedType) {
-	        // `propValue` being instance of, say, date/regexp, pass the 'object'
-	        // check, but we can offer a more precise error message here rather than
-	        // 'of type `object`'.
-	        var preciseType = getPreciseType(propValue);
-	
-	        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type ' + ('`' + preciseType + '` supplied to `' + componentName + '`, expected ') + ('`' + expectedType + '`.'));
-	      }
-	      return null;
-	    }
-	    return createChainableTypeChecker(validate);
-	  }
-	
-	  function createAnyTypeChecker() {
-	    return createChainableTypeChecker(emptyFunction.thatReturnsNull);
-	  }
-	
-	  function createArrayOfTypeChecker(typeChecker) {
-	    function validate(props, propName, componentName, location, propFullName) {
-	      if (typeof typeChecker !== 'function') {
-	        return new PropTypeError('Property `' + propFullName + '` of component `' + componentName + '` has invalid PropType notation inside arrayOf.');
-	      }
-	      var propValue = props[propName];
-	      if (!Array.isArray(propValue)) {
-	        var propType = getPropType(propValue);
-	        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type ' + ('`' + propType + '` supplied to `' + componentName + '`, expected an array.'));
-	      }
-	      for (var i = 0; i < propValue.length; i++) {
-	        var error = typeChecker(propValue, i, componentName, location, propFullName + '[' + i + ']', ReactPropTypesSecret);
-	        if (error instanceof Error) {
-	          return error;
-	        }
-	      }
-	      return null;
-	    }
-	    return createChainableTypeChecker(validate);
-	  }
-	
-	  function createElementTypeChecker() {
-	    function validate(props, propName, componentName, location, propFullName) {
-	      var propValue = props[propName];
-	      if (!isValidElement(propValue)) {
-	        var propType = getPropType(propValue);
-	        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type ' + ('`' + propType + '` supplied to `' + componentName + '`, expected a single ReactElement.'));
-	      }
-	      return null;
-	    }
-	    return createChainableTypeChecker(validate);
-	  }
-	
-	  function createInstanceTypeChecker(expectedClass) {
-	    function validate(props, propName, componentName, location, propFullName) {
-	      if (!(props[propName] instanceof expectedClass)) {
-	        var expectedClassName = expectedClass.name || ANONYMOUS;
-	        var actualClassName = getClassName(props[propName]);
-	        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type ' + ('`' + actualClassName + '` supplied to `' + componentName + '`, expected ') + ('instance of `' + expectedClassName + '`.'));
-	      }
-	      return null;
-	    }
-	    return createChainableTypeChecker(validate);
-	  }
-	
-	  function createEnumTypeChecker(expectedValues) {
-	    if (!Array.isArray(expectedValues)) {
-	      process.env.NODE_ENV !== 'production' ? warning(false, 'Invalid argument supplied to oneOf, expected an instance of array.') : void 0;
-	      return emptyFunction.thatReturnsNull;
-	    }
-	
-	    function validate(props, propName, componentName, location, propFullName) {
-	      var propValue = props[propName];
-	      for (var i = 0; i < expectedValues.length; i++) {
-	        if (is(propValue, expectedValues[i])) {
-	          return null;
-	        }
-	      }
-	
-	      var valuesString = JSON.stringify(expectedValues);
-	      return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of value `' + propValue + '` ' + ('supplied to `' + componentName + '`, expected one of ' + valuesString + '.'));
-	    }
-	    return createChainableTypeChecker(validate);
-	  }
-	
-	  function createObjectOfTypeChecker(typeChecker) {
-	    function validate(props, propName, componentName, location, propFullName) {
-	      if (typeof typeChecker !== 'function') {
-	        return new PropTypeError('Property `' + propFullName + '` of component `' + componentName + '` has invalid PropType notation inside objectOf.');
-	      }
-	      var propValue = props[propName];
-	      var propType = getPropType(propValue);
-	      if (propType !== 'object') {
-	        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type ' + ('`' + propType + '` supplied to `' + componentName + '`, expected an object.'));
-	      }
-	      for (var key in propValue) {
-	        if (propValue.hasOwnProperty(key)) {
-	          var error = typeChecker(propValue, key, componentName, location, propFullName + '.' + key, ReactPropTypesSecret);
-	          if (error instanceof Error) {
-	            return error;
-	          }
-	        }
-	      }
-	      return null;
-	    }
-	    return createChainableTypeChecker(validate);
-	  }
-	
-	  function createUnionTypeChecker(arrayOfTypeCheckers) {
-	    if (!Array.isArray(arrayOfTypeCheckers)) {
-	      process.env.NODE_ENV !== 'production' ? warning(false, 'Invalid argument supplied to oneOfType, expected an instance of array.') : void 0;
-	      return emptyFunction.thatReturnsNull;
-	    }
-	
-	    for (var i = 0; i < arrayOfTypeCheckers.length; i++) {
-	      var checker = arrayOfTypeCheckers[i];
-	      if (typeof checker !== 'function') {
-	        warning(
-	          false,
-	          'Invalid argument supplid to oneOfType. Expected an array of check functions, but ' +
-	          'received %s at index %s.',
-	          getPostfixForTypeWarning(checker),
-	          i
-	        );
-	        return emptyFunction.thatReturnsNull;
-	      }
-	    }
-	
-	    function validate(props, propName, componentName, location, propFullName) {
-	      for (var i = 0; i < arrayOfTypeCheckers.length; i++) {
-	        var checker = arrayOfTypeCheckers[i];
-	        if (checker(props, propName, componentName, location, propFullName, ReactPropTypesSecret) == null) {
-	          return null;
-	        }
-	      }
-	
-	      return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` supplied to ' + ('`' + componentName + '`.'));
-	    }
-	    return createChainableTypeChecker(validate);
-	  }
-	
-	  function createNodeChecker() {
-	    function validate(props, propName, componentName, location, propFullName) {
-	      if (!isNode(props[propName])) {
-	        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` supplied to ' + ('`' + componentName + '`, expected a ReactNode.'));
-	      }
-	      return null;
-	    }
-	    return createChainableTypeChecker(validate);
-	  }
-	
-	  function createShapeTypeChecker(shapeTypes) {
-	    function validate(props, propName, componentName, location, propFullName) {
-	      var propValue = props[propName];
-	      var propType = getPropType(propValue);
-	      if (propType !== 'object') {
-	        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type `' + propType + '` ' + ('supplied to `' + componentName + '`, expected `object`.'));
-	      }
-	      for (var key in shapeTypes) {
-	        var checker = shapeTypes[key];
-	        if (!checker) {
-	          continue;
-	        }
-	        var error = checker(propValue, key, componentName, location, propFullName + '.' + key, ReactPropTypesSecret);
-	        if (error) {
-	          return error;
-	        }
-	      }
-	      return null;
-	    }
-	    return createChainableTypeChecker(validate);
-	  }
-	
-	  function isNode(propValue) {
-	    switch (typeof propValue) {
-	      case 'number':
-	      case 'string':
-	      case 'undefined':
-	        return true;
-	      case 'boolean':
-	        return !propValue;
-	      case 'object':
-	        if (Array.isArray(propValue)) {
-	          return propValue.every(isNode);
-	        }
-	        if (propValue === null || isValidElement(propValue)) {
-	          return true;
-	        }
-	
-	        var iteratorFn = getIteratorFn(propValue);
-	        if (iteratorFn) {
-	          var iterator = iteratorFn.call(propValue);
-	          var step;
-	          if (iteratorFn !== propValue.entries) {
-	            while (!(step = iterator.next()).done) {
-	              if (!isNode(step.value)) {
-	                return false;
-	              }
-	            }
-	          } else {
-	            // Iterator will provide entry [k,v] tuples rather than values.
-	            while (!(step = iterator.next()).done) {
-	              var entry = step.value;
-	              if (entry) {
-	                if (!isNode(entry[1])) {
-	                  return false;
-	                }
-	              }
-	            }
-	          }
-	        } else {
-	          return false;
-	        }
-	
-	        return true;
-	      default:
-	        return false;
-	    }
-	  }
-	
-	  function isSymbol(propType, propValue) {
-	    // Native Symbol.
-	    if (propType === 'symbol') {
-	      return true;
-	    }
-	
-	    // 19.4.3.5 Symbol.prototype[@@toStringTag] === 'Symbol'
-	    if (propValue['@@toStringTag'] === 'Symbol') {
-	      return true;
-	    }
-	
-	    // Fallback for non-spec compliant Symbols which are polyfilled.
-	    if (typeof Symbol === 'function' && propValue instanceof Symbol) {
-	      return true;
-	    }
-	
-	    return false;
-	  }
-	
-	  // Equivalent of `typeof` but with special handling for array and regexp.
-	  function getPropType(propValue) {
-	    var propType = typeof propValue;
-	    if (Array.isArray(propValue)) {
-	      return 'array';
-	    }
-	    if (propValue instanceof RegExp) {
-	      // Old webkits (at least until Android 4.0) return 'function' rather than
-	      // 'object' for typeof a RegExp. We'll normalize this here so that /bla/
-	      // passes PropTypes.object.
-	      return 'object';
-	    }
-	    if (isSymbol(propType, propValue)) {
-	      return 'symbol';
-	    }
-	    return propType;
-	  }
-	
-	  // This handles more types than `getPropType`. Only used for error messages.
-	  // See `createPrimitiveTypeChecker`.
-	  function getPreciseType(propValue) {
-	    if (typeof propValue === 'undefined' || propValue === null) {
-	      return '' + propValue;
-	    }
-	    var propType = getPropType(propValue);
-	    if (propType === 'object') {
-	      if (propValue instanceof Date) {
-	        return 'date';
-	      } else if (propValue instanceof RegExp) {
-	        return 'regexp';
-	      }
-	    }
-	    return propType;
-	  }
-	
-	  // Returns a string that is postfixed to a warning about an invalid type.
-	  // For example, "undefined" or "of type array"
-	  function getPostfixForTypeWarning(value) {
-	    var type = getPreciseType(value);
-	    switch (type) {
-	      case 'array':
-	      case 'object':
-	        return 'an ' + type;
-	      case 'boolean':
-	      case 'date':
-	      case 'regexp':
-	        return 'a ' + type;
-	      default:
-	        return type;
-	    }
-	  }
-	
-	  // Returns class name of the object, if any.
-	  function getClassName(propValue) {
-	    if (!propValue.constructor || !propValue.constructor.name) {
-	      return ANONYMOUS;
-	    }
-	    return propValue.constructor.name;
-	  }
-	
-	  ReactPropTypes.checkPropTypes = checkPropTypes;
-	  ReactPropTypes.PropTypes = ReactPropTypes;
-	
-	  return ReactPropTypes;
-	};
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/process/browser.js */ 3)))
-
-/***/ },
-/* 333 */
-/*!**************************************************!*\
-  !*** ./~/prop-types/~/fbjs/lib/emptyFunction.js ***!
-  \**************************************************/
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	/**
-	 * Copyright (c) 2013-present, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * 
-	 */
-	
-	function makeEmptyFunction(arg) {
-	  return function () {
-	    return arg;
-	  };
-	}
-	
-	/**
-	 * This function accepts and discards inputs; it has no side effects. This is
-	 * primarily useful idiomatically for overridable function endpoints which
-	 * always need to be callable, since JS lacks a null-call idiom ala Cocoa.
-	 */
-	var emptyFunction = function emptyFunction() {};
-	
-	emptyFunction.thatReturns = makeEmptyFunction;
-	emptyFunction.thatReturnsFalse = makeEmptyFunction(false);
-	emptyFunction.thatReturnsTrue = makeEmptyFunction(true);
-	emptyFunction.thatReturnsNull = makeEmptyFunction(null);
-	emptyFunction.thatReturnsThis = function () {
-	  return this;
-	};
-	emptyFunction.thatReturnsArgument = function (arg) {
-	  return arg;
-	};
-	
-	module.exports = emptyFunction;
-
-/***/ },
-/* 334 */
-/*!**********************************************!*\
-  !*** ./~/prop-types/~/fbjs/lib/invariant.js ***!
-  \**********************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(process) {/**
-	 * Copyright (c) 2013-present, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 */
-	
-	'use strict';
-	
-	/**
-	 * Use invariant() to assert state which your program assumes to be true.
-	 *
-	 * Provide sprintf-style format (only %s is supported) and arguments
-	 * to provide information about what broke and what you were
-	 * expecting.
-	 *
-	 * The invariant message will be stripped in production, but the invariant
-	 * will remain to ensure logic does not differ in production.
-	 */
-	
-	var validateFormat = function validateFormat(format) {};
-	
-	if (process.env.NODE_ENV !== 'production') {
-	  validateFormat = function validateFormat(format) {
-	    if (format === undefined) {
-	      throw new Error('invariant requires an error message argument');
-	    }
-	  };
-	}
-	
-	function invariant(condition, format, a, b, c, d, e, f) {
-	  validateFormat(format);
-	
-	  if (!condition) {
-	    var error;
-	    if (format === undefined) {
-	      error = new Error('Minified exception occurred; use the non-minified dev environment ' + 'for the full error message and additional helpful warnings.');
-	    } else {
-	      var args = [a, b, c, d, e, f];
-	      var argIndex = 0;
-	      error = new Error(format.replace(/%s/g, function () {
-	        return args[argIndex++];
-	      }));
-	      error.name = 'Invariant Violation';
-	    }
-	
-	    error.framesToPop = 1; // we don't care about invariant's own frame
-	    throw error;
-	  }
-	}
-	
-	module.exports = invariant;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/process/browser.js */ 3)))
-
-/***/ },
-/* 335 */
-/*!********************************************!*\
-  !*** ./~/prop-types/~/fbjs/lib/warning.js ***!
-  \********************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(process) {/**
-	 * Copyright 2014-2015, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 */
-	
-	'use strict';
-	
-	var emptyFunction = __webpack_require__(/*! ./emptyFunction */ 333);
-	
-	/**
-	 * Similar to invariant but only logs a warning if the condition is not met.
-	 * This can be used to log issues in development environments in critical
-	 * paths. Removing the logging code for production environments will keep the
-	 * same logic and follow the same code paths.
-	 */
-	
-	var warning = emptyFunction;
-	
-	if (process.env.NODE_ENV !== 'production') {
-	  (function () {
-	    var printWarning = function printWarning(format) {
-	      for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-	        args[_key - 1] = arguments[_key];
-	      }
-	
-	      var argIndex = 0;
-	      var message = 'Warning: ' + format.replace(/%s/g, function () {
-	        return args[argIndex++];
-	      });
-	      if (typeof console !== 'undefined') {
-	        console.error(message);
-	      }
-	      try {
-	        // --- Welcome to debugging React ---
-	        // This error was thrown as a convenience so that you can use this stack
-	        // to find the callsite that caused this warning to fire.
-	        throw new Error(message);
-	      } catch (x) {}
-	    };
-	
-	    warning = function warning(condition, format) {
-	      if (format === undefined) {
-	        throw new Error('`warning(condition, format, ...args)` requires a warning ' + 'message argument');
-	      }
-	
-	      if (format.indexOf('Failed Composite propType: ') === 0) {
-	        return; // Ignore CompositeComponent proptype check.
-	      }
-	
-	      if (!condition) {
-	        for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
-	          args[_key2 - 2] = arguments[_key2];
-	        }
-	
-	        printWarning.apply(undefined, [format].concat(args));
-	      }
-	    };
-	  })();
-	}
-	
-	module.exports = warning;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/process/browser.js */ 3)))
-
-/***/ },
-/* 336 */
-/*!**************************************************!*\
-  !*** ./~/prop-types/lib/ReactPropTypesSecret.js ***!
-  \**************************************************/
-/***/ function(module, exports) {
-
-	/**
-	 * Copyright 2013-present, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 */
-	
-	'use strict';
-	
-	var ReactPropTypesSecret = 'SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED';
-	
-	module.exports = ReactPropTypesSecret;
-
-
-/***/ },
-/* 337 */
-/*!****************************************!*\
-  !*** ./~/prop-types/checkPropTypes.js ***!
-  \****************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(process) {/**
-	 * Copyright 2013-present, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 */
-	
-	'use strict';
-	
-	if (process.env.NODE_ENV !== 'production') {
-	  var invariant = __webpack_require__(/*! fbjs/lib/invariant */ 334);
-	  var warning = __webpack_require__(/*! fbjs/lib/warning */ 335);
-	  var ReactPropTypesSecret = __webpack_require__(/*! ./lib/ReactPropTypesSecret */ 336);
-	  var loggedTypeFailures = {};
-	}
-	
-	/**
-	 * Assert that the values match with the type specs.
-	 * Error messages are memorized and will only be shown once.
-	 *
-	 * @param {object} typeSpecs Map of name to a ReactPropType
-	 * @param {object} values Runtime values that need to be type-checked
-	 * @param {string} location e.g. "prop", "context", "child context"
-	 * @param {string} componentName Name of the component for error messages.
-	 * @param {?Function} getStack Returns the component stack.
-	 * @private
-	 */
-	function checkPropTypes(typeSpecs, values, location, componentName, getStack) {
-	  if (process.env.NODE_ENV !== 'production') {
-	    for (var typeSpecName in typeSpecs) {
-	      if (typeSpecs.hasOwnProperty(typeSpecName)) {
-	        var error;
-	        // Prop type validation may throw. In case they do, we don't want to
-	        // fail the render phase where it didn't fail before. So we log it.
-	        // After these have been cleaned up, we'll let them throw.
-	        try {
-	          // This is intentionally an invariant that gets caught. It's the same
-	          // behavior as without this statement except with a better message.
-	          invariant(typeof typeSpecs[typeSpecName] === 'function', '%s: %s type `%s` is invalid; it must be a function, usually from ' + 'React.PropTypes.', componentName || 'React class', location, typeSpecName);
-	          error = typeSpecs[typeSpecName](values, typeSpecName, componentName, location, null, ReactPropTypesSecret);
-	        } catch (ex) {
-	          error = ex;
-	        }
-	        warning(!error || error instanceof Error, '%s: type specification of %s `%s` is invalid; the type checker ' + 'function must return `null` or an `Error` but returned a %s. ' + 'You may have forgotten to pass an argument to the type checker ' + 'creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and ' + 'shape all require an argument).', componentName || 'React class', location, typeSpecName, typeof error);
-	        if (error instanceof Error && !(error.message in loggedTypeFailures)) {
-	          // Only monitor this failure once because there tends to be a lot of the
-	          // same error.
-	          loggedTypeFailures[error.message] = true;
-	
-	          var stack = getStack ? getStack() : '';
-	
-	          warning(false, 'Failed %s type: %s%s', location, error.message, stack != null ? stack : '');
-	        }
-	      }
-	    }
-	  }
-	}
-	
-	module.exports = checkPropTypes;
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/process/browser.js */ 3)))
-
-/***/ },
-/* 338 */
-/*!**************************************************!*\
-  !*** ./~/prop-types/factoryWithThrowingShims.js ***!
-  \**************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-present, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 */
-	
-	'use strict';
-	
-	var emptyFunction = __webpack_require__(/*! fbjs/lib/emptyFunction */ 333);
-	var invariant = __webpack_require__(/*! fbjs/lib/invariant */ 334);
-	var ReactPropTypesSecret = __webpack_require__(/*! ./lib/ReactPropTypesSecret */ 336);
-	
-	module.exports = function() {
-	  function shim(props, propName, componentName, location, propFullName, secret) {
-	    if (secret === ReactPropTypesSecret) {
-	      // It is still safe when called from React.
-	      return;
-	    }
-	    invariant(
-	      false,
-	      'Calling PropTypes validators directly is not supported by the `prop-types` package. ' +
-	      'Use PropTypes.checkPropTypes() to call them. ' +
-	      'Read more at http://fb.me/use-check-prop-types'
-	    );
-	  };
-	  shim.isRequired = shim;
-	  function getShim() {
-	    return shim;
-	  };
-	  // Important!
-	  // Keep this list in sync with production version in `./factoryWithTypeCheckers.js`.
-	  var ReactPropTypes = {
-	    array: shim,
-	    bool: shim,
-	    func: shim,
-	    number: shim,
-	    object: shim,
-	    string: shim,
-	    symbol: shim,
-	
-	    any: shim,
-	    arrayOf: getShim,
-	    element: shim,
-	    instanceOf: getShim,
-	    node: shim,
-	    objectOf: getShim,
-	    oneOf: getShim,
-	    oneOfType: getShim,
-	    shape: getShim
-	  };
-	
-	  ReactPropTypes.checkPropTypes = emptyFunction;
-	  ReactPropTypes.PropTypes = ReactPropTypes;
-	
-	  return ReactPropTypes;
-	};
-
-
-/***/ },
-/* 339 */
-/*!*****************************************!*\
-  !*** ./~/shallow-equal/arrays/index.js ***!
-  \*****************************************/
-/***/ function(module, exports) {
-
-	module.exports = function shallowEqualArrays(arrA, arrB) {
-	  if (arrA === arrB) {
-	    return true;
-	  }
-	
-	  var len = arrA.length;
-	
-	  if (arrB.length !== len) {
-	    return false;
-	  }
-	
-	  for (var i = 0; i < len; i++) {
-	    if (arrA[i] !== arrB[i]) {
-	      return false;
-	    }
-	  }
-	
-	  return true;
-	};
-
-
-/***/ },
-/* 340 */
-/*!********************************************!*\
-  !*** ./~/react-autowhatever/dist/index.js ***!
-  \********************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	module.exports = __webpack_require__(/*! ./Autowhatever */ 341).default;
-
-/***/ },
-/* 341 */
-/*!***************************************************!*\
-  !*** ./~/react-autowhatever/dist/Autowhatever.js ***!
-  \***************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-	
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _propTypes = __webpack_require__(/*! prop-types */ 331);
-	
-	var _propTypes2 = _interopRequireDefault(_propTypes);
-	
-	var _sectionIterator = __webpack_require__(/*! section-iterator */ 342);
-	
-	var _sectionIterator2 = _interopRequireDefault(_sectionIterator);
-	
-	var _reactThemeable = __webpack_require__(/*! react-themeable */ 343);
-	
-	var _reactThemeable2 = _interopRequireDefault(_reactThemeable);
-	
-	var _SectionTitle = __webpack_require__(/*! ./SectionTitle */ 345);
-	
-	var _SectionTitle2 = _interopRequireDefault(_SectionTitle);
-	
-	var _ItemsList = __webpack_require__(/*! ./ItemsList */ 347);
-	
-	var _ItemsList2 = _interopRequireDefault(_ItemsList);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var emptyObject = {};
-	var defaultRenderInputComponent = function defaultRenderInputComponent(props) {
-	  return _react2.default.createElement('input', props);
-	};
-	var defaultRenderItemsContainer = function defaultRenderItemsContainer(_ref) {
-	  var containerProps = _ref.containerProps,
-	      children = _ref.children;
-	  return _react2.default.createElement(
-	    'div',
-	    containerProps,
-	    children
-	  );
-	};
-	var defaultTheme = {
-	  container: 'react-autowhatever__container',
-	  containerOpen: 'react-autowhatever__container--open',
-	  input: 'react-autowhatever__input',
-	  inputOpen: 'react-autowhatever__input--open',
-	  inputFocused: 'react-autowhatever__input--focused',
-	  itemsContainer: 'react-autowhatever__items-container',
-	  itemsContainerOpen: 'react-autowhatever__items-container--open',
-	  itemsList: 'react-autowhatever__items-list',
-	  item: 'react-autowhatever__item',
-	  itemFirst: 'react-autowhatever__item--first',
-	  itemHighlighted: 'react-autowhatever__item--highlighted',
-	  sectionContainer: 'react-autowhatever__section-container',
-	  sectionContainerFirst: 'react-autowhatever__section-container--first',
-	  sectionTitle: 'react-autowhatever__section-title'
-	};
-	
-	var Autowhatever = function (_Component) {
-	  _inherits(Autowhatever, _Component);
-	
-	  function Autowhatever(props) {
-	    _classCallCheck(this, Autowhatever);
-	
-	    var _this = _possibleConstructorReturn(this, (Autowhatever.__proto__ || Object.getPrototypeOf(Autowhatever)).call(this, props));
-	
-	    _this.storeInputReference = function (input) {
-	      if (input !== null) {
-	        _this.input = input;
-	      }
-	    };
-	
-	    _this.storeItemsContainerReference = function (itemsContainer) {
-	      if (itemsContainer !== null) {
-	        _this.itemsContainer = itemsContainer;
-	      }
-	    };
-	
-	    _this.onHighlightedItemChange = function (highlightedItem) {
-	      _this.highlightedItem = highlightedItem;
-	    };
-	
-	    _this.getItemId = function (sectionIndex, itemIndex) {
-	      if (itemIndex === null) {
-	        return null;
-	      }
-	
-	      var id = _this.props.id;
-	
-	      var section = sectionIndex === null ? '' : 'section-' + sectionIndex;
-	
-	      return 'react-autowhatever-' + id + '-' + section + '-item-' + itemIndex;
-	    };
-	
-	    _this.onFocus = function (event) {
-	      var inputProps = _this.props.inputProps;
-	
-	
-	      _this.setState({
-	        isInputFocused: true
-	      });
-	
-	      inputProps.onFocus && inputProps.onFocus(event);
-	    };
-	
-	    _this.onBlur = function (event) {
-	      var inputProps = _this.props.inputProps;
-	
-	
-	      _this.setState({
-	        isInputFocused: false
-	      });
-	
-	      inputProps.onBlur && inputProps.onBlur(event);
-	    };
-	
-	    _this.onKeyDown = function (event) {
-	      var _this$props = _this.props,
-	          inputProps = _this$props.inputProps,
-	          highlightedSectionIndex = _this$props.highlightedSectionIndex,
-	          highlightedItemIndex = _this$props.highlightedItemIndex;
-	
-	
-	      switch (event.key) {
-	        case 'ArrowDown':
-	        case 'ArrowUp':
-	          {
-	            var nextPrev = event.key === 'ArrowDown' ? 'next' : 'prev';
-	
-	            var _this$sectionIterator = _this.sectionIterator[nextPrev]([highlightedSectionIndex, highlightedItemIndex]),
-	                _this$sectionIterator2 = _slicedToArray(_this$sectionIterator, 2),
-	                newHighlightedSectionIndex = _this$sectionIterator2[0],
-	                newHighlightedItemIndex = _this$sectionIterator2[1];
-	
-	            inputProps.onKeyDown(event, { newHighlightedSectionIndex: newHighlightedSectionIndex, newHighlightedItemIndex: newHighlightedItemIndex });
-	            break;
-	          }
-	
-	        default:
-	          inputProps.onKeyDown(event, { highlightedSectionIndex: highlightedSectionIndex, highlightedItemIndex: highlightedItemIndex });
-	      }
-	    };
-	
-	    _this.highlightedItem = null;
-	
-	    _this.state = {
-	      isInputFocused: false
-	    };
-	
-	    _this.setSectionsItems(props);
-	    _this.setSectionIterator(props);
-	    _this.setTheme(props);
-	    return _this;
-	  }
-	
-	  _createClass(Autowhatever, [{
-	    key: 'componentDidMount',
-	    value: function componentDidMount() {
-	      this.ensureHighlightedItemIsVisible();
-	    }
-	  }, {
-	    key: 'componentWillReceiveProps',
-	    value: function componentWillReceiveProps(nextProps) {
-	      if (nextProps.items !== this.props.items) {
-	        this.setSectionsItems(nextProps);
-	      }
-	
-	      if (nextProps.items !== this.props.items || nextProps.multiSection !== this.props.multiSection) {
-	        this.setSectionIterator(nextProps);
-	      }
-	
-	      if (nextProps.theme !== this.props.theme) {
-	        this.setTheme(nextProps);
-	      }
-	    }
-	  }, {
-	    key: 'componentDidUpdate',
-	    value: function componentDidUpdate() {
-	      this.ensureHighlightedItemIsVisible();
-	    }
-	  }, {
-	    key: 'setSectionsItems',
-	    value: function setSectionsItems(props) {
-	      if (props.multiSection) {
-	        this.sectionsItems = props.items.map(function (section) {
-	          return props.getSectionItems(section);
-	        });
-	        this.sectionsLengths = this.sectionsItems.map(function (items) {
-	          return items.length;
-	        });
-	        this.allSectionsAreEmpty = this.sectionsLengths.every(function (itemsCount) {
-	          return itemsCount === 0;
-	        });
-	      }
-	    }
-	  }, {
-	    key: 'setSectionIterator',
-	    value: function setSectionIterator(props) {
-	      this.sectionIterator = (0, _sectionIterator2.default)({
-	        multiSection: props.multiSection,
-	        data: props.multiSection ? this.sectionsLengths : props.items.length
-	      });
-	    }
-	  }, {
-	    key: 'setTheme',
-	    value: function setTheme(props) {
-	      this.theme = (0, _reactThemeable2.default)(props.theme);
-	    }
-	  }, {
-	    key: 'renderSections',
-	    value: function renderSections() {
-	      var _this2 = this;
-	
-	      if (this.allSectionsAreEmpty) {
-	        return null;
-	      }
-	
-	      var theme = this.theme;
-	      var _props = this.props,
-	          id = _props.id,
-	          items = _props.items,
-	          renderItem = _props.renderItem,
-	          renderItemData = _props.renderItemData,
-	          renderSectionTitle = _props.renderSectionTitle,
-	          highlightedSectionIndex = _props.highlightedSectionIndex,
-	          highlightedItemIndex = _props.highlightedItemIndex,
-	          itemProps = _props.itemProps;
-	
-	
-	      return items.map(function (section, sectionIndex) {
-	        var keyPrefix = 'react-autowhatever-' + id + '-';
-	        var sectionKeyPrefix = keyPrefix + 'section-' + sectionIndex + '-';
-	        var isFirstSection = sectionIndex === 0;
-	
-	        // `key` is provided by theme()
-	        /* eslint-disable react/jsx-key */
-	        return _react2.default.createElement(
-	          'div',
-	          theme(sectionKeyPrefix + 'container', 'sectionContainer', isFirstSection && 'sectionContainerFirst'),
-	          _react2.default.createElement(_SectionTitle2.default, {
-	            section: section,
-	            renderSectionTitle: renderSectionTitle,
-	            theme: theme,
-	            sectionKeyPrefix: sectionKeyPrefix
-	          }),
-	          _react2.default.createElement(_ItemsList2.default, {
-	            items: _this2.sectionsItems[sectionIndex],
-	            itemProps: itemProps,
-	            renderItem: renderItem,
-	            renderItemData: renderItemData,
-	            sectionIndex: sectionIndex,
-	            highlightedItemIndex: highlightedSectionIndex === sectionIndex ? highlightedItemIndex : null,
-	            onHighlightedItemChange: _this2.onHighlightedItemChange,
-	            getItemId: _this2.getItemId,
-	            theme: theme,
-	            keyPrefix: keyPrefix,
-	            ref: _this2.storeItemsListReference
-	          })
-	        );
-	        /* eslint-enable react/jsx-key */
-	      });
-	    }
-	  }, {
-	    key: 'renderItems',
-	    value: function renderItems() {
-	      var items = this.props.items;
-	
-	
-	      if (items.length === 0) {
-	        return null;
-	      }
-	
-	      var theme = this.theme;
-	      var _props2 = this.props,
-	          id = _props2.id,
-	          renderItem = _props2.renderItem,
-	          renderItemData = _props2.renderItemData,
-	          highlightedSectionIndex = _props2.highlightedSectionIndex,
-	          highlightedItemIndex = _props2.highlightedItemIndex,
-	          itemProps = _props2.itemProps;
-	
-	
-	      return _react2.default.createElement(_ItemsList2.default, {
-	        items: items,
-	        itemProps: itemProps,
-	        renderItem: renderItem,
-	        renderItemData: renderItemData,
-	        highlightedItemIndex: highlightedSectionIndex === null ? highlightedItemIndex : null,
-	        onHighlightedItemChange: this.onHighlightedItemChange,
-	        getItemId: this.getItemId,
-	        theme: theme,
-	        keyPrefix: 'react-autowhatever-' + id + '-'
-	      });
-	    }
-	  }, {
-	    key: 'ensureHighlightedItemIsVisible',
-	    value: function ensureHighlightedItemIsVisible() {
-	      var highlightedItem = this.highlightedItem;
-	
-	
-	      if (!highlightedItem) {
-	        return;
-	      }
-	
-	      var itemsContainer = this.itemsContainer;
-	
-	      var itemOffsetRelativeToContainer = highlightedItem.offsetParent === itemsContainer ? highlightedItem.offsetTop : highlightedItem.offsetTop - itemsContainer.offsetTop;
-	
-	      var scrollTop = itemsContainer.scrollTop; // Top of the visible area
-	
-	      if (itemOffsetRelativeToContainer < scrollTop) {
-	        // Item is off the top of the visible area
-	        scrollTop = itemOffsetRelativeToContainer;
-	      } else if (itemOffsetRelativeToContainer + highlightedItem.offsetHeight > scrollTop + itemsContainer.offsetHeight) {
-	        // Item is off the bottom of the visible area
-	        scrollTop = itemOffsetRelativeToContainer + highlightedItem.offsetHeight - itemsContainer.offsetHeight;
-	      }
-	
-	      if (scrollTop !== itemsContainer.scrollTop) {
-	        itemsContainer.scrollTop = scrollTop;
-	      }
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      var theme = this.theme;
-	      var _props3 = this.props,
-	          id = _props3.id,
-	          multiSection = _props3.multiSection,
-	          renderInputComponent = _props3.renderInputComponent,
-	          renderItemsContainer = _props3.renderItemsContainer,
-	          highlightedSectionIndex = _props3.highlightedSectionIndex,
-	          highlightedItemIndex = _props3.highlightedItemIndex;
-	      var isInputFocused = this.state.isInputFocused;
-	
-	      var renderedItems = multiSection ? this.renderSections() : this.renderItems();
-	      var isOpen = renderedItems !== null;
-	      var ariaActivedescendant = this.getItemId(highlightedSectionIndex, highlightedItemIndex);
-	      var containerProps = theme('react-autowhatever-' + id + '-container', 'container', isOpen && 'containerOpen');
-	      var itemsContainerId = 'react-autowhatever-' + id;
-	      var inputComponent = renderInputComponent(_extends({
-	        type: 'text',
-	        value: '',
-	        autoComplete: 'off',
-	        role: 'combobox',
-	        'aria-autocomplete': 'list',
-	        'aria-owns': itemsContainerId,
-	        'aria-expanded': isOpen,
-	        'aria-haspopup': isOpen,
-	        'aria-activedescendant': ariaActivedescendant
-	      }, theme('react-autowhatever-' + id + '-input', 'input', isOpen && 'inputOpen', isInputFocused && 'inputFocused'), this.props.inputProps, {
-	        onFocus: this.onFocus,
-	        onBlur: this.onBlur,
-	        onKeyDown: this.props.inputProps.onKeyDown && this.onKeyDown,
-	        ref: this.storeInputReference
-	      }));
-	      var itemsContainer = renderItemsContainer({
-	        containerProps: _extends({
-	          id: itemsContainerId
-	        }, theme('react-autowhatever-' + id + '-items-container', 'itemsContainer', isOpen && 'itemsContainerOpen'), {
-	          ref: this.storeItemsContainerReference
-	        }),
-	        children: renderedItems
-	      });
-	
-	      return _react2.default.createElement(
-	        'div',
-	        containerProps,
-	        inputComponent,
-	        itemsContainer
-	      );
-	    }
-	  }]);
-	
-	  return Autowhatever;
-	}(_react.Component);
-	
-	Autowhatever.propTypes = {
-	  id: _propTypes2.default.string, // Used in aria-* attributes. If multiple Autowhatever's are rendered on a page, they must have unique ids.
-	  multiSection: _propTypes2.default.bool, // Indicates whether a multi section layout should be rendered.
-	  renderInputComponent: _propTypes2.default.func, // When specified, it is used to render the input element.
-	  renderItemsContainer: _propTypes2.default.func, // Renders the items container.
-	  items: _propTypes2.default.array.isRequired, // Array of items or sections to render.
-	  renderItem: _propTypes2.default.func, // This function renders a single item.
-	  renderItemData: _propTypes2.default.object, // Arbitrary data that will be passed to renderItem()
-	  renderSectionTitle: _propTypes2.default.func, // This function gets a section and renders its title.
-	  getSectionItems: _propTypes2.default.func, // This function gets a section and returns its items, which will be passed into `renderItem` for rendering.
-	  inputProps: _propTypes2.default.object, // Arbitrary input props
-	  itemProps: _propTypes2.default.oneOfType([// Arbitrary item props
-	  _propTypes2.default.object, _propTypes2.default.func]),
-	  highlightedSectionIndex: _propTypes2.default.number, // Section index of the highlighted item
-	  highlightedItemIndex: _propTypes2.default.number, // Highlighted item index (within a section)
-	  theme: _propTypes2.default.oneOfType([// Styles. See: https://github.com/markdalgleish/react-themeable
-	  _propTypes2.default.object, _propTypes2.default.array])
-	};
-	Autowhatever.defaultProps = {
-	  id: '1',
-	  multiSection: false,
-	  renderInputComponent: defaultRenderInputComponent,
-	  renderItemsContainer: defaultRenderItemsContainer,
-	  renderItem: function renderItem() {
-	    throw new Error('`renderItem` must be provided');
-	  },
-	  renderItemData: emptyObject,
-	  renderSectionTitle: function renderSectionTitle() {
-	    throw new Error('`renderSectionTitle` must be provided');
-	  },
-	  getSectionItems: function getSectionItems() {
-	    throw new Error('`getSectionItems` must be provided');
-	  },
-	  inputProps: emptyObject,
-	  itemProps: emptyObject,
-	  highlightedSectionIndex: null,
-	  highlightedItemIndex: null,
-	  theme: defaultTheme
-	};
-	exports.default = Autowhatever;
-
-/***/ },
-/* 342 */
-/*!******************************************!*\
-  !*** ./~/section-iterator/dist/index.js ***!
-  \******************************************/
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-	
-	module.exports = function (_ref) {
-	  var data = _ref.data;
-	  var multiSection = _ref.multiSection;
-	
-	  function nextNonEmptySectionIndex(sectionIndex) {
-	    if (sectionIndex === null) {
-	      sectionIndex = 0;
-	    } else {
-	      sectionIndex++;
-	    }
-	
-	    while (sectionIndex < data.length && data[sectionIndex] === 0) {
-	      sectionIndex++;
-	    }
-	
-	    return sectionIndex === data.length ? null : sectionIndex;
-	  }
-	
-	  function prevNonEmptySectionIndex(sectionIndex) {
-	    if (sectionIndex === null) {
-	      sectionIndex = data.length - 1;
-	    } else {
-	      sectionIndex--;
-	    }
-	
-	    while (sectionIndex >= 0 && data[sectionIndex] === 0) {
-	      sectionIndex--;
-	    }
-	
-	    return sectionIndex === -1 ? null : sectionIndex;
-	  }
-	
-	  function next(position) {
-	    var _position = _slicedToArray(position, 2);
-	
-	    var sectionIndex = _position[0];
-	    var itemIndex = _position[1];
-	
-	
-	    if (multiSection) {
-	      if (itemIndex === null || itemIndex === data[sectionIndex] - 1) {
-	        sectionIndex = nextNonEmptySectionIndex(sectionIndex);
-	
-	        if (sectionIndex === null) {
-	          return [null, null];
-	        }
-	
-	        return [sectionIndex, 0];
-	      }
-	
-	      return [sectionIndex, itemIndex + 1];
-	    }
-	
-	    if (data === 0 || itemIndex === data - 1) {
-	      return [null, null];
-	    }
-	
-	    if (itemIndex === null) {
-	      return [null, 0];
-	    }
-	
-	    return [null, itemIndex + 1];
-	  }
-	
-	  function prev(position) {
-	    var _position2 = _slicedToArray(position, 2);
-	
-	    var sectionIndex = _position2[0];
-	    var itemIndex = _position2[1];
-	
-	
-	    if (multiSection) {
-	      if (itemIndex === null || itemIndex === 0) {
-	        sectionIndex = prevNonEmptySectionIndex(sectionIndex);
-	
-	        if (sectionIndex === null) {
-	          return [null, null];
-	        }
-	
-	        return [sectionIndex, data[sectionIndex] - 1];
-	      }
-	
-	      return [sectionIndex, itemIndex - 1];
-	    }
-	
-	    if (data === 0 || itemIndex === 0) {
-	      return [null, null];
-	    }
-	
-	    if (itemIndex === null) {
-	      return [null, data - 1];
-	    }
-	
-	    return [null, itemIndex - 1];
-	  }
-	
-	  function isLast(position) {
-	    return next(position)[1] === null;
-	  }
-	
-	  return {
-	    next: next,
-	    prev: prev,
-	    isLast: isLast
-	  };
-	};
-
-
-/***/ },
-/* 343 */
-/*!*****************************************!*\
-  !*** ./~/react-themeable/dist/index.js ***!
-  \*****************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	
-	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
-	
-	var _objectAssign = __webpack_require__(/*! object-assign */ 344);
-	
-	var _objectAssign2 = _interopRequireDefault(_objectAssign);
-	
-	var truthy = function truthy(x) {
-	  return x;
-	};
-	
-	exports['default'] = function (input) {
-	  var _ref = Array.isArray(input) && input.length === 2 ? input : [input, null];
-	
-	  var _ref2 = _slicedToArray(_ref, 2);
-	
-	  var theme = _ref2[0];
-	  var classNameDecorator = _ref2[1];
-	
-	  return function (key) {
-	    for (var _len = arguments.length, names = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-	      names[_key - 1] = arguments[_key];
-	    }
-	
-	    var styles = names.map(function (name) {
-	      return theme[name];
-	    }).filter(truthy);
-	
-	    return typeof styles[0] === 'string' || typeof classNameDecorator === 'function' ? { key: key, className: classNameDecorator ? classNameDecorator.apply(undefined, _toConsumableArray(styles)) : styles.join(' ') } : { key: key, style: _objectAssign2['default'].apply(undefined, [{}].concat(_toConsumableArray(styles))) };
-	  };
-	};
-	
-	module.exports = exports['default'];
-
-/***/ },
-/* 344 */
-/*!****************************************************!*\
-  !*** ./~/react-themeable/~/object-assign/index.js ***!
-  \****************************************************/
-/***/ function(module, exports) {
-
-	'use strict';
-	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
-	
-	function ToObject(val) {
-		if (val == null) {
-			throw new TypeError('Object.assign cannot be called with null or undefined');
-		}
-	
-		return Object(val);
-	}
-	
-	function ownEnumerableKeys(obj) {
-		var keys = Object.getOwnPropertyNames(obj);
-	
-		if (Object.getOwnPropertySymbols) {
-			keys = keys.concat(Object.getOwnPropertySymbols(obj));
-		}
-	
-		return keys.filter(function (key) {
-			return propIsEnumerable.call(obj, key);
-		});
-	}
-	
-	module.exports = Object.assign || function (target, source) {
-		var from;
-		var keys;
-		var to = ToObject(target);
-	
-		for (var s = 1; s < arguments.length; s++) {
-			from = arguments[s];
-			keys = ownEnumerableKeys(Object(from));
-	
-			for (var i = 0; i < keys.length; i++) {
-				to[keys[i]] = from[keys[i]];
-			}
-		}
-	
-		return to;
-	};
-
-
-/***/ },
-/* 345 */
-/*!***************************************************!*\
-  !*** ./~/react-autowhatever/dist/SectionTitle.js ***!
-  \***************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _propTypes = __webpack_require__(/*! prop-types */ 331);
-	
-	var _propTypes2 = _interopRequireDefault(_propTypes);
-	
-	var _compareObjects = __webpack_require__(/*! ./compareObjects */ 346);
-	
-	var _compareObjects2 = _interopRequireDefault(_compareObjects);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var SectionTitle = function (_Component) {
-	  _inherits(SectionTitle, _Component);
-	
-	  function SectionTitle() {
-	    _classCallCheck(this, SectionTitle);
-	
-	    return _possibleConstructorReturn(this, (SectionTitle.__proto__ || Object.getPrototypeOf(SectionTitle)).apply(this, arguments));
-	  }
-	
-	  _createClass(SectionTitle, [{
-	    key: 'shouldComponentUpdate',
-	    value: function shouldComponentUpdate(nextProps) {
-	      return (0, _compareObjects2.default)(nextProps, this.props);
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      var _props = this.props,
-	          section = _props.section,
-	          renderSectionTitle = _props.renderSectionTitle,
-	          theme = _props.theme,
-	          sectionKeyPrefix = _props.sectionKeyPrefix;
-	
-	      var sectionTitle = renderSectionTitle(section);
-	
-	      if (!sectionTitle) {
-	        return null;
-	      }
-	
-	      return _react2.default.createElement(
-	        'div',
-	        theme(sectionKeyPrefix + 'title', 'sectionTitle'),
-	        sectionTitle
-	      );
-	    }
-	  }]);
-	
-	  return SectionTitle;
-	}(_react.Component);
-	
-	SectionTitle.propTypes = {
-	  section: _propTypes2.default.any.isRequired,
-	  renderSectionTitle: _propTypes2.default.func.isRequired,
-	  theme: _propTypes2.default.func.isRequired,
-	  sectionKeyPrefix: _propTypes2.default.string.isRequired
-	};
-	exports.default = SectionTitle;
-
-/***/ },
-/* 346 */
-/*!*****************************************************!*\
-  !*** ./~/react-autowhatever/dist/compareObjects.js ***!
-  \*****************************************************/
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-	
-	exports.default = compareObjects;
-	function compareObjects(objA, objB) {
-	  var keys = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
-	
-	  if (objA === objB) {
-	    return false;
-	  }
-	
-	  var aKeys = Object.keys(objA);
-	  var bKeys = Object.keys(objB);
-	
-	  if (aKeys.length !== bKeys.length) {
-	    return true;
-	  }
-	
-	  var keysMap = {};
-	  var i = void 0,
-	      len = void 0;
-	
-	  for (i = 0, len = keys.length; i < len; i++) {
-	    keysMap[keys[i]] = true;
-	  }
-	
-	  for (i = 0, len = aKeys.length; i < len; i++) {
-	    var key = aKeys[i];
-	    var aValue = objA[key];
-	    var bValue = objB[key];
-	
-	    if (aValue === bValue) {
-	      continue;
-	    }
-	
-	    if (!keysMap[key] || aValue === null || bValue === null || (typeof aValue === 'undefined' ? 'undefined' : _typeof(aValue)) !== 'object' || (typeof bValue === 'undefined' ? 'undefined' : _typeof(bValue)) !== 'object') {
-	      return true;
-	    }
-	
-	    var aValueKeys = Object.keys(aValue);
-	    var bValueKeys = Object.keys(bValue);
-	
-	    if (aValueKeys.length !== bValueKeys.length) {
-	      return true;
-	    }
-	
-	    for (var n = 0, length = aValueKeys.length; n < length; n++) {
-	      var aValueKey = aValueKeys[n];
-	
-	      if (aValue[aValueKey] !== bValue[aValueKey]) {
-	        return true;
-	      }
-	    }
-	  }
-	
-	  return false;
-	}
-
-/***/ },
-/* 347 */
-/*!************************************************!*\
-  !*** ./~/react-autowhatever/dist/ItemsList.js ***!
-  \************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _propTypes = __webpack_require__(/*! prop-types */ 331);
-	
-	var _propTypes2 = _interopRequireDefault(_propTypes);
-	
-	var _Item = __webpack_require__(/*! ./Item */ 348);
-	
-	var _Item2 = _interopRequireDefault(_Item);
-	
-	var _compareObjects = __webpack_require__(/*! ./compareObjects */ 346);
-	
-	var _compareObjects2 = _interopRequireDefault(_compareObjects);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var ItemsList = function (_Component) {
-	  _inherits(ItemsList, _Component);
-	
-	  function ItemsList() {
-	    var _ref;
-	
-	    var _temp, _this, _ret;
-	
-	    _classCallCheck(this, ItemsList);
-	
-	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-	      args[_key] = arguments[_key];
-	    }
-	
-	    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = ItemsList.__proto__ || Object.getPrototypeOf(ItemsList)).call.apply(_ref, [this].concat(args))), _this), _this.storeHighlightedItemReference = function (highlightedItem) {
-	      _this.props.onHighlightedItemChange(highlightedItem === null ? null : highlightedItem.item);
-	    }, _temp), _possibleConstructorReturn(_this, _ret);
-	  }
-	
-	  _createClass(ItemsList, [{
-	    key: 'shouldComponentUpdate',
-	    value: function shouldComponentUpdate(nextProps) {
-	      return (0, _compareObjects2.default)(nextProps, this.props, ['itemProps']);
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      var _this2 = this;
-	
-	      var _props = this.props,
-	          items = _props.items,
-	          itemProps = _props.itemProps,
-	          renderItem = _props.renderItem,
-	          renderItemData = _props.renderItemData,
-	          sectionIndex = _props.sectionIndex,
-	          highlightedItemIndex = _props.highlightedItemIndex,
-	          getItemId = _props.getItemId,
-	          theme = _props.theme,
-	          keyPrefix = _props.keyPrefix;
-	
-	      var sectionPrefix = sectionIndex === null ? keyPrefix : keyPrefix + 'section-' + sectionIndex + '-';
-	      var isItemPropsFunction = typeof itemProps === 'function';
-	
-	      return _react2.default.createElement(
-	        'ul',
-	        _extends({ role: 'listbox' }, theme(sectionPrefix + 'items-list', 'itemsList')),
-	        items.map(function (item, itemIndex) {
-	          var isFirst = itemIndex === 0;
-	          var isHighlighted = itemIndex === highlightedItemIndex;
-	          var itemKey = sectionPrefix + 'item-' + itemIndex;
-	          var itemPropsObj = isItemPropsFunction ? itemProps({ sectionIndex: sectionIndex, itemIndex: itemIndex }) : itemProps;
-	          var allItemProps = _extends({
-	            id: getItemId(sectionIndex, itemIndex)
-	          }, theme(itemKey, 'item', isFirst && 'itemFirst', isHighlighted && 'itemHighlighted'), itemPropsObj);
-	
-	          if (isHighlighted) {
-	            allItemProps.ref = _this2.storeHighlightedItemReference;
-	          }
-	
-	          // `key` is provided by theme()
-	          /* eslint-disable react/jsx-key */
-	          return _react2.default.createElement(_Item2.default, _extends({}, allItemProps, {
-	            sectionIndex: sectionIndex,
-	            itemIndex: itemIndex,
-	            item: item,
-	            renderItem: renderItem,
-	            renderItemData: renderItemData
-	          }));
-	          /* eslint-enable react/jsx-key */
-	        })
-	      );
-	    }
-	  }]);
-	
-	  return ItemsList;
-	}(_react.Component);
-	
-	ItemsList.propTypes = {
-	  items: _propTypes2.default.array.isRequired,
-	  itemProps: _propTypes2.default.oneOfType([_propTypes2.default.object, _propTypes2.default.func]),
-	  renderItem: _propTypes2.default.func.isRequired,
-	  renderItemData: _propTypes2.default.object.isRequired,
-	  sectionIndex: _propTypes2.default.number,
-	  highlightedItemIndex: _propTypes2.default.number,
-	  onHighlightedItemChange: _propTypes2.default.func.isRequired,
-	  getItemId: _propTypes2.default.func.isRequired,
-	  theme: _propTypes2.default.func.isRequired,
-	  keyPrefix: _propTypes2.default.string.isRequired
-	};
-	ItemsList.defaultProps = {
-	  sectionIndex: null
-	};
-	exports.default = ItemsList;
-
-/***/ },
-/* 348 */
-/*!*******************************************!*\
-  !*** ./~/react-autowhatever/dist/Item.js ***!
-  \*******************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _propTypes = __webpack_require__(/*! prop-types */ 331);
-	
-	var _propTypes2 = _interopRequireDefault(_propTypes);
-	
-	var _compareObjects = __webpack_require__(/*! ./compareObjects */ 346);
-	
-	var _compareObjects2 = _interopRequireDefault(_compareObjects);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var Item = function (_Component) {
-	  _inherits(Item, _Component);
-	
-	  function Item() {
-	    var _ref;
-	
-	    var _temp, _this, _ret;
-	
-	    _classCallCheck(this, Item);
-	
-	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-	      args[_key] = arguments[_key];
-	    }
-	
-	    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = Item.__proto__ || Object.getPrototypeOf(Item)).call.apply(_ref, [this].concat(args))), _this), _this.storeItemReference = function (item) {
-	      if (item !== null) {
-	        _this.item = item;
-	      }
-	    }, _this.onMouseEnter = function (event) {
-	      var _this$props = _this.props,
-	          sectionIndex = _this$props.sectionIndex,
-	          itemIndex = _this$props.itemIndex;
-	
-	
-	      _this.props.onMouseEnter(event, { sectionIndex: sectionIndex, itemIndex: itemIndex });
-	    }, _this.onMouseLeave = function (event) {
-	      var _this$props2 = _this.props,
-	          sectionIndex = _this$props2.sectionIndex,
-	          itemIndex = _this$props2.itemIndex;
-	
-	
-	      _this.props.onMouseLeave(event, { sectionIndex: sectionIndex, itemIndex: itemIndex });
-	    }, _this.onMouseDown = function (event) {
-	      var _this$props3 = _this.props,
-	          sectionIndex = _this$props3.sectionIndex,
-	          itemIndex = _this$props3.itemIndex;
-	
-	
-	      _this.props.onMouseDown(event, { sectionIndex: sectionIndex, itemIndex: itemIndex });
-	    }, _this.onClick = function (event) {
-	      var _this$props4 = _this.props,
-	          sectionIndex = _this$props4.sectionIndex,
-	          itemIndex = _this$props4.itemIndex;
-	
-	
-	      _this.props.onClick(event, { sectionIndex: sectionIndex, itemIndex: itemIndex });
-	    }, _temp), _possibleConstructorReturn(_this, _ret);
-	  }
-	
-	  _createClass(Item, [{
-	    key: 'shouldComponentUpdate',
-	    value: function shouldComponentUpdate(nextProps) {
-	      return (0, _compareObjects2.default)(nextProps, this.props, ['renderItemData']);
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      var _props = this.props,
-	          item = _props.item,
-	          renderItem = _props.renderItem,
-	          renderItemData = _props.renderItemData,
-	          restProps = _objectWithoutProperties(_props, ['item', 'renderItem', 'renderItemData']);
-	
-	      delete restProps.sectionIndex;
-	      delete restProps.itemIndex;
-	
-	      if (typeof restProps.onMouseEnter === 'function') {
-	        restProps.onMouseEnter = this.onMouseEnter;
-	      }
-	
-	      if (typeof restProps.onMouseLeave === 'function') {
-	        restProps.onMouseLeave = this.onMouseLeave;
-	      }
-	
-	      if (typeof restProps.onMouseDown === 'function') {
-	        restProps.onMouseDown = this.onMouseDown;
-	      }
-	
-	      if (typeof restProps.onClick === 'function') {
-	        restProps.onClick = this.onClick;
-	      }
-	
-	      return _react2.default.createElement(
-	        'li',
-	        _extends({ role: 'option' }, restProps, { ref: this.storeItemReference }),
-	        renderItem(item, renderItemData)
-	      );
-	    }
-	  }]);
-	
-	  return Item;
-	}(_react.Component);
-	
-	Item.propTypes = {
-	  sectionIndex: _propTypes2.default.number,
-	  itemIndex: _propTypes2.default.number.isRequired,
-	  item: _propTypes2.default.any.isRequired,
-	  renderItem: _propTypes2.default.func.isRequired,
-	  renderItemData: _propTypes2.default.object.isRequired,
-	  onMouseEnter: _propTypes2.default.func,
-	  onMouseLeave: _propTypes2.default.func,
-	  onMouseDown: _propTypes2.default.func,
-	  onClick: _propTypes2.default.func
-	};
-	exports.default = Item;
-
-/***/ },
-/* 349 */
-/*!*******************************************!*\
-  !*** ./~/react-autosuggest/dist/theme.js ***!
-  \*******************************************/
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var defaultTheme = exports.defaultTheme = {
-	  container: 'react-autosuggest__container',
-	  containerOpen: 'react-autosuggest__container--open',
-	  input: 'react-autosuggest__input',
-	  inputOpen: 'react-autosuggest__input--open',
-	  inputFocused: 'react-autosuggest__input--focused',
-	  suggestionsContainer: 'react-autosuggest__suggestions-container',
-	  suggestionsContainerOpen: 'react-autosuggest__suggestions-container--open',
-	  suggestionsList: 'react-autosuggest__suggestions-list',
-	  suggestion: 'react-autosuggest__suggestion',
-	  suggestionFirst: 'react-autosuggest__suggestion--first',
-	  suggestionHighlighted: 'react-autosuggest__suggestion--highlighted',
-	  sectionContainer: 'react-autosuggest__section-container',
-	  sectionContainerFirst: 'react-autosuggest__section-container--first',
-	  sectionTitle: 'react-autosuggest__section-title'
-	};
-	
-	var mapToAutowhateverTheme = exports.mapToAutowhateverTheme = function mapToAutowhateverTheme(theme) {
-	  var result = {};
-	
-	  for (var key in theme) {
-	    switch (key) {
-	      case 'suggestionsContainer':
-	        result['itemsContainer'] = theme[key];
-	        break;
-	
-	      case 'suggestionsContainerOpen':
-	        result['itemsContainerOpen'] = theme[key];
-	        break;
-	
-	      case 'suggestion':
-	        result['item'] = theme[key];
-	        break;
-	
-	      case 'suggestionFirst':
-	        result['itemFirst'] = theme[key];
-	        break;
-	
-	      case 'suggestionHighlighted':
-	        result['itemHighlighted'] = theme[key];
-	        break;
-	
-	      case 'suggestionsList':
-	        result['itemsList'] = theme[key];
-	        break;
-	
-	      default:
-	        result[key] = theme[key];
-	    }
-	  }
-	
-	  return result;
-	};
-
-/***/ },
-/* 350 */
-/*!***********************************************!*\
-  !*** ./src/app/Components/UploadIpfsFile.jsx ***!
-  \***********************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var UploadIpfsFile = function (_React$Component) {
-	    _inherits(UploadIpfsFile, _React$Component);
-	
-	    function UploadIpfsFile(props) {
-	        _classCallCheck(this, UploadIpfsFile);
-	
-	        var _this2 = _possibleConstructorReturn(this, (UploadIpfsFile.__proto__ || Object.getPrototypeOf(UploadIpfsFile)).call(this, props));
-	
-	        _this2.state = {
-	            docs: {},
-	            pubKey: props.pubKey,
-	            selected: '0',
-	            files: ''
-	        };
-	        _this2.inputChangeHandler = _this2.inputChangeHandler.bind(_this2);
-	        return _this2;
-	    }
-	
-	    _createClass(UploadIpfsFile, [{
-	        key: 'componentDidMount',
-	        value: function componentDidMount() {
-	            $.ajax({
-	                url: twinUrl + "ipfs/alldocs/" + this.state.pubKey,
-	                dataType: 'json',
-	                cache: false,
-	                success: function (resp) {
-	                    this.setState({ docs: resp.data.documents });
-	                }.bind(this),
-	                error: function (xhr, status, err) {
-	                    console.error(this.props.url, status, err.toString());
-	                }.bind(this)
-	            });
-	
-	            $("#SubmitContainer .modal").modal('show');
-	            $("#SubmitContainer .modal").on('hidden.bs.modal', this.props.handleHideModal);
-	        }
-	    }, {
-	        key: 'uploadHandler',
-	        value: function uploadHandler(data, additionalParams) {
-	            var params = {
-	                url: twinUrl + "ipfs/upload",
-	                type: 'POST',
-	                data: data,
-	                cache: false,
-	                processData: false,
-	                contentType: false
-	            };
-	            $.extend(params, additionalParams);
-	            $.ajax(params);
-	        }
-	    }, {
-	        key: 'fileHandler',
-	        value: function fileHandler(e) {
-	            e.preventDefault();
-	            if (this.state.selected != "0") {
-	                var hash, fileHash;
-	                this.props.dataHandler(this.state.selected);
-	                $("button.close").trigger("click");
-	            } else {
-	                if (this.state.files.size > 0) {
-	                    var fileInput = $("input[name=newdoc]");
-	                    var fData = new FormData();
-	                    fData.append("user_pubkey", this.state.pubKey);
-	                    $.each(fileInput[0].files, function (key, value) {
-	                        fData.append(key, value);
-	                    });
-	                    var _this = this;
-	                    var callbacks = {
-	                        beforeSend: function beforeSend(xhr) {
-	                            $("button[name=uploadsubmit]").button('loading');
-	                            $("button.close").hide();
-	                        },
-	                        success: function (resp) {
-	                            if (resp.uploded && resp.uploded.length > 0) {
-	                                var filedata = resp.uploded[0].hash + "|" + resp.uploded[0].file_hash;
-	                                //data handler forms JSON object
-	                                this.props.dataHandler(filedata);
-	                                $("button.close").trigger("click");
-	                            }
-	                        }.bind(this),
-	                        complete: function complete() {
-	                            $("button[name=uploadsubmit]").button('reset');
-	                            $("button.close").show();
-	                        }
-	                    };
-	                    this.uploadHandler(fData, callbacks);
-	                }
-	            }
-	        }
-	    }, {
-	        key: 'inputChangeHandler',
-	        value: function inputChangeHandler(e) {
-	            if (e.target.tagName == "SELECT") {
-	                this.setState({ selected: e.target.value });
-	            } else this.setState({ files: e.target.files[0] });
-	        }
-	    }, {
-	        key: 'render',
-	        value: function render() {
-	            var _this3 = this;
-	
-	            //console.log("UploadIpfsFile state: " + JSON.stringify(this.state))
-	            var center = {
-	                textAlign: 'center'
-	            };
-	            return _react2.default.createElement(
-	                'div',
-	                { className: 'modal fade' },
-	                _react2.default.createElement(
-	                    'div',
-	                    { className: 'modal-dialog' },
-	                    _react2.default.createElement(
-	                        'div',
-	                        { className: 'modal-content' },
-	                        _react2.default.createElement(
-	                            'div',
-	                            { className: 'modal-header' },
-	                            _react2.default.createElement(
-	                                'button',
-	                                { type: 'button', className: 'close', 'data-dismiss': 'modal', 'aria-label': 'Close' },
-	                                _react2.default.createElement(
-	                                    'span',
-	                                    { 'aria-hidden': 'true' },
-	                                    '×'
-	                                )
-	                            ),
-	                            _react2.default.createElement(
-	                                'h4',
-	                                { className: 'modal-title' },
-	                                'Upload Document'
-	                            )
-	                        ),
-	                        _react2.default.createElement(
-	                            'div',
-	                            { className: 'modal-body' },
-	                            _react2.default.createElement(
-	                                'form',
-	                                null,
-	                                _react2.default.createElement(
-	                                    'div',
-	                                    { className: 'form-group' },
-	                                    _react2.default.createElement(
-	                                        'label',
-	                                        { htmlFor: 'get-hash' },
-	                                        'Choose from documents'
-	                                    ),
-	                                    _react2.default.createElement(
-	                                        'select',
-	                                        { className: 'form-control', onChange: this.inputChangeHandler },
-	                                        _react2.default.createElement(
-	                                            'option',
-	                                            { value: '0' },
-	                                            'Select Document'
-	                                        ),
-	                                        function () {
-	                                            if (_this3.state.docs && _this3.state.docs.length > 0) {
-	                                                var i = 0;
-	                                                return _this3.state.docs.map(function (obj) {
-	                                                    i++;
-	                                                    var optsVal = obj.hash + "|" + obj.file_hash;
-	                                                    return _react2.default.createElement(
-	                                                        'option',
-	                                                        { value: optsVal, key: i },
-	                                                        obj.filename
-	                                                    );
-	                                                });
-	                                            } else {
-	                                                return _react2.default.createElement(
-	                                                    'option',
-	                                                    { value: '0' },
-	                                                    '-- Empty --'
-	                                                );
-	                                            }
-	                                        }()
-	                                    )
-	                                ),
-	                                _react2.default.createElement(
-	                                    'p',
-	                                    { style: center },
-	                                    '(or)'
-	                                ),
-	                                _react2.default.createElement(
-	                                    'div',
-	                                    { className: 'form-group' },
-	                                    _react2.default.createElement(
-	                                        'label',
-	                                        { htmlFor: 'documents' },
-	                                        'Upload Document'
-	                                    ),
-	                                    _react2.default.createElement('input', { type: 'file', className: 'form-control', name: 'newdoc', onChange: this.inputChangeHandler })
-	                                )
-	                            )
-	                        ),
-	                        _react2.default.createElement(
-	                            'div',
-	                            { className: 'modal-footer' },
-	                            _react2.default.createElement(
-	                                'button',
-	                                { type: 'button', 'data-loading-text': 'Processing...', name: 'uploadsubmit', className: 'btn btn-success', onClick: this.fileHandler.bind(this) },
-	                                'Submit'
-	                            )
-	                        )
-	                    )
-	                )
-	            );
-	        }
-	    }]);
-	
-	    return UploadIpfsFile;
-	}(_react2.default.Component);
-	
-	;
-	
-	exports.default = UploadIpfsFile;
-
-/***/ },
-/* 351 */
-/*!***************************************!*\
-  !*** ./src/app/Components/Upload.jsx ***!
-  \***************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var UploadKeyStore = function (_React$Component) {
-		_inherits(UploadKeyStore, _React$Component);
-	
-		function UploadKeyStore(props) {
-			_classCallCheck(this, UploadKeyStore);
-	
-			var _this = _possibleConstructorReturn(this, (UploadKeyStore.__proto__ || Object.getPrototypeOf(UploadKeyStore)).call(this, props));
-	
-			_this.url = twinUrl + "ballot/readNotify/";
-			_this.state = {
-				pubKey: "",
-				fileread: false,
-				contacts: []
-			};
-	
-			_this.uploadFile = _this.uploadFile.bind(_this);
-			return _this;
-		}
-	
-		_createClass(UploadKeyStore, [{
-			key: "createStorage",
-			value: function createStorage(pubKey, private_key) {
-				localStorage.setItem("pubKey", pubKey);
-				localStorage.setItem("privKey", private_key);
-				var now = new Date();
-				now.setMinutes(now.getMinutes() + 30);
-				localStorage.setItem("timestamp", now.getTime());
-			}
-		}, {
-			key: "uploadFile",
-			value: function uploadFile(e) {
-				e.preventDefault();
-				var file = e.target.files.value;
-				var fileType = file.split('.').pop();
-				if (fileType == "json") {
-					var reader = new FileReader();
-					reader.onload = function (event) {
-						var obj = JSON.parse(event.target.result);
-						this.createStorage(obj.public_key, obj.private_key);
-						this.setState({ pubKey: obj.public_key, priKey: obj.private_key, fileread: true });
-						this.props.loginHandler(this.state);
-					}.bind(this);
-					reader.readAsText(e.target.files.files[0]);
-				} else {
-					alert("Unknown file format ! We support only JSON");
-				}
-	
-				//set contacts upon key upload; Replace hardcodede pubKey with uploaded key later
-				$.ajax({
-					url: twinUrl + "readContacts/" + '03a066efbb37f5fabfab05bf4a65e0dc376d0e3fb1c3d930d7f5ec6da3ac5bc237',
-					dataType: 'json',
-					cache: false,
-					success: function (resp) {
-						var names = [];
-						var keys = [];
-						for (var i = 0; i < resp.data.contacts.length; i++) {
-							names.push(resp.data.contacts[i].contactName);
-							keys.push(resp.data.contacts[i].pubKey);
-						}
-						// console.log(names);
-						// console.log(keys);
-						localStorage.setItem("contactNames", names);
-						localStorage.setItem("contactPubKeys", keys);
-						console.log("LS contactNames: " + localStorage.getItem("contactNames"));
-					}.bind(this)
-				});
-			}
-		}, {
-			key: "render",
-			value: function render() {
-				var cssClass = 'hidden';
-				if (this.state.fileread) cssClass = 'show';
-				return _react2.default.createElement(
-					"div",
-					{ className: "panel panel-default" },
-					_react2.default.createElement(
-						"div",
-						{ className: "panel-heading" },
-						_react2.default.createElement(
-							"strong",
-							null,
-							"Upload Key Store File"
-						),
-						" ",
-						_react2.default.createElement(
-							"small",
-							null,
-							"JSON(.json) file format only supported"
-						)
-					),
-					_react2.default.createElement(
-						"div",
-						{ className: "panel-body" },
-						_react2.default.createElement(
-							"h4",
-							null,
-							"Select file from your computer"
-						),
-						_react2.default.createElement(
-							"form",
-							{ action: "", method: "post", encType: "multipart/form-data", id: "js-upload-form", onSubmit: this.uploadFile },
-							_react2.default.createElement(
-								"div",
-								{ className: "form-inline" },
-								_react2.default.createElement(
-									"div",
-									{ className: "form-group" },
-									_react2.default.createElement("input", { type: "file", name: "files", id: "js-upload-files" })
-								),
-								_react2.default.createElement(
-									"button",
-									{ type: "submit", className: "btn btn-sm btn-primary", id: "js-upload-submit" },
-									"UPLOAD"
-								)
-							)
-						),
-						_react2.default.createElement("br", null),
-						_react2.default.createElement(
-							"div",
-							{ className: cssClass },
-							_react2.default.createElement(
-								"p",
-								null,
-								_react2.default.createElement(
-									"b",
-									null,
-									"Public Key : "
-								),
-								this.state.pubKey
-							)
-						)
-					)
-				);
-			}
-		}]);
-	
-		return UploadKeyStore;
-	}(_react2.default.Component);
-	
-	exports.default = UploadKeyStore;
-
-/***/ },
-/* 352 */
-/*!***************************************!*\
-  !*** ./src/app/Components/ToVote.jsx ***!
-  \***************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _reactDayPicker = __webpack_require__(/*! react-day-picker */ 353);
-	
-	var _reactDayPicker2 = _interopRequireDefault(_reactDayPicker);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var crypto = __webpack_require__(/*! crypto */ 243);
-	var secp256k1 = __webpack_require__(/*! secp256k1 */ 261);
-	var keccak_256 = __webpack_require__(/*! js-sha3 */ 325).keccak_256;
-	
-	function hex_to_ascii(str1) {
-		var hex = str1.toString();
-		var str = [];
-		for (var n = 0; n < hex.length; n += 1) {
-			str.push(String.fromCharCode(parseInt(hex.substr(n, 2), 16)));
-		}
-		return str;
-	}
-	
-	var ModalWin = function (_React$Component) {
-		_inherits(ModalWin, _React$Component);
-	
-		function ModalWin(props) {
-			_classCallCheck(this, ModalWin);
-	
-			var _this2 = _possibleConstructorReturn(this, (ModalWin.__proto__ || Object.getPrototypeOf(ModalWin)).call(this, props));
-	
-			_this2.state = {
-				proposal: _this2.props.dataHandler,
-				proposal_data: {},
-				selectedDay: new Date() //for signature expiration
-			};
-			return _this2;
-		}
-	
-		_createClass(ModalWin, [{
-			key: 'submitHandler',
-			value: function submitHandler(e) {
-				e.preventDefault();
-				var ele = $(e.target);
-	
-				//get private key from local storage
-				var privKey = localStorage.getItem("privKey");
-	
-				//make private key hex buffer
-				var privKey1 = new Buffer(privKey, "hex");
-	
-				//message is "vote_transaction"
-				var msg = "vote_transaction";
-	
-				//get hash of message
-				var msg_hash = keccak_256(msg);
-	
-				//make msg_hash a hex buffer
-				var msg_hash_buffer = new Buffer(msg_hash, "hex");
-	
-				//sign the message
-				var signature1 = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1));
-	
-				//get json object with key "signature"
-				signature1 = JSON.parse(signature1).signature;
-				signature1 = JSON.stringify(signature1);
-	
-				//get json object with key "data" in side the json object with key "signature"
-				signature1 = JSON.parse(signature1).data;
-	
-				//make the signature a buffer, then a string, to emit the commas
-				signature1 = new Buffer(signature1, "hex");
-				signature1 = signature1.toString("hex");
-	
-				//log for testing
-				console.log("sig" + signature1);
-				console.log(typeof signature1 === 'undefined' ? 'undefined' : _typeof(signature1));
-	
-				var day = this.state.selectedDay;
-				var sigExpire = day.getTime() / 1000;
-	
-				var json = {
-					"txnDesc": "sampleDesc",
-					"signature": signature1,
-					"msg": msg_hash_buffer.toString("hex"),
-					"publicKey": localStorage.getItem("pubKey"),
-					"proposalID": this.state.proposal.proposal_id,
-					"vote": parseInt(ele.attr("data-val")),
-					"sigExpire": sigExpire
-				};
-	
-				$.ajax({
-					url: twinUrl + 'voteonCOIDproposal',
-					type: 'POST',
-					data: json,
-					success: function success(res) {
-						if (res.status == "Ok" && res.msg == "true") {
-							var proposalID = this.state.proposal.proposal_id;
-							$.ajax({
-								url: twinUrl + proposalID + "/" + localStorage.getItem("pubKey"),
-								type: 'GET',
-								complete: function complete(xhr) {
-									//alert("vote successfully submitted");
-									window.location.reload();
-									_this.setState({
-										proposal_data: result
-									});
-								}
-							});
-						} else {
-							//alert("Unable to submit your vote. Please try again later");
-						}
-					}
-				});
-			}
-		}, {
-			key: 'componentDidMount',
-			value: function componentDidMount() {
-	
-				var _this = this;
-				var propType = this.state.proposal.propType;
-				console.log("propType: " + propType);
-	
-				$.ajax({
-					type: "POST",
-					url: twinUrl + 'getCoidData',
-					data: {
-						"publicKey": localStorage.getItem("pubKey"),
-						"proposalId": this.state.proposal.proposal_id,
-						"gatekeeperAddr": this.state.proposal.gatekeeperAddr,
-						"isHuman": this.state.proposal.isHuman
-					}, //.bind(this)
-					success: function success(result) {
-						var fileValidation = true;
-						// Fill up data in Modal window
-						//data.publicKey
-						if ($.type(result) == "string") {
-							result = JSON.parse(result);
-						}
-						var ownerArray = [];
-						for (var i = 0; i < result.ownershipTokenQuantity.length; i++) {
-							var temp = [];
-							temp[0] = result.ownerIdList[i];
-							temp[1] = result.ownershipTokenQuantity[i];
-							ownerArray.push(temp);
-						}
-						result.ownerArray = ownerArray;
-						//console.log(result.ownerArray)
-						console.log('result of getCoidData' + JSON.stringify(result));
-	
-						_this.setState({
-							proposal_data: result
-						});
-	
-						$("#proposalDetails").modal('show');
-						$("#proposalDetails").on('hidden.bs.modal', _this.props.hideHandler);
-	
-						var standardAsset = document.getElementById("standardAsset");
-						var KYC = document.getElementById("KYC");
-	
-						if (propType == 2) {
-							KYC.style.display = 'block';
-							standardAsset.style.display = 'none';
-						} else {
-							KYC.style.display = 'none';
-						}
-					} //end success
-				});
-			}
-		}, {
-			key: 'render',
-			value: function render() {
-				var _this3 = this;
-	
-				var prop = this.state.proposal;
-	
-				//{"type":"proposal","proposal_id":"AAC312616FFE818CA093C9B34BB58DB26AFA7287C0B3DB689F9AAD337BE8C5B1",
-				//"message":"You have been selected to vote on the proposal.","read_status":false,"time":1496256497368,
-				//"gatekeeperAddr":"0000000000000000000000000000000000000000","isHuman":true}
-				var style = {
-					fontSize: '12.5px'
-				};
-				return _react2.default.createElement(
-					'div',
-					{ className: 'modal fade', id: 'proposalDetails', tabIndex: '-1', role: 'dialog' },
-					_react2.default.createElement(
-						'div',
-						{ className: 'modal-dialog modal-lg', role: 'document' },
-						_react2.default.createElement(
-							'div',
-							{ className: 'modal-content' },
-							_react2.default.createElement(
-								'div',
-								{ className: 'modal-header' },
-								_react2.default.createElement(
-									'button',
-									{ type: 'button', className: 'close', 'data-dismiss': 'modal', 'aria-label': 'Close' },
-									_react2.default.createElement(
-										'span',
-										{ 'aria-hidden': 'true' },
-										'×'
-									)
-								),
-								_react2.default.createElement(
-									'h4',
-									{ className: 'modal-title', id: 'asset' },
-									'COID Proposal Details'
-								)
-							),
-							_react2.default.createElement(
-								'div',
-								{ id: 'standardAsset', className: 'modal-body' },
-								_react2.default.createElement(
-									'table',
-									{ className: 'table table-striped table-hover', style: style },
-									_react2.default.createElement(
-										'tbody',
-										null,
-										_react2.default.createElement(
-											'tr',
-											null,
-											_react2.default.createElement(
-												'td',
-												null,
-												'Proposal ID'
-											),
-											_react2.default.createElement(
-												'td',
-												null,
-												prop.proposal_id
-											)
-										),
-										_react2.default.createElement(
-											'tr',
-											null,
-											_react2.default.createElement(
-												'td',
-												{ colSpan: '2' },
-												_react2.default.createElement(
-													'b',
-													null,
-													'Official IDs'
-												)
-											)
-										),
-										function () {
-											var ipfs_url = "http://10.101.114.231:8080/ipfs/";
-											if (!$.isEmptyObject(_this3.state.proposal_data)) {
-												return _this3.state.proposal_data.uniqueIdAttributes.map(function (ids, i) {
-													return _react2.default.createElement(
-														'tr',
-														{ key: i },
-														_react2.default.createElement(
-															'td',
-															null,
-															ids[0]
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															_react2.default.createElement(
-																'p',
-																null,
-																'File hash: ',
-																ids[2]
-															),
-															_react2.default.createElement(
-																'p',
-																null,
-																'IPFS hash: ',
-																_react2.default.createElement(
-																	'a',
-																	{ target: '_blank', href: ipfs_url + "/" + ids[1] },
-																	ids[1]
-																)
-															)
-														)
-													);
-												});
-											} else {
-												return _react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														{ colSpan: '2' },
-														'No Ids found'
-													)
-												);
-											}
-										}(this),
-										_react2.default.createElement(
-											'tr',
-											null,
-											_react2.default.createElement(
-												'td',
-												null,
-												'Ownership ID'
-											),
-											_react2.default.createElement(
-												'td',
-												null,
-												this.state.proposal_data.ownershipId
-											)
-										),
-										_react2.default.createElement(
-											'tr',
-											null,
-											_react2.default.createElement(
-												'td',
-												null,
-												'Ownership ID List'
-											),
-											_react2.default.createElement(
-												'td',
-												null,
-												function () {
-													if (!$.isEmptyObject(_this3.state.proposal_data)) {
-														return _this3.state.proposal_data.ownerIdList.map(function (ids, i) {
-															return _react2.default.createElement(
-																'p',
-																{ key: i },
-																' ',
-																_this3.state.proposal_data.ownerIdList[i]
-															);
-														});
-													} else {
-														return _react2.default.createElement(
-															'p',
-															null,
-															'No Ids found'
-														);
-													}
-												}(this)
-											)
-										),
-										_react2.default.createElement(
-											'tr',
-											null,
-											_react2.default.createElement(
-												'td',
-												null,
-												'Ownership Token ID'
-											),
-											_react2.default.createElement(
-												'td',
-												null,
-												_react2.default.createElement(
-													'p',
-													null,
-													' ',
-													this.state.proposal_data.ownershipTokenId
-												)
-											)
-										),
-										_react2.default.createElement(
-											'tr',
-											null,
-											_react2.default.createElement(
-												'td',
-												null,
-												'Ownership Token Description'
-											),
-											_react2.default.createElement(
-												'td',
-												null,
-												_react2.default.createElement(
-													'p',
-													null,
-													this.state.proposal_data.ownershipTokenAttributes
-												)
-											)
-										),
-										_react2.default.createElement(
-											'tr',
-											null,
-											_react2.default.createElement(
-												'td',
-												null,
-												'Ownership Token Quantity'
-											),
-											_react2.default.createElement(
-												'td',
-												null,
-												_react2.default.createElement(
-													'p',
-													null,
-													' ',
-													this.state.proposal_data.ownershipTokenQuantity
-												)
-											)
-										),
-										_react2.default.createElement(
-											'tr',
-											null,
-											_react2.default.createElement(
-												'td',
-												null,
-												'Control ID'
-											),
-											_react2.default.createElement(
-												'td',
-												null,
-												_react2.default.createElement(
-													'p',
-													null,
-													' ',
-													this.state.proposal_data.controlId
-												)
-											)
-										),
-										_react2.default.createElement(
-											'tr',
-											null,
-											_react2.default.createElement(
-												'td',
-												null,
-												'Control ID List'
-											),
-											_react2.default.createElement(
-												'td',
-												null,
-												function () {
-													if (!$.isEmptyObject(_this3.state.proposal_data)) {
-														return _this3.state.proposal_data.controlIdList.map(function (ids, i) {
-															return _react2.default.createElement(
-																'p',
-																{ key: i },
-																' ',
-																_this3.state.proposal_data.controlIdList[i]
-															);
-														});
-													}
-												}(this)
-											)
-										),
-										_react2.default.createElement(
-											'tr',
-											null,
-											_react2.default.createElement(
-												'td',
-												null,
-												'Control Token ID'
-											),
-											_react2.default.createElement(
-												'td',
-												null,
-												' ',
-												_react2.default.createElement(
-													'p',
-													null,
-													' ',
-													this.state.proposal_data.controlTokenId
-												)
-											)
-										),
-										_react2.default.createElement(
-											'tr',
-											null,
-											_react2.default.createElement(
-												'td',
-												null,
-												'Control Token Description'
-											),
-											_react2.default.createElement(
-												'td',
-												null,
-												_react2.default.createElement(
-													'p',
-													null,
-													this.state.proposal_data.controlTokenAttributes
-												)
-											)
-										),
-										_react2.default.createElement(
-											'tr',
-											null,
-											_react2.default.createElement(
-												'td',
-												null,
-												'Control Token Quantity'
-											),
-											_react2.default.createElement(
-												'td',
-												null,
-												_react2.default.createElement(
-													'p',
-													null,
-													' ',
-													this.state.proposal_data.controlTokenQuantity
-												)
-											)
-										),
-										_react2.default.createElement(
-											'tr',
-											null,
-											_react2.default.createElement(
-												'td',
-												null,
-												'Recovery IDs'
-											),
-											_react2.default.createElement(
-												'td',
-												null,
-												function () {
-													if (!$.isEmptyObject(_this3.state.proposal_data)) {
-														return _this3.state.proposal_data.identityRecoveryIdList.map(function (ids, i) {
-															return _react2.default.createElement(
-																'p',
-																{ key: i },
-																' ',
-																_this3.state.proposal_data.identityRecoveryIdList[i]
-															);
-														});
-													}
-												}(this)
-											)
-										),
-										_react2.default.createElement(
-											'tr',
-											null,
-											_react2.default.createElement(
-												'td',
-												null,
-												'Recovery Condition'
-											),
-											_react2.default.createElement(
-												'td',
-												null,
-												' ',
-												_react2.default.createElement(
-													'p',
-													null,
-													' ',
-													this.state.proposal_data.recoveryCondition
-												)
-											)
-										),
-										_react2.default.createElement(
-											'tr',
-											null,
-											_react2.default.createElement(
-												'td',
-												null,
-												'Vote Description'
-											),
-											_react2.default.createElement(
-												'td',
-												null,
-												_react2.default.createElement('textarea', { className: 'form-control' })
-											)
-										)
-									)
-								)
-							),
-							_react2.default.createElement(
-								'div',
-								{ id: 'KYC', className: 'modal-body' },
-								_react2.default.createElement(
-									'table',
-									{ className: 'table table-striped table-hover', style: style },
-									_react2.default.createElement(
-										'tbody',
-										null,
-										_react2.default.createElement(
-											'tr',
-											null,
-											_react2.default.createElement(
-												'td',
-												null,
-												'Proposal ID'
-											),
-											_react2.default.createElement(
-												'td',
-												null,
-												prop.proposal_id
-											)
-										),
-										_react2.default.createElement(
-											'tr',
-											null,
-											_react2.default.createElement(
-												'td',
-												null,
-												'Signature Expiration:'
-											),
-											_react2.default.createElement(
-												'td',
-												null,
-												_react2.default.createElement(_reactDayPicker2.default, {
-													disabledDays: { daysOfWeek: [0] },
-													onDayClick: function onDayClick(day) {
-														return _this3.state.selectedDay = day;
-													}
-												})
-											)
-										)
-									)
-								)
-							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'modal-footer' },
-								_react2.default.createElement(
-									'button',
-									{ type: 'button', className: 'btn btn-primary', 'data-val': '2', onClick: this.submitHandler.bind(this) },
-									'Yes'
-								),
-								_react2.default.createElement(
-									'button',
-									{ type: 'button', className: 'btn btn-default', 'data-val': '1', onClick: this.submitHandler.bind(this) },
-									'No'
-								)
-							)
-						)
-					)
-				);
-			}
-		}]);
-	
-		return ModalWin;
-	}(_react2.default.Component);
-	
-	;
-	
-	var ToVote = function (_React$Component2) {
-		_inherits(ToVote, _React$Component2);
-	
-		function ToVote(props) {
-			_classCallCheck(this, ToVote);
-	
-			//coid=proposals
-			var _this4 = _possibleConstructorReturn(this, (ToVote.__proto__ || Object.getPrototypeOf(ToVote)).call(this, props));
-	
-			_this4.state = {
-				coid: [], //array of messages from DT
-				showDetails: false,
-				activeProposal: {}
-			};
-			_this4.showHandler = _this4.showHandler.bind(_this4);
-			return _this4;
-		}
-	
-		_createClass(ToVote, [{
-			key: 'getDateFormat',
-			value: function getDateFormat(timestamp) {
-				var d = new Date(timestamp);
-				return d.getMonth() + 1 + "/" + d.getDate() + "/" + d.getFullYear();
-			}
-		}, {
-			key: 'componentDidMount',
-			value: function componentDidMount() {
-				$.ajax({
-					url: twinUrl + "ballot/readNotify/" + keccak_256(localStorage.getItem("pubKey")).toUpperCase(),
-					dataType: 'json',
-					cache: false,
-					success: function (result) {
-						console.log("result: " + JSON.stringify(result));
-						if ((typeof result === 'undefined' ? 'undefined' : _typeof(result)) != "object") {
-							//if(true){
-							var data = JSON.parse(result);
-							console.log("TOVOTE needs else brackets?" + localStorage.getItem("pubKey"));
-						} else {
-							var data = result;
-							var test = JSON.parse(result.data);
-							test = JSON.parse(JSON.stringify(test.messages));
-							console.log(test[0].type);
-						}
-						this.setState({ coid: test });
-						console.log("ToVote state: " + JSON.stringify(this.state));
-						console.log("result: " + JSON.stringify(result.data));
-					}.bind(this)
-				});
-			}
-		}, {
-			key: 'hideHandler',
-			value: function hideHandler() {
-				this.setState({ showDetails: false });
-			}
-	
-			//assigns entire COID to activeProposal, 
-	
-		}, {
-			key: 'dataHandler',
-			value: function dataHandler(index) {
-				return this.state.coid[index];
-			}
-	
-			// getActiveData() {
-			// 	return this.state.activeProposal;
-			// }
-	
-		}, {
-			key: 'showHandler',
-			value: function showHandler(e) {
-				e.preventDefault();
-				this.setState({
-					showDetails: true,
-					activeProposal: this.dataHandler($(e.target).attr('data-index'))
-				});
-			}
-		}, {
-			key: 'render',
-			value: function render() {
-				var _this5 = this;
-	
-				console.log("STATE: " + JSON.stringify(this.state));
-				var _that = this;
-				return _react2.default.createElement(
-					'div',
-					{ id: 'vote_container' },
-					_react2.default.createElement(
-						'h1',
-						null,
-						'Proposals pending for your action'
-					),
-					' ',
-					_react2.default.createElement('hr', null),
-					_react2.default.createElement(
-						'table',
-						{ className: 'table table-striped' },
-						_react2.default.createElement(
-							'tbody',
-							null,
-							function () {
-								if ($.isArray(_this5.state.coid) && _this5.state.coid.length > 0) {
-									return _this5.state.coid.map(function (el, i) {
-										return _react2.default.createElement(
-											'tr',
-											{ key: i },
-											_react2.default.createElement(
-												'td',
-												null,
-												_react2.default.createElement(
-													'div',
-													null,
-													_react2.default.createElement(
-														'b',
-														null,
-														'Proposal ID: '
-													),
-													el.proposal_id
-												),
-												_react2.default.createElement(
-													'div',
-													null,
-													_react2.default.createElement(
-														'b',
-														null,
-														'Published On: '
-													),
-													_that.getDateFormat(el.time)
-												)
-											),
-											_react2.default.createElement(
-												'td',
-												{ className: 'pull-right' },
-												_react2.default.createElement(
-													'button',
-													{ type: 'button', title: 'View proposal to vote', 'data-item': el, 'data-index': i, onClick: _that.showHandler, className: 'btn btn-primary' },
-													'View Proposal'
-												)
-											)
-										);
-									});
-								} else {
-									return _react2.default.createElement(
-										'tr',
-										null,
-										_react2.default.createElement(
-											'td',
-											null,
-											_react2.default.createElement(
-												'p',
-												null,
-												'No data to act upon !'
-											)
-										)
-									);
-								}
-							}(this)
-						)
-					),
-					this.state.showDetails ? _react2.default.createElement(ModalWin, { hideHandler: this.hideHandler.bind(this), dataHandler: this.state.activeProposal }) : null
-				);
-			}
-		}]);
-	
-		return ToVote;
-	}(_react2.default.Component);
-	
-	;
-	exports.default = ToVote;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/buffer/index.js */ 239).Buffer))
-
-/***/ },
-/* 353 */
-/*!*****************************************!*\
-  !*** ./~/react-day-picker/DayPicker.js ***!
-  \*****************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/* eslint-disable no-var */
-	/* eslint-env node */
-	
-	var DayPicker = __webpack_require__(/*! ./lib/src/DayPicker */ 354);
-	var DateUtils = __webpack_require__(/*! ./lib/src/DateUtils */ 362);
-	var LocaleUtils = __webpack_require__(/*! ./lib/src/LocaleUtils */ 363);
-	var ModifiersUtils = __webpack_require__(/*! ./lib/src/ModifiersUtils */ 366);
-	var Weekday = __webpack_require__(/*! ./lib/src/Weekday */ 365);
-	var Navbar = __webpack_require__(/*! ./lib/src/Navbar */ 357);
-	var PropTypes = __webpack_require__(/*! ./lib/src/PropTypes */ 356);
-	
-	module.exports = DayPicker.default || DayPicker;
-	module.exports.DateUtils = DateUtils.default || DateUtils;
-	module.exports.LocaleUtils = LocaleUtils.default || LocaleUtils;
-	module.exports.ModifiersUtils = ModifiersUtils.default || ModifiersUtils;
-	module.exports.WeekdayPropTypes = Weekday.WeekdayPropTypes;
-	module.exports.NavbarPropTypes = Navbar.NavbarPropTypes;
-	module.exports.PropTypes = PropTypes;
-
-
-/***/ },
-/* 354 */
-/*!*************************************************!*\
-  !*** ./~/react-day-picker/lib/src/DayPicker.js ***!
-  \*************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _Caption = __webpack_require__(/*! ./Caption */ 355);
-	
-	var _Caption2 = _interopRequireDefault(_Caption);
-	
-	var _Navbar = __webpack_require__(/*! ./Navbar */ 357);
-	
-	var _Navbar2 = _interopRequireDefault(_Navbar);
-	
-	var _Month = __webpack_require__(/*! ./Month */ 359);
-	
-	var _Month2 = _interopRequireDefault(_Month);
-	
-	var _Day = __webpack_require__(/*! ./Day */ 364);
-	
-	var _Day2 = _interopRequireDefault(_Day);
-	
-	var _Weekday = __webpack_require__(/*! ./Weekday */ 365);
-	
-	var _Weekday2 = _interopRequireDefault(_Weekday);
-	
-	var _Helpers = __webpack_require__(/*! ./Helpers */ 361);
-	
-	var Helpers = _interopRequireWildcard(_Helpers);
-	
-	var _DateUtils = __webpack_require__(/*! ./DateUtils */ 362);
-	
-	var DateUtils = _interopRequireWildcard(_DateUtils);
-	
-	var _LocaleUtils = __webpack_require__(/*! ./LocaleUtils */ 363);
-	
-	var LocaleUtils = _interopRequireWildcard(_LocaleUtils);
-	
-	var _ModifiersUtils = __webpack_require__(/*! ./ModifiersUtils */ 366);
-	
-	var ModifiersUtils = _interopRequireWildcard(_ModifiersUtils);
-	
-	var _classNames = __webpack_require__(/*! ./classNames */ 358);
-	
-	var _classNames2 = _interopRequireDefault(_classNames);
-	
-	var _keys = __webpack_require__(/*! ./keys */ 367);
-	
-	var _keys2 = _interopRequireDefault(_keys);
-	
-	var _PropTypes = __webpack_require__(/*! ./PropTypes */ 356);
-	
-	var _PropTypes2 = _interopRequireDefault(_PropTypes);
-	
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
-	
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var DayPicker = function (_Component) {
-	  _inherits(DayPicker, _Component);
-	
-	  function DayPicker(props) {
-	    _classCallCheck(this, DayPicker);
-	
-	    /* istanbul ignore next */
-	    // for the ignore above see: https://github.com/gotwarlost/istanbul/issues/690
-	
-	    var _this = _possibleConstructorReturn(this, (DayPicker.__proto__ || Object.getPrototypeOf(DayPicker)).call(this, props));
-	
-	    _initialiseProps.call(_this);
-	
-	    _this.renderDayInMonth = _this.renderDayInMonth.bind(_this);
-	    _this.showNextMonth = _this.showNextMonth.bind(_this);
-	    _this.showPreviousMonth = _this.showPreviousMonth.bind(_this);
-	
-	    _this.handleKeyDown = _this.handleKeyDown.bind(_this);
-	    _this.handleDayClick = _this.handleDayClick.bind(_this);
-	    _this.handleDayKeyDown = _this.handleDayKeyDown.bind(_this);
-	
-	    _this.state = _this.getStateFromProps(props);
-	    return _this;
-	  }
-	
-	  _createClass(DayPicker, [{
-	    key: 'componentWillReceiveProps',
-	    value: function componentWillReceiveProps(nextProps) {
-	      if (this.props.month !== nextProps.month) {
-	        this.setState(this.getStateFromProps(nextProps));
-	      }
-	    }
-	  }, {
-	    key: 'getDayNodes',
-	    value: function getDayNodes() {
-	      var outsideClassName = void 0;
-	      if (this.props.classNames === _classNames2.default) {
-	        // When using CSS modules prefix the modifier as required by the BEM syntax
-	        outsideClassName = this.props.classNames.day + '--' + this.props.classNames.outside;
-	      } else {
-	        outsideClassName = '' + this.props.classNames.outside;
-	      }
-	      var dayQuery = this.props.classNames.day.replace(/ /g, '.');
-	      var outsideDayQuery = outsideClassName.replace(/ /g, '.');
-	      var selector = '.' + dayQuery + ':not(.' + outsideDayQuery + ')';
-	      return this.dayPicker.querySelectorAll(selector);
-	    }
-	  }, {
-	    key: 'getNextNavigableMonth',
-	    value: function getNextNavigableMonth() {
-	      return DateUtils.addMonths(this.state.currentMonth, this.props.numberOfMonths);
-	    }
-	  }, {
-	    key: 'getPreviousNavigableMonth',
-	    value: function getPreviousNavigableMonth() {
-	      return DateUtils.addMonths(this.state.currentMonth, -1);
-	    }
-	  }, {
-	    key: 'allowPreviousMonth',
-	    value: function allowPreviousMonth() {
-	      var previousMonth = DateUtils.addMonths(this.state.currentMonth, -1);
-	      return this.allowMonth(previousMonth);
-	    }
-	  }, {
-	    key: 'allowNextMonth',
-	    value: function allowNextMonth() {
-	      var nextMonth = DateUtils.addMonths(this.state.currentMonth, this.props.numberOfMonths);
-	      return this.allowMonth(nextMonth);
-	    }
-	  }, {
-	    key: 'allowMonth',
-	    value: function allowMonth(d) {
-	      var _props = this.props,
-	          fromMonth = _props.fromMonth,
-	          toMonth = _props.toMonth,
-	          canChangeMonth = _props.canChangeMonth;
-	
-	      if (!canChangeMonth || fromMonth && Helpers.getMonthsDiff(fromMonth, d) < 0 || toMonth && Helpers.getMonthsDiff(toMonth, d) > 0) {
-	        return false;
-	      }
-	      return true;
-	    }
-	  }, {
-	    key: 'allowYearChange',
-	    value: function allowYearChange() {
-	      return this.props.canChangeMonth;
-	    }
-	  }, {
-	    key: 'showMonth',
-	    value: function showMonth(d, callback) {
-	      var _this2 = this;
-	
-	      if (!this.allowMonth(d)) {
-	        return;
-	      }
-	      this.setState({ currentMonth: Helpers.startOfMonth(d) }, function () {
-	        if (callback) {
-	          callback();
-	        }
-	        if (_this2.props.onMonthChange) {
-	          _this2.props.onMonthChange(_this2.state.currentMonth);
-	        }
-	      });
-	    }
-	  }, {
-	    key: 'showNextMonth',
-	    value: function showNextMonth(callback) {
-	      if (!this.allowNextMonth()) {
-	        return;
-	      }
-	      var deltaMonths = this.props.pagedNavigation ? this.props.numberOfMonths : 1;
-	      var nextMonth = DateUtils.addMonths(this.state.currentMonth, deltaMonths);
-	      this.showMonth(nextMonth, callback);
-	    }
-	  }, {
-	    key: 'showPreviousMonth',
-	    value: function showPreviousMonth(callback) {
-	      if (!this.allowPreviousMonth()) {
-	        return;
-	      }
-	      var deltaMonths = this.props.pagedNavigation ? this.props.numberOfMonths : 1;
-	      var previousMonth = DateUtils.addMonths(this.state.currentMonth, -deltaMonths);
-	      this.showMonth(previousMonth, callback);
-	    }
-	  }, {
-	    key: 'showNextYear',
-	    value: function showNextYear() {
-	      if (!this.allowYearChange()) {
-	        return;
-	      }
-	      var nextMonth = DateUtils.addMonths(this.state.currentMonth, 12);
-	      this.showMonth(nextMonth);
-	    }
-	  }, {
-	    key: 'showPreviousYear',
-	    value: function showPreviousYear() {
-	      if (!this.allowYearChange()) {
-	        return;
-	      }
-	      var nextMonth = DateUtils.addMonths(this.state.currentMonth, -12);
-	      this.showMonth(nextMonth);
-	    }
-	  }, {
-	    key: 'focusFirstDayOfMonth',
-	    value: function focusFirstDayOfMonth() {
-	      this.getDayNodes()[0].focus();
-	    }
-	  }, {
-	    key: 'focusLastDayOfMonth',
-	    value: function focusLastDayOfMonth() {
-	      var dayNodes = this.getDayNodes();
-	      dayNodes[dayNodes.length - 1].focus();
-	    }
-	  }, {
-	    key: 'focusPreviousDay',
-	    value: function focusPreviousDay(dayNode) {
-	      var _this3 = this;
-	
-	      var dayNodes = this.getDayNodes();
-	      var dayNodeIndex = [].concat(_toConsumableArray(dayNodes)).indexOf(dayNode);
-	
-	      if (dayNodeIndex === 0) {
-	        this.showPreviousMonth(function () {
-	          return _this3.focusLastDayOfMonth();
-	        });
-	      } else {
-	        dayNodes[dayNodeIndex - 1].focus();
-	      }
-	    }
-	  }, {
-	    key: 'focusNextDay',
-	    value: function focusNextDay(dayNode) {
-	      var _this4 = this;
-	
-	      var dayNodes = this.getDayNodes();
-	      var dayNodeIndex = [].concat(_toConsumableArray(dayNodes)).indexOf(dayNode);
-	
-	      if (dayNodeIndex === dayNodes.length - 1) {
-	        this.showNextMonth(function () {
-	          return _this4.focusFirstDayOfMonth();
-	        });
-	      } else {
-	        dayNodes[dayNodeIndex + 1].focus();
-	      }
-	    }
-	  }, {
-	    key: 'focusNextWeek',
-	    value: function focusNextWeek(dayNode) {
-	      var _this5 = this;
-	
-	      var dayNodes = this.getDayNodes();
-	      var dayNodeIndex = [].concat(_toConsumableArray(dayNodes)).indexOf(dayNode);
-	      var isInLastWeekOfMonth = dayNodeIndex > dayNodes.length - 8;
-	
-	      if (isInLastWeekOfMonth) {
-	        this.showNextMonth(function () {
-	          var daysAfterIndex = dayNodes.length - dayNodeIndex;
-	          var nextMonthDayNodeIndex = 7 - daysAfterIndex;
-	          _this5.getDayNodes()[nextMonthDayNodeIndex].focus();
-	        });
-	      } else {
-	        dayNodes[dayNodeIndex + 7].focus();
-	      }
-	    }
-	  }, {
-	    key: 'focusPreviousWeek',
-	    value: function focusPreviousWeek(dayNode) {
-	      var _this6 = this;
-	
-	      var dayNodes = this.getDayNodes();
-	      var dayNodeIndex = [].concat(_toConsumableArray(dayNodes)).indexOf(dayNode);
-	      var isInFirstWeekOfMonth = dayNodeIndex <= 6;
-	
-	      if (isInFirstWeekOfMonth) {
-	        this.showPreviousMonth(function () {
-	          var previousMonthDayNodes = _this6.getDayNodes();
-	          var startOfLastWeekOfMonth = previousMonthDayNodes.length - 7;
-	          var previousMonthDayNodeIndex = startOfLastWeekOfMonth + dayNodeIndex;
-	          previousMonthDayNodes[previousMonthDayNodeIndex].focus();
-	        });
-	      } else {
-	        dayNodes[dayNodeIndex - 7].focus();
-	      }
-	    }
-	
-	    // Event handlers
-	
-	  }, {
-	    key: 'handleKeyDown',
-	    value: function handleKeyDown(e) {
-	      e.persist();
-	
-	      switch (e.keyCode) {
-	        case _keys2.default.LEFT:
-	          this.showPreviousMonth();
-	          break;
-	        case _keys2.default.RIGHT:
-	          this.showNextMonth();
-	          break;
-	        case _keys2.default.UP:
-	          this.showPreviousYear();
-	          break;
-	        case _keys2.default.DOWN:
-	          this.showNextYear();
-	          break;
-	        default:
-	          break;
-	      }
-	
-	      if (this.props.onKeyDown) {
-	        this.props.onKeyDown(e);
-	      }
-	    }
-	  }, {
-	    key: 'handleDayKeyDown',
-	    value: function handleDayKeyDown(day, modifiers, e) {
-	      e.persist();
-	      switch (e.keyCode) {
-	        case _keys2.default.LEFT:
-	          Helpers.cancelEvent(e);
-	          this.focusPreviousDay(e.target);
-	          break;
-	        case _keys2.default.RIGHT:
-	          Helpers.cancelEvent(e);
-	          this.focusNextDay(e.target);
-	          break;
-	        case _keys2.default.UP:
-	          Helpers.cancelEvent(e);
-	          this.focusPreviousWeek(e.target);
-	          break;
-	        case _keys2.default.DOWN:
-	          Helpers.cancelEvent(e);
-	          this.focusNextWeek(e.target);
-	          break;
-	        case _keys2.default.ENTER:
-	        case _keys2.default.SPACE:
-	          Helpers.cancelEvent(e);
-	          if (this.props.onDayClick) {
-	            this.handleDayClick(day, modifiers, e);
-	          }
-	          break;
-	        default:
-	          break;
-	      }
-	      if (this.props.onDayKeyDown) {
-	        this.props.onDayKeyDown(day, modifiers, e);
-	      }
-	    }
-	  }, {
-	    key: 'handleDayClick',
-	    value: function handleDayClick(day, modifiers, e) {
-	      e.persist();
-	      if (modifiers.outside) {
-	        this.handleOutsideDayClick(day);
-	      }
-	      this.props.onDayClick(day, modifiers, e);
-	    }
-	  }, {
-	    key: 'handleOutsideDayClick',
-	    value: function handleOutsideDayClick(day) {
-	      var currentMonth = this.state.currentMonth;
-	      var numberOfMonths = this.props.numberOfMonths;
-	
-	      var diffInMonths = Helpers.getMonthsDiff(currentMonth, day);
-	      if (diffInMonths > 0 && diffInMonths >= numberOfMonths) {
-	        this.showNextMonth();
-	      } else if (diffInMonths < 0) {
-	        this.showPreviousMonth();
-	      }
-	    }
-	  }, {
-	    key: 'renderNavbar',
-	    value: function renderNavbar() {
-	      var _props2 = this.props,
-	          labels = _props2.labels,
-	          locale = _props2.locale,
-	          localeUtils = _props2.localeUtils,
-	          canChangeMonth = _props2.canChangeMonth,
-	          navbarElement = _props2.navbarElement,
-	          attributes = _objectWithoutProperties(_props2, ['labels', 'locale', 'localeUtils', 'canChangeMonth', 'navbarElement']);
-	
-	      if (!canChangeMonth) return null;
-	
-	      var props = {
-	        classNames: this.props.classNames,
-	        className: this.props.classNames.navBar,
-	        nextMonth: this.getNextNavigableMonth(),
-	        previousMonth: this.getPreviousNavigableMonth(),
-	        showPreviousButton: this.allowPreviousMonth(),
-	        showNextButton: this.allowNextMonth(),
-	        onNextClick: this.showNextMonth,
-	        onPreviousClick: this.showPreviousMonth,
-	        dir: attributes.dir,
-	        labels: labels,
-	        locale: locale,
-	        localeUtils: localeUtils
-	      };
-	      return _react2.default.isValidElement(navbarElement) ? _react2.default.cloneElement(navbarElement, props) : _react2.default.createElement(navbarElement, props);
-	    }
-	  }, {
-	    key: 'renderDayInMonth',
-	    value: function renderDayInMonth(day, month) {
-	      var propModifiers = Helpers.getModifiersFromProps(this.props);
-	      var dayModifiers = ModifiersUtils.getModifiersForDay(day, propModifiers);
-	      if (DateUtils.isSameDay(day, new Date()) && !Object.prototype.hasOwnProperty.call(propModifiers, this.props.classNames.today)) {
-	        dayModifiers.push(this.props.classNames.today);
-	      }
-	      if (day.getMonth() !== month.getMonth()) {
-	        dayModifiers.push(this.props.classNames.outside);
-	      }
-	
-	      var isOutside = day.getMonth() !== month.getMonth();
-	      var tabIndex = null;
-	      if (this.props.onDayClick && !isOutside) {
-	        tabIndex = -1;
-	        // Focus on the first day of the month
-	        if (day.getDate() === 1) {
-	          tabIndex = this.props.tabIndex;
-	        }
-	      }
-	      var key = '' + day.getFullYear() + day.getMonth() + day.getDate();
-	      var modifiers = {};
-	      dayModifiers.forEach(function (modifier) {
-	        modifiers[modifier] = true;
-	      });
-	
-	      return _react2.default.createElement(
-	        _Day2.default,
-	        {
-	          key: '' + (isOutside ? 'outside-' : '') + key,
-	          classNames: this.props.classNames,
-	          day: day,
-	          modifiers: modifiers,
-	          modifiersStyles: this.props.modifiersStyles,
-	          empty: isOutside && !this.props.enableOutsideDays && !this.props.fixedWeeks,
-	          tabIndex: tabIndex,
-	          ariaLabel: this.props.localeUtils.formatDay(day, this.props.locale),
-	          ariaDisabled: isOutside || dayModifiers.indexOf('disabled') > -1,
-	          ariaSelected: dayModifiers.indexOf('selected') > -1,
-	          onMouseEnter: this.props.onDayMouseEnter,
-	          onMouseLeave: this.props.onDayMouseLeave,
-	          onKeyDown: this.handleDayKeyDown,
-	          onTouchStart: this.props.onDayTouchStart,
-	          onTouchEnd: this.props.onDayTouchEnd,
-	          onFocus: this.props.onDayFocus,
-	          onClick: this.props.onDayClick ? this.handleDayClick : undefined
-	        },
-	        this.props.renderDay(day, modifiers)
-	      );
-	    }
-	  }, {
-	    key: 'renderMonths',
-	    value: function renderMonths() {
-	      var months = [];
-	      var firstDayOfWeek = Helpers.getFirstDayOfWeekFromProps(this.props);
-	
-	      for (var i = 0; i < this.props.numberOfMonths; i += 1) {
-	        var month = DateUtils.addMonths(this.state.currentMonth, i);
-	
-	        months.push(_react2.default.createElement(
-	          _Month2.default,
-	          {
-	            key: i,
-	            classNames: this.props.classNames,
-	            month: month,
-	            months: this.props.months,
-	            weekdayElement: this.props.weekdayElement,
-	            captionElement: this.props.captionElement,
-	            fixedWeeks: this.props.fixedWeeks,
-	            weekdaysShort: this.props.weekdaysShort,
-	            weekdaysLong: this.props.weekdaysLong,
-	            locale: this.props.locale,
-	            localeUtils: this.props.localeUtils,
-	            firstDayOfWeek: firstDayOfWeek,
-	            footer: this.props.todayButton && this.renderTodayButton(),
-	            showWeekNumbers: this.props.showWeekNumbers,
-	            onCaptionClick: this.props.onCaptionClick,
-	            onWeekClick: this.props.onWeekClick
-	          },
-	          this.renderDayInMonth
-	        ));
-	      }
-	
-	      if (this.props.reverseMonths) {
-	        months.reverse();
-	      }
-	      return months;
-	    }
-	  }, {
-	    key: 'renderTodayButton',
-	    value: function renderTodayButton() {
-	      return _react2.default.createElement(
-	        'button',
-	        {
-	          tabIndex: 0,
-	          className: this.props.classNames.todayButton,
-	          'aria-label': this.props.todayButton,
-	          onClick: this.handleTodayButtonClick
-	        },
-	        this.props.todayButton
-	      );
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      var _this7 = this;
-	
-	      var className = this.props.classNames.container;
-	
-	      if (!this.props.onDayClick) {
-	        className = className + ' ' + this.props.classNames.interactionDisabled;
-	      }
-	      if (this.props.className) {
-	        className = className + ' ' + this.props.className;
-	      }
-	
-	      return _react2.default.createElement(
-	        'div',
-	        _extends({}, this.props.containerProps, {
-	          className: className,
-	          ref: function ref(el) {
-	            _this7.dayPicker = el;
-	          },
-	          role: 'application',
-	          lang: this.props.locale,
-	          tabIndex: this.props.canChangeMonth && this.props.tabIndex,
-	          onKeyDown: this.handleKeyDown,
-	          onFocus: this.props.onFocus,
-	          onBlur: this.props.onBlur
-	        }),
-	        this.renderNavbar(),
-	        this.renderMonths()
-	      );
-	    }
-	  }]);
-	
-	  return DayPicker;
-	}(_react.Component);
-	
-	DayPicker.VERSION = '5.5.3';
-	DayPicker.propTypes = {
-	  // Rendering months
-	  initialMonth: _PropTypes2.default.instanceOf(Date),
-	  month: _PropTypes2.default.instanceOf(Date),
-	  numberOfMonths: _PropTypes2.default.number,
-	  fromMonth: _PropTypes2.default.instanceOf(Date),
-	  toMonth: _PropTypes2.default.instanceOf(Date),
-	  canChangeMonth: _PropTypes2.default.bool,
-	  reverseMonths: _PropTypes2.default.bool,
-	  pagedNavigation: _PropTypes2.default.bool,
-	  todayButton: _PropTypes2.default.string,
-	  showWeekNumbers: _PropTypes2.default.bool,
-	
-	  // Modifiers
-	  selectedDays: _PropTypes2.default.oneOfType([_PropTypes.ModifierPropType, _PropTypes2.default.arrayOf(_PropTypes.ModifierPropType)]),
-	  disabledDays: _PropTypes2.default.oneOfType([_PropTypes.ModifierPropType, _PropTypes2.default.arrayOf(_PropTypes.ModifierPropType)]),
-	
-	  modifiers: _PropTypes2.default.object,
-	  modifiersStyles: _PropTypes2.default.object,
-	
-	  // Localization
-	  dir: _PropTypes2.default.string,
-	  firstDayOfWeek: _PropTypes2.default.oneOf([0, 1, 2, 3, 4, 5, 6]),
-	  labels: _PropTypes2.default.shape({
-	    nextMonth: _PropTypes2.default.string.isRequired,
-	    previousMonth: _PropTypes2.default.string.isRequired
-	  }).isRequired,
-	  locale: _PropTypes2.default.string,
-	  localeUtils: _PropTypes2.default.localeUtils,
-	  months: _PropTypes2.default.arrayOf(_PropTypes2.default.string),
-	  weekdaysLong: _PropTypes2.default.arrayOf(_PropTypes2.default.string),
-	  weekdaysShort: _PropTypes2.default.arrayOf(_PropTypes2.default.string),
-	
-	  // Customization
-	  enableOutsideDays: _PropTypes2.default.bool,
-	  fixedWeeks: _PropTypes2.default.bool,
-	
-	  // CSS and HTML
-	  classNames: _PropTypes2.default.shape({
-	    body: _PropTypes2.default.string,
-	    container: _PropTypes2.default.string,
-	    day: _PropTypes2.default.string.isRequired,
-	    disabled: _PropTypes2.default.string.isRequired,
-	    footer: _PropTypes2.default.string,
-	    interactionDisabled: _PropTypes2.default.string,
-	    month: _PropTypes2.default.string,
-	    navBar: _PropTypes2.default.string,
-	    outside: _PropTypes2.default.string.isRequired,
-	    selected: _PropTypes2.default.string.isRequired,
-	    today: _PropTypes2.default.string.isRequired,
-	    todayButton: _PropTypes2.default.string,
-	    week: _PropTypes2.default.string
-	  }),
-	  className: _PropTypes2.default.string,
-	  containerProps: _PropTypes2.default.object,
-	  tabIndex: _PropTypes2.default.number,
-	
-	  // Custom elements
-	  renderDay: _PropTypes2.default.func,
-	  weekdayElement: _PropTypes2.default.oneOfType([_PropTypes2.default.element, _PropTypes2.default.func, _PropTypes2.default.instanceOf(_react.Component)]),
-	  navbarElement: _PropTypes2.default.oneOfType([_PropTypes2.default.element, _PropTypes2.default.func, _PropTypes2.default.instanceOf(_react.Component)]),
-	  captionElement: _PropTypes2.default.oneOfType([_PropTypes2.default.element, _PropTypes2.default.func, _PropTypes2.default.instanceOf(_react.Component)]),
-	
-	  // Events
-	  onBlur: _PropTypes2.default.func,
-	  onFocus: _PropTypes2.default.func,
-	  onKeyDown: _PropTypes2.default.func,
-	  onDayClick: _PropTypes2.default.func,
-	  onDayKeyDown: _PropTypes2.default.func,
-	  onDayMouseEnter: _PropTypes2.default.func,
-	  onDayMouseLeave: _PropTypes2.default.func,
-	  onDayTouchStart: _PropTypes2.default.func,
-	  onDayTouchEnd: _PropTypes2.default.func,
-	  onDayFocus: _PropTypes2.default.func,
-	  onMonthChange: _PropTypes2.default.func,
-	  onCaptionClick: _PropTypes2.default.func,
-	  onWeekClick: _PropTypes2.default.func
-	};
-	DayPicker.defaultProps = {
-	  classNames: _classNames2.default,
-	  tabIndex: 0,
-	  initialMonth: new Date(),
-	  numberOfMonths: 1,
-	  labels: {
-	    previousMonth: 'Previous Month',
-	    nextMonth: 'Next Month'
-	  },
-	  locale: 'en',
-	  localeUtils: LocaleUtils,
-	  enableOutsideDays: false,
-	  fixedWeeks: false,
-	  canChangeMonth: true,
-	  reverseMonths: false,
-	  pagedNavigation: false,
-	  showWeekNumbers: false,
-	  renderDay: function renderDay(day) {
-	    return day.getDate();
-	  },
-	  weekdayElement: _react2.default.createElement(_Weekday2.default, null),
-	  navbarElement: _react2.default.createElement(_Navbar2.default, { classNames: _classNames2.default }),
-	  captionElement: _react2.default.createElement(_Caption2.default, { classNames: _classNames2.default })
-	};
-	
-	var _initialiseProps = function _initialiseProps() {
-	  var _this8 = this;
-	
-	  this.getStateFromProps = function (props) {
-	    var initialMonth = Helpers.startOfMonth(props.month || props.initialMonth);
-	    var currentMonth = initialMonth;
-	
-	    if (props.pagedNavigation && props.numberOfMonths > 1 && props.fromMonth) {
-	      var diffInMonths = Helpers.getMonthsDiff(props.fromMonth, currentMonth);
-	      currentMonth = DateUtils.addMonths(props.fromMonth, Math.floor(diffInMonths / props.numberOfMonths) * props.numberOfMonths);
-	    }
-	    return { currentMonth: currentMonth };
-	  };
-	
-	  this.dayPicker = null;
-	
-	  this.handleTodayButtonClick = function (e) {
-	    _this8.showMonth(new Date());
-	    e.target.blur();
-	  };
-	};
-	
-	exports.default = DayPicker;
-	//# sourceMappingURL=DayPicker.js.map
-
-/***/ },
-/* 355 */
-/*!***********************************************!*\
-  !*** ./~/react-day-picker/lib/src/Caption.js ***!
-  \***********************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = Caption;
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _PropTypes = __webpack_require__(/*! ./PropTypes */ 356);
-	
-	var _PropTypes2 = _interopRequireDefault(_PropTypes);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function Caption(_ref) {
-	  var classNames = _ref.classNames,
-	      date = _ref.date,
-	      months = _ref.months,
-	      locale = _ref.locale,
-	      localeUtils = _ref.localeUtils,
-	      onClick = _ref.onClick;
-	
-	  return _react2.default.createElement(
-	    'div',
-	    { className: classNames.caption, onClick: onClick, role: 'heading' },
-	    months ? months[date.getMonth()] + ' ' + date.getFullYear() : localeUtils.formatMonthTitle(date, locale)
-	  );
-	}
-	
-	Caption.propTypes = {
-	  date: _PropTypes2.default.instanceOf(Date),
-	  months: _PropTypes2.default.arrayOf(_PropTypes2.default.string),
-	  locale: _PropTypes2.default.string,
-	  localeUtils: _PropTypes2.default.localeUtils,
-	  onClick: _PropTypes2.default.func,
-	  classNames: _PropTypes2.default.shape({
-	    caption: _PropTypes2.default.string.isRequired
-	  }).isRequired
-	};
-	//# sourceMappingURL=Caption.js.map
-
-/***/ },
-/* 356 */
-/*!*************************************************!*\
-  !*** ./~/react-day-picker/lib/src/PropTypes.js ***!
-  \*************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.ModifierPropType = undefined;
-	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-	
-	var _propTypes = __webpack_require__(/*! prop-types */ 331);
-	
-	var _propTypes2 = _interopRequireDefault(_propTypes);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var PrimitiveTypes = _extends({
-	  localeUtils: _propTypes2.default.shape({
-	    formatMonthTitle: _propTypes2.default.func,
-	    formatWeekdayShort: _propTypes2.default.func,
-	    formatWeekdayLong: _propTypes2.default.func,
-	    getFirstDayOfWeek: _propTypes2.default.func
-	  }),
-	  range: _propTypes2.default.shape({
-	    from: _propTypes2.default.instanceOf(Date),
-	    to: _propTypes2.default.instanceOf(Date)
-	  }),
-	  after: _propTypes2.default.shape({
-	    after: _propTypes2.default.instanceOf(Date)
-	  }),
-	  before: _propTypes2.default.shape({
-	    before: _propTypes2.default.instanceOf(Date)
-	  })
-	}, _propTypes2.default);
-	
-	var ModifierPropType = exports.ModifierPropType = _propTypes2.default.oneOfType([PrimitiveTypes.after, PrimitiveTypes.before, PrimitiveTypes.range, _propTypes2.default.func, _propTypes2.default.array]);
-	
-	exports.default = PrimitiveTypes;
-	//# sourceMappingURL=PropTypes.js.map
-
-/***/ },
-/* 357 */
-/*!**********************************************!*\
-  !*** ./~/react-day-picker/lib/src/Navbar.js ***!
-  \**********************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.NavbarPropTypes = undefined;
-	exports.default = Navbar;
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _PropTypes = __webpack_require__(/*! ./PropTypes */ 356);
-	
-	var _PropTypes2 = _interopRequireDefault(_PropTypes);
-	
-	var _classNames = __webpack_require__(/*! ./classNames */ 358);
-	
-	var _classNames2 = _interopRequireDefault(_classNames);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function Navbar(_ref) {
-	  var classNames = _ref.classNames,
-	      className = _ref.className,
-	      showPreviousButton = _ref.showPreviousButton,
-	      showNextButton = _ref.showNextButton,
-	      onPreviousClick = _ref.onPreviousClick,
-	      onNextClick = _ref.onNextClick,
-	      labels = _ref.labels,
-	      dir = _ref.dir;
-	
-	  var previousClickHandler = dir === 'rtl' ? onNextClick : onPreviousClick;
-	  var nextClickHandler = dir === 'rtl' ? onPreviousClick : onNextClick;
-	
-	  var previousButton = showPreviousButton && _react2.default.createElement('span', {
-	    role: 'button',
-	    'aria-label': labels.previousMonth,
-	    key: 'previous',
-	    className: classNames.navButtonPrev,
-	    onClick: function onClick() {
-	      return previousClickHandler();
-	    }
-	  });
-	
-	  var nextButton = showNextButton && _react2.default.createElement('span', {
-	    role: 'button',
-	    'aria-label': labels.nextMonth,
-	    key: 'right',
-	    className: classNames.navButtonNext,
-	    onClick: function onClick() {
-	      return nextClickHandler();
-	    }
-	  });
-	
-	  return _react2.default.createElement(
-	    'div',
-	    { className: className || classNames.navBar },
-	    dir === 'rtl' ? [nextButton, previousButton] : [previousButton, nextButton]
-	  );
-	}
-	
-	var NavbarPropTypes = exports.NavbarPropTypes = {
-	  classNames: _PropTypes2.default.shape({
-	    navBar: _PropTypes2.default.string.isRequired,
-	    navButtonPrev: _PropTypes2.default.string.isRequired,
-	    navButtonNext: _PropTypes2.default.string.isRequired
-	  }),
-	  className: _PropTypes2.default.string,
-	  showPreviousButton: _PropTypes2.default.bool,
-	  showNextButton: _PropTypes2.default.bool,
-	  onPreviousClick: _PropTypes2.default.func,
-	  onNextClick: _PropTypes2.default.func,
-	  dir: _PropTypes2.default.string,
-	  labels: _PropTypes2.default.shape({
-	    previousMonth: _PropTypes2.default.string.isRequired,
-	    nextMonth: _PropTypes2.default.string.isRequired
-	  })
-	};
-	
-	Navbar.propTypes = NavbarPropTypes;
-	
-	Navbar.defaultProps = {
-	  classNames: _classNames2.default,
-	  dir: 'ltr',
-	  labels: {
-	    previousMonth: 'Previous Month',
-	    nextMonth: 'Next Month'
-	  },
-	  showPreviousButton: true,
-	  showNextButton: true
-	};
-	//# sourceMappingURL=Navbar.js.map
-
-/***/ },
-/* 358 */
-/*!**************************************************!*\
-  !*** ./~/react-day-picker/lib/src/classNames.js ***!
-  \**************************************************/
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	// Proxy object to map classnames when css modules are not used
-	
-	exports.default = {
-	  container: 'DayPicker',
-	  interactionDisabled: 'DayPicker--interactionDisabled',
-	  month: 'DayPicker-Month',
-	  navBar: 'DayPicker-NavBar',
-	  navButtonPrev: 'DayPicker-NavButton DayPicker-NavButton--prev',
-	  navButtonNext: 'DayPicker-NavButton DayPicker-NavButton--next',
-	  caption: 'DayPicker-Caption',
-	  weekdays: 'DayPicker-Weekdays',
-	  weekdaysRow: 'DayPicker-WeekdaysRow',
-	  weekday: 'DayPicker-Weekday',
-	  body: 'DayPicker-Body',
-	  week: 'DayPicker-Week',
-	  weekNumber: 'DayPicker-WeekNumber',
-	  day: 'DayPicker-Day',
-	  footer: 'DayPicker-Footer',
-	  todayButton: 'DayPicker-TodayButton',
-	
-	  // default modifiers
-	  today: 'today',
-	  selected: 'selected',
-	  disabled: 'disabled',
-	  outside: 'outside'
-	};
-	//# sourceMappingURL=classNames.js.map
-
-/***/ },
-/* 359 */
-/*!*********************************************!*\
-  !*** ./~/react-day-picker/lib/src/Month.js ***!
-  \*********************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = Month;
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _PropTypes = __webpack_require__(/*! ./PropTypes */ 356);
-	
-	var _PropTypes2 = _interopRequireDefault(_PropTypes);
-	
-	var _Weekdays = __webpack_require__(/*! ./Weekdays */ 360);
-	
-	var _Weekdays2 = _interopRequireDefault(_Weekdays);
-	
-	var _Helpers = __webpack_require__(/*! ./Helpers */ 361);
-	
-	var _DateUtils = __webpack_require__(/*! ./DateUtils */ 362);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function Month(_ref) {
-	  var classNames = _ref.classNames,
-	      month = _ref.month,
-	      months = _ref.months,
-	      fixedWeeks = _ref.fixedWeeks,
-	      captionElement = _ref.captionElement,
-	      weekdayElement = _ref.weekdayElement,
-	      locale = _ref.locale,
-	      localeUtils = _ref.localeUtils,
-	      weekdaysLong = _ref.weekdaysLong,
-	      weekdaysShort = _ref.weekdaysShort,
-	      firstDayOfWeek = _ref.firstDayOfWeek,
-	      onCaptionClick = _ref.onCaptionClick,
-	      children = _ref.children,
-	      footer = _ref.footer,
-	      showWeekNumbers = _ref.showWeekNumbers,
-	      onWeekClick = _ref.onWeekClick;
-	
-	  var captionProps = {
-	    date: month,
-	    classNames: classNames,
-	    months: months,
-	    localeUtils: localeUtils,
-	    locale: locale,
-	    onClick: onCaptionClick ? function (e) {
-	      return onCaptionClick(month, e);
-	    } : undefined
-	  };
-	  var caption = _react2.default.isValidElement(captionElement) ? _react2.default.cloneElement(captionElement, captionProps) : _react2.default.createElement(captionElement, captionProps);
-	
-	  var weeks = (0, _Helpers.getWeekArray)(month, firstDayOfWeek, fixedWeeks);
-	
-	  return _react2.default.createElement(
-	    'div',
-	    { className: classNames.month, role: 'grid' },
-	    caption,
-	    _react2.default.createElement(_Weekdays2.default, {
-	      classNames: classNames,
-	      weekdaysShort: weekdaysShort,
-	      weekdaysLong: weekdaysLong,
-	      firstDayOfWeek: firstDayOfWeek,
-	      showWeekNumbers: showWeekNumbers,
-	      locale: locale,
-	      localeUtils: localeUtils,
-	      weekdayElement: weekdayElement
-	    }),
-	    _react2.default.createElement(
-	      'div',
-	      { className: classNames.body, role: 'rowgroup' },
-	      weeks.map(function (week) {
-	        var weekNumber = void 0;
-	        if (showWeekNumbers) {
-	          weekNumber = (0, _DateUtils.getWeekNumber)(week[0]);
-	        }
-	        return _react2.default.createElement(
-	          'div',
-	          { key: week[0].getTime(), className: classNames.week, role: 'row' },
-	          showWeekNumbers && _react2.default.createElement(
-	            'div',
-	            {
-	              className: classNames.weekNumber,
-	              tabIndex: 0,
-	              role: 'gridcell',
-	              onClick: function onClick(e) {
-	                return onWeekClick(weekNumber, week, e);
-	              }
-	            },
-	            weekNumber
-	          ),
-	          week.map(function (day) {
-	            return children(day, month);
-	          })
-	        );
-	      })
-	    ),
-	    footer && _react2.default.createElement(
-	      'div',
-	      { className: classNames.footer },
-	      footer
-	    )
-	  );
-	}
-	
-	Month.propTypes = {
-	  classNames: _PropTypes2.default.shape({
-	    month: _PropTypes2.default.string.isRequired,
-	    body: _PropTypes2.default.string.isRequired,
-	    week: _PropTypes2.default.string.isRequired
-	  }).isRequired,
-	
-	  month: _PropTypes2.default.instanceOf(Date).isRequired,
-	  months: _PropTypes2.default.arrayOf(_PropTypes2.default.string),
-	
-	  fixedWeeks: _PropTypes2.default.bool,
-	  captionElement: _PropTypes2.default.oneOfType([_PropTypes2.default.element, _PropTypes2.default.func, _PropTypes2.default.instanceOf(_react2.default.Component)]).isRequired,
-	  weekdayElement: _PropTypes2.default.oneOfType([_PropTypes2.default.element, _PropTypes2.default.func, _PropTypes2.default.instanceOf(_react2.default.Component)]),
-	
-	  footer: _PropTypes2.default.node,
-	  showWeekNumbers: _PropTypes2.default.bool,
-	  onWeekClick: _PropTypes2.default.func,
-	
-	  locale: _PropTypes2.default.string.isRequired,
-	  localeUtils: _PropTypes2.default.localeUtils.isRequired,
-	  weekdaysLong: _PropTypes2.default.arrayOf(_PropTypes2.default.string),
-	  weekdaysShort: _PropTypes2.default.arrayOf(_PropTypes2.default.string),
-	  firstDayOfWeek: _PropTypes2.default.number.isRequired,
-	
-	  onCaptionClick: _PropTypes2.default.func,
-	
-	  children: _PropTypes2.default.func.isRequired
-	};
-	//# sourceMappingURL=Month.js.map
-
-/***/ },
-/* 360 */
-/*!************************************************!*\
-  !*** ./~/react-day-picker/lib/src/Weekdays.js ***!
-  \************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = Weekdays;
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _PropTypes = __webpack_require__(/*! ./PropTypes */ 356);
-	
-	var _PropTypes2 = _interopRequireDefault(_PropTypes);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function Weekdays(_ref) {
-	  var classNames = _ref.classNames,
-	      firstDayOfWeek = _ref.firstDayOfWeek,
-	      showWeekNumbers = _ref.showWeekNumbers,
-	      weekdaysLong = _ref.weekdaysLong,
-	      weekdaysShort = _ref.weekdaysShort,
-	      locale = _ref.locale,
-	      localeUtils = _ref.localeUtils,
-	      weekdayElement = _ref.weekdayElement;
-	
-	  var days = [];
-	  for (var i = 0; i < 7; i += 1) {
-	    var weekday = (i + firstDayOfWeek) % 7;
-	    var elementProps = {
-	      key: i,
-	      className: classNames.weekday,
-	      weekday: weekday,
-	      weekdaysLong: weekdaysLong,
-	      weekdaysShort: weekdaysShort,
-	      localeUtils: localeUtils,
-	      locale: locale
-	    };
-	    var element = _react2.default.isValidElement(weekdayElement) ? _react2.default.cloneElement(weekdayElement, elementProps) : _react2.default.createElement(weekdayElement, elementProps);
-	    days.push(element);
-	  }
-	
-	  return _react2.default.createElement(
-	    'div',
-	    { className: classNames.weekdays, role: 'rowgroup' },
-	    _react2.default.createElement(
-	      'div',
-	      { className: classNames.weekdaysRow, role: 'row' },
-	      showWeekNumbers && _react2.default.createElement('div', { className: classNames.weekday }),
-	      days
-	    )
-	  );
-	}
-	
-	Weekdays.propTypes = {
-	  classNames: _PropTypes2.default.shape({
-	    weekday: _PropTypes2.default.string.isRequired,
-	    weekdays: _PropTypes2.default.string.isRequired,
-	    weekdaysRow: _PropTypes2.default.string.isRequired
-	  }).isRequired,
-	
-	  firstDayOfWeek: _PropTypes2.default.number.isRequired,
-	  weekdaysLong: _PropTypes2.default.arrayOf(_PropTypes2.default.string),
-	  weekdaysShort: _PropTypes2.default.arrayOf(_PropTypes2.default.string),
-	  showWeekNumbers: _PropTypes2.default.bool,
-	  locale: _PropTypes2.default.string.isRequired,
-	  localeUtils: _PropTypes2.default.localeUtils.isRequired,
-	  weekdayElement: _PropTypes2.default.oneOfType([_PropTypes2.default.element, _PropTypes2.default.func, _PropTypes2.default.instanceOf(_react2.default.Component)])
-	};
-	//# sourceMappingURL=Weekdays.js.map
-
-/***/ },
-/* 361 */
-/*!***********************************************!*\
-  !*** ./~/react-day-picker/lib/src/Helpers.js ***!
-  \***********************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-	
-	exports.cancelEvent = cancelEvent;
-	exports.getFirstDayOfMonth = getFirstDayOfMonth;
-	exports.getDaysInMonth = getDaysInMonth;
-	exports.getModifiersFromProps = getModifiersFromProps;
-	exports.getFirstDayOfWeekFromProps = getFirstDayOfWeekFromProps;
-	exports.isRangeOfDates = isRangeOfDates;
-	exports.getMonthsDiff = getMonthsDiff;
-	exports.getWeekArray = getWeekArray;
-	exports.startOfMonth = startOfMonth;
-	
-	var _DateUtils = __webpack_require__(/*! ./DateUtils */ 362);
-	
-	var _LocaleUtils = __webpack_require__(/*! ./LocaleUtils */ 363);
-	
-	function cancelEvent(e) {
-	  e.preventDefault();
-	  e.stopPropagation();
-	}
-	
-	function getFirstDayOfMonth(d) {
-	  return new Date(d.getFullYear(), d.getMonth(), 1, 12);
-	}
-	
-	function getDaysInMonth(d) {
-	  var resultDate = getFirstDayOfMonth(d);
-	
-	  resultDate.setMonth(resultDate.getMonth() + 1);
-	  resultDate.setDate(resultDate.getDate() - 1);
-	
-	  return resultDate.getDate();
-	}
-	
-	function getModifiersFromProps(props) {
-	  var modifiers = _extends({}, props.modifiers);
-	  if (props.selectedDays) {
-	    modifiers[props.classNames.selected] = props.selectedDays;
-	  }
-	  if (props.disabledDays) {
-	    modifiers[props.classNames.disabled] = props.disabledDays;
-	  }
-	  return modifiers;
-	}
-	
-	function getFirstDayOfWeekFromProps(props) {
-	  var firstDayOfWeek = props.firstDayOfWeek,
-	      _props$locale = props.locale,
-	      locale = _props$locale === undefined ? 'en' : _props$locale,
-	      _props$localeUtils = props.localeUtils,
-	      localeUtils = _props$localeUtils === undefined ? {} : _props$localeUtils;
-	
-	  if (!isNaN(firstDayOfWeek)) {
-	    return firstDayOfWeek;
-	  }
-	  if (localeUtils.getFirstDayOfWeek) {
-	    return localeUtils.getFirstDayOfWeek(locale);
-	  }
-	  return 0;
-	}
-	
-	function isRangeOfDates(value) {
-	  return !!(value && value.from && value.to);
-	}
-	
-	function getMonthsDiff(d1, d2) {
-	  return d2.getMonth() - d1.getMonth() + 12 * (d2.getFullYear() - d1.getFullYear());
-	}
-	
-	function getWeekArray(d) {
-	  var firstDayOfWeek = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : (0, _LocaleUtils.getFirstDayOfWeek)();
-	  var fixedWeeks = arguments[2];
-	
-	  var daysInMonth = getDaysInMonth(d);
-	  var dayArray = [];
-	
-	  var week = [];
-	  var weekArray = [];
-	
-	  for (var i = 1; i <= daysInMonth; i += 1) {
-	    dayArray.push(new Date(d.getFullYear(), d.getMonth(), i, 12));
-	  }
-	
-	  dayArray.forEach(function (day) {
-	    if (week.length > 0 && day.getDay() === firstDayOfWeek) {
-	      weekArray.push(week);
-	      week = [];
-	    }
-	    week.push(day);
-	    if (dayArray.indexOf(day) === dayArray.length - 1) {
-	      weekArray.push(week);
-	    }
-	  });
-	
-	  // unshift days to start the first week
-	  var firstWeek = weekArray[0];
-	  for (var _i = 7 - firstWeek.length; _i > 0; _i -= 1) {
-	    var outsideDate = (0, _DateUtils.clone)(firstWeek[0]);
-	    outsideDate.setDate(firstWeek[0].getDate() - 1);
-	    firstWeek.unshift(outsideDate);
-	  }
-	
-	  // push days until the end of the last week
-	  var lastWeek = weekArray[weekArray.length - 1];
-	  for (var _i2 = lastWeek.length; _i2 < 7; _i2 += 1) {
-	    var _outsideDate = (0, _DateUtils.clone)(lastWeek[lastWeek.length - 1]);
-	    _outsideDate.setDate(lastWeek[lastWeek.length - 1].getDate() + 1);
-	    lastWeek.push(_outsideDate);
-	  }
-	
-	  // add extra weeks to reach 6 weeks
-	  if (fixedWeeks && weekArray.length < 6) {
-	    var lastExtraWeek = void 0;
-	
-	    for (var _i3 = weekArray.length; _i3 < 6; _i3 += 1) {
-	      lastExtraWeek = weekArray[weekArray.length - 1];
-	      var lastDay = lastExtraWeek[lastExtraWeek.length - 1];
-	      var extraWeek = [];
-	
-	      for (var j = 0; j < 7; j += 1) {
-	        var _outsideDate2 = (0, _DateUtils.clone)(lastDay);
-	        _outsideDate2.setDate(lastDay.getDate() + j + 1);
-	        extraWeek.push(_outsideDate2);
-	      }
-	
-	      weekArray.push(extraWeek);
-	    }
-	  }
-	
-	  return weekArray;
-	}
-	
-	function startOfMonth(d) {
-	  var newDate = (0, _DateUtils.clone)(d);
-	  newDate.setDate(1);
-	  newDate.setHours(12, 0, 0, 0); // always set noon to avoid time zone issues
-	  return newDate;
-	}
-	//# sourceMappingURL=Helpers.js.map
-
-/***/ },
-/* 362 */
-/*!*************************************************!*\
-  !*** ./~/react-day-picker/lib/src/DateUtils.js ***!
-  \*************************************************/
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.clone = clone;
-	exports.addMonths = addMonths;
-	exports.isSameDay = isSameDay;
-	exports.isDayBefore = isDayBefore;
-	exports.isDayAfter = isDayAfter;
-	exports.isPastDay = isPastDay;
-	exports.isFutureDay = isFutureDay;
-	exports.isDayBetween = isDayBetween;
-	exports.addDayToRange = addDayToRange;
-	exports.isDayInRange = isDayInRange;
-	exports.getWeekNumber = getWeekNumber;
-	/**
-	 * Clone a date object.
-	 *
-	 * @export
-	 * @param  {Date} d The date to clone
-	 * @return {Date} The cloned date
-	 */
-	function clone(d) {
-	  return new Date(d.getTime());
-	}
-	
-	/**
-	 * Return `d` as a new date with `n` months added.
-	 * 
-	 * @export
-	 * @param {[type]} d
-	 * @param {[type]} n
-	 */
-	function addMonths(d, n) {
-	  var newDate = clone(d);
-	  newDate.setMonth(d.getMonth() + n);
-	  return newDate;
-	}
-	
-	/**
-	 * Return `true` if two dates are the same day, ignoring the time.
-	 *
-	 * @export
-	 * @param  {Date}  d1
-	 * @param  {Date}  d2
-	 * @return {Boolean}
-	 */
-	function isSameDay(d1, d2) {
-	  if (!d1 || !d2) {
-	    return false;
-	  }
-	  return d1.getDate() === d2.getDate() && d1.getMonth() === d2.getMonth() && d1.getFullYear() === d2.getFullYear();
-	}
-	
-	/**
-	 * Returns `true` if the first day is before the second day.
-	 * 
-	 * @export
-	 * @param {Date} d1 
-	 * @param {Date} d2 
-	 * @returns {Boolean}
-	 */
-	function isDayBefore(d1, d2) {
-	  var day1 = clone(d1).setHours(0, 0, 0, 0);
-	  var day2 = clone(d2).setHours(0, 0, 0, 0);
-	  return day1 < day2;
-	}
-	
-	/**
-	 * Returns `true` if the first day is after the second day.
-	 * 
-	 * @export
-	 * @param {Date} d1 
-	 * @param {Date} d2 
-	 * @returns {Boolean}
-	 */
-	function isDayAfter(d1, d2) {
-	  var day1 = clone(d1).setHours(0, 0, 0, 0);
-	  var day2 = clone(d2).setHours(0, 0, 0, 0);
-	  return day1 > day2;
-	}
-	
-	/**
-	 * Return `true` if a day is in the past, e.g. yesterday or any day
-	 * before yesterday.
-	 *
-	 * @export
-	 * @param  {Date}  d
-	 * @return {Boolean}
-	 */
-	function isPastDay(d) {
-	  var today = new Date();
-	  today.setHours(0, 0, 0, 0);
-	  return isDayBefore(d, today);
-	}
-	
-	/**
-	 * Return `true` if a day is in the future, e.g. tomorrow or any day
-	 * after tomorrow.
-	 *
-	 * @export
-	 * @param  {Date}  d
-	 * @return {Boolean}
-	 */
-	function isFutureDay(d) {
-	  var tomorrow = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
-	  tomorrow.setHours(0, 0, 0, 0);
-	  return d >= tomorrow;
-	}
-	
-	/**
-	 * Return `true` if day `d` is between days `d1` and `d2`,
-	 * without including them.
-	 *
-	 * @export
-	 * @param  {Date}  d
-	 * @param  {Date}  d1
-	 * @param  {Date}  d2
-	 * @return {Boolean}
-	 */
-	function isDayBetween(d, d1, d2) {
-	  var date = clone(d);
-	  date.setHours(0, 0, 0, 0);
-	  return isDayAfter(date, d1) && isDayBefore(date, d2) || isDayAfter(date, d2) && isDayBefore(date, d1);
-	}
-	
-	/**
-	 * Add a day to a range and return a new range. A range is an object with
-	 * `from` and `to` days.
-	 *
-	 * @export
-	 * @param {Date} day
-	 * @param {Object} range
-	 * @return {Object} Returns a new range object
-	 */
-	function addDayToRange(day) {
-	  var range = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { from: null, to: null };
-	  var from = range.from,
-	      to = range.to;
-	
-	  if (!from) {
-	    from = day;
-	  } else if (from && to && isSameDay(from, to) && isSameDay(day, from)) {
-	    from = null;
-	    to = null;
-	  } else if (to && isDayBefore(day, from)) {
-	    from = day;
-	  } else if (to && isSameDay(day, to)) {
-	    from = day;
-	    to = day;
-	  } else {
-	    to = day;
-	    if (isDayBefore(to, from)) {
-	      to = from;
-	      from = day;
-	    }
-	  }
-	
-	  return { from: from, to: to };
-	}
-	
-	/**
-	 * Return `true` if a day is included in a range of days.
-	 *
-	 * @export
-	 * @param  {Date}  day
-	 * @param  {Object}  range
-	 * @return {Boolean}
-	 */
-	function isDayInRange(day, range) {
-	  var from = range.from,
-	      to = range.to;
-	
-	  return from && isSameDay(day, from) || to && isSameDay(day, to) || from && to && isDayBetween(day, from, to);
-	}
-	
-	/**
-	 * Return the year's week number (as per ISO, i.e. with the week starting from monday)
-	 * for the given day.
-	 * 
-	 * @export
-	 * @param {Date} day 
-	 * @returns {Number}
-	 */
-	function getWeekNumber(day) {
-	  var date = clone(day);
-	  date.setHours(0, 0, 0);
-	  date.setDate(date.getDate() + 4 - (date.getDay() || 7));
-	  return Math.ceil(((date - new Date(date.getFullYear(), 0, 1)) / 8.64e7 + 1) / 7);
-	}
-	
-	exports.default = {
-	  addDayToRange: addDayToRange,
-	  addMonths: addMonths,
-	  clone: clone,
-	  getWeekNumber: getWeekNumber,
-	  isDayAfter: isDayAfter,
-	  isDayBefore: isDayBefore,
-	  isDayBetween: isDayBetween,
-	  isDayInRange: isDayInRange,
-	  isFutureDay: isFutureDay,
-	  isPastDay: isPastDay,
-	  isSameDay: isSameDay
-	};
-	//# sourceMappingURL=DateUtils.js.map
-
-/***/ },
-/* 363 */
-/*!***************************************************!*\
-  !*** ./~/react-day-picker/lib/src/LocaleUtils.js ***!
-  \***************************************************/
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.formatDay = formatDay;
-	exports.formatMonthTitle = formatMonthTitle;
-	exports.formatWeekdayShort = formatWeekdayShort;
-	exports.formatWeekdayLong = formatWeekdayLong;
-	exports.getFirstDayOfWeek = getFirstDayOfWeek;
-	exports.getMonths = getMonths;
-	var WEEKDAYS_LONG = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-	
-	var WEEKDAYS_SHORT = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-	
-	var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-	
-	function formatDay(day) {
-	  return day.toDateString();
-	}
-	
-	function formatMonthTitle(d) {
-	  return MONTHS[d.getMonth()] + ' ' + d.getFullYear();
-	}
-	
-	function formatWeekdayShort(i) {
-	  return WEEKDAYS_SHORT[i];
-	}
-	
-	function formatWeekdayLong(i) {
-	  return WEEKDAYS_LONG[i];
-	}
-	
-	function getFirstDayOfWeek() {
-	  return 0;
-	}
-	
-	function getMonths() {
-	  return MONTHS;
-	}
-	
-	exports.default = {
-	  formatDay: formatDay,
-	  formatMonthTitle: formatMonthTitle,
-	  formatWeekdayShort: formatWeekdayShort,
-	  formatWeekdayLong: formatWeekdayLong,
-	  getFirstDayOfWeek: getFirstDayOfWeek,
-	  getMonths: getMonths
-	};
-	//# sourceMappingURL=LocaleUtils.js.map
-
-/***/ },
-/* 364 */
-/*!*******************************************!*\
-  !*** ./~/react-day-picker/lib/src/Day.js ***!
-  \*******************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = Day;
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _classNames = __webpack_require__(/*! ./classNames */ 358);
-	
-	var _classNames2 = _interopRequireDefault(_classNames);
-	
-	var _PropTypes = __webpack_require__(/*! ./PropTypes */ 356);
-	
-	var _PropTypes2 = _interopRequireDefault(_PropTypes);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function handleEvent(handler, day, modifiers) {
-	  if (!handler) {
-	    return undefined;
-	  }
-	  return function (e) {
-	    e.persist();
-	    handler(day, modifiers, e);
-	  };
-	} /* eslint-disable jsx-a11y/no-static-element-interactions, react/forbid-prop-types */
-	
-	function Day(_ref) {
-	  var classNames = _ref.classNames,
-	      modifiersStyles = _ref.modifiersStyles,
-	      day = _ref.day,
-	      tabIndex = _ref.tabIndex,
-	      empty = _ref.empty,
-	      modifiers = _ref.modifiers,
-	      onMouseEnter = _ref.onMouseEnter,
-	      onMouseLeave = _ref.onMouseLeave,
-	      onClick = _ref.onClick,
-	      onKeyDown = _ref.onKeyDown,
-	      onTouchStart = _ref.onTouchStart,
-	      onTouchEnd = _ref.onTouchEnd,
-	      onFocus = _ref.onFocus,
-	      ariaLabel = _ref.ariaLabel,
-	      ariaDisabled = _ref.ariaDisabled,
-	      ariaSelected = _ref.ariaSelected,
-	      children = _ref.children;
-	
-	  var className = classNames.day;
-	  if (classNames !== _classNames2.default) {
-	    // When using CSS modules prefix the modifier as required by the BEM syntax
-	    className += ' ' + Object.keys(modifiers).join(' ');
-	  } else {
-	    className += Object.keys(modifiers).map(function (modifier) {
-	      return ' ' + className + '--' + modifier;
-	    }).join('');
-	  }
-	
-	  var style = void 0;
-	  if (modifiersStyles) {
-	    Object.keys(modifiers).filter(function (modifier) {
-	      return !!modifiersStyles[modifier];
-	    }).forEach(function (modifier) {
-	      style = Object.assign({}, style, modifiersStyles[modifier]);
-	    });
-	  }
-	
-	  if (empty) {
-	    return _react2.default.createElement('div', { role: 'gridcell', 'aria-disabled': true, className: className, style: style });
-	  }
-	
-	  return _react2.default.createElement(
-	    'div',
-	    {
-	      className: className,
-	      tabIndex: tabIndex || 0,
-	      style: style,
-	      role: 'gridcell',
-	      'aria-label': ariaLabel,
-	      'aria-disabled': ariaDisabled.toString(),
-	      'aria-selected': ariaSelected.toString(),
-	      onClick: handleEvent(onClick, day, modifiers),
-	      onKeyDown: handleEvent(onKeyDown, day, modifiers),
-	      onMouseEnter: handleEvent(onMouseEnter, day, modifiers),
-	      onMouseLeave: handleEvent(onMouseLeave, day, modifiers),
-	      onTouchEnd: handleEvent(onTouchEnd, day, modifiers),
-	      onTouchStart: handleEvent(onTouchStart, day, modifiers),
-	      onFocus: handleEvent(onFocus, day, modifiers)
-	    },
-	    children
-	  );
-	}
-	
-	Day.propTypes = {
-	  classNames: _PropTypes2.default.shape({
-	    day: _PropTypes2.default.string.isRequired
-	  }).isRequired,
-	
-	  day: _PropTypes2.default.instanceOf(Date).isRequired,
-	  children: _PropTypes2.default.node.isRequired,
-	
-	  ariaDisabled: _PropTypes2.default.bool,
-	  ariaLabel: _PropTypes2.default.string,
-	  ariaSelected: _PropTypes2.default.bool,
-	  empty: _PropTypes2.default.bool,
-	  modifiers: _PropTypes2.default.object,
-	  modifiersStyles: _PropTypes2.default.object,
-	  onClick: _PropTypes2.default.func,
-	  onKeyDown: _PropTypes2.default.func,
-	  onMouseEnter: _PropTypes2.default.func,
-	  onMouseLeave: _PropTypes2.default.func,
-	  onTouchEnd: _PropTypes2.default.func,
-	  onTouchStart: _PropTypes2.default.func,
-	  onFocus: _PropTypes2.default.func,
-	  tabIndex: _PropTypes2.default.number
-	};
-	
-	Day.defaultProps = {
-	  modifiers: {},
-	  empty: false
-	};
-	//# sourceMappingURL=Day.js.map
-
-/***/ },
-/* 365 */
-/*!***********************************************!*\
-  !*** ./~/react-day-picker/lib/src/Weekday.js ***!
-  \***********************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.WeekdayPropTypes = undefined;
-	exports.default = Weekday;
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _PropTypes = __webpack_require__(/*! ./PropTypes */ 356);
-	
-	var _PropTypes2 = _interopRequireDefault(_PropTypes);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function Weekday(_ref) {
-	  var weekday = _ref.weekday,
-	      className = _ref.className,
-	      weekdaysLong = _ref.weekdaysLong,
-	      weekdaysShort = _ref.weekdaysShort,
-	      localeUtils = _ref.localeUtils,
-	      locale = _ref.locale;
-	
-	  var title = void 0;
-	  if (weekdaysLong) {
-	    title = weekdaysLong[weekday];
-	  } else {
-	    title = localeUtils.formatWeekdayLong(weekday, locale);
-	  }
-	  var content = void 0;
-	  if (weekdaysShort) {
-	    content = weekdaysShort[weekday];
-	  } else {
-	    content = localeUtils.formatWeekdayShort(weekday, locale);
-	  }
-	
-	  return _react2.default.createElement(
-	    'div',
-	    { className: className, role: 'columnheader' },
-	    _react2.default.createElement(
-	      'abbr',
-	      { title: title },
-	      content
-	    )
-	  );
-	}
-	
-	var WeekdayPropTypes = exports.WeekdayPropTypes = {
-	  weekday: _PropTypes2.default.number,
-	  className: _PropTypes2.default.string,
-	  locale: _PropTypes2.default.string,
-	  localeUtils: _PropTypes2.default.localeUtils,
-	
-	  weekdaysLong: _PropTypes2.default.arrayOf(_PropTypes2.default.string),
-	  weekdaysShort: _PropTypes2.default.arrayOf(_PropTypes2.default.string)
-	};
-	
-	Weekday.propTypes = WeekdayPropTypes;
-	//# sourceMappingURL=Weekday.js.map
-
-/***/ },
-/* 366 */
-/*!******************************************************!*\
-  !*** ./~/react-day-picker/lib/src/ModifiersUtils.js ***!
-  \******************************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.dayMatchesModifier = dayMatchesModifier;
-	exports.getModifiersForDay = getModifiersForDay;
-	
-	var _DateUtils = __webpack_require__(/*! ./DateUtils */ 362);
-	
-	var _Helpers = __webpack_require__(/*! ./Helpers */ 361);
-	
-	/**
-	 * Return `true` if a date matches the specified modifier.
-	 * 
-	 * @export
-	 * @param {Date} day
-	 * @param {Any} modifier 
-	 * @return {Boolean}
-	 */
-	function dayMatchesModifier(day, modifier) {
-	  if (!modifier) {
-	    return false;
-	  }
-	  var arr = Array.isArray(modifier) ? modifier : [modifier];
-	  return arr.some(function (mod) {
-	    if (!mod) {
-	      return false;
-	    }
-	    if (mod instanceof Date) {
-	      return (0, _DateUtils.isSameDay)(day, mod);
-	    }
-	    if ((0, _Helpers.isRangeOfDates)(mod)) {
-	      return (0, _DateUtils.isDayInRange)(day, mod);
-	    }
-	    if (mod.after) {
-	      return (0, _DateUtils.isDayAfter)(day, mod.after);
-	    }
-	    if (mod.before) {
-	      return (0, _DateUtils.isDayBefore)(day, mod.before);
-	    }
-	    if (mod.daysOfWeek) {
-	      return mod.daysOfWeek.some(function (dayOfWeek) {
-	        return day.getDay() === dayOfWeek;
-	      });
-	    }
-	    if (typeof mod === 'function') {
-	      return mod(day);
-	    }
-	    return false;
-	  });
-	}
-	
-	/**
-	 * Return the modifiers matching the given day for the given
-	 * object of modifiers.
-	 * 
-	 * @export
-	 * @param {Date} day
-	 * @param {Object} [modifiersObj={}] 
-	 * @return {Array}
-	 */
-	function getModifiersForDay(day) {
-	  var modifiersObj = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-	
-	  return Object.keys(modifiersObj).reduce(function (modifiers, modifierName) {
-	    var value = modifiersObj[modifierName];
-	    if (dayMatchesModifier(day, value)) {
-	      modifiers.push(modifierName);
-	    }
-	    return modifiers;
-	  }, []);
-	}
-	
-	exports.default = { dayMatchesModifier: dayMatchesModifier, getModifiersForDay: getModifiersForDay };
-	//# sourceMappingURL=ModifiersUtils.js.map
-
-/***/ },
-/* 367 */
-/*!********************************************!*\
-  !*** ./~/react-day-picker/lib/src/keys.js ***!
-  \********************************************/
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = {
-	  LEFT: 37,
-	  UP: 38,
-	  RIGHT: 39,
-	  DOWN: 40,
-	  ENTER: 13,
-	  SPACE: 32,
-	  ESC: 27
-	};
-	//# sourceMappingURL=keys.js.map
-
-/***/ },
-/* 368 */
-/*!**********************************************!*\
-  !*** ./src/app/Components/Notifications.jsx ***!
-  \**********************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var keccak_256 = __webpack_require__(/*! js-sha3 */ 325).keccak_256;
-	
-	var Notifications = function (_React$Component) {
-		_inherits(Notifications, _React$Component);
-	
-		function Notifications(props) {
-			_classCallCheck(this, Notifications);
-	
-			//coid=proposals
-			var _this = _possibleConstructorReturn(this, (Notifications.__proto__ || Object.getPrototypeOf(Notifications)).call(this, props));
-	
-			_this.state = { coid: [],
-				showDetails: false,
-				activeMessages: {}
-			};
-			_this.showHandler = _this.showHandler.bind(_this);
-			return _this;
-		}
-	
-		_createClass(Notifications, [{
-			key: 'getDateFormat',
-			value: function getDateFormat(timestamp) {
-				var d = new Date(timestamp);
-				return d.getMonth() + 1 + "/" + d.getDate() + "/" + d.getFullYear();
-			}
-		}, {
-			key: 'componentDidMount',
-			value: function componentDidMount() {
-				$.ajax({
-					url: twinUrl + "ballot/readNotify/" + keccak_256(localStorage.getItem("pubKey")).toUpperCase(),
-					dataType: 'json',
-					cache: false,
-					success: function (result) {
-						console.log("result: " + JSON.stringify(result));
-						if ((typeof result === 'undefined' ? 'undefined' : _typeof(result)) != "object") {
-							var data = JSON.parse(result);
-						} else {
-							var data = result;
-							var test = JSON.parse(result.data);
-							test = JSON.parse(JSON.stringify(test.messages));
-							console.log(test[0].type);
-						}
-						this.setState({ coid: test });
-						console.log("Notifications state: " + JSON.stringify(this.state));
-						console.log(typeof result === 'undefined' ? 'undefined' : _typeof(result));
-					}.bind(this)
-				});
-			}
-		}, {
-			key: 'hideHandler',
-			value: function hideHandler() {
-				this.setState({ showDetails: false });
-			}
-	
-			//assigns entire COID to activeMessages, 
-	
-		}, {
-			key: 'dataHandler',
-			value: function dataHandler(index) {
-				return this.state.coid[index];
-			}
-		}, {
-			key: 'getActiveData',
-			value: function getActiveData() {
-				return this.state.activeMessages;
-			}
-		}, {
-			key: 'showHandler',
-			value: function showHandler(e) {
-				e.preventDefault();
-				this.setState({
-					showDetails: true,
-					activeMessages: this.dataHandler($(e.target).attr('data-index'))
-				});
-			}
-		}, {
-			key: 'render',
-			value: function render() {
-				var _this2 = this;
-	
-				var _that = this;
-				return _react2.default.createElement(
-					'div',
-					{ id: 'notifications_container' },
-					_react2.default.createElement(
-						'h1',
-						null,
-						'Notifications'
-					),
-					' ',
-					_react2.default.createElement('hr', null),
-					_react2.default.createElement(
-						'table',
-						{ className: 'table table-striped' },
-						_react2.default.createElement(
-							'tbody',
-							null,
-							function () {
-								if ($.isArray(_this2.state.coid) && _this2.state.coid.length > 0) {
-									return _this2.state.coid.map(function (el, i) {
-										return _react2.default.createElement(
-											'tr',
-											{ key: i },
-											_react2.default.createElement(
-												'td',
-												null,
-												_react2.default.createElement(
-													'div',
-													null,
-													_react2.default.createElement(
-														'b',
-														null,
-														'Proposal ID: '
-													),
-													el.proposal_id
-												),
-												_react2.default.createElement(
-													'div',
-													null,
-													_react2.default.createElement(
-														'b',
-														null,
-														'Message: '
-													),
-													el.message
-												),
-												_react2.default.createElement(
-													'div',
-													null,
-													_react2.default.createElement(
-														'b',
-														null,
-														'Published On: '
-													),
-													_that.getDateFormat(el.time)
-												)
-											)
-										);
-									});
-								} else {
-									return _react2.default.createElement(
-										'tr',
-										null,
-										_react2.default.createElement(
-											'td',
-											null,
-											_react2.default.createElement(
-												'p',
-												null,
-												'No messages to show !'
-											)
-										)
-									);
-								}
-							}(this)
-						)
-					)
-				);
-			}
-		}]);
-	
-		return Notifications;
-	}(_react2.default.Component);
-	
-	;
-	exports.default = Notifications;
-
-/***/ },
-/* 369 */
-/*!***************************************!*\
-  !*** ./src/app/Components/Assets.jsx ***!
-  \***************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _reactRouter = __webpack_require__(/*! react-router */ 172);
-	
-	var _reactTagsinput = __webpack_require__(/*! react-tagsinput */ 328);
-	
-	var _reactTagsinput2 = _interopRequireDefault(_reactTagsinput);
-	
-	var _qrcode = __webpack_require__(/*! qrcode.react */ 370);
-	
-	var _qrcode2 = _interopRequireDefault(_qrcode);
-	
-	var _classAndSubClass = __webpack_require__(/*! ./classAndSubClass.js */ 380);
-	
-	var _classAndSubClass2 = _interopRequireDefault(_classAndSubClass);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	//import { Router, Route, IndexRedirect, hashHistory } from 'react-router';
-	
-	var crypto = __webpack_require__(/*! crypto */ 243);
-	var secp256k1 = __webpack_require__(/*! secp256k1 */ 261);
-	var keccak_256 = __webpack_require__(/*! js-sha3 */ 325).keccak_256;
-	
-	// TODO: Static public/private keys has to be changed
-	
-	var Modal = function (_Component) {
-		_inherits(Modal, _Component);
-	
-		function Modal(props) {
-			_classCallCheck(this, Modal);
-	
-			var _this2 = _possibleConstructorReturn(this, (Modal.__proto__ || Object.getPrototypeOf(Modal)).call(this, props));
-	
-			_this2.pubKey = localStorage.getItem("pubKey");
-			_this2.privKey = localStorage.getItem("privKey");
-			_this2.tags = new _classAndSubClass2.default(_this2.pubKey, props.asset.asset_id);
-			_this2.state = {
-	
-				//added for identityDimension tab-pane
-				inputs: ['input-0'],
-	
-				asset: props.asset || {},
-				asset_class: _this2.tags.getAssetData("classes"),
-				asset_subclass: _this2.tags.getAssetData("subclasses"),
-				qrCode_signature: {},
-	
-				qrCode_COID_device_relation: {},
-	
-				notCOID: true, //if the asset in view is MYCOID, we dont need second QR
-	
-				//used for identitydimension file upload
-				docs: {}
-	
-			};
-			_this2.handleClassChange = _this2.handleClassChange.bind(_this2);
-			_this2.handleSubClassChange = _this2.handleSubClassChange.bind(_this2);
-			_this2.maxUniqAttr = 10;
-			return _this2;
-		}
-	
-		_createClass(Modal, [{
-			key: 'handleClassChange',
-			value: function handleClassChange(tags) {
-				this.setState({ asset_class: tags });
-				this.tags.updateClasses(tags, this.props.asset.asset_id, "classes");
-			}
-		}, {
-			key: 'handleSubClassChange',
-			value: function handleSubClassChange(tags) {
-				this.setState({ asset_subclass: tags });
-				this.tags.updateClasses(tags, this.props.asset.asset_id, "subclasses");
-			}
-		}, {
-			key: 'componentDidMount',
-			value: function componentDidMount() {
-				$("#assetDetails").modal('show');
-				$("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
-	
-				var asset_id = this.props.asset.asset_id;
-				if (asset_id == "MyCOID") {
-					this.setState({ notCOID: false });
-				} else {
-					this.setState({ notCOID: true });
-				}
-	
-				var standardAsset = document.getElementById("standardAsset");
-				var KYC = document.getElementById("KYC");
-	
-				if (this.props.asset.asset_details.propType == 2) {
-					standardAsset.style.display = 'none';
-					KYC.style.display = 'block';
-				} else {
-					KYC.style.display = 'none';
-				}
-	
-				var prop = this.props.asset.asset_details;
-	
-				var theTime = new Date().toString();
-	
-				var qrCode_Object = JSON.stringify({
-					uniqueId: prop.uniqueId,
-					name: prop.uniqueIdAttributes[0],
-					ownershipId: prop.ownershipId,
-					bigchainID: prop.bigchainID,
-					bigchainHash: prop.bigchainHash,
-					endpoint: twinUrl + "validateQrCode"
-				});
-				console.log("**" + qrCode_Object);
-	
-				var qrCode_Object_hash = keccak_256(theTime);
-	
-				this.privKey = new Buffer(this.privKey, "hex");
-	
-				var qrCode_Object_hash_buffer = new Buffer(qrCode_Object_hash, "hex");
-	
-				var signature = JSON.stringify(secp256k1.sign(qrCode_Object_hash_buffer, this.privKey));
-				signature = JSON.parse(signature).signature;
-				signature = JSON.stringify(signature);
-				signature = JSON.parse(signature).data;
-				signature = new Buffer(signature, "hex");
-				signature = signature.toString("hex");
-				console.log("singature: " + signature);
-	
-				//***************************************************************************
-				//***************************************************************************
-	
-				var owners_sig = "348dba954726daeb583726cc1838aacbb2d69038438723987ec5a2223217dcca45bd22528f56eb8dd232ec2345de34243234bdd34124af34f454e7d6f5e7d545";
-	
-				var qrCode_owned_Object = JSON.stringify({
-					uniqueId: prop.uniqueId,
-					owner: prop.ownerIdList,
-					owner_signature: owners_sig,
-					asset_signature: signature,
-					bigchainID: prop.bigchainID,
-					bigchainHash: prop.bigchainHash
-				});
-	
-				var qrCode_owned_Object_hash = keccak_256(theTime);
-	
-				//***************************************************************************.
-				//***************************************************************************
-				//added second object for second qrCode
-	
-				this.setState({
-					qrCode_signature: { "msgHash": qrCode_Object_hash, "signature": signature, "timestamp": theTime },
-					qrCode_COID_device_relation: { "msgHash": qrCode_owned_Object_hash, "owners_sig": owners_sig, "timestamp": theTime }
-				});
-			}
-		}, {
-			key: 'appendInput',
-			value: function appendInput() {
-				console.log("hit append Input");
-				var inputLen = this.state.inputs.length;
-				if (inputLen < this.maxUniqAttr) {
-					var newInput = 'input-' + inputLen;
-					this.setState({ inputs: this.state.inputs.concat([newInput]) });
-				}
-			}
-		}, {
-			key: 'getLabelValues',
-			value: function getLabelValues() {
-				console.log("hit getLabelValues");
-				var labelVals = [];
-				var _this = this;
-				$.each($("input[name^='label-']"), function (obj) {
-					var value = $.trim($(this).val());
-					if (value.length > 0) {
-						labelVals.push(_defineProperty({}, $(this).attr('name').replace("label-", ""), value));
-					}
-				});
-				return labelVals;
-			}
-		}, {
-			key: 'handleHideModal',
-			value: function handleHideModal() {
-				this.setState({ showModal: false });
-			}
-		}, {
-			key: 'handleShowModal',
-			value: function handleShowModal(e) {
-				this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-			}
-		}, {
-			key: 'render',
-			value: function render() {
-				var _this3 = this;
-	
-				console.log("******" + JSON.stringify(this.state.qrCode_COID_device_relation));
-	
-				var _this = this;
-	
-				var prop = this.props.asset.asset_details;
-				var style = {
-					fontSize: '12.5px'
-				};
-	
-				var classInput = {
-					addKeys: [13, 188], // Enter and comma
-					value: this.state.asset_class,
-					onChange: this.handleClassChange,
-					inputProps: { placeholder: "" }
-				};
-				var subClassInput = {
-					addKeys: [13, 188], // Enter and comma
-					value: this.state.asset_subclass,
-					onChange: this.handleSubClassChange.bind(this),
-					inputProps: { placeholder: "" }
-				};
-	
-				//message hash is the hash of the elemets
-				var qrConfig = JSON.stringify({
-					pubKey: prop.pubKey,
-					//this.setState({qrCode_signature: {"msgHash": qrCode_Object_hash, "signature":signature}})
-					msgHash: this.state.qrCode_signature.msgHash,
-					sig: this.state.qrCode_signature.signature,
-					uniqueId: prop.uniqueId,
-					ownershipId: prop.ownershipId,
-					name: prop.uniqueIdAttributes[0][0],
-					bigchainID: prop.bigchainID,
-					bigchainHash: prop.bigchainHash,
-					timestamp: this.state.qrCode_signature.timestamp,
-					endpoint: twinUrl + "validateQrCode"
-				});
-	
-				var qrOwnedDevice = JSON.stringify({
-					pubKey: prop.pubkey,
-					msgHash: _this.state.qrCode_COID_device_relation.msgHash,
-					asset_sig: _this.state.qrCode_COID_device_relation.signature,
-					//need to make sure asset_sig is correct
-					owners_sig: _this.state.qrCode_COID_device_relation.owners_sig,
-					owner: prop.ownerIdList
-				});
-	
-				var qrStyle = {
-					maxWidth: "100%",
-					textAlign: "center"
-				};
-	
-				var syle = {
-					marginRight: '15px'
-				};
-	
-				var popUpWidth = {
-					width: '70%'
-				};
-	
-				return _react2.default.createElement(
-					'div',
-					{ className: 'modal fade', id: 'assetDetails', key: this.props.asset.asset_id, tabIndex: '-1', role: 'dialog', 'aria-labelledby': 'asset' },
-					_react2.default.createElement(
-						'div',
-						{ className: 'modal-dialog modal-lg', role: 'document', style: popUpWidth },
-						_react2.default.createElement(
-							'div',
-							{ className: 'modal-content' },
-							_react2.default.createElement(
-								'div',
-								{ className: 'modal-header' },
-								_react2.default.createElement(
-									'button',
-									{ type: 'button', className: 'close', 'data-dismiss': 'modal', 'aria-label': 'Close' },
-									_react2.default.createElement(
-										'span',
-										{ 'aria-hidden': 'true' },
-										'× '
-									)
-								),
-								_react2.default.createElement(
-									'ul',
-									{ className: 'nav nav-pills', role: 'tablist' },
-									_react2.default.createElement(
-										'li',
-										{ role: 'presentation', className: 'active' },
-										_react2.default.createElement(
-											'a',
-											{ href: '#asset_details', role: 'tab', 'data-toggle': 'tab' },
-											'Asset Details'
-										)
-									),
-									_react2.default.createElement(
-										'li',
-										{ role: 'presentation' },
-										_react2.default.createElement(
-											'a',
-											{ href: '#qrcode', role: 'tab', 'data-toggle': 'tab' },
-											'QR Code'
-										)
-									),
-									_react2.default.createElement(
-										'li',
-										{ role: 'presentation' },
-										_react2.default.createElement(
-											'a',
-											{ href: '#qrcode2', role: 'tab', 'data-toggle': 'tab' },
-											'Validate ownership'
-										)
-									)
-								)
-							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'modal-body' },
-								_react2.default.createElement(
-									'div',
-									{ className: 'tab-content' },
-									_react2.default.createElement(
-										'div',
-										{ role: 'tabpanel', className: 'tab-pane active', id: 'asset_details' },
-										_react2.default.createElement(
-											'div',
-											{ id: 'standardAsset' },
-											_react2.default.createElement(
-												'table',
-												{ className: 'table table-striped table-hover', style: style },
-												_react2.default.createElement(
-													'tbody',
-													null,
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'Asset Name'
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															this.props.asset.asset_id
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'Asset Class',
-															_react2.default.createElement(
-																'p',
-																{ className: 'text-info' },
-																'Use comma/enter to add class '
-															)
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															_react2.default.createElement(_reactTagsinput2.default, classInput)
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'Asset SubClass',
-															_react2.default.createElement(
-																'p',
-																{ className: 'text-info' },
-																'Use comma/enter to add sub class '
-															)
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															_react2.default.createElement(_reactTagsinput2.default, subClassInput)
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'COID Contract address'
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															_react2.default.createElement(
-																'p',
-																null,
-																_react2.default.createElement(
-																	'b',
-																	null,
-																	' ',
-																	prop.coidAddr,
-																	' '
-																)
-															)
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'Gatekeeper Contract address'
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															_react2.default.createElement(
-																'p',
-																null,
-																_react2.default.createElement(
-																	'b',
-																	null,
-																	' ',
-																	prop.gatekeeperAddr,
-																	' '
-																)
-															)
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'Dimension Control address'
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															_react2.default.createElement(
-																'p',
-																null,
-																_react2.default.createElement(
-																	'b',
-																	null,
-																	' ',
-																	prop.dimensionCtrlAddr,
-																	' '
-																)
-															)
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'BigchainDB Transaction ID'
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															_react2.default.createElement(
-																'p',
-																null,
-																' ',
-																prop.bigchainID,
-																' '
-															)
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'BigchainDB Transaction Hash'
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															_react2.default.createElement(
-																'p',
-																null,
-																' ',
-																prop.bigchainHash,
-																' '
-															)
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															{ colSpan: '2' },
-															_react2.default.createElement(
-																'b',
-																null,
-																'Official IDs'
-															)
-														)
-													),
-													function () {
-														var ipfs_url = "http://10.101.114.231:8080/ipfs/";
-														if (!$.isEmptyObject(prop)) {
-															return prop.uniqueIdAttributes.map(function (ids, i) {
-																if (ids[2].charAt(0) == "Q") {
-																	return _react2.default.createElement(
-																		'tr',
-																		{ key: i },
-																		_react2.default.createElement(
-																			'td',
-																			null,
-																			ids[0]
-																		),
-																		_react2.default.createElement(
-																			'td',
-																			null,
-																			_react2.default.createElement(
-																				'p',
-																				null,
-																				'File hash: ',
-																				ids[1]
-																			),
-																			_react2.default.createElement(
-																				'p',
-																				null,
-																				'IPFS hash: ',
-																				_react2.default.createElement(
-																					'a',
-																					{ target: '_blank', href: ipfs_url + "/" + ids[2] },
-																					ids[2]
-																				)
-																			)
-																		)
-																	);
-																} else {
-																	return _react2.default.createElement(
-																		'tr',
-																		{ key: i },
-																		_react2.default.createElement(
-																			'td',
-																			null,
-																			ids[0]
-																		),
-																		_react2.default.createElement(
-																			'td',
-																			null,
-																			_react2.default.createElement(
-																				'p',
-																				null,
-																				'File hash: ',
-																				ids[1]
-																			),
-																			_react2.default.createElement(
-																				'p',
-																				null,
-																				'BigChain hash: ',
-																				_react2.default.createElement(
-																					'a',
-																					{ href: 'javascript:', onClick: function onClick(e) {
-																							_this3.bigchainGet(ids[2]);
-																						} },
-																					ids[2]
-																				)
-																			)
-																		)
-																	);
-																}
-															});
-														} else {
-															return _react2.default.createElement(
-																'tr',
-																null,
-																_react2.default.createElement(
-																	'td',
-																	{ colSpan: '2' },
-																	'No Ids found'
-																)
-															);
-														}
-													}(this),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'Ownership ID'
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															_react2.default.createElement(
-																'p',
-																null,
-																' ',
-																prop.ownershipId
-															)
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'Ownership ID List'
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															function () {
-																if (!$.isEmptyObject(prop.ownerIdList)) {
-																	return prop.ownerIdList.map(function (ids, i) {
-																		return _react2.default.createElement(
-																			'p',
-																			{ key: i },
-																			' ',
-																			prop.ownerIdList[i]
-																		);
-																	});
-																}
-															}(this)
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'Ownership Token ID'
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															_react2.default.createElement(
-																'p',
-																null,
-																' ',
-																prop.ownershipTokenId
-															)
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'Ownership Token Description'
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															_react2.default.createElement(
-																'p',
-																null,
-																prop.ownershipTokenAttributes
-															)
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'Ownership Token Quantity'
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															_react2.default.createElement(
-																'p',
-																null,
-																' ',
-																prop.ownershipTokenQuantity
-															)
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'Control ID'
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															_react2.default.createElement(
-																'p',
-																null,
-																' ',
-																prop.controlId
-															)
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'Control ID List'
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															function () {
-																if (!$.isEmptyObject(prop.controlIdList)) {
-																	return prop.controlIdList.map(function (ids, i) {
-																		return _react2.default.createElement(
-																			'p',
-																			{ key: i },
-																			' ',
-																			prop.controlIdList[i]
-																		);
-																	});
-																}
-															}(this)
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'Control Token ID'
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															' ',
-															_react2.default.createElement(
-																'p',
-																null,
-																' ',
-																prop.controlTokenId
-															)
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'Control Token Description'
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															_react2.default.createElement(
-																'p',
-																null,
-																prop.controlTokenAttributes
-															)
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'Control Token Quantity'
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															_react2.default.createElement(
-																'p',
-																null,
-																' ',
-																prop.controlTokenQuantity
-															)
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'Recovery IDs'
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															function () {
-																if (!$.isEmptyObject(prop.identityRecoveryIdList)) {
-																	return prop.identityRecoveryIdList.map(function (ids, i) {
-																		return _react2.default.createElement(
-																			'p',
-																			{ key: i },
-																			' ',
-																			prop.identityRecoveryIdList[i]
-																		);
-																	});
-																}
-															}(this)
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'Recovery Condition'
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															' ',
-															_react2.default.createElement(
-																'p',
-																null,
-																' ',
-																prop.recoveryCondition
-															)
-														)
-													)
-												)
-											)
-										),
-										_react2.default.createElement(
-											'div',
-											{ id: 'KYC' },
-											_react2.default.createElement(
-												'table',
-												{ className: 'table table-striped table-hover', style: style },
-												_react2.default.createElement(
-													'tbody',
-													null,
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'Asset Name'
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															this.props.asset.asset_id
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															{ colSpan: '2' },
-															_react2.default.createElement(
-																'b',
-																null,
-																'Official IDs'
-															)
-														)
-													),
-													function () {
-														var ipfs_url = "http://10.101.114.231:8080/ipfs/";
-														if (!$.isEmptyObject(prop)) {
-															return prop.uniqueIdAttributes.map(function (ids, i) {
-																if (ids[2].charAt(0) == "Q") {
-																	return _react2.default.createElement(
-																		'tr',
-																		{ key: i },
-																		_react2.default.createElement(
-																			'td',
-																			null,
-																			ids[0]
-																		),
-																		_react2.default.createElement(
-																			'td',
-																			null,
-																			_react2.default.createElement(
-																				'p',
-																				null,
-																				'File hash: ',
-																				ids[1]
-																			),
-																			_react2.default.createElement(
-																				'p',
-																				null,
-																				'IPFS hash: ',
-																				_react2.default.createElement(
-																					'a',
-																					{ target: '_blank', href: ipfs_url + "/" + ids[2] },
-																					ids[2]
-																				)
-																			)
-																		)
-																	);
-																} else {
-																	return _react2.default.createElement(
-																		'tr',
-																		{ key: i },
-																		_react2.default.createElement(
-																			'td',
-																			null,
-																			ids[0]
-																		),
-																		_react2.default.createElement(
-																			'td',
-																			null,
-																			_react2.default.createElement(
-																				'p',
-																				null,
-																				'File hash: ',
-																				ids[1]
-																			),
-																			_react2.default.createElement(
-																				'p',
-																				null,
-																				'BigChain hash: ',
-																				_react2.default.createElement(
-																					'a',
-																					{ href: 'javascript:', onClick: function onClick(e) {
-																							_this3.bigchainGet(ids[2]);
-																						} },
-																					ids[2]
-																				)
-																			)
-																		)
-																	);
-																}
-															});
-														} else {
-															return _react2.default.createElement(
-																'tr',
-																null,
-																_react2.default.createElement(
-																	'td',
-																	{ colSpan: '2' },
-																	'No Ids found'
-																)
-															);
-														}
-													}(this),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															{ colSpan: '2' },
-															_react2.default.createElement(
-																'b',
-																null,
-																'Signatures'
-															)
-														)
-													),
-													function () {
-														var ipfs_url = "http://10.101.114.231:8080/ipfs/";
-														if (!$.isEmptyObject(prop.validatorSigs)) {
-															return prop.validatorList.map(function (ids, i) {
-																var sigs = prop.validatorSigs[i];
-																return _react2.default.createElement(
-																	'tr',
-																	{ key: i },
-																	_react2.default.createElement('td', null),
-																	_react2.default.createElement(
-																		'td',
-																		null,
-																		_react2.default.createElement(
-																			'p',
-																			null,
-																			'Public Key: ',
-																			sigs[2]
-																		),
-																		_react2.default.createElement(
-																			'p',
-																			null,
-																			'Signature: ',
-																			sigs[1]
-																		),
-																		_react2.default.createElement(
-																			'p',
-																			null,
-																			'Expiration Date: ',
-																			String(new Date(Number(sigs[3]) * 1000))
-																		)
-																	)
-																);
-															});
-														} else {
-															return _react2.default.createElement(
-																'tr',
-																null,
-																_react2.default.createElement(
-																	'td',
-																	{ colSpan: '2' },
-																	'No signatures'
-																)
-															);
-														}
-													}(this),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'Asset Class',
-															_react2.default.createElement(
-																'p',
-																{ className: 'text-info' },
-																'Use comma/enter to add class '
-															)
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															_react2.default.createElement(_reactTagsinput2.default, classInput)
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															'Asset SubClass',
-															_react2.default.createElement(
-																'p',
-																{ className: 'text-info' },
-																'Use comma/enter to add sub class '
-															)
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															_react2.default.createElement(_reactTagsinput2.default, subClassInput)
-														)
-													)
-												)
-											)
-										)
-									),
-									_react2.default.createElement(
-										'div',
-										{ role: 'tabpanel', className: 'tab-pane center-block', id: 'qrcode', style: qrStyle },
-										_react2.default.createElement(_qrcode2.default, { value: qrConfig, size: 200 })
-									),
-									_react2.default.createElement(
-										'div',
-										{ role: 'tabpanel', className: 'tab-pane center-block', id: 'qrcode2', style: qrStyle },
-										this.state.notCOID ? _react2.default.createElement(_qrcode2.default, { value: qrOwnedDevice, size: 200 }) : null
-									)
-								)
-							)
-						)
-					)
-				);
-			}
-		}]);
-	
-		return Modal;
-	}(_react.Component);
-	
-	Modal.propTypes = {
-		hideHandler: _react2.default.PropTypes.func.isRequired // hideHandler method must exists in parent component
-	};
-	
-	//**************************************************************************************************************** */
-	
-	var Dims = function (_Component2) {
-		_inherits(Dims, _Component2);
-	
-		function Dims(props) {
-			_classCallCheck(this, Dims);
-	
-			var _this4 = _possibleConstructorReturn(this, (Dims.__proto__ || Object.getPrototypeOf(Dims)).call(this, props));
-	
-			_this4.pubKey = localStorage.getItem("pubKey");
-			_this4.privKey = localStorage.getItem("privKey");
-			_this4.tags = new _classAndSubClass2.default(_this4.pubKey, props.dimension.dimension_id);
-			_this4.state = {
-	
-				asset_class: _this4.tags.getAssetData("classes"),
-				asset_subclass: _this4.tags.getAssetData("subclasses"),
-	
-				inputs: ['input-0'],
-	
-				dimension: props.dimension || {},
-	
-				dimensionDataArray: []
-	
-			};
-			_this4.handleClassChange = _this4.handleClassChange.bind(_this4);
-			_this4.handleSubClassChange = _this4.handleSubClassChange.bind(_this4);
-			_this4.maxUniqAttr = 10;
-			return _this4;
-		}
-	
-		_createClass(Dims, [{
-			key: 'handleClassChange',
-			value: function handleClassChange(tags) {
-				this.setState({ asset_class: tags });
-				this.tags.updateClasses(tags, this.props.dimension.dimension_id, "classes");
-			}
-		}, {
-			key: 'handleSubClassChange',
-			value: function handleSubClassChange(tags) {
-				this.setState({ asset_subclass: tags });
-				this.tags.updateClasses(tags, this.props.dimension.dimension_id, "subclasses");
-			}
-	
-			//get the data object array and putting it in one array (so we can use map function)
-	
-		}, {
-			key: 'componentWillMount',
-			value: function componentWillMount() {
-				var dataArray = [];
-				var data = this.props.dimension.dimension_details.data;
-				//{"descriptor":"jan_history","attribute":"QmTok8Hgi4CCYS3fkxS83XpRjHjfegQZNszU6ekSFFq65s","flag":0}
-				Object.keys(data).forEach(function (key) {
-					dataArray.push(data[key].descriptor);
-					dataArray.push(data[key].attribute);
-					dataArray.push(data[key].flag);
-				});
-				var arrayOfArrays = [];
-				for (var i = 0; i < data.length; i++) {
-					var element = [dataArray[3 * i + 0], dataArray[3 * i + 1], dataArray[3 * i + 2]]; /*, dataArray[4 * i + 3]*/
-					arrayOfArrays.push(element);
-				}
-				this.setState({ dimensionDataArray: arrayOfArrays });
-			}
-		}, {
-			key: 'componentDidMount',
-			value: function componentDidMount() {
-				$("#assetDetails").modal('show');
-				$("#assetDetails").on('hidden.bs.modal', this.props.hideHandler);
-	
-				var prop = this.props.dimension.dimension_details;
-			}
-		}, {
-			key: 'appendInput',
-			value: function appendInput() {
-				console.log("hit append Input");
-				var inputLen = this.state.inputs.length;
-				if (inputLen < this.maxUniqAttr) {
-					var newInput = 'input-' + inputLen;
-					this.setState({ inputs: this.state.inputs.concat([newInput]) });
-				}
-			}
-		}, {
-			key: 'getLabelValues',
-			value: function getLabelValues() {
-				console.log("hit getLabelValues");
-				var labelVals = [];
-				var _this = this;
-				$.each($("input[name^='label-']"), function (obj) {
-					var value = $.trim($(this).val());
-					if (value.length > 0) {
-						labelVals.push(_defineProperty({}, $(this).attr('name').replace("label-", ""), value));
-					}
-				});
-				return labelVals;
-			}
-		}, {
-			key: 'handleHideModal',
-			value: function handleHideModal() {
-				this.setState({ showModal: false });
-			}
-		}, {
-			key: 'handleShowModal',
-			value: function handleShowModal(e) {
-				this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-			}
-	
-			//**********************************************************************************
-			//**********************************************************************************
-	
-		}, {
-			key: 'showAttrs',
-			value: function showAttrs(e) {
-				alert('If you continue, you will spend a token to read entries.');
-				e.preventDefault();
-				var ele = $(e.target);
-				var value = parseInt(ele.attr("data-val"));
-				console.log("got value.. " + value);
-				var prop = this.props.dimension;
-	
-				var json = {};
-				var dimensionName = prop.dimension_details.dimensionName;
-				var ID = "";
-				var descriptor = prop.dimension_details.data[value].descriptor;
-				console.log("descriptor: " + JSON.stringify(descriptor));
-	
-				var owners = prop.dimension_details.owners;
-				json.owners = owners;
-	
-				var pubKey = keccak_256(localStorage.getItem("pubKey"));
-				json.pubKey = pubKey;
-				json.dimensionName = dimensionName;
-				json.dimensionCtrlAddr = prop.dimension_details.dimensionCtrlAddr;
-				json.ID = ID;
-				json.descriptor = descriptor;
-	
-				console.log("JSON: " + JSON.stringify(json));
-	
-				var ipfs_url = "http://10.101.114.231:8080/ipfs/";
-	
-				var delegations = prop.dimension_details.delegations;
-				console.log("delegations... " + JSON.stringify(delegations));
-				console.log(delegations[0].amount);
-	
-				$.ajax({
-					type: "POST",
-					url: twinUrl + 'dimensions/readEntry',
-					data: json,
-					success: function success(result) {
-						var data = result;
-						if ($.type(result) != "object") {
-							console.log("not object");
-							data = JSON.parseJSON(result);
-						}
-	
-						console.log("repsonse readEntry: " + JSON.stringify(data));
-						console.log("data.Result: " + data.Result);
-						if (data.Result.charAt(0) == "Q") {
-							window.open(ipfs_url + data.Result, '_blank');
-						} else {
-							var bigchainServer = 'http://10.101.114.230:5000';
-							var endpoint = '/getTransaction/' + data.Result;
-							$.ajax({
-								method: 'GET',
-								url: bigchainServer + endpoint,
-								headers: { 'Access-Control-Allow-Origin': '*' },
-								crossDomain: true,
-								dataType: 'json',
-								contentType: 'application/json',
-								cache: false,
-								success: function success(resp) {
-									//the response is body -- send that
-									console.log(resp);
-									var full_data = resp;
-									var short_data = resp.asset.data.Coid_Data;
-									console.log("short data is..." + short_data.ownershipId);
-									console.log(JSON.stringify(full_data));
-									console.log(JSON.stringify(short_data));
-									var something = window.open("data:text/json," + encodeURIComponent(JSON.stringify(short_data)), "_blank");
-									something.focus();
-								} //end success 
-							}); //end bigchain ajax
-						} //end else
-					}
-				});
-			}
-		}, {
-			key: 'render',
-			value: function render() {
-				var _this5 = this;
-	
-				var prop = this.props.dimension;
-	
-				console.log("dimension(prop): " + JSON.stringify(prop));
-	
-				var dataArray = this.state.dimensionDataArray;
-	
-				console.log("this.state... \n" + JSON.stringify(this.state));
-	
-				var style = {
-					fontSize: '12.5px'
-				};
-	
-				var classInput = {
-					addKeys: [13, 188], // Enter and comma
-					value: this.state.asset_class,
-					onChange: this.handleClassChange,
-					inputProps: { placeholder: "" }
-				};
-				var subClassInput = {
-					addKeys: [13, 188], // Enter and comma
-					value: this.state.asset_subclass,
-					onChange: this.handleSubClassChange.bind(this),
-					inputProps: { placeholder: "" }
-				};
-	
-				var qrStyle = {
-					maxWidth: "100%",
-					textAlign: "center"
-				};
-	
-				var syle = {
-					marginRight: '15px'
-				};
-	
-				return _react2.default.createElement(
-					'div',
-					{ className: 'modal fade', id: 'assetDetails', key: this.props.dimension.dimension_id, tabIndex: '-1', role: 'dialog', 'aria-labelledby': 'asset' },
-					_react2.default.createElement(
-						'div',
-						{ className: 'modal-dialog modal-lg', role: 'document' },
-						_react2.default.createElement(
-							'div',
-							{ className: 'modal-content' },
-							_react2.default.createElement(
-								'div',
-								{ className: 'modal-header' },
-								_react2.default.createElement(
-									'button',
-									{ type: 'button', className: 'close', 'data-dismiss': 'modal', 'aria-label': 'Close' },
-									_react2.default.createElement(
-										'span',
-										{ 'aria-hidden': 'true' },
-										'× '
-									)
-								),
-								_react2.default.createElement(
-									'ul',
-									{ id: 'mytabs', className: 'nav nav-pills', role: 'tablist' },
-									_react2.default.createElement(
-										'li',
-										{ role: 'presentation', className: 'active' },
-										_react2.default.createElement(
-											'a',
-											{ href: '#asset_details', role: 'tab', 'data-toggle': 'tab' },
-											'Dimension Details'
-										)
-									),
-									_react2.default.createElement(
-										'li',
-										{ role: 'presentation' },
-										_react2.default.createElement(
-											'a',
-											{ href: '#show_descriptors', role: 'tab', 'data-toggle': 'tab' },
-											'Descriptors'
-										)
-									)
-								)
-							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'modal-body' },
-								_react2.default.createElement(
-									'div',
-									{ className: 'tab-content' },
-									_react2.default.createElement(
-										'div',
-										{ role: 'tabpanel', className: 'tab-pane active', id: 'asset_details' },
-										_react2.default.createElement(
-											'table',
-											{ className: 'table table-striped table-hover', style: style },
-											_react2.default.createElement(
-												'tbody',
-												null,
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'Dimension Name'
-													),
-													_react2.default.createElement(
-														'td',
-														null,
-														prop.dimension_id
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'Dimension Class',
-														_react2.default.createElement(
-															'p',
-															{ className: 'text-info' },
-															'Use comma/enter to add class '
-														)
-													),
-													_react2.default.createElement(
-														'td',
-														null,
-														_react2.default.createElement(_reactTagsinput2.default, classInput)
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'Dimension SubClass',
-														_react2.default.createElement(
-															'p',
-															{ className: 'text-info' },
-															'Use comma/enter to add sub class '
-														)
-													),
-													_react2.default.createElement(
-														'td',
-														null,
-														_react2.default.createElement(_reactTagsinput2.default, subClassInput)
-													)
-												),
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														null,
-														'Dimension Contract address'
-													),
-													_react2.default.createElement(
-														'td',
-														null,
-														_react2.default.createElement(
-															'p',
-															null,
-															_react2.default.createElement(
-																'b',
-																null,
-																' ',
-																prop.dimension_details.address,
-																' '
-															)
-														)
-													)
-												)
-											)
-										)
-									),
-									_react2.default.createElement(
-										'div',
-										{ title: 'tabs', role: 'tabpanel', className: 'tab-pane center-block', id: 'show_descriptors' },
-										_react2.default.createElement(
-											'table',
-											{ className: 'table table-striped table-hover', style: style },
-											_react2.default.createElement(
-												'tbody',
-												null,
-												_react2.default.createElement(
-													'tr',
-													null,
-													_react2.default.createElement(
-														'td',
-														{ colSpan: '2' },
-														_react2.default.createElement(
-															'b',
-															null,
-															'Descriptors'
-														)
-													)
-												),
-												function () {
-													if (dataArray.length > 0) {
-														return dataArray.map(function (attrs, i) {
-															//console.log("attrs[0]: " + attrs[0] + ", attrs[1]:" + attrs[1] + ", attrs[2]: " + attrs[2])
-															return _react2.default.createElement(
-																'tr',
-																{ key: i },
-																_react2.default.createElement(
-																	'td',
-																	null,
-																	attrs[0]
-																),
-																_react2.default.createElement(
-																	'td',
-																	null,
-																	_react2.default.createElement(
-																		'button',
-																		{ type: 'button', className: 'btn btn-primary btn-sm', 'data-val': i, onClick: _this5.showAttrs.bind(_this5) },
-																		'Spend Token'
-																	)
-																)
-															);
-														});
-													} else {
-														return _react2.default.createElement(
-															'tr',
-															null,
-															_react2.default.createElement(
-																'td',
-																{ colSpan: '2' },
-																'No descriptors found.'
-															)
-														);
-													}
-												}(this)
-											)
-										)
-									)
-								)
-							)
-						)
-					)
-				);
-			}
-		}]);
-	
-		return Dims;
-	}(_react.Component);
-	
-	Dims.propTypes = {
-		hideHandler: _react2.default.PropTypes.func.isRequired // hideHandler method must exists in parent component
-	};
-	
-	//																<td>Token Amount: 1</td>
-	
-	
-	var Assets = function (_Component3) {
-		_inherits(Assets, _Component3);
-	
-		function Assets(props) {
-			_classCallCheck(this, Assets);
-	
-			var _this6 = _possibleConstructorReturn(this, (Assets.__proto__ || Object.getPrototypeOf(Assets)).call(this, props));
-	
-			_this6.state = {
-				showDetails: false,
-				showDetails1: false, //set in dimensionHandler to render delegated data
-				wallet: { pubKey: localStorage.getItem("pubKey") },
-				own_assets: [],
-				controlled_assets: [],
-				delegated_assets: [],
-				delegated_dims: [],
-				active_asset: {},
-				show_only: []
-			};
-	
-			// event handlers must attached with current scope
-			_this6.assetHandler = _this6.assetHandler.bind(_this6);
-			_this6.dimensionHandler = _this6.dimensionHandler.bind(_this6);
-			_this6.hideHandler = _this6.hideHandler.bind(_this6);
-	
-			_this6.hideHandler1 = _this6.hideHandler1.bind(_this6);
-	
-			_this6.searchHandler = _this6.searchHandler.bind(_this6);
-			return _this6;
-		}
-	
-		//*******************************************************************************
-		//get all OWNED, CONTROLLED, DELEGATED assets & DELEGATED dimensions
-	
-	
-		_createClass(Assets, [{
-			key: 'componentWillMount',
-			value: function componentWillMount() {
-				// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
-				// -> -> -> START get OWNED assets -> -> ->
-				$.ajax({
-					type: "POST",
-					url: twinUrl + 'getOwnedAssets',
-					data: { "pubKey": localStorage.getItem("pubKey") },
-					success: function (result) {
-						var data = result;
-						if ($.type(result) != "object") {
-							data = JSON.parseJSON(result);
-						}
-	
-						//get the array:
-						data = data.data;
-	
-						//DEBUGGING:
-						//console.log("getOwnedAssets result: " + data);
-						var assetData = [];
-	
-						if (data.length > 0) {
-	
-							//loop through OWNED assets
-							for (var i = 0; i < data.length; i++) {
-								//AJAX each asset:
-								$.ajax({
-									type: "POST",
-									url: twinUrl + 'getAsset',
-									data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": data[i] },
-									success: function (result) {
-										var dataResult = result;
-										if ($.type(result) != "object") {
-											dataResult = JSON.parseJSON(result);
-										}
-	
-										//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-										var theArray = this.state.own_assets;
-	
-										//console.log("length is: " + theArray.length)
-										//console.log(theArray)
-										//TODO: RENAME asset_name TO ASSET DETAILS
-										theArray[theArray.length] = {
-											asset_id: dataResult.assetID,
-											asset_details: dataResult
-										};
-										this.setState({ own_assets: theArray });
-	
-										assetData[assetData.length] = {
-											asset_id: dataResult.assetID,
-											asset_uniqueId: dataResult.uniqueId,
-											asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
-											asset_coidAddr: dataResult.coidAddr,
-											asset_gatekeeperAddr: dataResult.gatekeeperAddr,
-											asset_owners: dataResult.ownerIdList,
-											asset_controllers: dataResult.controlIdList,
-											asset_bigchainID: dataResult.bigchainID,
-											asset_type: dataResult.propType
-										};
-										localStorage.setItem("owned_assets", JSON.stringify(assetData));
-										//console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets))
-									}.bind(this),
-									complete: function complete() {}
-								});
-							} //end for
-						} //end if (data > 0)
-					}.bind(this)
-				});
-				// <- <- <- END get OWNED assets <- <- <-
-				// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
-				// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
-				// -> -> -> START get CONTROLLED assets -> -> ->
-				$.ajax({
-					type: "POST",
-					url: twinUrl + 'getControlledAssets',
-					data: { "pubKey": localStorage.getItem("pubKey") },
-					success: function (result) {
-						var data = result;
-						if ($.type(result) != "object") {
-							data = JSON.parseJSON(result);
-						}
-						console.log("got data: " + JSON.stringify(data));
-	
-						data = data.data;
-						console.log("Get Controlled Assets result: " + data);
-						var assetData = [];
-	
-						if (data.length > 0) {
-							//loop through OWNED assets
-							for (var i = 0; i < data.length; i++) {
-								//console.log("i is: " + i + " filename: " + data[i])
-								//AJAX each asset:
-								$.ajax({
-									type: "POST",
-									url: twinUrl + 'getAsset',
-									data: { "pubKey": localStorage.getItem("pubKey"), "flag": 1, "fileName": data[i] },
-									success: function (result) {
-										var dataResult = result;
-										if ($.type(result) != "object") {
-											dataResult = JSON.parseJSON(result);
-										}
-	
-										var theArray = this.state.controlled_assets;
-										//console.log("length is: " + theArray.length)
-										//console.log(JSON.stringify(theArray))
-	
-										theArray[theArray.length] = {
-											asset_id: dataResult.assetID,
-											asset_details: dataResult
-										};
-										this.setState({ controlled_assets: theArray });
-										//this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
-	
-										assetData[assetData.length] = {
-											asset_id: dataResult.assetID,
-											asset_uniqueId: dataResult.uniqueId,
-											asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
-											asset_coidAddr: dataResult.coidAddr,
-											asset_gatekeeperAddr: dataResult.gatekeeperAddr,
-											asset_owners: dataResult.ownerIdList,
-											asset_controllers: dataResult.controlIdList,
-											asset_bigchainID: dataResult.bigchainID,
-											asset_type: dataResult.propType
-										};
-										localStorage.setItem("controlled_assets", JSON.stringify(assetData));
-									}.bind(this),
-									complete: function complete() {}
-								});
-							} //end for
-						}
-					}.bind(this)
-				});
-				// <- <- <- END get CONTROLLED assets <- <- <-
-				// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
-				// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
-				// -> -> -> START get DELEGATED assets -> -> ->
-				$.ajax({
-					type: "POST",
-					url: twinUrl + 'getDelegatedAssets',
-					data: { "pubKey": localStorage.getItem("pubKey") },
-					success: function (result) {
-						var data = result;
-						if ($.type(result) != "object") {
-							data = JSON.parseJSON(result);
-						}
-	
-						data = data.data;
-						console.log("Get Delegated Assets result: " + data);
-	
-						if (data.length > 0) {
-							//loop through OWNED assets
-							for (var i = 0; i < data.length; i++) {
-								//AJAX each asset:
-								$.ajax({
-									type: "POST",
-									url: twinUrl + 'getAsset',
-									data: { "pubKey": localStorage.getItem("pubKey"), "flag": 2, "fileName": data[i] },
-									success: function (result) {
-										var dataResult = result;
-										if ($.type(result) != "object") {
-											dataResult = JSON.parseJSON(result);
-										}
-	
-										//***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-										var theArray1 = this.state.delegated_assets;
-	
-										theArray1[theArray1.length] = {
-											asset_id: dataResult.assetID,
-											asset_details: dataResult
-										};
-										this.setState({ delegated_assets: theArray1 });
-									}.bind(this),
-									complete: function complete() {}
-								});
-							} //end for
-						}
-					}.bind(this)
-				});
-				// <- <- <- END get CONTROLLED assets <- <- <-
-				// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
-				// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
-				// -> -> -> START get DELEGATED dimensions -> -> ->
-				$.ajax({
-					type: "POST",
-					url: twinUrl + 'getDelegatedDimensions',
-					data: { "pubKey": localStorage.getItem("pubKey") },
-					success: function (result) {
-						var data = result;
-						if ($.type(result) != "object") {
-							data = JSON.parseJSON(result);
-						}
-	
-						data = data.data;
-						console.log("getDelegatedDimensions: " + data);
-	
-						var PUBKEY = keccak_256(localStorage.getItem("pubKey"));
-	
-						//var delegatedDims = []
-	
-						if (data.length > 0) {
-							//loop through OWNED assets
-							for (var i = 0; i < data.length; i++) {
-								console.log("grabbing.. " + data[i]);
-								//AJAX each asset:
-								$.ajax({
-									type: "POST",
-									url: twinUrl + 'getDimension',
-									data: { "pubKey": PUBKEY, "flag": 2, "fileName": data[i] },
-									success: function (result) {
-										var dataResult = result;
-										if ($.type(result) != "object") {
-											console.log("result != object");
-											dataResult = JSON.parseJSON(result);
-										}
-	
-										var delegatedDims = this.state.delegated_dims;
-	
-										delegatedDims[delegatedDims.length] = {
-											dimension_id: dataResult.dimension.dimensionName,
-											dimension_details: dataResult.dimension
-										};
-										this.setState({ delegated_dims: delegatedDims });
-	
-										console.log("dataResult get Dimension: \n " + JSON.stringify(dataResult));
-										console.log("dimensionName: " + dataResult.dimension.dimensionName);
-									}.bind(this),
-									complete: function complete() {}
-								});
-							} //end for
-						}
-					}.bind(this)
-				});
-				// <- <- <- END get DELEGATED assets <- <- <-
-				// <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
-			}
-		}, {
-			key: 'assetHandler',
-			value: function assetHandler(asset) {
-				var assetID = asset.asset_id;
-				if (assetID) {
-					this.setState({ showDetails: true, active_asset: asset });
-				}
-			}
-		}, {
-			key: 'dimensionHandler',
-			value: function dimensionHandler(dimension) {
-				console.log("dimension handler.. " + dimension);
-				var dimensionID = dimension.dimension_id;
-				if (dimensionID) {
-					console.log("dimensionID: " + dimensionID);
-					this.setState({ showDetails1: true, active_dimension: dimension });
-				}
-			}
-	
-			// Close Asset Details Window
-	
-		}, {
-			key: 'hideHandler',
-			value: function hideHandler() {
-				this.setState({ showDetails: false, active_asset: {} });
-			}
-		}, {
-			key: 'hideHandler1',
-			value: function hideHandler1() {
-				this.setState({ showDetails1: false, active_dimension: {} });
-			}
-		}, {
-			key: 'searchHandler',
-			value: function searchHandler(e) {
-				var str = e.target.value.trim();
-				var _this = this;
-				setTimeout(function () {
-					var data = JSON.parse(localStorage.getItem(_this.state.wallet.pubKey));
-					var indexed = [];
-					for (var assetID in data) {
-						var allTags = data[assetID].classes.concat(data[assetID].subclasses);
-						allTags.map(function (ele) {
-							if (ele.toLowerCase() == str.toLowerCase()) {
-								indexed.push(assetID);
-							}
-						});
-					}
-					_this.setState({ show_only: indexed });
-				}, 350);
-				if (!str.length) this.setState({ show_only: [] });
-			}
-		}, {
-			key: 'render',
-			value: function render() {
-				var _this7 = this;
-	
-				return _react2.default.createElement(
-					'div',
-					{ id: 'assets-container', className: 'assets' },
-					_react2.default.createElement(
-						'div',
-						{ className: 'row', id: 'search-bar' },
-						_react2.default.createElement(
-							'div',
-							{ className: 'col-md-6' },
-							_react2.default.createElement(
-								'h3',
-								{ className: 'margin0px' },
-								'Manage Assets'
-							),
-							_react2.default.createElement('hr', null),
-							_react2.default.createElement(
-								'p',
-								null,
-								_react2.default.createElement(
-									'b',
-									null,
-									'Public Key: '
-								),
-								this.state.wallet.pubKey
-							),
-							_react2.default.createElement('hr', null)
-						),
-						_react2.default.createElement(
-							'div',
-							{ className: 'col-md-6' },
-							_react2.default.createElement(
-								'form',
-								{ className: 'form-inline' },
-								_react2.default.createElement(
-									'div',
-									{ className: 'form-group pull-right' },
-									_react2.default.createElement(
-										'div',
-										{ className: 'input-group' },
-										_react2.default.createElement('input', { type: 'text', name: 'search-assets', id: 'search-assets', className: 'form-control', placeholder: 'Search Assets', onKeyUp: this.searchHandler }),
-										_react2.default.createElement(
-											'div',
-											{ className: 'input-group-addon' },
-											_react2.default.createElement('span', { className: 'glyphicon glyphicon-search' })
-										)
-									)
-								)
-							)
-						)
-					),
-					_react2.default.createElement('br', null),
-					_react2.default.createElement(
-						'div',
-						{ id: 'own-assets' },
-						_react2.default.createElement(
-							'h4',
-							null,
-							'My Owned Assets'
-						),
-						_react2.default.createElement('hr', null),
-						_react2.default.createElement(
-							'div',
-							{ className: 'owned-assets' },
-							_react2.default.createElement(
-								'div',
-								{ className: 'row assets' },
-								this.state.own_assets.map(function (asset, i) {
-									var cssClass = "btn btn-success";
-									if (_this7.state.show_only.length > 0) {
-										if (_this7.state.show_only.toString().indexOf(asset.asset_id.toString()) == -1) {
-											cssClass += " hidden";
-										} else cssClass.replace("hidden", "");
-									}
-									return _react2.default.createElement(
-										'button',
-										{ type: 'button', key: i, className: cssClass, onClick: function onClick() {
-												return _this7.assetHandler(asset);
-											} },
-										_react2.default.createElement('span', { className: 'glyphicon glyphicon-ok-circle' }),
-										asset.asset_id
-									);
-								})
-							)
-						)
-					),
-					_react2.default.createElement('br', null),
-					_react2.default.createElement(
-						'div',
-						{ id: 'controlled-assets' },
-						_react2.default.createElement(
-							'h4',
-							null,
-							'My Controlled Assets'
-						),
-						_react2.default.createElement('hr', null),
-						_react2.default.createElement(
-							'div',
-							{ className: 'controlled-assets' },
-							_react2.default.createElement(
-								'div',
-								{ className: 'row assets' },
-								this.state.controlled_assets.map(function (asset) {
-									var cssClass = "btn btn-info";
-									if (_this7.state.show_only.length > 0) {
-										if (_this7.state.show_only.toString().indexOf(asset.asset_id.toString()) >= 0) {
-											cssClass += " show";
-										} else cssClass += " hidden";
-									}
-									return _react2.default.createElement(
-										'button',
-										{ type: 'button', key: asset.asset_id, className: cssClass, onClick: function onClick() {
-												return _this7.assetHandler(asset);
-											} },
-										_react2.default.createElement('span', { className: 'glyphicon glyphicon-link' }),
-										asset.asset_id
-									);
-								})
-							)
-						)
-					),
-					_react2.default.createElement('br', null),
-					_react2.default.createElement(
-						'div',
-						{ id: 'delegated-assets' },
-						_react2.default.createElement(
-							'h4',
-							null,
-							'My Delegated Data'
-						),
-						_react2.default.createElement('hr', null),
-						_react2.default.createElement(
-							'div',
-							{ className: 'delegated-assets' },
-							_react2.default.createElement(
-								'div',
-								{ className: 'row assets' },
-								this.state.delegated_dims.map(function (dimension, i) {
-									var cssClass = "btn btn-danger";
-									if (_this7.state.show_only.length > 0) {
-										if (_this7.state.show_only.toString().indexOf(dimension.dimension_id.toString()) >= 0) {
-											cssClass += " show";
-										} else cssClass += " hidden";
-									}
-									return _react2.default.createElement(
-										'button',
-										{ type: 'button', key: i, className: cssClass, onClick: function onClick() {
-												return _this7.dimensionHandler(dimension);
-											} },
-										_react2.default.createElement('span', { className: 'glyphicon glyphicon-piggy-bank' }),
-										dimension.dimension_id
-									);
-								})
-							)
-						)
-					),
-					_react2.default.createElement('br', null),
-					this.state.showDetails ? _react2.default.createElement(Modal, { hideHandler: this.hideHandler, asset: this.state.active_asset }) : null,
-					this.state.showDetails1 ? _react2.default.createElement(Dims, { hideHandler: this.hideHandler1, dimension: this.state.active_dimension }) : null
-				);
-			}
-		}]);
-	
-		return Assets;
-	}(_react.Component);
-	
-	exports.default = Assets;
-	
-	// <form action="http://google.com">
-	// <input type="submit" value="Go to Google" />
-	// </form>
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/buffer/index.js */ 239).Buffer))
-
-/***/ },
-/* 370 */
 /*!*************************************!*\
   !*** ./~/qrcode.react/lib/index.js ***!
   \*************************************/
@@ -57211,8 +51384,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	// qr.js doesn't handle error level of zero (M) so we need to do it right,
 	// thus the deep require.
-	var QRCodeImpl = __webpack_require__(/*! qr.js/lib/QRCode */ 371);
-	var ErrorCorrectLevel = __webpack_require__(/*! qr.js/lib/ErrorCorrectLevel */ 375);
+	var QRCodeImpl = __webpack_require__(/*! qr.js/lib/QRCode */ 332);
+	var ErrorCorrectLevel = __webpack_require__(/*! qr.js/lib/ErrorCorrectLevel */ 336);
 	
 	function getBackingStorePixelRatio(ctx) {
 	  return ctx.webkitBackingStorePixelRatio || ctx.mozBackingStorePixelRatio || ctx.msBackingStorePixelRatio || ctx.oBackingStorePixelRatio || ctx.backingStorePixelRatio || 1;
@@ -57315,17 +51488,17 @@
 	module.exports = QRCode;
 
 /***/ },
-/* 371 */
+/* 332 */
 /*!*******************************!*\
   !*** ./~/qr.js/lib/QRCode.js ***!
   \*******************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var BitByte = __webpack_require__(/*! ./8BitByte */ 372);
-	var RSBlock = __webpack_require__(/*! ./RSBlock */ 374);
-	var BitBuffer = __webpack_require__(/*! ./BitBuffer */ 376);
-	var util = __webpack_require__(/*! ./util */ 377);
-	var Polynomial = __webpack_require__(/*! ./Polynomial */ 378);
+	var BitByte = __webpack_require__(/*! ./8BitByte */ 333);
+	var RSBlock = __webpack_require__(/*! ./RSBlock */ 335);
+	var BitBuffer = __webpack_require__(/*! ./BitBuffer */ 337);
+	var util = __webpack_require__(/*! ./util */ 338);
+	var Polynomial = __webpack_require__(/*! ./Polynomial */ 339);
 	
 	function QRCode(typeNumber, errorCorrectLevel) {
 		this.typeNumber = typeNumber;
@@ -57762,13 +51935,13 @@
 
 
 /***/ },
-/* 372 */
+/* 333 */
 /*!*********************************!*\
   !*** ./~/qr.js/lib/8BitByte.js ***!
   \*********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var mode = __webpack_require__(/*! ./mode */ 373);
+	var mode = __webpack_require__(/*! ./mode */ 334);
 	
 	function QR8bitByte(data) {
 		this.mode = mode.MODE_8BIT_BYTE;
@@ -57794,7 +51967,7 @@
 
 
 /***/ },
-/* 373 */
+/* 334 */
 /*!*****************************!*\
   !*** ./~/qr.js/lib/mode.js ***!
   \*****************************/
@@ -57809,14 +51982,14 @@
 
 
 /***/ },
-/* 374 */
+/* 335 */
 /*!********************************!*\
   !*** ./~/qr.js/lib/RSBlock.js ***!
   \********************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	// ErrorCorrectLevel
-	var ECL = __webpack_require__(/*! ./ErrorCorrectLevel */ 375);
+	var ECL = __webpack_require__(/*! ./ErrorCorrectLevel */ 336);
 	
 	function QRRSBlock(totalCount, dataCount) {
 		this.totalCount = totalCount;
@@ -58117,7 +52290,7 @@
 
 
 /***/ },
-/* 375 */
+/* 336 */
 /*!******************************************!*\
   !*** ./~/qr.js/lib/ErrorCorrectLevel.js ***!
   \******************************************/
@@ -58133,7 +52306,7 @@
 
 
 /***/ },
-/* 376 */
+/* 337 */
 /*!**********************************!*\
   !*** ./~/qr.js/lib/BitBuffer.js ***!
   \**********************************/
@@ -58180,15 +52353,15 @@
 
 
 /***/ },
-/* 377 */
+/* 338 */
 /*!*****************************!*\
   !*** ./~/qr.js/lib/util.js ***!
   \*****************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var Mode = __webpack_require__(/*! ./mode */ 373);
-	var Polynomial = __webpack_require__(/*! ./Polynomial */ 378);
-	var math = __webpack_require__(/*! ./math */ 379);
+	var Mode = __webpack_require__(/*! ./mode */ 334);
+	var Polynomial = __webpack_require__(/*! ./Polynomial */ 339);
+	var math = __webpack_require__(/*! ./math */ 340);
 	
 	var QRMaskPattern = {
 		PATTERN000 : 0,
@@ -58468,13 +52641,13 @@
 
 
 /***/ },
-/* 378 */
+/* 339 */
 /*!***********************************!*\
   !*** ./~/qr.js/lib/Polynomial.js ***!
   \***********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var math = __webpack_require__(/*! ./math */ 379);
+	var math = __webpack_require__(/*! ./math */ 340);
 	
 	function QRPolynomial(num, shift) {
 	
@@ -58544,7 +52717,7 @@
 
 
 /***/ },
-/* 379 */
+/* 340 */
 /*!*****************************!*\
   !*** ./~/qr.js/lib/math.js ***!
   \*****************************/
@@ -58597,7 +52770,7 @@
 
 
 /***/ },
-/* 380 */
+/* 341 */
 /*!************************************************!*\
   !*** ./src/app/Components/classAndSubClass.js ***!
   \************************************************/
@@ -58671,7 +52844,7 @@
 	exports.default = AssetTags;
 
 /***/ },
-/* 381 */
+/* 342 */
 /*!***************************************!*\
   !*** ./src/app/Components/MyCOID.jsx ***!
   \***************************************/
@@ -58683,9 +52856,9 @@
 	    value: true
 	});
 	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-	
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
@@ -58697,13 +52870,17 @@
 	
 	var _reactRouter = __webpack_require__(/*! react-router */ 172);
 	
-	var _reactTagsinput = __webpack_require__(/*! react-tagsinput */ 328);
+	var _reactTagsinput = __webpack_require__(/*! react-tagsinput */ 330);
 	
 	var _reactTagsinput2 = _interopRequireDefault(_reactTagsinput);
 	
-	var _UploadIpfsFile = __webpack_require__(/*! ./UploadIpfsFile.jsx */ 350);
+	var _UploadIpfsFile = __webpack_require__(/*! ./UploadIpfsFile.jsx */ 343);
 	
 	var _UploadIpfsFile2 = _interopRequireDefault(_UploadIpfsFile);
+	
+	var _UniqueIDAttributeForm = __webpack_require__(/*! ./IdentityFederation/UniqueIDAttributeForm.jsx */ 344);
+	
+	var _UniqueIDAttributeForm2 = _interopRequireDefault(_UniqueIDAttributeForm);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -58715,83 +52892,17 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var crypto = __webpack_require__(/*! crypto */ 243);
+	//var crypto = require('crypto');
 	var secp256k1 = __webpack_require__(/*! secp256k1 */ 261);
 	var keccak_256 = __webpack_require__(/*! js-sha3 */ 325).keccak_256;
 	
 	//********************************************************
-	//********************************************************
 	
-	var AttributeForm = function (_React$Component) {
-	    _inherits(AttributeForm, _React$Component);
-	
-	    function AttributeForm(props) {
-	        _classCallCheck(this, AttributeForm);
-	
-	        var _this2 = _possibleConstructorReturn(this, (AttributeForm.__proto__ || Object.getPrototypeOf(AttributeForm)).call(this, props));
-	
-	        _this2.state = {
-	            tmpFile: '',
-	            showModal: false
-	        };
-	        _this2.maxAttributes = _this2.props.max;
-	        return _this2;
-	    }
-	
-	    _createClass(AttributeForm, [{
-	        key: 'handleShowModal',
-	        value: function handleShowModal(e) {
-	            this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-	        }
-	    }, {
-	        key: 'handleHideModal',
-	        value: function handleHideModal() {
-	            this.setState({ showModal: false });
-	        }
-	    }, {
-	        key: 'render',
-	        value: function render() {
-	            console.log("attribute form props: " + JSON.stringify(this.props));
-	
-	            var style = {
-	                fontSize: '12.5px'
-	            };
-	            return _react2.default.createElement(
-	                'div',
-	                { className: 'form-group col-md-12', style: style },
-	                _react2.default.createElement(
-	                    'div',
-	                    { className: 'col-md-10' },
-	                    _react2.default.createElement(
-	                        'label',
-	                        { htmlFor: 'unique_id_attrs' },
-	                        ' Dimension Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research". '
-	                    ),
-	                    _react2.default.createElement('input', { name: 'label-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: 'Descriptor' })
-	                ),
-	                _react2.default.createElement(
-	                    'div',
-	                    { className: 'col-md-2' },
-	                    _react2.default.createElement(
-	                        'button',
-	                        { style: style, type: 'button', 'data-id': this.props.labelref, onClick: this.props.handleShowModal, className: 'btn btn-warning pull-right' },
-	                        _react2.default.createElement('span', { className: 'glyphicon glyphicon-upload' }),
-	                        'Upload File'
-	                    )
-	                )
-	            );
-	        }
-	    }]);
-	
-	    return AttributeForm;
-	}(_react2.default.Component);
-	
-	;
 	//********************************************************
 	//********************************************************
 	
-	var TokenDistributionForm = function (_React$Component2) {
-	    _inherits(TokenDistributionForm, _React$Component2);
+	var TokenDistributionForm = function (_React$Component) {
+	    _inherits(TokenDistributionForm, _React$Component);
 	
 	    function TokenDistributionForm(props) {
 	        _classCallCheck(this, TokenDistributionForm);
@@ -58867,15 +52978,15 @@
 	//********************************************************
 	//********************************************************
 	
-	var Asset = function (_React$Component3) {
-	    _inherits(Asset, _React$Component3);
+	var Asset = function (_React$Component2) {
+	    _inherits(Asset, _React$Component2);
 	
 	    function Asset(props) {
 	        _classCallCheck(this, Asset);
 	
-	        var _this4 = _possibleConstructorReturn(this, (Asset.__proto__ || Object.getPrototypeOf(Asset)).call(this, props));
+	        var _this3 = _possibleConstructorReturn(this, (Asset.__proto__ || Object.getPrototypeOf(Asset)).call(this, props));
 	
-	        _this4.state = {
+	        _this3.state = {
 	
 	            asset: props.asset || {},
 	            //added assetType to try to hide divs properly
@@ -58901,14 +53012,19 @@
 	            delegatee_id: [],
 	            delegatee_token_quantity: [],
 	            controlled_assets: [],
-	            own_assets: []
+	            own_assets: [],
+	
+	            removeIfICA: 'hidden',
+	            removeIfMyCOID: {
+	                visibility: 'visible'
+	            }
 	
 	        };
 	
-	        var _this = _this4;
-	        _this4.handleHideModal = _this4.handleHideModal.bind(_this4);
-	        _this4.onFieldChange = _this4.onFieldChange.bind(_this4);
-	        return _this4;
+	        var _this = _this3;
+	        _this3.handleHideModal = _this3.handleHideModal.bind(_this3);
+	        _this3.onFieldChange = _this3.onFieldChange.bind(_this3);
+	        return _this3;
 	    }
 	    //*****************************************************************************
 	    //watch for inputs on recovery_list
@@ -58921,40 +53037,6 @@
 	            multipleValues[inputField] = e;
 	            this.setState(multipleValues);
 	        }
-	        //*****************************************************************************
-	        //if the asset in scope is 'MyCOID', we cannot add additional owners
-	
-	    }, {
-	        key: 'assetType_check',
-	        value: function assetType_check() {}
-	        // let asset_id = this.props.asset.asset_id
-	        // console.log("assetID.. " + asset_id)
-	
-	        // let own = document.getElementById("OWNERSHIP");
-	        // let ctrl = document.getElementById("controllers");
-	        // let recovery = document.getElementById("recovery");
-	        // let dele = document.getElementById("delegations");
-	
-	        // if (asset_id == "MyCOID")
-	        // { own.style.display = 'none'; }
-	        // else
-	        // { own.style.display = 'block'; }
-	
-	        // let storage = Array(localStorage.getItem("owned_assets"))
-	        // storage = JSON.parse(storage); //now storage is an object
-	        // console.log("typeof storage: " + typeof(storage));
-	
-	        // storage.forEach(function(element) {
-	        //     if(asset_id = element.asset_id && element.asset_type == 2){
-	        //         console.log("found")
-	        //         ctrl.style.display = 'none';
-	        //         recovery.style.display = 'none';
-	        //         dele.style.display = 'none';
-	        //     }
-	        //     //console.log("element: " + JSON.stringify(element))
-	        // })
-	
-	
 	        //*****************************************************************************
 	        //Passed as a prop to DimensionAttributeForm
 	
@@ -59419,41 +53501,59 @@
 	        value: function componentWillMount() {
 	
 	            var asset_id = this.state.asset.asset_id;
+	            console.log("Asset in asset class: " + JSON.stringify(this.state.asset));
 	
 	            var ownDiv = document.getElementById("owners");
 	            var ctrlDiv = document.getElementById("controllers");
 	            var recoveryDiv = document.getElementById("recovery");
 	            var deleDiv = document.getElementById("delegations");
 	
-	            //let asset_type = this.state.assetType;
-	            //console.log("assetType: " + asset_type)
-	
-	            // if(asset_type == 2){
-	            //     console.log("assetType is 2")
-	            //     ctrl.style.display = 'none';
-	            //     recovery.style.display = 'none';
-	            //     dele.style.display = 'none';
-	            // }
-	
-	            // if (asset_id == "MyCOID")
-	            // { own.style.display = 'none'; }
-	            // else
-	            // { own.style.display = 'block'; }
-	
-	            var storage = Array(localStorage.getItem("owned_assets"));
-	            storage = JSON.parse(storage); //now storage is an object
-	            console.log("typeof storage: " + (typeof storage === 'undefined' ? 'undefined' : _typeof(storage)));
-	
-	            storage.forEach(function (element) {
-	                if (asset_id = element.asset_id && element.asset_type == 2) {
-	                    console.log("found");
-	                    $('controllers').addClass("hidden");
-	                    // ctrl.style.display = 'none';
-	                    // recovery.style.display = 'none';
-	                    // dele.style.display = 'none';
+	            if (this.state.asset.asset_name.propType == "2") {
+	                //this.setState({ removeIfICA: 'hidden' })
+	                this.state.removeIfICA = 'hidden';
+	                this.state.removeIfMyCOID.visibility = 'hidden';
+	            } else {
+	                if (this.state.asset.asset_id == "MyCOID") {
+	                    this.state.removeIfMyCOID.visibility = 'hidden';
+	                } else {
+	                    this.state.removeIfMyCOID.visibility = 'visible';
 	                }
-	                //console.log("element: " + JSON.stringify(element))
-	            });
+	                //this.setState({ removeIfICA: 'visible' })
+	                this.state.removeIfICA = 'visible';
+	            }
+	
+	            // let storage = Array(localStorage.getItem("owned_assets"))
+	            // storage = JSON.parse(storage); //now storage is an object
+	            // console.log("typeof storage: " + typeof(storage));
+	
+	            // storage.forEach(function(element) {
+	            //     if(asset_id = element.asset_id && element.asset_type == 2){
+	            //         console.log("found")
+	            //         $('controllers').addClass("hidden");
+	            //         // ctrl.style.display = 'none';
+	            //         // recovery.style.display = 'none';
+	            //         // dele.style.display = 'none';
+	            //     }
+	            //     //console.log("element: " + JSON.stringify(element))
+	            // })
+	        }
+	    }, {
+	        key: 'componentWillUpdate',
+	        value: function componentWillUpdate(nextProps, nextState) {
+	            console.log("NextProps: " + JSON.stringify(nextProps));
+	            if (nextProps.asset.asset_name.propType == "2") {
+	                //this.setState({ removeIfICA: 'hidden' })
+	                this.state.removeIfICA = 'hidden';
+	                this.state.removeIfMyCOID.visibility = 'hidden';
+	            } else {
+	                //this.setState({ removeIfICA: 'visible' })
+	                if (nextProps.asset.asset_id == "MyCOID") {
+	                    this.state.removeIfMyCOID.visibility = 'hidden';
+	                } else {
+	                    this.state.removeIfMyCOID.visibility = 'visible';
+	                }
+	                this.state.removeIfICA = 'visible';
+	            }
 	        }
 	    }, {
 	        key: 'componentDidMount',
@@ -59464,12 +53564,16 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _this5 = this;
+	            var _this4 = this;
 	
 	            console.log("asset: " + JSON.stringify(this.state.asset));
 	
 	            var style = {
 	                fontSize: '12.5px'
+	            };
+	
+	            var removeIfICA = {
+	                visibility: this.state.removeIfICA
 	            };
 	            var inputAttrs = {
 	                addKeys: [13, 188], // Enter and comma
@@ -59480,8 +53584,6 @@
 	            };
 	
 	            var prop = this.props.asset.asset_name;
-	
-	            //onClick={this.assetType_check.bind(this)}
 	
 	            return _react2.default.createElement(
 	                'div',
@@ -59518,7 +53620,7 @@
 	                        ),
 	                        _react2.default.createElement(
 	                            'li',
-	                            { role: 'presentation' },
+	                            { style: removeIfICA, role: 'presentation' },
 	                            _react2.default.createElement(
 	                                'a',
 	                                { href: '#controllers', role: 'tab', 'data-toggle': 'tab' },
@@ -59527,7 +53629,7 @@
 	                        ),
 	                        _react2.default.createElement(
 	                            'li',
-	                            { role: 'presentation' },
+	                            { style: removeIfICA, role: 'presentation' },
 	                            _react2.default.createElement(
 	                                'a',
 	                                { href: '#recovery', role: 'tab', 'data-toggle': 'tab' },
@@ -59536,7 +53638,7 @@
 	                        ),
 	                        _react2.default.createElement(
 	                            'li',
-	                            { role: 'presentation' },
+	                            { style: removeIfICA, role: 'presentation' },
 	                            _react2.default.createElement(
 	                                'a',
 	                                { href: '#delegations', role: 'tab', 'data-toggle': 'tab' },
@@ -59632,7 +53734,7 @@
 	                                                                _react2.default.createElement(
 	                                                                    'a',
 	                                                                    { href: 'javascript:', onClick: function onClick(e) {
-	                                                                            _this5.bigchainGet(ids[2]);
+	                                                                            _this4.bigchainGet(ids[2]);
 	                                                                        } },
 	                                                                    ids[2]
 	                                                                )
@@ -59664,7 +53766,7 @@
 	                                    'Enter Unique ID Attributes:'
 	                                ),
 	                                this.state.inputs.map(function (input) {
-	                                    return _react2.default.createElement(AttributeForm, { handleShowModal: _this5.handleShowModal.bind(_this5), max: '10', key: input, labelref: input });
+	                                    return _react2.default.createElement(_UniqueIDAttributeForm2.default, { type: 'MyCOID', handleShowModal: _this4.handleShowModal.bind(_this4), max: '10', key: input, labelref: input });
 	                                })
 	                            ),
 	                            _react2.default.createElement(
@@ -59730,7 +53832,7 @@
 	                            ),
 	                            _react2.default.createElement(
 	                                'div',
-	                                { id: 'OWNERSHIP' },
+	                                { id: 'OWNERSHIP', style: this.state.removeIfMyCOID },
 	                                _react2.default.createElement(
 	                                    'div',
 	                                    { className: 'form-group' },
@@ -59740,7 +53842,7 @@
 	                                        'Enter Owners and their ownership token(s).'
 	                                    ),
 	                                    this.state.inputs_owners.map(function (input) {
-	                                        return _react2.default.createElement(TokenDistributionForm, { handleShowModal: _this5.handleShowModal.bind(_this5), min: _this5.state.subform_cont, max: '10', key: input, labelref: input });
+	                                        return _react2.default.createElement(TokenDistributionForm, { handleShowModal: _this4.handleShowModal.bind(_this4), min: _this4.state.subform_cont, max: '10', key: input, labelref: input });
 	                                    })
 	                                ),
 	                                _react2.default.createElement(
@@ -59814,7 +53916,7 @@
 	                                    'Enter Controllers and their control token(s).'
 	                                ),
 	                                this.state.inputs_controllers.map(function (input) {
-	                                    return _react2.default.createElement(TokenDistributionForm, { handleShowModal: _this5.handleShowModal.bind(_this5), min: _this5.state.subform_cont, max: '10', key: input, labelref: input });
+	                                    return _react2.default.createElement(TokenDistributionForm, { handleShowModal: _this4.handleShowModal.bind(_this4), min: _this4.state.subform_cont, max: '10', key: input, labelref: input });
 	                                })
 	                            ),
 	                            _react2.default.createElement(
@@ -59915,7 +54017,7 @@
 	                                    'Enter Recovery ID(s).'
 	                                ),
 	                                _react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs, { value: this.state.recovery_list, onChange: function onChange(e) {
-	                                        _this5.onFieldChange("recovery_list", e);
+	                                        _this4.onFieldChange("recovery_list", e);
 	                                    } }))
 	                            ),
 	                            _react2.default.createElement('br', null),
@@ -59964,7 +54066,7 @@
 	                                    'Enter Delegatees and their delegated control token(s).'
 	                                ),
 	                                this.state.inputs_delegatees.map(function (input) {
-	                                    return _react2.default.createElement(TokenDistributionForm, { handleShowModal: _this5.handleShowModal.bind(_this5), min: _this5.state.subform_cont, max: '10', key: input, labelref: input });
+	                                    return _react2.default.createElement(TokenDistributionForm, { handleShowModal: _this4.handleShowModal.bind(_this4), min: _this4.state.subform_cont, max: '10', key: input, labelref: input });
 	                                })
 	                            ),
 	                            _react2.default.createElement(
@@ -60012,25 +54114,25 @@
 	 * componentWillMount method will populate nav bar tabs with DT assets
 	/*************************************************************************/
 	
-	var Identities = function (_React$Component4) {
-	    _inherits(Identities, _React$Component4);
+	var Identities = function (_React$Component3) {
+	    _inherits(Identities, _React$Component3);
 	
 	    function Identities(props) {
 	        _classCallCheck(this, Identities);
 	
-	        var _this6 = _possibleConstructorReturn(this, (Identities.__proto__ || Object.getPrototypeOf(Identities)).call(this, props));
+	        var _this5 = _possibleConstructorReturn(this, (Identities.__proto__ || Object.getPrototypeOf(Identities)).call(this, props));
 	
-	        _this6.state = {
+	        _this5.state = {
 	            own_assets: [], //populated from DT
 	            controlled_assets: [], //[populated from DT
 	            showDetails: false, //will be set true when user selects asset
 	            active_asset: {} };
 	
 	        //handleSelectAsset will be called anytime we select from the nav bar
-	        _this6.handleSelectAsset = _this6.handleSelectAsset.bind(_this6);
+	        _this5.handleSelectAsset = _this5.handleSelectAsset.bind(_this5);
 	        //if this.state.showDetails is true, handleHideAsset is passed as a prop (hideHandler) to Asset class
-	        _this6.handleHideAsset = _this6.handleHideAsset.bind(_this6);
-	        return _this6;
+	        _this5.handleHideAsset = _this5.handleHideAsset.bind(_this5);
+	        return _this5;
 	    }
 	
 	    _createClass(Identities, [{
@@ -60077,6 +54179,7 @@
 	                    console.log("getOwnedAssets result: " + data);
 	                    //data is: MYCOID.json
 	
+	                    var assetData = [];
 	                    if (data.length > 0) {
 	                        //loop through OWNED assets
 	                        for (var i = 0; i < data.length; i++) {
@@ -60095,10 +54198,36 @@
 	
 	                                    theArray[theArray.length] = { asset_id: dataResult.assetID, asset_name: dataResult };
 	                                    if (dataResult.assetID = "MyCOID") this.setState({ own_assets: theArray });
+	
+	                                    // assetData[assetData.length] = {
+	                                    //     asset_id: dataResult.assetID,
+	                                    //     asset_uniqueId: dataResult.uniqueId,
+	                                    //     asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
+	                                    //     asset_coidAddr: dataResult.coidAddr,
+	                                    //     asset_gatekeeperAddr: dataResult.gatekeeperAddr,
+	                                    //     asset_owners: dataResult.ownerIdList,
+	                                    //     asset_controllers: dataResult.controlIdList,
+	                                    //     asset_bigchainID: dataResult.bigchainID,
+	                                    //     asset_type: dataResult.propType
+	                                    // }
+	                                    // localStorage.setItem("owned_assets", JSON.stringify(assetData))
 	                                }.bind(this)
 	                            });
 	                        } //end for loop
 	                    }
+	                    // else {
+	                    //     var assetData = []
+	                    //     assetData[assetData.length] = {
+	                    //         asset_id: "",
+	                    //         asset_uniqueId: "",
+	                    //         asset_dimCtrlAddr: "",
+	                    //         asset_coidAddr: "",
+	                    //         asset_gatekeeperAddr: "",
+	                    //         asset_owners: "",
+	                    //         asset_controllers: ""
+	                    //     }
+	                    //     localStorage.setItem("owned_assets", JSON.stringify(assetData))
+	                    // }
 	                }.bind(this) //success
 	            });
 	            // <- <- <- END get OWNED assets <- <- <-
@@ -60118,6 +54247,7 @@
 	                    //debugging:
 	                    console.log("Get Controlled Assets result: " + data);
 	
+	                    var assetData = [];
 	                    if (data.length > 0) {
 	                        //loop through OWNED assets
 	                        for (var i = 0; i < data.length; i++) {
@@ -60141,6 +54271,19 @@
 	                            });
 	                        } //end for loop
 	                    }
+	                    // else {
+	                    //     var assetData = []
+	                    //     assetData[assetData.length] = {
+	                    //         asset_id: "",
+	                    //         asset_uniqueId: "",
+	                    //         asset_dimCtrlAddr: "",
+	                    //         asset_coidAddr: "",
+	                    //         asset_gatekeeperAddr: "",
+	                    //         asset_owners: "",
+	                    //         asset_controllers: ""
+	                    //     }
+	                    //     localStorage.setItem("controlled_assets", JSON.stringify(assetData))
+	                    // }
 	                }.bind(this)
 	            });
 	            // <- <- <- END get CONTROLLED assets <- <- <-
@@ -60152,173 +54295,11 @@
 	
 	    }, {
 	        key: 'componentDidMount',
-	        value: function componentDidMount() {
-	            //TODO:
-	            //ADD THE CODE SO THAT MYCOID displays on the page by default?
-	
-	            // -> -> -> START get OWNED assets -> -> ->
-	            $.ajax({
-	                type: "POST",
-	                url: twinUrl + 'getOwnedAssets',
-	                data: { "pubKey": localStorage.getItem("pubKey") },
-	                error: function error() {},
-	                success: function (result) {
-	                    var data = result;
-	                    if ($.type(result) != "object") {
-	                        data = JSON.parseJSON(result);
-	                    }
-	
-	                    //get the array:
-	                    data = data.data;
-	                    console.log("Get Owned Assets result: " + data);
-	                    //DEBUGGING:
-	                    //console.log("getOwnedAssets result: " + data);
-	                    var assetData = [];
-	
-	                    if (data.length > 0) {
-	
-	                        //loop through OWNED assets
-	                        for (var i = 0; i < data.length; i++) {
-	                            //AJAX each asset:
-	                            $.ajax({
-	                                type: "POST",
-	                                url: twinUrl + 'getAsset',
-	                                data: { "pubKey": localStorage.getItem("pubKey"), "flag": 0, "fileName": data[i] },
-	                                success: function (result) {
-	                                    var dataResult = result;
-	                                    if ($.type(result) != "object") {
-	                                        dataResult = JSON.parseJSON(result);
-	                                    }
-	
-	                                    //***TODO: CHECK THAT THIS ADDS TO THE ARRAY, NOT REPLACE IT
-	                                    var theArray = this.state.own_assets;
-	
-	                                    //console.log("length is: " + theArray.length)
-	                                    //console.log(theArray)
-	                                    //TODO: RENAME asset_name TO ASSET DETAILS
-	                                    theArray[theArray.length] = {
-	                                        asset_id: dataResult.assetID,
-	                                        asset_details: dataResult
-	                                    };
-	                                    this.setState({ own_assets: theArray });
-	
-	                                    assetData[assetData.length] = {
-	                                        asset_id: dataResult.assetID,
-	                                        asset_uniqueId: dataResult.uniqueId,
-	                                        asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
-	                                        asset_coidAddr: dataResult.coidAddr,
-	                                        asset_gatekeeperAddr: dataResult.gatekeeperAddr,
-	                                        asset_owners: dataResult.ownerIdList,
-	                                        asset_controllers: dataResult.controlIdList,
-	                                        asset_bigchainID: dataResult.bigchainID,
-	                                        asset_type: dataResult.propType
-	                                    };
-	                                    localStorage.setItem("owned_assets", JSON.stringify(assetData));
-	                                    //console.log("owned_assets~~: " + JSON.stringify(this.state.own_assets))
-	                                }.bind(this),
-	                                complete: function complete() {}
-	                            });
-	                        } //end for
-	                    } //end if (data > 0)
-	                    else {
-	                            var assetData = [];
-	                            assetData[assetData.length] = {
-	                                asset_id: "",
-	                                asset_uniqueId: "",
-	                                asset_dimCtrlAddr: "",
-	                                asset_coidAddr: "",
-	                                asset_gatekeeperAddr: "",
-	                                asset_owners: "",
-	                                asset_controllers: ""
-	                            };
-	                            localStorage.setItem("owned_assets", JSON.stringify(assetData));
-	                        }
-	                }.bind(this)
-	            });
-	            // <- <- <- END get OWNED assets <- <- <-
-	            // <- <- <- <- <- <- <- <- <- <- <- <- <- <- <-
-	            // -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
-	            // -> -> -> START get CONTROLLED assets -> -> ->
-	            $.ajax({
-	                type: "POST",
-	                url: twinUrl + 'getControlledAssets',
-	                data: { "pubKey": localStorage.getItem("pubKey") },
-	                error: function error() {},
-	                success: function (result) {
-	                    var data = result;
-	                    if ($.type(result) != "object") {
-	                        data = JSON.parseJSON(result);
-	                    }
-	                    console.log("got data: " + JSON.stringify(data));
-	
-	                    data = data.data;
-	                    console.log("Get Controlled Assets result: " + data);
-	                    var assetData = [];
-	
-	                    if (data.length > 0) {
-	                        //loop through OWNED assets
-	                        for (var i = 0; i < data.length; i++) {
-	                            //console.log("i is: " + i + " filename: " + data[i])
-	                            //AJAX each asset:
-	                            $.ajax({
-	                                type: "POST",
-	                                url: twinUrl + 'getAsset',
-	                                data: { "pubKey": localStorage.getItem("pubKey"), "flag": 1, "fileName": data[i] },
-	                                success: function (result) {
-	                                    var dataResult = result;
-	                                    if ($.type(result) != "object") {
-	                                        dataResult = JSON.parseJSON(result);
-	                                    }
-	
-	                                    var theArray = this.state.controlled_assets;
-	                                    //console.log("length is: " + theArray.length)
-	                                    //console.log(JSON.stringify(theArray))
-	
-	                                    theArray[theArray.length] = {
-	                                        asset_id: dataResult.assetID,
-	                                        asset_details: dataResult
-	                                    };
-	                                    this.setState({ controlled_assets: theArray });
-	                                    //this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
-	
-	                                    assetData[assetData.length] = {
-	                                        asset_id: dataResult.assetID,
-	                                        asset_uniqueId: dataResult.uniqueId,
-	                                        asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
-	                                        asset_coidAddr: dataResult.coidAddr,
-	                                        asset_gatekeeperAddr: dataResult.gatekeeperAddr,
-	                                        asset_owners: dataResult.ownerIdList,
-	                                        asset_controllers: dataResult.controlIdList,
-	                                        asset_bigchainID: dataResult.bigchainID,
-	                                        asset_type: dataResult.propType
-	                                    };
-	                                    localStorage.setItem("controlled_assets", JSON.stringify(assetData));
-	                                }.bind(this),
-	                                complete: function complete() {}
-	                            });
-	                        } //end for
-	                    } else {
-	                        var assetData = [];
-	                        assetData[assetData.length] = {
-	                            asset_id: "",
-	                            asset_uniqueId: "",
-	                            asset_dimCtrlAddr: "",
-	                            asset_coidAddr: "",
-	                            asset_gatekeeperAddr: "",
-	                            asset_owners: "",
-	                            asset_controllers: ""
-	                        };
-	                        localStorage.setItem("controlled_assets", JSON.stringify(assetData));
-	                    }
-	                }.bind(this)
-	            });
-	            // <- <- <- END get CONTROLLED assets <- <- <-
-	
-	        }
+	        value: function componentDidMount() {}
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _this7 = this;
+	            var _this6 = this;
 	
 	            var style = { fontSize: '12.5px' };
 	            //TODO: replace with DT controlled assets
@@ -60331,6 +54312,15 @@
 	                    'h1',
 	                    null,
 	                    'Identity Utility'
+	                ),
+	                _react2.default.createElement(
+	                    'h5',
+	                    null,
+	                    _react2.default.createElement(
+	                        'i',
+	                        null,
+	                        'My Assets'
+	                    )
 	                ),
 	                _react2.default.createElement('hr', null),
 	                _react2.default.createElement(
@@ -60353,15 +54343,15 @@
 	                                { className: 'dropdown-menu' },
 	                                function () {
 	                                    {/* POPULATE the owned assets, */}
-	                                    if (_this7.state.own_assets.length > 0) {
-	                                        return _this7.state.own_assets.map(function (own, i) {
+	                                    if (_this6.state.own_assets.length > 0) {
+	                                        return _this6.state.own_assets.map(function (own, i) {
 	                                            return _react2.default.createElement(
 	                                                'li',
 	                                                { role: 'presentation', key: i },
 	                                                _react2.default.createElement(
 	                                                    'a',
 	                                                    { role: 'tab', 'data-toggle': 'tab', onClick: function onClick() {
-	                                                            return _this7.handleSelectAsset(own);
+	                                                            return _this6.handleSelectAsset(own);
 	                                                        } },
 	                                                    own.asset_id
 	                                                )
@@ -60391,15 +54381,15 @@
 	                                { className: 'dropdown-menu' },
 	                                function () {
 	                                    {/* POPULATE the controlled assets, */}
-	                                    if (_this7.state.controlled_assets.length > 0) {
-	                                        return _this7.state.controlled_assets.map(function (ctrl, i) {
+	                                    if (_this6.state.controlled_assets.length > 0) {
+	                                        return _this6.state.controlled_assets.map(function (ctrl, i) {
 	                                            return _react2.default.createElement(
 	                                                'li',
 	                                                { role: 'presentation', key: i },
 	                                                _react2.default.createElement(
 	                                                    'a',
 	                                                    { role: 'tab', 'data-toggle': 'tab', onClick: function onClick() {
-	                                                            return _this7.handleSelectAsset(ctrl);
+	                                                            return _this6.handleSelectAsset(ctrl);
 	                                                        } },
 	                                                    ctrl.asset_id
 	                                                )
@@ -60421,7 +54411,7 @@
 	                            _react2.default.createElement(
 	                                'a',
 	                                { href: '#/identityDimension' },
-	                                'Identity Dimensions'
+	                                'Personas'
 	                            )
 	                        )
 	                    )
@@ -60449,19 +54439,17 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/buffer/index.js */ 239).Buffer))
 
 /***/ },
-/* 382 */
-/*!**************************************************!*\
-  !*** ./src/app/Components/IdentityDimension.jsx ***!
-  \**************************************************/
+/* 343 */
+/*!***********************************************!*\
+  !*** ./src/app/Components/UploadIpfsFile.jsx ***!
+  \***********************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
+	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
@@ -60469,17 +54457,7 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _reactTagsinput = __webpack_require__(/*! react-tagsinput */ 328);
-	
-	var _reactTagsinput2 = _interopRequireDefault(_reactTagsinput);
-	
-	var _UploadIpfsFile = __webpack_require__(/*! ./UploadIpfsFile.jsx */ 350);
-	
-	var _UploadIpfsFile2 = _interopRequireDefault(_UploadIpfsFile);
-	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -60487,462 +54465,122 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var secp256k1 = __webpack_require__(/*! secp256k1 */ 261);
-	var keccak_256 = __webpack_require__(/*! js-sha3 */ 325).keccak_256;
+	var UploadIpfsFile = function (_React$Component) {
+	    _inherits(UploadIpfsFile, _React$Component);
 	
-	/*
-	CLASSES:
-	    DimensionDelegationForm: (for adding delegations and tokens)
-	    DimensionAttributeForm: (for uploading files for desc/attr pairs)
-	    DimensionForm: (rendered when we click an owned or controlled dimension)
-	    IdentityDimensions: PARENT CLASS
-	*/
+	    function UploadIpfsFile(props) {
+	        _classCallCheck(this, UploadIpfsFile);
 	
-	var DimensionAttributeForm = function (_React$Component) {
-	    _inherits(DimensionAttributeForm, _React$Component);
+	        var _this2 = _possibleConstructorReturn(this, (UploadIpfsFile.__proto__ || Object.getPrototypeOf(UploadIpfsFile)).call(this, props));
 	
-	    function DimensionAttributeForm(props) {
-	        _classCallCheck(this, DimensionAttributeForm);
-	
-	        var _this2 = _possibleConstructorReturn(this, (DimensionAttributeForm.__proto__ || Object.getPrototypeOf(DimensionAttributeForm)).call(this, props));
-	
-	        _this2.maxDelegations = _this2.props.max;
+	        _this2.state = {
+	            docs: {},
+	            pubKey: props.pubKey,
+	            selected: '0',
+	            files: ''
+	        };
+	        _this2.inputChangeHandler = _this2.inputChangeHandler.bind(_this2);
 	        return _this2;
 	    }
 	
-	    _createClass(DimensionAttributeForm, [{
-	        key: 'render',
-	        value: function render() {
-	            return _react2.default.createElement(
-	                'div',
-	                { className: 'form-group col-md-12' },
-	                _react2.default.createElement(
-	                    'div',
-	                    { className: 'col-md-10' },
-	                    _react2.default.createElement(
-	                        'label',
-	                        { htmlFor: 'unique_id_attrs' },
-	                        ' Persona Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research". '
-	                    ),
-	                    _react2.default.createElement('input', { name: 'label-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: 'Descriptor' })
-	                ),
-	                _react2.default.createElement(
-	                    'div',
-	                    { className: 'col-md-2' },
-	                    _react2.default.createElement(
-	                        'button',
-	                        { type: 'button', 'data-id': this.props.labelref, onClick: this.props.handleShowModal, className: 'btn btn-warning pull-right' },
-	                        _react2.default.createElement('span', { className: 'glyphicon glyphicon-upload' }),
-	                        'Upload File'
-	                    )
-	                )
-	            );
-	        }
-	    }]);
-	
-	    return DimensionAttributeForm;
-	}(_react2.default.Component);
-	
-	;
-	
-	var DimensionDelegationForm = function (_React$Component2) {
-	    _inherits(DimensionDelegationForm, _React$Component2);
-	
-	    function DimensionDelegationForm(props) {
-	        _classCallCheck(this, DimensionDelegationForm);
-	
-	        var _this3 = _possibleConstructorReturn(this, (DimensionDelegationForm.__proto__ || Object.getPrototypeOf(DimensionDelegationForm)).call(this, props));
-	
-	        _this3.maxDelegations = _this3.props.max;
-	        return _this3;
-	    }
-	
-	    _createClass(DimensionDelegationForm, [{
-	        key: 'render',
-	        value: function render() {
-	            var style = { fontSize: '12.5px' };
-	            return _react2.default.createElement(
-	                'div',
-	                { className: 'form-group col-md-12' },
-	                _react2.default.createElement(
-	                    'div',
-	                    { className: 'col-md-10' },
-	                    _react2.default.createElement(
-	                        'table',
-	                        { className: 'table table-striped table-hover', style: style },
-	                        _react2.default.createElement(
-	                            'tbody',
-	                            null,
-	                            _react2.default.createElement(
-	                                'tr',
-	                                null,
-	                                _react2.default.createElement(
-	                                    'th',
-	                                    null,
-	                                    _react2.default.createElement(
-	                                        'b',
-	                                        null,
-	                                        'Delegatee'
-	                                    )
-	                                ),
-	                                _react2.default.createElement(
-	                                    'th',
-	                                    null,
-	                                    _react2.default.createElement(
-	                                        'b',
-	                                        null,
-	                                        'Control Token Quantity'
-	                                    )
-	                                )
-	                            ),
-	                            _react2.default.createElement(
-	                                'tr',
-	                                null,
-	                                _react2.default.createElement(
-	                                    'td',
-	                                    null,
-	                                    _react2.default.createElement('input', { name: 'delegatee-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: 'Public Key of Delegatee' })
-	                                ),
-	                                _react2.default.createElement(
-	                                    'td',
-	                                    null,
-	                                    _react2.default.createElement('input', { name: 'delegatee-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: 'Control Token Quantity' })
-	                                )
-	                            )
-	                        )
-	                    )
-	                )
-	            );
-	        }
-	    }]);
-	
-	    return DimensionDelegationForm;
-	}(_react2.default.Component);
-	
-	;
-	
-	var DimensionForm = function (_Component) {
-	    _inherits(DimensionForm, _Component);
-	
-	    function DimensionForm(props) {
-	        _classCallCheck(this, DimensionForm);
-	
-	        var _this4 = _possibleConstructorReturn(this, (DimensionForm.__proto__ || Object.getPrototypeOf(DimensionForm)).call(this, props));
-	
-	        _this4.state = {
-	            dimension: _this4.props.dataHandler,
-	            //dimension_data: {},
-	            selected: false,
-	            docs: {}, //takes same form as it does in Documents.jsx and CoreIdentity.jsx/MyGatekeeper.jsx
-	            pubkey: localStorage.getItem("pubKey"),
-	            delegations: ['input-0']
-	        };
-	
-	        _this4.bigchainGet = _this4.bigchainGet.bind(_this4);
-	        return _this4;
-	    }
-	
-	    _createClass(DimensionForm, [{
-	        key: 'bigchainGet',
-	        value: function bigchainGet(attr) {
-	            //e.preventDefault();
-	            var txID = attr; //req.body.bigchainID;
-	            console.log(txID);
-	            console.log("BIGCHAINGET ONCLICK");
-	            //var formdata = req.body;
-	            //BIGCHAIN ENDPOINT:
-	            var bigchainServer = 'http://10.101.114.230:5000';
-	            var endpoint = '/getTransaction/' + txID;
-	            $.ajax({
-	                method: 'GET',
-	                url: bigchainServer + endpoint,
-	                headers: { 'Access-Control-Allow-Origin': '*' },
-	                crossDomain: true,
-	                dataType: 'json',
-	                contentType: 'application/json',
-	                cache: false,
-	                success: function success(resp) {
-	                    //the response is body -- send that
-	                    console.log(resp);
-	                    var full_data = resp;
-	                    var short_data = resp.asset.data.Coid_Data;
-	                    console.log("short data is..." + short_data.ownershipId);
-	                    console.log(JSON.stringify(full_data));
-	                    console.log(JSON.stringify(short_data));
-	                    var something = window.open("data:text/json," + encodeURIComponent(JSON.stringify(short_data)), "_blank");
-	                    something.focus();
-	                }
-	            });
-	        }
-	
-	        //HANDLE THE CHOICE OF USER INPUT
-	
-	    }, {
-	        key: 'submitHandler',
-	        value: function submitHandler(e) {
-	            var _this5 = this;
-	
-	            e.preventDefault();
-	            var ele = $(e.target);
-	            var button_val = parseInt(ele.attr("data-val"));
-	            //*********************************************/
-	            var dimension = this.state.dimension.dimension;
-	            var typeInput = dimension.dimensionName;
-	
-	            var json = {
-	                "publicKey": localStorage.getItem("pubKey"),
-	                "typeInput": typeInput,
-	                "flag": "0",
-	                "accessCategories": ""
-	            };
-	
-	            //*********************************************************************
-	            // request to add dimension descriptor/attribute pair
-	            if (button_val === 1) {
-	                console.log("hit add descriptor rq");
-	                var descriptor = void 0;
-	
-	                $.each($("input[name^='descriptor']"), function (obj) {
-	                    var value = $.trim($(this).val());
-	                    if (value.length > 0) {
-	                        descriptor = value;
-	                    }
-	                });
-	                //descriptor, ex: 'financial history 1/2017'
-	                json.descriptor = descriptor;
-	
-	                $.ajax({
-	                    url: twinUrl + 'addDimensionAttribute',
-	                    type: 'POST',
-	                    data: json,
-	                    success: function success(res) {
-	                        if (res.status == "Ok" && res.msg == "true") {
-	                            //var i_dimension = this.state.dimension.ID
-	                        }
-	                    }
-	                });
-	            } //end if
-	            //*********************************************************************
-	            // request to add a delegation for a dimension (one or many descriptors)
-	            if (button_val === 2) {
-	                var x;
-	
-	                (function () {
-	                    console.log("hit delegation rq");
-	
-	                    //checking if they want to delegate access to all attrs
-	                    //this mean accessCategories (contract) will be null
-	                    x = $("#allAttrs").is(":checked");
-	
-	                    console.log("checkbox: " + x);
-	
-	                    if ($("#allAttrs").is(":checked")) {
-	                        $('#accessCategories').hide();
-	                    }
-	
-	                    var accessCategories = [];
-	
-	                    //Getting the value (index) of selected access categories
-	                    //the index represents the desriptor/attribute
-	                    $('#accessCategories option:selected').each(function () {
-	                        accessCategories.push($(this).val());
-	                        //accessCategories now contains the selected indices
-	                    });
-	
-	                    console.log("selectedCategories: " + accessCategories);
-	
-	                    accessCategories.forEach(function (element) {
-	                        //console.log("got element: " + element)
-	                        json.accessCategories += dimension.data[element].descriptor + ",";
-	                    });
-	
-	                    json.accessCategories = json.accessCategories.substring(0, json.accessCategories.length - 1);
-	
-	                    // json.delegations = this.prepareDelegationDistribution(function (err) {
-	                    //     if (err) { console.log("ERROR DELEGATIONS: " + err) }
-	                    // })
-	
-	                    var delegations = _this5.prepareDelegationDistribution(dimensionName, json.owners);
-	                    json.delegations = delegations;
-	
-	                    json.owner = _this5.state.dimension.owner;
-	
-	                    json.coidAddr = _this5.state.dimension.coidAddr;
-	                    json.dimensionCtrlAddr = _this5.state.dimension.dimensionCtrlAddr;
-	
-	                    json.dimension = _this5.state.dimension.dimensionName;
-	
-	                    console.log("\n JSON body: " + JSON.stringify(json));
-	                    // $.ajax({
-	                    //     url: twinUrl + 'dimensions/addDelegation',
-	                    //     type: 'POST',
-	                    //     data: json,
-	                    //     success: function (res) {
-	                    //         if (res.status == "Ok" && res.msg == "true") {
-	                    //             //var i_dimension = this.state.dimension.ID
-	                    //         }
-	                    //     }
-	                    // });
-	                })();
-	            }
-	            //*********************************************************************
-	        } //end submitHandler
-	
-	        //THIS METHOD IS THE CONSTRUCTOR
-	
-	    }, {
-	        key: 'componentWillMount',
-	        value: function componentWillMount() {
-	
-	            $('#accessCategories').show();
-	
-	            if ($("#allAttrs").is(":checked")) {
-	                this.state.selected = true;
-	            }
-	            if (this.state.selected = true) {
-	                $('#accessCategories').hide();
-	            }
-	        }
-	    }, {
+	    _createClass(UploadIpfsFile, [{
 	        key: 'componentDidMount',
 	        value: function componentDidMount() {
-	
-	            // this.setState({dimension_data: this.props.dimension});
-	            $("#dimension_Details").modal('show');
-	            $("#dimension_Details").on('hidden.bs.modal', this.props.hideHandler);
-	
-	            // $.ajax({
-	            //     url: twinUrl + "ipfs/alldocs/" + this.state.pubKey,
-	            //     dataType: 'json',
-	            //     cache: false,
-	            //     success: function (resp) {
-	            //         this.setState({ docs: resp.data.documents });
-	            //     }.bind(this),
-	            //     error: function (xhr, status, err) {
-	            //         console.error(this.props.url, status, err.toString());
-	            //     }.bind(this)
-	            // });
-	        }
-	
-	        /*****************************************************************************
-	        * SAME PROCESS TO ADD DELEGATIONS
-	        * 1) define getDelegationInputValues
-	        * 2) getDelegationInputValues inside prepareDelegationDistribution
-	        *****************************************************************************/
-	
-	    }, {
-	        key: 'getDelegationInputValues',
-	        value: function getDelegationInputValues() {
-	            var labelVals = [];
-	            var _this = this;
-	            //in DimensionForm
-	            $.each($("input[name^='delegatee-']"), function (obj) {
-	                var value = $.trim($(this).val());
-	                if (value.length > 0) {
-	                    labelVals.push(_defineProperty({}, $(this).attr('name').replace("label-", ""), value));
-	                }
+	            $.ajax({
+	                url: twinUrl + "ipfs/alldocs/" + this.state.pubKey,
+	                dataType: 'json',
+	                cache: false,
+	                success: function (resp) {
+	                    this.setState({ docs: resp.data.documents });
+	                }.bind(this),
+	                error: function (xhr, status, err) {
+	                    console.error(this.props.url, status, err.toString());
+	                }.bind(this)
 	            });
-	            return labelVals;
-	            //returns an object array: [{"delegatee-input1-0":"pubkey"},{"delegatee-input1-0":"2"}
+	
+	            if (this.props.flag) {
+	                $("#descriptors .modal").modal('show');
+	                $("#descriptors .modal").on('hidden.bs.modal', this.props.handleHideModal);
+	            }
+	
+	            $("#SubmitContainer .modal").modal('show');
+	            $("#SubmitContainer .modal").on('hidden.bs.modal', this.props.handleHideModal);
 	        }
-	        //*****************************************************************************
-	        //prepare the delegations object array
-	
 	    }, {
-	        key: 'prepareDelegationDistribution',
-	        value: function prepareDelegationDistribution(dimension, owners) {
-	            var dimensionName = dimension;
-	            var owner = owners;
-	            console.log("got owners for delegations: " + owner);
-	
-	            console.log("preparedelegation dimensionName: " + dimensionName);
-	            var labels = this.getDelegationInputValues();
-	            var delegatee = [];
-	            var delegatee_token_quantity = [];
-	            for (var i = 0; i < labels.length; i += 2) {
-	                for (var key in labels[i]) {
-	                    delegatee.push(labels[i][key]);
-	                    delegatee_token_quantity.push(labels[i + 1][key]);
+	        key: 'uploadHandler',
+	        value: function uploadHandler(data, additionalParams) {
+	            var params = {
+	                url: twinUrl + "ipfs/upload",
+	                type: 'POST',
+	                data: data,
+	                cache: false,
+	                processData: false,
+	                contentType: false
+	            };
+	            $.extend(params, additionalParams);
+	            $.ajax(params);
+	        }
+	    }, {
+	        key: 'fileHandler',
+	        value: function fileHandler(e) {
+	            e.preventDefault();
+	            if (this.state.selected != "0") {
+	                var hash, fileHash;
+	                this.props.dataHandler(this.state.selected);
+	                $("button.close").trigger("click");
+	            } else {
+	                if (this.state.files.size > 0) {
+	                    var fileInput = $("input[name=newdoc]");
+	                    var fData = new FormData();
+	                    fData.append("user_pubkey", this.state.pubKey);
+	                    $.each(fileInput[0].files, function (key, value) {
+	                        fData.append(key, value);
+	                    });
+	                    var _this = this;
+	                    var callbacks = {
+	                        beforeSend: function beforeSend(xhr) {
+	                            $("button[name=uploadsubmit]").button('loading');
+	                            $("button.close").hide();
+	                        },
+	                        success: function (resp) {
+	                            if (resp.uploded && resp.uploded.length > 0) {
+	                                var filedata = resp.uploded[0].hash + "|" + resp.uploded[0].file_hash;
+	                                //data handler forms JSON object
+	                                this.props.dataHandler(filedata);
+	                                $("button.close").trigger("click");
+	                            }
+	                        }.bind(this),
+	                        complete: function complete() {
+	                            $("button[name=uploadsubmit]").button('reset');
+	                            $("button.close").show();
+	                        }
+	                    };
+	                    this.uploadHandler(fData, callbacks);
 	                }
 	            }
-	            var delegationsArray = [];
-	            var date = new Date();
-	            if (delegatee.length == delegatee_token_quantity.length) {
-	                //{ owner: "", delegatee: "", amount: "", dimension: "", expiration: "", accessCategories: "" }
-	                for (var i = 0; i < delegatee.length; i++) {
-	                    var delegationObj = {};
-	                    delegationObj.dimension = dimensionName;
-	                    delegationObj.owner = owner; // EDIT!!!!!!!!!!
-	                    delegationObj.delegatee = keccak_256(delegatee[i]);
-	                    delegationObj.amount = delegatee_token_quantity[i];
-	                    delegationObj.accessCategories = "";
-	                    delegationObj.timeFrame = date.getTime();
-	                    delegationsArray.push(delegationObj);
-	                }
-	            }
-	            return JSON.stringify(delegationsArray);
 	        }
-	        //*****************************************************************************
-	
 	    }, {
-	        key: 'appendDelegation',
-	        value: function appendDelegation() {
-	            var inputLen = this.state.delegations.length;
-	            console.log("dimensionForm delegations length: " + inputLen);
-	            if (inputLen < 10) {
-	                var newInput1 = 'input1-' + inputLen;
-	                this.setState({ delegations: this.state.delegations.concat([newInput1]) });
-	            }
+	        key: 'inputChangeHandler',
+	        value: function inputChangeHandler(e) {
+	            if (e.target.tagName == "SELECT") {
+	                this.setState({ selected: e.target.value });
+	            } else this.setState({ files: e.target.files[0] });
 	        }
-	        //*****************************************************************************
-	        //*****************************************************************************
-	
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _this6 = this;
+	            var _this3 = this;
 	
-	            console.log("state in DimensionForm\n" + JSON.stringify(this.state));
-	            var dims = this.state.dimension;
-	            console.log("dims: " + JSON.stringify(dims));
-	
-	            var dataArray = [];
-	            var arrayOfArrays = [];
-	            var data = dims.dimension_details.data; //data comes from _dimension.json object structure
-	            console.log("data: " + JSON.stringify(data));
-	
-	            Object.keys(data).forEach(function (key) {
-	                dataArray.push(data[key].descriptor);
-	                dataArray.push(data[key].attribute);
-	                dataArray.push(data[key].flag);
-	                dataArray.push(data[key].ID);
-	            });
-	
-	            //data.length will equal the number of dimensions
-	            for (var i = 0; i < data.length; i++) {
-	                var element = [dataArray[4 * i + 0], dataArray[4 * i + 1], dataArray[4 * i + 2], dataArray[4 * i + 3]];
-	                arrayOfArrays.push(element);
-	            }
-	
-	            // console.log("DataArray: " + dataArray)
-	            // console.log("arrayOfArrays[0][0]: " + arrayOfArrays[0][0])
-	            // console.log("arrayOfArrays[1][1]: " + arrayOfArrays[1][1])
-	
-	            var controllers = dims.dimension_details.controllers;
-	
-	            var syle = {
-	                marginRight: '15px'
-	            };
+	            //console.log("UploadIpfsFile state: " + JSON.stringify(this.state))
 	            var center = {
 	                textAlign: 'center'
 	            };
-	
 	            return _react2.default.createElement(
 	                'div',
-	                { className: 'modal fade', id: 'dimension_Details', key: dims.ID, tabIndex: '-1', role: 'dialog', 'aria-labelledby': 'dimension' },
+	                { className: 'modal fade' },
 	                _react2.default.createElement(
 	                    'div',
-	                    { className: 'modal-dialog modal-lg', role: 'document' },
+	                    { className: 'modal-dialog' },
 	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'modal-content' },
@@ -60955,1304 +54593,83 @@
 	                                _react2.default.createElement(
 	                                    'span',
 	                                    { 'aria-hidden': 'true' },
-	                                    '× '
+	                                    '×'
 	                                )
 	                            ),
 	                            _react2.default.createElement(
-	                                'ul',
-	                                { className: 'nav nav-pills', role: 'tablist' },
-	                                _react2.default.createElement(
-	                                    'li',
-	                                    { role: 'presentation', className: 'active' },
-	                                    _react2.default.createElement(
-	                                        'a',
-	                                        { href: '#dimensionDetails', role: 'tab', 'data-toggle': 'tab' },
-	                                        'Identity Dimension Details'
-	                                    )
-	                                ),
-	                                _react2.default.createElement(
-	                                    'li',
-	                                    { role: 'presentation' },
-	                                    _react2.default.createElement(
-	                                        'a',
-	                                        { href: '#control', role: 'tab', 'data-toggle': 'tab' },
-	                                        'Add Descriptor'
-	                                    )
-	                                ),
-	                                _react2.default.createElement(
-	                                    'li',
-	                                    { role: 'presentation' },
-	                                    _react2.default.createElement(
-	                                        'a',
-	                                        { href: '#delegations', role: 'tab', 'data-toggle': 'tab' },
-	                                        'Token Delegations'
-	                                    )
-	                                )
+	                                'h4',
+	                                { className: 'modal-title' },
+	                                'Upload Document'
 	                            )
 	                        ),
 	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'modal-body' },
 	                            _react2.default.createElement(
-	                                'div',
-	                                { className: 'tab-content' },
-	                                _react2.default.createElement(
-	                                    'div',
-	                                    { role: 'tabpanel', className: 'tab-pane active', id: 'dimensionDetails' },
-	                                    _react2.default.createElement(
-	                                        'table',
-	                                        { className: 'table table-striped table-hover', style: syle },
-	                                        _react2.default.createElement(
-	                                            'tbody',
-	                                            null,
-	                                            _react2.default.createElement(
-	                                                'tr',
-	                                                null,
-	                                                _react2.default.createElement(
-	                                                    'td',
-	                                                    null,
-	                                                    'Asset'
-	                                                ),
-	                                                _react2.default.createElement(
-	                                                    'td',
-	                                                    null,
-	                                                    'MyCOID'
-	                                                )
-	                                            ),
-	                                            _react2.default.createElement(
-	                                                'tr',
-	                                                null,
-	                                                _react2.default.createElement(
-	                                                    'td',
-	                                                    null,
-	                                                    'Dimension Type'
-	                                                ),
-	                                                _react2.default.createElement(
-	                                                    'td',
-	                                                    null,
-	                                                    dims.dimension_details.dimensionName
-	                                                )
-	                                            ),
-	                                            _react2.default.createElement(
-	                                                'tr',
-	                                                null,
-	                                                _react2.default.createElement(
-	                                                    'td',
-	                                                    null,
-	                                                    'Controller List'
-	                                                ),
-	                                                _react2.default.createElement(
-	                                                    'td',
-	                                                    null,
-	                                                    function () {
-	                                                        if (!$.isEmptyObject(dims)) {
-	                                                            return controllers.map(function (ids, i) {
-	                                                                return _react2.default.createElement(
-	                                                                    'p',
-	                                                                    { key: i },
-	                                                                    ' ',
-	                                                                    controllers[i]
-	                                                                );
-	                                                            });
-	                                                        }
-	                                                    }(this)
-	                                                )
-	                                            ),
-	                                            _react2.default.createElement(
-	                                                'tr',
-	                                                null,
-	                                                _react2.default.createElement(
-	                                                    'td',
-	                                                    { colSpan: '2' },
-	                                                    _react2.default.createElement(
-	                                                        'b',
-	                                                        null,
-	                                                        'Descriptors:'
-	                                                    )
-	                                                )
-	                                            ),
-	                                            function () {
-	                                                var ipfs_url = "http://10.101.114.231:8080/ipfs/";
-	                                                if (arrayOfArrays.length > 0) {
-	                                                    return arrayOfArrays.map(function (attrs, i) {
-	                                                        //console.log("attrs[0]: " + attrs[0] + ", attrs[1]:" + attrs[1] + ", attrs[2]: " + attrs[2] + ", attrs[3]: " + attrs[3])
-	                                                        if (attrs[1] && attrs[1].charAt(0) == "Q") {
-	                                                            return _react2.default.createElement(
-	                                                                'tr',
-	                                                                { key: i },
-	                                                                _react2.default.createElement(
-	                                                                    'td',
-	                                                                    null,
-	                                                                    attrs[0]
-	                                                                ),
-	                                                                _react2.default.createElement(
-	                                                                    'td',
-	                                                                    null,
-	                                                                    _react2.default.createElement(
-	                                                                        'p',
-	                                                                        null,
-	                                                                        _react2.default.createElement(
-	                                                                            'a',
-	                                                                            { target: '_blank', href: ipfs_url + "/" + attrs[1] },
-	                                                                            attrs[1]
-	                                                                        )
-	                                                                    )
-	                                                                )
-	                                                            );
-	                                                        } else return _react2.default.createElement(
-	                                                            'tr',
-	                                                            { key: i },
-	                                                            _react2.default.createElement(
-	                                                                'td',
-	                                                                null,
-	                                                                attrs[0]
-	                                                            ),
-	                                                            _react2.default.createElement(
-	                                                                'td',
-	                                                                null,
-	                                                                _react2.default.createElement(
-	                                                                    'p',
-	                                                                    null,
-	                                                                    _react2.default.createElement(
-	                                                                        'a',
-	                                                                        { href: 'javascript:', onClick: function onClick(e) {
-	                                                                                _this6.bigchainGet(attrs[1]);
-	                                                                            } },
-	                                                                        attrs[1]
-	                                                                    )
-	                                                                )
-	                                                            )
-	                                                        );
-	                                                    });
-	                                                } else {
-	                                                    return _react2.default.createElement(
-	                                                        'tr',
-	                                                        null,
-	                                                        _react2.default.createElement(
-	                                                            'td',
-	                                                            { colSpan: '2' },
-	                                                            'No descriptors found.'
-	                                                        )
-	                                                    );
-	                                                }
-	                                            }(this)
-	                                        )
-	                                    )
-	                                ),
-	                                _react2.default.createElement(
-	                                    'div',
-	                                    { role: 'tabpanel', className: 'tab-pane', id: 'control' },
-	                                    _react2.default.createElement(
-	                                        'table',
-	                                        { className: 'table table-striped table-hover', style: syle },
-	                                        _react2.default.createElement(
-	                                            'tbody',
-	                                            null,
-	                                            _react2.default.createElement(
-	                                                'tr',
-	                                                null,
-	                                                _react2.default.createElement(
-	                                                    'th',
-	                                                    null,
-	                                                    _react2.default.createElement(
-	                                                        'b',
-	                                                        null,
-	                                                        'Add Dimension Descriptor and Attribute'
-	                                                    )
-	                                                )
-	                                            ),
-	                                            _react2.default.createElement(
-	                                                'tr',
-	                                                null,
-	                                                _react2.default.createElement(
-	                                                    'td',
-	                                                    null,
-	                                                    _react2.default.createElement('input', { name: 'descriptor', className: 'form-control col-md-4', type: 'text', placeholder: 'descriptor name' })
-	                                                )
-	                                            )
-	                                        )
-	                                    ),
-	                                    _react2.default.createElement(
-	                                        'div',
-	                                        { className: 'body' },
-	                                        _react2.default.createElement(
-	                                            'form',
-	                                            null,
-	                                            _react2.default.createElement(
-	                                                'div',
-	                                                { className: 'form-group' },
-	                                                _react2.default.createElement(
-	                                                    'label',
-	                                                    { htmlFor: 'get-hash' },
-	                                                    'Choose from documents'
-	                                                ),
-	                                                _react2.default.createElement(
-	                                                    'select',
-	                                                    { className: 'form-control col-md-4', onChange: this.inputChangeHandler },
-	                                                    _react2.default.createElement(
-	                                                        'option',
-	                                                        { value: '0' },
-	                                                        'Select Document'
-	                                                    ),
-	                                                    function () {
-	                                                        if (_this6.state.docs && _this6.state.docs.length > 0) {
-	                                                            var i = 0;
-	                                                            return _this6.state.docs.map(function (obj) {
-	                                                                i++;
-	                                                                var optsVal = obj.hash + "|" + obj.file_hash;
-	                                                                return _react2.default.createElement(
-	                                                                    'option',
-	                                                                    { value: optsVal, key: i },
-	                                                                    obj.filename
-	                                                                );
-	                                                            });
-	                                                        } else {
-	                                                            return _react2.default.createElement(
-	                                                                'option',
-	                                                                { value: '0' },
-	                                                                '-- Empty --'
-	                                                            );
-	                                                        }
-	                                                    }()
-	                                                )
-	                                            ),
-	                                            _react2.default.createElement(
-	                                                'p',
-	                                                { style: center },
-	                                                '(or)'
-	                                            ),
-	                                            _react2.default.createElement(
-	                                                'div',
-	                                                { className: 'form-group' },
-	                                                _react2.default.createElement(
-	                                                    'label',
-	                                                    { htmlFor: 'documents' },
-	                                                    'Upload Document'
-	                                                ),
-	                                                _react2.default.createElement('input', { type: 'file', className: 'form-control', name: 'newdoc', onChange: this.inputChangeHandler })
-	                                            )
-	                                        )
-	                                    ),
-	                                    _react2.default.createElement(
-	                                        'button',
-	                                        { type: 'button', className: 'btn btn-info', 'data-val': '1', onClick: this.submitHandler.bind(this) },
-	                                        ' Add descriptor'
-	                                    )
-	                                ),
-	                                _react2.default.createElement(
-	                                    'div',
-	                                    { role: 'tabpanel', className: 'tab-pane', id: 'delegations' },
-	                                    _react2.default.createElement(
-	                                        'table',
-	                                        { className: 'table table-striped table-hover', style: syle },
-	                                        _react2.default.createElement(
-	                                            'thead',
-	                                            null,
-	                                            _react2.default.createElement(
-	                                                'tr',
-	                                                null,
-	                                                _react2.default.createElement(
-	                                                    'th',
-	                                                    null,
-	                                                    'Tokens delegated for this dimension: 1'
-	                                                )
-	                                            )
-	                                        ),
-	                                        _react2.default.createElement('hr', null),
-	                                        _react2.default.createElement(
-	                                            'tbody',
-	                                            null,
-	                                            _react2.default.createElement(
-	                                                'tr',
-	                                                null,
-	                                                _react2.default.createElement(
-	                                                    'td',
-	                                                    null,
-	                                                    _react2.default.createElement(
-	                                                        'label',
-	                                                        { htmlFor: 'control_dist' },
-	                                                        'Enter Delegations and their delegated control token(s).'
-	                                                    ),
-	                                                    this.state.delegations.map(function (input) {
-	                                                        return _react2.default.createElement(DimensionDelegationForm, { max: '10', key: input, labelref: input });
-	                                                    })
-	                                                )
-	                                            ),
-	                                            _react2.default.createElement(
-	                                                'tr',
-	                                                null,
-	                                                _react2.default.createElement(
-	                                                    'td',
-	                                                    null,
-	                                                    _react2.default.createElement(
-	                                                        'button',
-	                                                        { type: 'button', className: 'btn btn-info pull-right', style: syle, onClick: this.appendDelegation.bind(this) },
-	                                                        _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
-	                                                        'Add More'
-	                                                    )
-	                                                )
-	                                            ),
-	                                            _react2.default.createElement(
-	                                                'tr',
-	                                                null,
-	                                                _react2.default.createElement(
-	                                                    'td',
-	                                                    null,
-	                                                    _react2.default.createElement('input', { className: 'form-control col-md-4', type: 'text', placeholder: 'Expiration' })
-	                                                )
-	                                            ),
-	                                            _react2.default.createElement(
-	                                                'tr',
-	                                                null,
-	                                                _react2.default.createElement(
-	                                                    'th',
-	                                                    null,
-	                                                    _react2.default.createElement(
-	                                                        'b',
-	                                                        null,
-	                                                        'Delegate access to all attributes:'
-	                                                    )
-	                                                )
-	                                            ),
-	                                            _react2.default.createElement(
-	                                                'tr',
-	                                                null,
-	                                                _react2.default.createElement(
-	                                                    'td',
-	                                                    null,
-	                                                    _react2.default.createElement('input', { id: 'allAttrs', type: 'checkbox' }),
-	                                                    'YES'
-	                                                )
-	                                            ),
-	                                            _react2.default.createElement(
-	                                                'tr',
-	                                                null,
-	                                                _react2.default.createElement(
-	                                                    'th',
-	                                                    null,
-	                                                    _react2.default.createElement(
-	                                                        'b',
-	                                                        null,
-	                                                        'Access Categories (select 1 or many):'
-	                                                    )
-	                                                )
-	                                            ),
-	                                            _react2.default.createElement(
-	                                                'tr',
-	                                                null,
-	                                                _react2.default.createElement(
-	                                                    'td',
-	                                                    null,
-	                                                    _react2.default.createElement(
-	                                                        'select',
-	                                                        { id: 'accessCategories', className: 'selectpicker', multiple: 'multiple' },
-	                                                        function () {
-	                                                            if (arrayOfArrays.length > 0) {
-	                                                                return arrayOfArrays.map(function (attrs, i) {
-	                                                                    return _react2.default.createElement(
-	                                                                        'option',
-	                                                                        { key: i, value: i },
-	                                                                        attrs[0]
-	                                                                    );
-	                                                                });
-	                                                            }
-	                                                        }(this)
-	                                                    )
-	                                                )
-	                                            )
-	                                        )
-	                                    ),
-	                                    _react2.default.createElement(
-	                                        'button',
-	                                        { type: 'button', className: 'btn btn-info', 'data-val': '2', onClick: this.submitHandler.bind(this) },
-	                                        'Delegate tokens'
-	                                    )
-	                                )
-	                            )
-	                        )
-	                    )
-	                )
-	            );
-	        }
-	    }]);
-	
-	    return DimensionForm;
-	}(_react.Component);
-	
-	var IdentityDimensions = function (_Component2) {
-	    _inherits(IdentityDimensions, _Component2);
-	
-	    function IdentityDimensions(props) {
-	        _classCallCheck(this, IdentityDimensions);
-	
-	        var _this7 = _possibleConstructorReturn(this, (IdentityDimensions.__proto__ || Object.getPrototypeOf(IdentityDimensions)).call(this, props));
-	
-	        _this7.state = {
-	
-	            pubKey: localStorage.getItem("pubKey"),
-	
-	            //Dimensions pulled from DT
-	            iDimensions: [],
-	            ctrlDimensions: [],
-	            //prop dataHandler passes activeDimension to DimensionForm
-	            activeDimension: {},
-	
-	            //inputs array is pushed when addimg DimensionAttributeForm instances
-	            inputs: ['input-0'],
-	            //as we add more Dimension attributes, we end up shifting tmpFile and inputs
-	            //tmp file always holds current input label, ex: 'input-0'
-	            tmpFile: '',
-	            //file_attrs will look like: [ {input-0: IPFS_hash0}, {input-1: IPFS_hash1} ]
-	            file_attrs: [],
-	
-	            //delegations array is pushed if 'addMore' is clicked
-	            delegations: ['input1-0'],
-	
-	            //contains actual asset data from DT
-	            control_assets: [],
-	            controlled_assets_label: [],
-	            own_assets: [],
-	            owned_assets_label: [],
-	
-	            showModal: false,
-	
-	            showDetails: false,
-	            currentAsset: "",
-	
-	            // owndIsSelected: false,
-	            // ctrlIsSelected: false,
-	
-	            //Controllers for dimension (not necessarily COID controllers)
-	            control_list: []
-	
-	        };
-	        _this7.showDimensionHandler = _this7.showDimensionHandler.bind(_this7);
-	        _this7.handleHideModal = _this7.handleHideModal.bind(_this7);
-	        _this7.onFieldChange = _this7.onFieldChange.bind(_this7);
-	        _this7.pickerChange = _this7.pickerChange.bind(_this7);
-	
-	        return _this7;
-	    }
-	    //*****************************************************************************
-	
-	
-	    _createClass(IdentityDimensions, [{
-	        key: 'pickerChange',
-	        value: function pickerChange(e) {
-	            this.setState({ currentAsset: e.target.value });
-	            console.log('asset change: ' + e.target.value);
-	        }
-	        //*****************************************************************************
-	        //watch for inputs on control_list
-	
-	    }, {
-	        key: 'onFieldChange',
-	        value: function onFieldChange(inputField, e) {
-	            var multipleValues = {};
-	            multipleValues[inputField] = e;
-	            this.setState(multipleValues);
-	        }
-	        //*****************************************************************************
-	
-	    }, {
-	        key: 'hideHandler',
-	        value: function hideHandler() {
-	            this.setState({ showDetails: false });
-	        }
-	        //*****************************************************************************
-	        //used to show activeDimension, is fired onClick
-	
-	    }, {
-	        key: 'showDimensionHandler',
-	        value: function showDimensionHandler(e) {
-	            e.preventDefault();
-	            this.setState({
-	                showDetails: true,
-	                activeDimension: this.dataHandler($(e.target).attr('data-index'))
-	            });
-	        }
-	        //*****************************************************************************
-	        //used to set activeDimension inside showDimensionHandler
-	        //When we render a DimensionForm, dataHandler={this.state.activeDimension}
-	
-	    }, {
-	        key: 'dataHandler',
-	        value: function dataHandler(index) {
-	            return this.state.iDimensions[index];
-	        }
-	        //*****************************************************************************
-	        /*if this.state.showModal is true UploadIpfsFile component is rendered,
-	            and passed the prop dataHandler={this.getFileDetails.bind(this)}*/
-	
-	    }, {
-	        key: 'getFileDetails',
-	        value: function getFileDetails(filedata) {
-	            var obj = _defineProperty({}, this.state.tmpFile, filedata);
-	            this.setState({ file_attrs: this.state.file_attrs.concat([obj]) });
-	        }
-	        //*****************************************************************************
-	        //Passed as a prop to DimensionAttributeForm
-	
-	    }, {
-	        key: 'handleShowModal',
-	        value: function handleShowModal(e) {
-	            this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-	        }
-	        //is passed to UploadIpfsFile so it knows when to close the modal window
-	        //method also exists in DimensionForm
-	
-	    }, {
-	        key: 'handleHideModal',
-	        value: function handleHideModal() {
-	            this.setState({ showModal: false });
-	        }
-	        //*****************************************************************************
-	        //takes in a msg/json and returns a signature (needed for requests)
-	
-	    }, {
-	        key: 'getSignature',
-	        value: function getSignature(msg) {
-	            console.log("creating signature, signing msg: \n" + JSON.stringify(msg));
-	            var privKey = localStorage.getItem("privKey");
-	            var privKey1 = new Buffer(privKey, "hex");
-	            var msg_hash = keccak_256(JSON.stringify(msg));
-	            var msg_hash_buffer = new Buffer(msg_hash, "hex");
-	            var signature = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1));
-	            signature = JSON.parse(signature).signature;
-	            signature = JSON.stringify(signature);
-	            signature = JSON.parse(signature).data;
-	            signature = new Buffer(signature, "hex");
-	            signature = signature.toString("hex");
-	            return signature;
-	        }
-	        //*****************************************************************************
-	        // Get DT Dimension Data. Call this in componentWillMount
-	
-	    }, {
-	        key: 'getDimensions',
-	        value: function getDimensions() {
-	
-	            $.ajax({
-	                type: "POST",
-	                url: twinUrl + 'getOwnedDimensions',
-	                data: { "pubKey": localStorage.getItem("pubKey") },
-	                success: function (result) {
-	                    var data = result;
-	                    if ($.type(result) != "object") {
-	                        data = JSON.parseJSON(result);
-	                    }
-	
-	                    data = data.data;
-	                    console.log("getOwnedDimensions: " + data);
-	
-	                    var PUBKEY = keccak_256(localStorage.getItem("pubKey"));
-	
-	                    //var delegatedDims = []
-	
-	                    if (data.length > 0) {
-	                        //loop through OWNED assets
-	                        for (var i = 0; i < data.length; i++) {
-	                            console.log("grabbing.. " + data[i]);
-	                            //AJAX each asset:
-	                            $.ajax({
-	                                type: "POST",
-	                                url: twinUrl + 'getDimension',
-	                                data: { "pubKey": PUBKEY, "flag": 0, "fileName": data[i] },
-	                                success: function (result) {
-	                                    var dataResult = result;
-	                                    if ($.type(result) != "object") {
-	                                        console.log("result != object");
-	                                        dataResult = JSON.parseJSON(result);
-	                                    }
-	
-	                                    var ownedDims = this.state.iDimensions;
-	
-	                                    ownedDims[ownedDims.length] = {
-	                                        //dimension_id: dataResult.dimension.dimensionName,
-	                                        dimension_details: dataResult.dimension
-	                                    };
-	                                    this.setState({ iDimensions: ownedDims });
-	
-	                                    //this.setState({ controlled_assets: [{ asset_id: dataResult.assetID, asset_details: dataResult }] });
-	                                    console.log("dataResult get Dimension: \n " + JSON.stringify(dataResult));
-	                                    console.log("dataResult dimensionName: " + dataResult.dimension.dimensionName);
-	                                }.bind(this),
-	                                complete: function complete() {}
-	                            });
-	                        } //end for
-	                    }
-	                }.bind(this)
-	            });
-	        } //end getDimensions
-	
-	    }, {
-	        key: 'componentWillMount',
-	        value: function componentWillMount() {
-	
-	            this.getDimensions();
-	            //****************************************************** */
-	
-	            if (localStorage.getItem("owned_assets")) {
-	                var owned_labels = [];
-	                var own_assets = [];
-	
-	                var owned = localStorage.getItem("owned_assets");
-	                owned = JSON.parse(owned);
-	
-	                //for loop is preparing arrays to set state vars 'own_assets' and 'owned_assets_label'
-	                for (var i = 0; i < owned.length; i++) {
-	                    owned_labels.push(owned[i].asset_id);
-	                    own_assets[own_assets.length] = owned[i];
-	                }
-	                this.setState({ own_assets: own_assets, owned_assets_label: owned_labels });
-	            }
-	
-	            if (localStorage.getItem("controlled_assets")) {
-	                console.log("WE HAVE CONTROLLED ASSETS!!!!!");
-	                var controlled_labels = []; //set this.state.controlled_assets_label
-	                var control_assets = [];
-	
-	                var controlled = localStorage.getItem("controlled_assets");
-	                controlled = JSON.parse(controlled);
-	                console.log("controlled... " + JSON.stringify(controlled));
-	
-	                for (var i = 0; i < controlled.length; i++) {
-	                    controlled_labels.push(controlled[i].asset_id);
-	                    control_assets[control_assets.length] = controlled[i];
-	                }
-	                this.setState({ control_assets: control_assets, controlled_assets_label: controlled_labels });
-	            }
-	        } //componentWillMount
-	
-	    }, {
-	        key: 'componentDidMount',
-	        value: function componentDidMount() {}
-	
-	        /*****************************************************************************
-	        /*****************************************************************************
-	         * IN ORDER TO ADD DIMENSION ATTRIBUTES, we have these functions
-	         * 1) define getLabelValues
-	         * 2) call getLabelValues inside prepareAttributes (where we group descriptors and attributes)
-	         * (use appendAttribute to make sure max limit isnt hit) ????
-	        *****************************************************************************/
-	        //used for DimensionAttributeForm to prepare attributes
-	
-	    }, {
-	        key: 'getLabelValues',
-	        value: function getLabelValues() {
-	            var labelVals = [];
-	            var _this = this;
-	            //in DimensionForm
-	            $.each($("input[name^='label-']"), function (obj) {
-	                var value = $.trim($(this).val());
-	                if (value.length > 0) {
-	                    labelVals.push(_defineProperty({}, $(this).attr('name').replace("label-", ""), value));
-	                }
-	            });
-	            return labelVals;
-	        }
-	        /*file_attrs looks like: [{key: "IPFS_hash | shaHash}]
-	            [{"input-0":"QmPcY8sJ8hSfWhzqX8iLzQEbgiESjqTaeEEoJUrZwhLNk5|9bb7e24956771c4f1bbfe5eceff9e9e1457fafa5d3af3a56f4d7cef0bdd509dc"},
-	            {"input-1":"QmUJGfdKUCFiL2cKE3dcVFL5Q6PsvcWJSPxff5snJ46tuk|28a6ce8b3c55a60f5923cb87e5fd1c47decb973d1973f047f722141460fdad71"},]*/
-	
-	    }, {
-	        key: 'prepareAttributes',
-	        value: function prepareAttributes(selectedAsset, bigchainTrxnID) {
-	            console.log("selectedAsset: " + selectedAsset);
-	            console.log("bigchainID: " + bigchainTrxnID);
-	            var attrs = [];
-	            var labels = this.getLabelValues();
-	            //labelVals: [{"input-0":"mydocument"},{"input-1":"seconddocument"}]
-	            for (var i = 0; i < labels.length; i++) {
-	                var tmpArr = [];
-	                for (var key in labels[i]) {
-	                    tmpArr.push(labels[i][key]);
-	                    var ipfsHash = this.state.file_attrs[i][key].split("|");
-	                    ipfsHash = ipfsHash[0]; //not sending sha3 hash
-	                    tmpArr.push(ipfsHash);
-	                }
-	                attrs.push(tmpArr);
-	            }
-	            var objArray = [];
-	            for (var i = 0; i < attrs.length; i++) {
-	                var obj = {};
-	                obj.descriptor = attrs[i][0];
-	                //console.log("obj.descriptor: " + obj.descriptor + ", type: " + typeof(obj.descriptor))
-	                obj.attribute = attrs[i][1];
-	                obj.flag = 0;
-	                objArray.push(obj);
-	                console.log("objArray: " + JSON.stringify(objArray));
-	            }
-	
-	            var passBigchainObj = document.getElementById("passAsset");
-	            if (passBigchainObj.selectedIndex == 0) {
-	                alert('select one answer');
-	            }
-	            if (passBigchainObj.selectedIndex == 1) {
-	                var objKYC = {};
-	                objKYC.descriptor = "bigchainID";
-	                objKYC.attribute = bigchainTrxnID;
-	                objKYC.flag = 0;
-	                objArray.push(objKYC);
-	            }
-	
-	            //needed to stringify this obj Array for backend
-	            return JSON.stringify(objArray);
-	        }
-	        //*****************************************************************************
-	        //when we click Add More, a new value is pushed into this.state.inputs,
-	        //and a new DimensionAttributeForm is rendered
-	
-	    }, {
-	        key: 'appendAttribute',
-	        value: function appendAttribute() {
-	            var inputLen = this.state.inputs.length;
-	            if (inputLen < 10) {
-	                var newInput = 'input-' + inputLen;
-	                this.setState({ inputs: this.state.inputs.concat([newInput]) });
-	                //inputs: input-0
-	            }
-	        }
-	        /*****************************************************************************
-	        /*****************************************************************************
-	         * SAME PROCESS TO ADD DELEGATIONS
-	         * 1) define getDelegationInputValues
-	         * 2) getDelegationInputValues inside prepareDelegationDistribution
-	        *****************************************************************************/
-	
-	    }, {
-	        key: 'getDelegationInputValues',
-	        value: function getDelegationInputValues() {
-	            var labelVals = [];
-	            var _this = this;
-	            //in DimensionForm
-	            $.each($("input[name^='delegatee-']"), function (obj) {
-	                var value = $.trim($(this).val());
-	                if (value.length > 0) {
-	                    labelVals.push(_defineProperty({}, $(this).attr('name').replace("label-", ""), value));
-	                }
-	            });
-	            return labelVals;
-	            //returns an object array: [{"delegatee-input1-0":"pubkey"},{"delegatee-input1-0":"2"}
-	        }
-	        //*****************************************************************************
-	        //prepare the delegations object array
-	
-	    }, {
-	        key: 'prepareDelegationDistribution',
-	        value: function prepareDelegationDistribution(dimension, owners) {
-	            var dimensionName = dimension;
-	            var owner = owners;
-	            console.log("got owners for delegations: " + owner);
-	
-	            console.log("preparedelegation dimensionName: " + dimensionName);
-	            var labels = this.getDelegationInputValues();
-	            var delegatee = [];
-	            var delegatee_token_quantity = [];
-	            for (var i = 0; i < labels.length; i += 2) {
-	                for (var key in labels[i]) {
-	                    delegatee.push(labels[i][key]);
-	                    delegatee_token_quantity.push(labels[i + 1][key]);
-	                }
-	            }
-	            var delegationsArray = [];
-	            var date = new Date();
-	            if (delegatee.length == delegatee_token_quantity.length) {
-	                //{ owner: "", delegatee: "", amount: "", dimension: "", expiration: "", accessCategories: "" }
-	                for (var i = 0; i < delegatee.length; i++) {
-	                    var delegationObj = {};
-	                    delegationObj.dimension = dimensionName;
-	                    delegationObj.owner = owner; // EDIT!!!!!!!!!!
-	                    delegationObj.delegatee = keccak_256(delegatee[i]);
-	                    delegationObj.amount = delegatee_token_quantity[i];
-	                    delegationObj.accessCategories = "";
-	                    delegationObj.timeFrame = date.getTime();
-	                    delegationsArray.push(delegationObj);
-	                }
-	            }
-	            return JSON.stringify(delegationsArray);
-	        }
-	        //*****************************************************************************
-	
-	    }, {
-	        key: 'appendDelegation',
-	        value: function appendDelegation() {
-	            var inputLen = this.state.delegations.length;
-	            console.log("delegations length: " + inputLen);
-	            if (inputLen < 10) {
-	                var newInput1 = 'input1-' + inputLen;
-	                this.setState({ delegations: this.state.delegations.concat([newInput1]) });
-	            }
-	        }
-	        //*****************************************************************************
-	        //*****************************************************************************
-	        //called onClick of 'Create Dimension' button
-	
-	    }, {
-	        key: 'createDimension',
-	        value: function createDimension(e) {
-	
-	            e.preventDefault();
-	            var json = {};
-	            //*************************************************************************
-	            var dimensionName = $("input[name^='dimensionName']").val();
-	            if (dimensionName) {
-	                json.dimensionName = dimensionName;
-	            }
-	            json.pubKey = localStorage.getItem("pubKey");
-	            json.address = "", json.flag = 0, json.ID = 0;
-	            //*************************************************************************
-	            // GET PROPER DATA FROM SELECTED ASSET (we will pass owners to prepareDelegations)
-	            var selected_asset = this.state.currentAsset; //$("#assetSelect option:selected").text();
-	
-	            var bigchainTrxnID = void 0; //we will pass this to prepareAttributes function
-	            this.state.own_assets.forEach(function (asset, index) {
-	                if (selected_asset == asset.asset_id) {
-	                    // this.state.owndIsSelected = true;
-	                    console.log("\n\n SELECTED ASSET: " + selected_asset + "  Owned assetID: " + asset.asset_id);
-	                    json.coidAddr = asset.asset_coidAddr, json.dimensionCtrlAddr = asset.asset_dimCtrlAddr, json.uniqueId = asset.asset_uniqueId, json.owners = asset.asset_owners, json.controllers = asset.asset_controllers, bigchainTrxnID = asset.asset_bigchainID;
-	                }
-	            });
-	            this.state.control_assets.forEach(function (asset, index) {
-	                if (selected_asset == asset.asset_id) {
-	                    // this.state.ctrlIsSelected = true;
-	                    console.log("\n\n SELECTED ASSET: " + selected_asset + "  Controlled assetID: " + asset.asset_id);
-	                    json.coidAddr = asset.asset_coidAddr, json.dimensionCtrlAddr = asset.asset_dimCtrlAddr, json.uniqueId = asset.asset_uniqueId, json.owners = asset.asset_owners, json.controllers = asset.asset_controllers;
-	                    bigchainTrxnID = asset.asset_bigchainID;
-	                }
-	            });
-	            //*************************************************************************
-	            var delegations = this.prepareDelegationDistribution(dimensionName, json.owners);
-	            json.delegations = delegations;
-	            var attributes = this.prepareAttributes(selected_asset, bigchainTrxnID);
-	            json.data = attributes;
-	            var controllers_dimension = this.state.control_list;
-	            if (controllers_dimension) {
-	                json.controllers_dimension = controllers_dimension;
-	            }
-	
-	            //*************************************************************************
-	            var signature = this.getSignature(json);
-	            var msg_hash = keccak_256(JSON.stringify(json));
-	            var msg_hash_buffer = new Buffer(msg_hash, "hex");
-	            json.msg = msg_hash_buffer.toString("hex");
-	            json.sig = signature;
-	            //*************************************************************************
-	            console.log("JSON: " + JSON.stringify(json));
-	
-	            $.ajax({
-	                type: "POST",
-	                url: twinUrl + 'dimensions/CreateDimension',
-	                data: json,
-	                success: function (result) {
-	                    //returns (bool success, bytes32 callerHash, address test)
-	                    var data = result;
-	                    if ($.type(result) != "object") {
-	                        data = JSON.parseJSON(result);
-	                    }
-	                    console.log("response createDimenson: " + JSON.stringify(data));
-	
-	                    data = data.Result;
-	                    console.log("data.Result: " + data.Result);
-	                    data = data.split(",");
-	                    console.log("DATA: " + data);
-	
-	                    //var dimensionAddr = data.Result[2]
-	                    //console.log("created dimension address: " + dimensionAddr)
-	
-	                    //get the array:
-	                    //data = data.data;
-	                }.bind(this),
-	                complete: function complete() {
-	                    // do something
-	                    //ST: HERE WE COULD WRITE DIMENSIONS INTO COID JSON?
-	                }
-	            });
-	        } //end creationDimension
-	
-	        //*****************************************************************************
-	
-	    }, {
-	        key: 'render',
-	        value: function render() {
-	            var _this8 = this,
-	                _React$createElement,
-	                _React$createElement2;
-	
-	            //console.log("this.state.idims: " + JSON.stringify(this.state.iDimensions))
-	
-	            var _that = this;
-	
-	            var syle = { marginRight: '15px' };
-	
-	            var table = { margin: '0 auto' };
-	
-	            var inputAttrs = {
-	                addKeys: [13, 188], // Enter and comma
-	                inputProps: {
-	                    placeholder: "use comma(,) to add multiple values",
-	                    style: { width: '30%' }
-	                }
-	            };
-	
-	            return _react2.default.createElement(
-	                'div',
-	                { id: 'IDENTITYDIMENSIONS_MODAL' },
-	                _react2.default.createElement(
-	                    'h1',
-	                    null,
-	                    'Personas'
-	                ),
-	                _react2.default.createElement(
-	                    'h5',
-	                    null,
-	                    _react2.default.createElement(
-	                        'i',
-	                        null,
-	                        'Personal Data Repositories'
-	                    )
-	                ),
-	                _react2.default.createElement('hr', null),
-	                _react2.default.createElement(
-	                    'div',
-	                    { className: 'modal-header' },
-	                    _react2.default.createElement(
-	                        'ul',
-	                        { className: 'nav nav-tabs', role: 'tablist' },
-	                        _react2.default.createElement(
-	                            'li',
-	                            { role: 'presentation', className: 'active' },
-	                            _react2.default.createElement(
-	                                'a',
-	                                { href: '#dimensions', role: 'tab', 'data-toggle': 'tab' },
-	                                'Persona'
-	                            )
-	                        ),
-	                        _react2.default.createElement(
-	                            'li',
-	                            { role: 'presentation' },
-	                            _react2.default.createElement(
-	                                'a',
-	                                { href: '#addDimension', role: 'tab', 'data-toggle': 'tab' },
-	                                'Create new persona'
-	                            )
-	                        )
-	                    )
-	                ),
-	                _react2.default.createElement(
-	                    'div',
-	                    { className: 'modal-body' },
-	                    _react2.default.createElement(
-	                        'div',
-	                        { className: 'tab-content' },
-	                        _react2.default.createElement(
-	                            'div',
-	                            (_React$createElement = { className: 'tabpanel', role: 'tabpanel' }, _defineProperty(_React$createElement, 'className', 'tab-pane active'), _defineProperty(_React$createElement, 'id', 'dimensions'), _React$createElement),
-	                            _react2.default.createElement('br', null),
-	                            _react2.default.createElement(
-	                                'div',
-	                                { id: 'ownedDimensions' },
-	                                _react2.default.createElement(
-	                                    'h5',
-	                                    null,
-	                                    _react2.default.createElement(
-	                                        'b',
-	                                        null,
-	                                        'My Personas'
-	                                    )
-	                                ),
-	                                ' ',
-	                                _react2.default.createElement('hr', null),
-	                                _react2.default.createElement(
-	                                    'table',
-	                                    { style: table, className: 'table table-striped center' },
-	                                    _react2.default.createElement(
-	                                        'tbody',
-	                                        null,
-	                                        function () {
-	                                            if ($.isArray(_this8.state.iDimensions) && _this8.state.iDimensions.length > 0) {
-	                                                return _this8.state.iDimensions.map(function (el, i) {
-	                                                    return _react2.default.createElement(
-	                                                        'tr',
-	                                                        { key: i },
-	                                                        _react2.default.createElement(
-	                                                            'td',
-	                                                            null,
-	                                                            _react2.default.createElement(
-	                                                                'a',
-	                                                                { 'data-item': el.dimension_details, 'data-index': i, onClick: _that.showDimensionHandler },
-	                                                                el.dimension_details.dimensionName
-	                                                            )
-	                                                        )
-	                                                    );
-	                                                });
-	                                            } else {
-	                                                return _react2.default.createElement(
-	                                                    'tr',
-	                                                    null,
-	                                                    _react2.default.createElement(
-	                                                        'td',
-	                                                        null,
-	                                                        _react2.default.createElement(
-	                                                            'p',
-	                                                            null,
-	                                                            'No owned personas.'
-	                                                        )
-	                                                    )
-	                                                );
-	                                            }
-	                                        }(this)
-	                                    )
-	                                ),
-	                                this.state.showDetails ? _react2.default.createElement(DimensionForm, { hideHandler: this.hideHandler.bind(this), dataHandler: this.state.activeDimension }) : null
-	                            ),
-	                            _react2.default.createElement('br', null),
-	                            _react2.default.createElement(
-	                                'div',
-	                                { id: 'controlledDimensions' },
-	                                _react2.default.createElement(
-	                                    'h5',
-	                                    null,
-	                                    _react2.default.createElement(
-	                                        'b',
-	                                        null,
-	                                        'My Controlled Personas'
-	                                    )
-	                                ),
-	                                ' ',
-	                                _react2.default.createElement('hr', null),
-	                                _react2.default.createElement(
-	                                    'table',
-	                                    { style: table, className: 'table table-striped center' },
-	                                    _react2.default.createElement(
-	                                        'tbody',
-	                                        null,
-	                                        function () {
-	                                            if ($.isArray(_this8.state.ctrlDimensions) && _this8.state.ctrlDimensions.length > 0) {
-	                                                return _this8.state.ctrlDimensions.map(function (el, i) {
-	                                                    return _react2.default.createElement(
-	                                                        'tr',
-	                                                        { key: i },
-	                                                        _react2.default.createElement(
-	                                                            'td',
-	                                                            null,
-	                                                            _react2.default.createElement(
-	                                                                'a',
-	                                                                { 'data-item': el.dimension, 'data-index': i, onClick: _that.showDimensionHandler },
-	                                                                el.dimension.dimensionName
-	                                                            )
-	                                                        )
-	                                                    );
-	                                                });
-	                                            } else {
-	                                                return _react2.default.createElement(
-	                                                    'tr',
-	                                                    null,
-	                                                    _react2.default.createElement(
-	                                                        'td',
-	                                                        null,
-	                                                        _react2.default.createElement(
-	                                                            'p',
-	                                                            null,
-	                                                            'No controlled personas.'
-	                                                        )
-	                                                    )
-	                                                );
-	                                            }
-	                                        }(this)
-	                                    )
-	                                ),
-	                                this.state.showDetails ? _react2.default.createElement(DimensionForm, { hideHandler: this.hideHandler.bind(this), dataHandler: this.state.activeDimension }) : null
-	                            )
-	                        ),
-	                        _react2.default.createElement(
-	                            'div',
-	                            (_React$createElement2 = { className: 'tabpanel', role: 'tabpanel' }, _defineProperty(_React$createElement2, 'className', 'tab-pane'), _defineProperty(_React$createElement2, 'id', 'addDimension'), _React$createElement2),
-	                            _react2.default.createElement('br', null),
-	                            _react2.default.createElement(
-	                                'div',
+	                                'form',
 	                                null,
 	                                _react2.default.createElement(
-	                                    'h5',
-	                                    null,
+	                                    'div',
+	                                    { className: 'form-group' },
 	                                    _react2.default.createElement(
-	                                        'b',
-	                                        null,
-	                                        'Select asset:'
+	                                        'label',
+	                                        { htmlFor: 'get-hash' },
+	                                        'Choose from documents'
+	                                    ),
+	                                    _react2.default.createElement(
+	                                        'select',
+	                                        { className: 'form-control', onChange: this.inputChangeHandler },
+	                                        _react2.default.createElement(
+	                                            'option',
+	                                            { value: '0' },
+	                                            'Select Document'
+	                                        ),
+	                                        function () {
+	                                            if (_this3.state.docs && _this3.state.docs.length > 0) {
+	                                                var i = 0;
+	                                                return _this3.state.docs.map(function (obj) {
+	                                                    i++;
+	                                                    var optsVal = obj.hash + "|" + obj.file_hash;
+	                                                    return _react2.default.createElement(
+	                                                        'option',
+	                                                        { value: optsVal, key: i },
+	                                                        obj.filename
+	                                                    );
+	                                                });
+	                                            } else {
+	                                                return _react2.default.createElement(
+	                                                    'option',
+	                                                    { value: '0' },
+	                                                    '-- Empty --'
+	                                                );
+	                                            }
+	                                        }()
 	                                    )
 	                                ),
 	                                _react2.default.createElement(
-	                                    'select',
-	                                    { id: 'assetSelect', className: 'selectpicker show-tick', value: this.state.currentAsset, onChange: this.pickerChange },
+	                                    'p',
+	                                    { style: center },
+	                                    '(or)'
+	                                ),
+	                                _react2.default.createElement(
+	                                    'div',
+	                                    { className: 'form-group' },
 	                                    _react2.default.createElement(
-	                                        'optgroup',
-	                                        { label: 'Owned' },
-	                                        function () {
-	                                            if (_this8.state.owned_assets_label.length > 0) {
-	                                                return _this8.state.owned_assets_label.map(function (label, i) {
-	                                                    //let val = label.split(',') //get rid of the .json
-	                                                    return _react2.default.createElement(
-	                                                        'option',
-	                                                        { key: i, value: label },
-	                                                        label
-	                                                    );
-	                                                });
-	                                            } else {
-	                                                return _react2.default.createElement(
-	                                                    'option',
-	                                                    null,
-	                                                    'None'
-	                                                );
-	                                            }
-	                                        }(this)
+	                                        'label',
+	                                        { htmlFor: 'documents' },
+	                                        'Upload Document'
 	                                    ),
-	                                    _react2.default.createElement(
-	                                        'optgroup',
-	                                        { label: 'Controlled' },
-	                                        function () {
-	                                            if (_this8.state.controlled_assets_label.length > 0) {
-	                                                return _this8.state.controlled_assets_label.map(function (label, i) {
-	                                                    //let val = label.split(',') //get rid of the .json
-	                                                    return _react2.default.createElement(
-	                                                        'option',
-	                                                        { key: i, value: label },
-	                                                        label
-	                                                    );
-	                                                });
-	                                            } else {
-	                                                return _react2.default.createElement(
-	                                                    'option',
-	                                                    null,
-	                                                    'None'
-	                                                );
-	                                            }
-	                                        }(this)
-	                                    )
+	                                    _react2.default.createElement('input', { type: 'file', className: 'form-control', name: 'newdoc', onChange: this.inputChangeHandler })
 	                                )
-	                            ),
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'modal-footer' },
 	                            _react2.default.createElement(
-	                                'div',
-	                                { id: 'SubmitContainer' },
-	                                _react2.default.createElement(
-	                                    'form',
-	                                    { method: 'POST', id: 'register', role: 'form' },
-	                                    _react2.default.createElement(
-	                                        'div',
-	                                        { className: 'form-group' },
-	                                        _react2.default.createElement(
-	                                            'label',
-	                                            { htmlFor: 'dimensionName' },
-	                                            'Persona name:'
-	                                        ),
-	                                        _react2.default.createElement('input', { name: 'dimensionName', className: 'form-control col-md-4', type: 'text', placeholder: 'Dimension Name' })
-	                                    ),
-	                                    _react2.default.createElement(
-	                                        'div',
-	                                        { className: 'form-group' },
-	                                        _react2.default.createElement(
-	                                            'label',
-	                                            null,
-	                                            'Pass asset as JSON object:'
-	                                        ),
-	                                        _react2.default.createElement(
-	                                            'select',
-	                                            { id: 'passAsset' },
-	                                            _react2.default.createElement(
-	                                                'option',
-	                                                { value: 'selectOption' },
-	                                                '--- Please select ---'
-	                                            ),
-	                                            _react2.default.createElement(
-	                                                'option',
-	                                                { value: 'Yes' },
-	                                                'Yes'
-	                                            ),
-	                                            _react2.default.createElement(
-	                                                'option',
-	                                                { value: 'No' },
-	                                                'No'
-	                                            )
-	                                        )
-	                                    ),
-	                                    _react2.default.createElement(
-	                                        'div',
-	                                        { className: 'form-group', id: 'unique_id_div' },
-	                                        _react2.default.createElement(
-	                                            'label',
-	                                            { htmlFor: 'unique_id' },
-	                                            'Enter descriptor(s) and attribute(s):'
-	                                        ),
-	                                        this.state.inputs.map(function (input) {
-	                                            return _react2.default.createElement(DimensionAttributeForm, { handleShowModal: _this8.handleShowModal.bind(_this8), max: '10', key: input, labelref: input });
-	                                        })
-	                                    ),
-	                                    _react2.default.createElement(
-	                                        'div',
-	                                        { className: 'form-group', id: 'unique_id_btn' },
-	                                        _react2.default.createElement(
-	                                            'div',
-	                                            { className: 'col-md-offset-6 col-md-6 ' },
-	                                            _react2.default.createElement(
-	                                                'button',
-	                                                { type: 'button', className: 'btn btn-info pull-right', style: syle, onClick: this.appendAttribute.bind(this) },
-	                                                _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
-	                                                'Add More'
-	                                            )
-	                                        )
-	                                    ),
-	                                    _react2.default.createElement(
-	                                        'div',
-	                                        { className: 'form-group' },
-	                                        _react2.default.createElement(
-	                                            'label',
-	                                            { htmlFor: 'control_dist' },
-	                                            'Enter Delegations and their delegated token(s).'
-	                                        ),
-	                                        this.state.delegations.map(function (input) {
-	                                            return _react2.default.createElement(DimensionDelegationForm, { max: '10', key: input, labelref: input });
-	                                        })
-	                                    ),
-	                                    _react2.default.createElement(
-	                                        'div',
-	                                        { className: 'form-group' },
-	                                        _react2.default.createElement(
-	                                            'div',
-	                                            { className: 'col-md-offset-6 col-md-6 ' },
-	                                            _react2.default.createElement(
-	                                                'button',
-	                                                { type: 'button', className: 'btn btn-info pull-right', style: syle, onClick: this.appendDelegation.bind(this) },
-	                                                _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
-	                                                'Add More'
-	                                            )
-	                                        )
-	                                    ),
-	                                    _react2.default.createElement(
-	                                        'div',
-	                                        { className: 'form-group' },
-	                                        _react2.default.createElement(
-	                                            'label',
-	                                            { htmlFor: 'control_dist' },
-	                                            'Enter Persona Controllers. These controllers can be but do not have to be your Core Identity controllers.'
-	                                        ),
-	                                        _react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs, { value: this.state.control_list, onChange: function onChange(e) {
-	                                                _this8.onFieldChange("control_list", e);
-	                                            } }))
-	                                    ),
-	                                    _react2.default.createElement(
-	                                        'div',
-	                                        { className: 'form-group' },
-	                                        _react2.default.createElement(
-	                                            'div',
-	                                            { className: 'col-sm-6' },
-	                                            _react2.default.createElement(
-	                                                'button',
-	                                                { className: 'btn btn-primary', 'data-loading-text': 'Submit', name: 'submit-form', type: 'button', onClick: this.createDimension.bind(this) },
-	                                                'Create Persona'
-	                                            )
-	                                        )
-	                                    )
-	                                ),
-	                                this.state.showModal ? _react2.default.createElement(_UploadIpfsFile2.default, { pubKey: this.state.pubKey, dataHandler: this.getFileDetails.bind(this), handleHideModal: this.handleHideModal }) : null
+	                                'button',
+	                                { type: 'button', 'data-loading-text': 'Processing...', name: 'uploadsubmit', className: 'btn btn-success', onClick: this.fileHandler.bind(this) },
+	                                'Submit'
 	                            )
 	                        )
 	                    )
@@ -62261,16 +54678,113 @@
 	        }
 	    }]);
 	
-	    return IdentityDimensions;
-	}(_react.Component);
+	    return UploadIpfsFile;
+	}(_react2.default.Component);
 	
 	;
 	
-	exports.default = IdentityDimensions;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/buffer/index.js */ 239).Buffer))
+	exports.default = UploadIpfsFile;
 
 /***/ },
-/* 383 */
+/* 344 */
+/*!*************************************************************************!*\
+  !*** ./src/app/Components/IdentityFederation/UniqueIDAttributeForm.jsx ***!
+  \*************************************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var UniqueIDAttributesForm = function (_React$Component) {
+	    _inherits(UniqueIDAttributesForm, _React$Component);
+	
+	    function UniqueIDAttributesForm(props) {
+	        _classCallCheck(this, UniqueIDAttributesForm);
+	
+	        var _this = _possibleConstructorReturn(this, (UniqueIDAttributesForm.__proto__ || Object.getPrototypeOf(UniqueIDAttributesForm)).call(this, props));
+	
+	        _this.maxAttributes = _this.props.max;
+	        return _this;
+	    }
+	
+	    _createClass(UniqueIDAttributesForm, [{
+	        key: "renderIDF",
+	        value: function renderIDF() {
+	            return _react2.default.createElement(
+	                "label",
+	                { htmlFor: "unique_id_attrs" },
+	                " Official IDs e.g. SSN, Passport, Driver's License, Digital retinal scans and/or digital fingerprints"
+	            );
+	        }
+	    }, {
+	        key: "renderMyGK",
+	        value: function renderMyGK() {
+	            return _react2.default.createElement(
+	                "label",
+	                { htmlFor: "unique_id_attrs" },
+	                " Unique Identfiers e.g. Serial Numbers, MAC Addresses, Vehicle Identitfication Numbers"
+	            );
+	        }
+	    }, {
+	        key: "renderMyCOID",
+	        value: function renderMyCOID() {
+	            return _react2.default.createElement(
+	                "label",
+	                { htmlFor: "unique_id_attrs" },
+	                " Attributes e.g. \"My college transcript\", \"Chase Bank KYC\", or \"My blockchain research\""
+	            );
+	        }
+	    }, {
+	        key: "render",
+	        value: function render() {
+	            var style = { fontSize: '12.5px' };
+	            return _react2.default.createElement(
+	                "div",
+	                { className: "form-group col-md-12", style: style },
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "col-md-10" },
+	                    this.props.type == "IDF" ? this.renderIDF() : null,
+	                    this.props.type == "MyGK" ? this.renderMyGK() : null,
+	                    this.props.type == "MyCOID" ? this.renderMyCOID() : null,
+	                    _react2.default.createElement("input", { name: 'label-' + this.props.labelref, className: "form-control col-md-4", type: "text", placeholder: "Label" }),
+	                    _react2.default.createElement(
+	                        "button",
+	                        { type: "button", "data-id": this.props.labelref, onClick: this.props.handleShowModal, className: "btn-sm btn-warning pull-right" },
+	                        _react2.default.createElement("span", { className: "glyphicon glyphicon-upload" }),
+	                        "Upload File"
+	                    )
+	                )
+	            );
+	        }
+	    }]);
+	
+	    return UniqueIDAttributesForm;
+	}(_react2.default.Component);
+	
+	;
+	
+	exports.default = UniqueIDAttributesForm;
+
+/***/ },
+/* 345 */
 /*!******************************************!*\
   !*** ./src/app/Components/Documents.jsx ***!
   \******************************************/
@@ -62679,23 +55193,19 @@
 	exports.default = Documents;
 
 /***/ },
-/* 384 */
+/* 346 */
 /*!*********************************************!*\
-  !*** ./src/app/Components/MyGateKeeper.jsx ***!
+  !*** ./src/app/Components/Attestations.jsx ***!
   \*********************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	    value: true
 	});
 	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-	
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-	
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
@@ -62703,19 +55213,11 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _reactTagsinput = __webpack_require__(/*! react-tagsinput */ 328);
+	var _reactDayPicker = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"react-day-picker\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
-	var _reactTagsinput2 = _interopRequireDefault(_reactTagsinput);
-	
-	var _reactAutosuggest = __webpack_require__(/*! react-autosuggest */ 329);
-	
-	var _reactAutosuggest2 = _interopRequireDefault(_reactAutosuggest);
-	
-	var _jsSha = __webpack_require__(/*! js-sha3 */ 325);
+	var _reactDayPicker2 = _interopRequireDefault(_reactDayPicker);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -62723,1647 +55225,551 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var crypto = __webpack_require__(/*! crypto */ 243);
+	//var crypto = require('crypto');
 	var secp256k1 = __webpack_require__(/*! secp256k1 */ 261);
+	var keccak_256 = __webpack_require__(/*! js-sha3 */ 325).keccak_256;
+	function hex_to_ascii(str1) {
+	    var hex = str1.toString();
+	    var str = [];
+	    for (var n = 0; n < hex.length; n += 1) {
+	        str.push(String.fromCharCode(parseInt(hex.substr(n, 2), 16)));
+	    }
+	    return str;
+	}
 	
-	//TODO : Namespace validation
-	//TODO:
-	//CONTROLLERS need to be able to upload documents---LATER
+	var ModalWin = function (_React$Component) {
+	    _inherits(ModalWin, _React$Component);
 	
-	var UploadIpfsFile = function (_React$Component) {
-		_inherits(UploadIpfsFile, _React$Component);
+	    function ModalWin(props) {
+	        _classCallCheck(this, ModalWin);
 	
-		function UploadIpfsFile(props) {
-			_classCallCheck(this, UploadIpfsFile);
+	        var _this2 = _possibleConstructorReturn(this, (ModalWin.__proto__ || Object.getPrototypeOf(ModalWin)).call(this, props));
 	
-			var _this2 = _possibleConstructorReturn(this, (UploadIpfsFile.__proto__ || Object.getPrototypeOf(UploadIpfsFile)).call(this, props));
+	        _this2.state = {
+	            proposal: _this2.props.dataHandler,
+	            proposal_data: {},
+	            selectedDay: new Date() //for signature expiration
+	        };
+	        return _this2;
+	    }
 	
-			_this2.state = {
-				docs: {},
-				pubKey: props.pubKey,
-				selected: '0',
-				files: ''
-			};
-			_this2.inputChangeHandler = _this2.inputChangeHandler.bind(_this2);
-			return _this2;
-		}
+	    _createClass(ModalWin, [{
+	        key: 'submitHandler',
+	        value: function submitHandler(e) {
+	            e.preventDefault();
+	            var ele = $(e.target);
+	            //get private key from local storage
+	            var privKey = localStorage.getItem("privKey");
+	            //make private key hex buffer
+	            var privKey1 = new Buffer(privKey, "hex");
+	            //message is "vote_transaction"
+	            var msg = "vote_transaction";
+	            //get hash of message
+	            var msg_hash = keccak_256(msg);
+	            //make msg_hash a hex buffer
+	            var msg_hash_buffer = new Buffer(msg_hash, "hex");
+	            //sign the message
+	            var signature1 = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1));
+	            //get json object with key "signature"
+	            signature1 = JSON.parse(signature1).signature;
+	            signature1 = JSON.stringify(signature1);
+	            //get json object with key "data" in side the json object with key "signature"
+	            signature1 = JSON.parse(signature1).data;
+	            //make the signature a buffer, then a string, to emit the commas
+	            signature1 = new Buffer(signature1, "hex");
+	            signature1 = signature1.toString("hex");
+	            //log for testing
+	            console.log("sig" + signature1);
+	            console.log(typeof signature1 === 'undefined' ? 'undefined' : _typeof(signature1));
+	            var day = this.state.selectedDay;
+	            var sigExpire = day.getTime() / 1000;
+	            var json = {
+	                txid: this.state.proposal.txid,
+	                pubKey: localStorage.getItem("pubKey"),
+	                sig: signature1,
+	                msg: msg_hash_buffer.toString("hex"),
+	                proposalId: this.state.proposal.proposal_id
+	            };
+	            console.log(JSON.stringify(json));
+	            if (parseInt(ele.attr("data-val")) == 2) {
+	                $.ajax({
+	                    url: twinUrl + 'signature/revokeIca',
+	                    type: 'POST',
+	                    data: json,
+	                    success: function success(res) {
+	                        if (res.status == "Ok" && res.msg == "true") {} else {
+	                            //alert("Unable to submit your vote. Please try again later");
+	                        }
+	                    }
+	                });
+	            }
+	        }
+	    }, {
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            var _this = this;
+	            var propType = 2;
+	            console.log("propType: " + propType);
+	            var bigchainServer = 'http://10.101.114.230:5000';
+	            var endpoint = '/getTransaction/' + this.state.proposal.txid;
+	            //console.log("this.state.proposal: "+JSON.stringify(this.state.proposal));
+	            //onsole.log("getStuff: "+keccak_256(this.state.proposal.owner).toUpperCase() +"   "+ this.state.proposal.assetId+".json")
+	            $.ajax({
+	                type: "POST",
+	                url: twinUrl + 'getAsset',
+	                data: { "pubKey": this.state.proposal.owner, "flag": 0, "fileName": this.state.proposal.assetId + ".json" },
+	                success: function (result) {
+	                    var dataResult = result;
+	                    if ($.type(result) != "object") {
+	                        dataResult = JSON.parseJSON(result);
+	                    }
+	                    console.log("getasset result: " + result);
+	                    console.log("getasset result: " + JSON.stringify(result));
+	                    // assetData[assetData.length] = {
+	                    //     asset_id: dataResult.assetID,
+	                    //     asset_uniqueId: dataResult.uniqueId,
+	                    //     asset_dimCtrlAddr: dataResult.dimensionCtrlAddr,
+	                    //     asset_coidAddr: dataResult.coidAddr,
+	                    //     asset_gatekeeperAddr: dataResult.gatekeeperAddr,
+	                    //     asset_owners: dataResult.ownerIdList,
+	                    //     asset_controllers: dataResult.controlIdList,
+	                    //     asset_bigchainID: dataResult.bigchainID,
+	                    //     asset_type: dataResult.propType
+	                    // }
+	                    _this.setState({
+	                        proposal_data: dataResult
+	                    });
+	                }.bind(this),
+	                complete: function complete() {}
+	            });
+	            // $.ajax({
+	            //     type: "GET",
+	            //     url: bigchainServer + endpoint,
+	            //     data: {
+	            //     },
+	            //     success: function (result) {
+	            //         var fileValidation = true;
+	            //         result = result.asset.data.Coid_Data;
+	            //         console.log("BCDB: " + JSON.stringify(result))
+	            //         // Fill up data in Modal window
+	            //         //data.publicKey
+	            //         if ($.type(result) == "string") {
+	            //             result = JSON.parse(result);
+	            //         }
+	            //         var ownerArray = [];
+	            //         for (var i = 0; i < result.ownershipTokenQuantity.length; i++) {
+	            //             var temp = [];
+	            //             temp[0] = result.ownerIdList[i];
+	            //             temp[1] = result.ownershipTokenQuantity[i];
+	            //             ownerArray.push(temp)
+	            //         }
+	            //         result.ownerArray = ownerArray
+	            //         //console.log(result.ownerArray)
+	            //         console.log('result of getCoidData' + JSON.stringify(result));
+	            //         _this.setState({
+	            //             proposal_data: result
+	            //         });
+	            $("#proposalDetails").modal('show');
+	            $("#proposalDetails").on('hidden.bs.modal', _this.props.hideHandler);
+	            var standardAsset = document.getElementById("standardAsset");
+	            var KYC = document.getElementById("KYC");
+	            //         // if (propType == 2) {
+	            //KYC.style.display = 'block';
+	            //standardAsset.style.display = 'none';
+	            //         // } else {
+	            KYC.style.display = 'none';
+	            //         //}
+	            //     }//end success
+	            // });
+	        } // end componentDidMount
 	
-		_createClass(UploadIpfsFile, [{
-			key: 'componentDidMount',
-			value: function componentDidMount() {
-				$.ajax({
-					url: twinUrl + "ipfs/alldocs/" + this.state.pubKey,
-					dataType: 'json',
-					cache: false,
-					success: function (resp) {
-						this.setState({ docs: resp.data.documents });
-					}.bind(this),
-					error: function (xhr, status, err) {
-						console.error(this.props.url, status, err.toString());
-					}.bind(this)
-				});
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var _this3 = this;
 	
-				$("#CoreIdentityContainer .modal").modal('show');
-				$("#CoreIdentityContainer .modal").on('hidden.bs.modal', this.props.handleHideModal);
-			}
-		}, {
-			key: 'uploadHandler',
-			value: function uploadHandler(data, additionalParams) {
-				var params = {
-					url: twinUrl + "ipfs/upload",
-					type: 'POST',
-					data: data,
-					cache: false,
-					processData: false,
-					contentType: false
-				};
-				$.extend(params, additionalParams);
-				$.ajax(params);
-			}
-		}, {
-			key: 'fileHandler',
-			value: function fileHandler(e) {
-				e.preventDefault();
-				if (this.state.selected != "0") {
-					var hash, fileHash;
-					this.props.dataHandler(this.state.selected);
-					$("button.close").trigger("click");
-				} else {
-					if (this.state.files.size > 0) {
-						var fileInput = $("input[name=newdoc]");
-						var fData = new FormData();
-						fData.append("user_pubkey", this.state.pubKey);
-						$.each(fileInput[0].files, function (key, value) {
-							fData.append(key, value);
-						});
-						var _this = this;
-						var callbacks = {
-							beforeSend: function beforeSend(xhr) {
-								$("button[name=uploadsubmit]").button('loading');
-								$("button.close").hide();
-							},
-							success: function (resp) {
-								if (resp.uploded && resp.uploded.length > 0) {
-									var filedata = resp.uploded[0].hash + "|" + resp.uploded[0].file_hash;
-									//data handler forms JSON object
-									this.props.dataHandler(filedata);
-									$("button.close").trigger("click");
-								}
-							}.bind(this),
-							complete: function complete() {
-								$("button[name=uploadsubmit]").button('reset');
-								$("button.close").show();
-							}
-						};
-						this.uploadHandler(fData, callbacks);
-					}
-				}
-			}
-		}, {
-			key: 'inputChangeHandler',
-			value: function inputChangeHandler(e) {
-				if (e.target.tagName == "SELECT") {
-					this.setState({ selected: e.target.value });
-				} else this.setState({ files: e.target.files[0] });
-			}
-		}, {
-			key: 'render',
-			value: function render() {
-				var _this3 = this;
+	            var prop = this.state.proposal;
+	            console.log("this.state.proposal_data: " + JSON.stringify(this.state.proposal_data));
+	            //{"type":"proposal","proposal_id":"AAC312616FFE818CA093C9B34BB58DB26AFA7287C0B3DB689F9AAD337BE8C5B1",
+	            //"message":"You have been selected to vote on the proposal.","read_status":false,"time":1496256497368,
+	            //"gatekeeperAddr":"0000000000000000000000000000000000000000","isHuman":true}
+	            var style = {
+	                fontSize: '12.5px'
+	            };
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'modal fade', id: 'proposalDetails', tabIndex: '-1', role: 'dialog' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'modal-dialog modal-lg', role: 'document' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'modal-content' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'modal-header' },
+	                            _react2.default.createElement(
+	                                'button',
+	                                { type: 'button', className: 'close', 'data-dismiss': 'modal', 'aria-label': 'Close' },
+	                                _react2.default.createElement(
+	                                    'span',
+	                                    { 'aria-hidden': 'true' },
+	                                    '×'
+	                                )
+	                            ),
+	                            _react2.default.createElement(
+	                                'h4',
+	                                { className: 'modal-title', id: 'asset' },
+	                                'Revoke this asset?'
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'div',
+	                            { id: 'standardAsset', className: 'modal-body' },
+	                            _react2.default.createElement(
+	                                'table',
+	                                { className: 'table table-striped table-hover', style: style },
+	                                _react2.default.createElement(
+	                                    'tbody',
+	                                    null,
+	                                    _react2.default.createElement(
+	                                        'tr',
+	                                        null,
+	                                        _react2.default.createElement(
+	                                            'td',
+	                                            null,
+	                                            'Proposal ID'
+	                                        ),
+	                                        _react2.default.createElement(
+	                                            'td',
+	                                            null,
+	                                            prop.proposal_id
+	                                        )
+	                                    ),
+	                                    _react2.default.createElement(
+	                                        'tr',
+	                                        null,
+	                                        _react2.default.createElement(
+	                                            'td',
+	                                            { colSpan: '2' },
+	                                            _react2.default.createElement(
+	                                                'b',
+	                                                null,
+	                                                'Official IDs'
+	                                            )
+	                                        )
+	                                    ),
+	                                    function () {
+	                                        var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+	                                        if (!$.isEmptyObject(_this3.state.proposal_data)) {
+	                                            return _this3.state.proposal_data.uniqueIdAttributes.map(function (ids, i) {
+	                                                return _react2.default.createElement(
+	                                                    'tr',
+	                                                    { key: i },
+	                                                    _react2.default.createElement(
+	                                                        'td',
+	                                                        null,
+	                                                        ids[0]
+	                                                    ),
+	                                                    _react2.default.createElement(
+	                                                        'td',
+	                                                        null,
+	                                                        _react2.default.createElement(
+	                                                            'p',
+	                                                            null,
+	                                                            'File hash: ',
+	                                                            ids[2]
+	                                                        ),
+	                                                        _react2.default.createElement(
+	                                                            'p',
+	                                                            null,
+	                                                            'IPFS hash: ',
+	                                                            _react2.default.createElement(
+	                                                                'a',
+	                                                                { target: '_blank', href: ipfs_url + "/" + ids[1] },
+	                                                                ids[1]
+	                                                            )
+	                                                        )
+	                                                    )
+	                                                );
+	                                            });
+	                                        } else {
+	                                            return _react2.default.createElement(
+	                                                'tr',
+	                                                null,
+	                                                _react2.default.createElement(
+	                                                    'td',
+	                                                    { colSpan: '2' },
+	                                                    'No Ids found'
+	                                                )
+	                                            );
+	                                        }
+	                                    }(this),
+	                                    _react2.default.createElement(
+	                                        'tr',
+	                                        null,
+	                                        _react2.default.createElement(
+	                                            'td',
+	                                            null,
+	                                            'Ownership ID'
+	                                        ),
+	                                        _react2.default.createElement(
+	                                            'td',
+	                                            null,
+	                                            this.state.proposal_data.ownershipId
+	                                        )
+	                                    ),
+	                                    _react2.default.createElement(
+	                                        'tr',
+	                                        null,
+	                                        _react2.default.createElement(
+	                                            'td',
+	                                            null,
+	                                            'Ownership ID List'
+	                                        ),
+	                                        _react2.default.createElement(
+	                                            'td',
+	                                            null,
+	                                            function () {
+	                                                if (!$.isEmptyObject(_this3.state.proposal_data)) {
+	                                                    return _this3.state.proposal_data.ownerIdList.map(function (ids, i) {
+	                                                        return _react2.default.createElement(
+	                                                            'p',
+	                                                            { key: i },
+	                                                            ' ',
+	                                                            _this3.state.proposal_data.ownerIdList[i]
+	                                                        );
+	                                                    });
+	                                                } else {
+	                                                    return _react2.default.createElement(
+	                                                        'p',
+	                                                        null,
+	                                                        'No Ids found'
+	                                                    );
+	                                                }
+	                                            }(this)
+	                                        )
+	                                    )
+	                                )
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'div',
+	                            { id: 'KYC', className: 'modal-body' },
+	                            _react2.default.createElement(
+	                                'table',
+	                                { className: 'table table-striped table-hover', style: style },
+	                                _react2.default.createElement(
+	                                    'tbody',
+	                                    null,
+	                                    _react2.default.createElement(
+	                                        'tr',
+	                                        null,
+	                                        _react2.default.createElement(
+	                                            'td',
+	                                            null,
+	                                            'Proposal ID'
+	                                        ),
+	                                        _react2.default.createElement(
+	                                            'td',
+	                                            null,
+	                                            prop.proposal_id
+	                                        )
+	                                    )
+	                                )
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'modal-footer' },
+	                            _react2.default.createElement(
+	                                'button',
+	                                { type: 'button', className: 'btn btn-primary', 'data-val': '2', onClick: this.submitHandler.bind(this) },
+	                                'Yes'
+	                            ),
+	                            _react2.default.createElement(
+	                                'button',
+	                                { type: 'button', className: 'btn btn-default', 'data-val': '1', onClick: this.submitHandler.bind(this) },
+	                                'No'
+	                            )
+	                        )
+	                    )
+	                )
+	            );
+	        }
+	    }]);
 	
-				var center = {
-					textAlign: 'center'
-				};
-				return _react2.default.createElement(
-					'div',
-					{ className: 'modal fade' },
-					_react2.default.createElement(
-						'div',
-						{ className: 'modal-dialog' },
-						_react2.default.createElement(
-							'div',
-							{ className: 'modal-content' },
-							_react2.default.createElement(
-								'div',
-								{ className: 'modal-header' },
-								_react2.default.createElement(
-									'button',
-									{ type: 'button', className: 'close', 'data-dismiss': 'modal', 'aria-label': 'Close' },
-									_react2.default.createElement(
-										'span',
-										{ 'aria-hidden': 'true' },
-										'×'
-									)
-								),
-								_react2.default.createElement(
-									'h4',
-									{ className: 'modal-title' },
-									'Upload Document'
-								)
-							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'modal-body' },
-								_react2.default.createElement(
-									'form',
-									null,
-									_react2.default.createElement(
-										'div',
-										{ className: 'form-group' },
-										_react2.default.createElement(
-											'label',
-											{ htmlFor: 'get-hash' },
-											'Choose from documents'
-										),
-										_react2.default.createElement(
-											'select',
-											{ className: 'form-control', onChange: this.inputChangeHandler },
-											_react2.default.createElement(
-												'option',
-												{ value: '0' },
-												'Select Document'
-											),
-											function () {
-												if (_this3.state.docs && _this3.state.docs.length > 0) {
-													var i = 0;
-													return _this3.state.docs.map(function (obj) {
-														i++;
-														var optsVal = obj.hash + "|" + obj.file_hash;
-														return _react2.default.createElement(
-															'option',
-															{ value: optsVal, key: i },
-															obj.filename
-														);
-													});
-												} else {
-													return _react2.default.createElement(
-														'option',
-														{ value: '0' },
-														'-- Empty --'
-													);
-												}
-											}()
-										)
-									),
-									_react2.default.createElement(
-										'p',
-										{ style: center },
-										'(or)'
-									),
-									_react2.default.createElement(
-										'div',
-										{ className: 'form-group' },
-										_react2.default.createElement(
-											'label',
-											{ htmlFor: 'documents' },
-											'Upload Document'
-										),
-										_react2.default.createElement('input', { type: 'file', className: 'form-control', name: 'newdoc', onChange: this.inputChangeHandler })
-									)
-								)
-							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'modal-footer' },
-								_react2.default.createElement(
-									'button',
-									{ type: 'button', 'data-loading-text': 'Processing...', name: 'uploadsubmit', className: 'btn btn-success', onClick: this.fileHandler.bind(this) },
-									'Submit'
-								)
-							)
-						)
-					)
-				);
-			}
-		}]);
-	
-		return UploadIpfsFile;
+	    return ModalWin;
 	}(_react2.default.Component);
 	
 	;
 	
-	//form where we can add additional uniqueIDAttrs
+	var Attestations = function (_React$Component2) {
+	    _inherits(Attestations, _React$Component2);
 	
-	var UniqueIDAttributesForm = function (_React$Component2) {
-		_inherits(UniqueIDAttributesForm, _React$Component2);
+	    function Attestations(props) {
+	        _classCallCheck(this, Attestations);
 	
-		function UniqueIDAttributesForm(props) {
-			_classCallCheck(this, UniqueIDAttributesForm);
+	        //coid=proposals
+	        var _this4 = _possibleConstructorReturn(this, (Attestations.__proto__ || Object.getPrototypeOf(Attestations)).call(this, props));
 	
-			var _this4 = _possibleConstructorReturn(this, (UniqueIDAttributesForm.__proto__ || Object.getPrototypeOf(UniqueIDAttributesForm)).call(this, props));
+	        _this4.state = {
+	            coid: [], //array of messages from DT
+	            showDetails: false,
+	            activeProposal: {}
+	        };
+	        _this4.showHandler = _this4.showHandler.bind(_this4);
+	        return _this4;
+	    }
 	
-			_this4.state = {
-				file_attrs: [],
-				inputs: ['input-0'],
-				tmpFile: '',
-				showModal: false,
-				pubKey: localStorage.getItem("pubKey")
-			};
-			return _this4;
-		}
+	    _createClass(Attestations, [{
+	        key: 'getDateFormat',
+	        value: function getDateFormat(timestamp) {
+	            var d = new Date(timestamp);
+	            return d.getMonth() + 1 + "/" + d.getDate() + "/" + d.getFullYear();
+	        }
+	    }, {
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            $.ajax({
+	                url: twinUrl + "signature/readAttestation/" + keccak_256(localStorage.getItem("pubKey")).toUpperCase(),
+	                dataType: 'json',
+	                cache: false,
+	                success: function (result) {
+	                    console.log("result: " + JSON.stringify(result));
+	                    if ((typeof result === 'undefined' ? 'undefined' : _typeof(result)) != "object") {
+	                        //if(true){
+	                        var data = JSON.parse(result);
+	                        console.log("TOVOTE needs else brackets?" + localStorage.getItem("pubKey"));
+	                    } else {
+	                        var data = result;
+	                        //var test = JSON.parse((result.data));
+	                        //test = JSON.parse(JSON.stringify(test.messages));
+	                        console.log("data.coid: " + JSON.stringify(data));
+	                    }
+	                    this.setState({ coid: data.data.coid });
+	                    console.log("ToVote state: " + JSON.stringify(this.state));
+	                    console.log("result: " + JSON.stringify(result.data));
+	                }.bind(this)
+	            });
+	        }
+	    }, {
+	        key: 'hideHandler',
+	        value: function hideHandler() {
+	            this.setState({ showDetails: false });
+	        }
+	        //assigns entire COID to activeProposal, 
 	
-		_createClass(UniqueIDAttributesForm, [{
-			key: 'handleShowModal',
-			value: function handleShowModal(e) {
-				this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-			}
-		}, {
-			key: 'handleHideModal',
-			value: function handleHideModal() {
-				this.setState({ showModal: false });
-			}
-		}, {
-			key: 'render',
-			value: function render() {
+	    }, {
+	        key: 'dataHandler',
+	        value: function dataHandler(index) {
+	            return this.state.coid[index];
+	        }
+	        // getActiveData() {
+	        //  return this.state.activeProposal;
+	        // }
 	
-				return _react2.default.createElement(
-					'div',
-					{ className: 'form-group col-md-12' },
-					_react2.default.createElement(
-						'div',
-						{ className: 'col-md-10' },
-						_react2.default.createElement(
-							'label',
-							{ htmlFor: 'unique_id_attrs' },
-							' Unique Identfiers e.g. Serial Numbers, MAC Addresses, Vehicle Identitfication Numbers'
-						),
-						_react2.default.createElement('input', { name: 'label-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: 'Label' })
-					),
-					_react2.default.createElement(
-						'div',
-						{ className: 'col-md-2' },
-						_react2.default.createElement(
-							'button',
-							{ type: 'button', 'data-id': this.props.labelref, onClick: this.props.handleShowModal, className: 'btn btn-warning pull-right' },
-							_react2.default.createElement('span', { className: 'glyphicon glyphicon-upload' }),
-							'Upload File'
-						)
-					)
-				);
-			}
-		}]);
+	    }, {
+	        key: 'showHandler',
+	        value: function showHandler(e) {
+	            e.preventDefault();
+	            this.setState({
+	                showDetails: true,
+	                activeProposal: this.dataHandler($(e.target).attr('data-index'))
+	            });
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var _this5 = this;
 	
-		return UniqueIDAttributesForm;
+	            console.log("STATE: " + JSON.stringify(this.state));
+	            var _that = this;
+	            return _react2.default.createElement(
+	                'div',
+	                { id: 'vote_container' },
+	                _react2.default.createElement(
+	                    'h1',
+	                    null,
+	                    'Assets you have attested to'
+	                ),
+	                ' ',
+	                _react2.default.createElement('hr', null),
+	                _react2.default.createElement(
+	                    'table',
+	                    { className: 'table table-striped' },
+	                    _react2.default.createElement(
+	                        'tbody',
+	                        null,
+	                        function () {
+	                            if ($.isArray(_this5.state.coid) && _this5.state.coid.length > 0) {
+	                                return _this5.state.coid.map(function (el, i) {
+	                                    return _react2.default.createElement(
+	                                        'tr',
+	                                        { key: i },
+	                                        _react2.default.createElement(
+	                                            'td',
+	                                            null,
+	                                            _react2.default.createElement(
+	                                                'div',
+	                                                null,
+	                                                _react2.default.createElement(
+	                                                    'b',
+	                                                    null,
+	                                                    'Proposal ID: '
+	                                                ),
+	                                                el.proposal_id
+	                                            ),
+	                                            _react2.default.createElement(
+	                                                'div',
+	                                                null,
+	                                                _react2.default.createElement(
+	                                                    'b',
+	                                                    null,
+	                                                    'Published On: '
+	                                                ),
+	                                                _that.getDateFormat(el.time)
+	                                            )
+	                                        ),
+	                                        _react2.default.createElement(
+	                                            'td',
+	                                            { className: 'pull-right' },
+	                                            _react2.default.createElement(
+	                                                'button',
+	                                                { type: 'button', title: 'View proposal to vote', 'data-item': el, 'data-index': i, onClick: _that.showHandler, className: 'btn btn-primary' },
+	                                                'Revoke Signature'
+	                                            )
+	                                        )
+	                                    );
+	                                });
+	                            } else {
+	                                return _react2.default.createElement(
+	                                    'tr',
+	                                    null,
+	                                    _react2.default.createElement(
+	                                        'td',
+	                                        null,
+	                                        _react2.default.createElement(
+	                                            'p',
+	                                            null,
+	                                            'No attestations !'
+	                                        )
+	                                    )
+	                                );
+	                            }
+	                        }(this)
+	                    )
+	                ),
+	                this.state.showDetails ? _react2.default.createElement(ModalWin, { hideHandler: this.hideHandler.bind(this), dataHandler: this.state.activeProposal }) : null
+	            );
+	        }
+	    }]);
+	
+	    return Attestations;
 	}(_react2.default.Component);
 	
 	;
-	
-	var ControlTokenDistributionForm = function (_React$Component3) {
-		_inherits(ControlTokenDistributionForm, _React$Component3);
-	
-		function ControlTokenDistributionForm(props) {
-			_classCallCheck(this, ControlTokenDistributionForm);
-	
-			return _possibleConstructorReturn(this, (ControlTokenDistributionForm.__proto__ || Object.getPrototypeOf(ControlTokenDistributionForm)).call(this, props));
-			// this.state = {
-			// 	controltoken_quantity: [],
-			// 	controltoken_list: [],
-			// 	showModal: false
-			// };
-			//this.maxUniqAttr = 10;
-			//this.onFieldChange = this.onFieldChange.bind(this);
-			//this.handleHideModal = this.handleHideModal.bind(this);
-		}
-		// handleShowModal(e) {
-		// 	this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-		// }
-	
-		// handleHideModal() {
-		// 	this.setState({ showModal: false });
-		// }
-	
-	
-		_createClass(ControlTokenDistributionForm, [{
-			key: 'render',
-			value: function render() {
-				var style = {
-					fontSize: '12.5px'
-				};
-				return _react2.default.createElement(
-					'div',
-					{ className: 'form-group col-md-12' },
-					_react2.default.createElement(
-						'div',
-						{ className: 'col-md-10' },
-						_react2.default.createElement(
-							'table',
-							{ className: 'table table-striped table-hover', style: style },
-							_react2.default.createElement(
-								'tbody',
-								null,
-								_react2.default.createElement(
-									'tr',
-									null,
-									_react2.default.createElement(
-										'th',
-										null,
-										_react2.default.createElement(
-											'b',
-											null,
-											'Controller'
-										)
-									),
-									_react2.default.createElement(
-										'th',
-										null,
-										_react2.default.createElement(
-											'b',
-											null,
-											'Token Quantity'
-										)
-									)
-								),
-								_react2.default.createElement(
-									'tr',
-									null,
-									_react2.default.createElement(
-										'td',
-										null,
-										_react2.default.createElement('input', { name: 'label1-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: 'Public Key of Controller' })
-									),
-									_react2.default.createElement(
-										'td',
-										null,
-										_react2.default.createElement('input', { name: 'label1-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: 'Control Token Quantity' })
-									)
-								)
-							)
-						)
-					)
-				);
-			}
-		}]);
-	
-		return ControlTokenDistributionForm;
-	}(_react2.default.Component);
-	
-	;
-	
-	var OwnerTokenDistributionForm = function (_React$Component4) {
-		_inherits(OwnerTokenDistributionForm, _React$Component4);
-	
-		function OwnerTokenDistributionForm(props) {
-			_classCallCheck(this, OwnerTokenDistributionForm);
-	
-			return _possibleConstructorReturn(this, (OwnerTokenDistributionForm.__proto__ || Object.getPrototypeOf(OwnerTokenDistributionForm)).call(this, props));
-			// this.state = {
-			// 	ownertoken_quantity: [],
-			// 	ownertoken_list: [],
-			// 	showModal: false
-			// };
-	
-			// this.maxUniqAttr = 10;
-			// this.onFieldChange = this.onFieldChange.bind(this);
-			// this.handleHideModal = this.handleHideModal.bind(this);
-		}
-		// handleShowModal(e) {
-		// 	this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-		// }
-	
-		// handleHideModal() {
-		// 	this.setState({ showModal: false });
-		// }
-	
-	
-		_createClass(OwnerTokenDistributionForm, [{
-			key: 'render',
-			value: function render() {
-				var style = {
-					fontSize: '12.5px'
-				};
-				return _react2.default.createElement(
-					'div',
-					{ className: 'form-group col-md-12' },
-					_react2.default.createElement(
-						'div',
-						{ className: 'col-md-10' },
-						_react2.default.createElement(
-							'table',
-							{ className: 'table table-striped table-hover', style: style },
-							_react2.default.createElement(
-								'tbody',
-								null,
-								_react2.default.createElement(
-									'tr',
-									null,
-									_react2.default.createElement(
-										'th',
-										null,
-										_react2.default.createElement(
-											'b',
-											null,
-											'Owner'
-										)
-									),
-									_react2.default.createElement(
-										'th',
-										null,
-										_react2.default.createElement(
-											'b',
-											null,
-											'Token Quantity'
-										)
-									)
-								),
-								_react2.default.createElement(
-									'tr',
-									null,
-									_react2.default.createElement(
-										'td',
-										null,
-										_react2.default.createElement('input', { name: 'label2-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: 'Public Key of Owner' })
-									),
-									_react2.default.createElement(
-										'td',
-										null,
-										_react2.default.createElement('input', { name: 'label2-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: 'Ownership Token Quantity' })
-									)
-								)
-							)
-						)
-					)
-				);
-			}
-		}]);
-	
-		return OwnerTokenDistributionForm;
-	}(_react2.default.Component);
-	
-	;
-	
-	var MyGatekeeper = function (_React$Component5) {
-		_inherits(MyGatekeeper, _React$Component5);
-	
-		function MyGatekeeper(props) {
-			_classCallCheck(this, MyGatekeeper);
-	
-			var _this7 = _possibleConstructorReturn(this, (MyGatekeeper.__proto__ || Object.getPrototypeOf(MyGatekeeper)).call(this, props));
-	
-			_this7.state = {
-				isICA: false,
-				file_attrs: [],
-				inputs: ['input-0'], //removed input-1
-				inputs_control: ['input1-0'],
-				inputs_ownership: ['input1-0'],
-				official_id: [], //first official ID is name (see identity spec v1.3)
-				owner_id: [[]],
-				control_id: [[]],
-				recovery_id: [],
-				//recoveryCondition: [],
-				isHuman: [],
-				owner_token_id: [],
-				owner_token_desc: [],
-				owner_token_quantity: [[]],
-				control_token_id: [],
-				control_token_desc: [],
-				control_token_quantity: [[]],
-				showModal: false,
-				tmpFile: '',
-				pubKey: localStorage.getItem("pubKey"),
-				privKey: localStorage.getItem("privKey"),
-				//gatekeeperAddr: localStorage.getItem("MyGatekeeperAddr"),
-				validators: [],
-				signature: '',
-				assetID: [],
-				dimensions: '',
-				names: localStorage.getItem("contactNames").split(','),
-				keys: localStorage.getItem("contactPubKeys").split(','),
-				value: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-				suggest_attrs: [{
-					addKeys: [13, 188], // Enter and comma
-					inputProps: {
-						placeholder: "use ENTER to add values",
-						style: { width: '30%' },
-						id: "3"
-					}
-				}],
-				suggest_attrs2: [{
-					addKeys: [13, 188], // Enter and comma
-					inputProps: {
-						placeholder: "use ENTER to add values",
-						style: { width: '30%' },
-						id: "13"
-					}
-				}]
-	
-			};
-	
-			_this7.maxUniqAttr = 10;
-			_this7.onFieldChange = _this7.onFieldChange.bind(_this7);
-			_this7.onFieldChange2 = _this7.onFieldChange2.bind(_this7);
-			_this7.handleHideModal = _this7.handleHideModal.bind(_this7);
-			_this7.checkboxChange = _this7.checkboxChange.bind(_this7);
-			return _this7;
-		}
-	
-		_createClass(MyGatekeeper, [{
-			key: 'componentDidMount',
-			value: function componentDidMount() {
-				//TODO********** add fileName.json********put in localstorage!
-	
-				var publicKey = localStorage.getItem("pubKey");
-				console.log("compDidMountAjax");
-				$.ajax({
-					type: "POST",
-					url: twinUrl + 'getAsset',
-					data: { "pubKey": publicKey, "flag": 0, "fileName": "MyCOID.json" },
-					success: function (result) {
-						var data = result;
-						if ($.type(result) != "object") {
-							data = JSON.parseJSON(result);
-						}
-						console.log("gkaddr file: " + result.gatekeeperAddr);
-						//var gatekeeperAddr = "gatekeeperAddr_" + publicKey 
-						//console.log("gkaddr:  " + gatekeeperAddr)
-						localStorage.setItem("gatekeeperAddr", result.gatekeeperAddr);
-						//localStorage.setItem("coidAddr", result.coidAddr)
-						localStorage.setItem("dimensionCtrlAddr", result.dimensionCtrlAddr);
-						console.log("GKAddr: " + localStorage.getItem("gatekeeperAddr"));
-					}.bind(this),
-					complete: function complete() {
-						//console.log("gkaddr file: "+result);
-					}
-				});
-			}
-		}, {
-			key: 'onFieldChange',
-			value: function onFieldChange(inputField, e) {
-				var multipleValues = {};
-				if (inputField == "name" || inputField == "signature" || inputField == "message") {
-					this.setState(_defineProperty({}, inputField, e.target.value));
-				} else {
-					multipleValues[inputField] = e;
-					this.setState(multipleValues);
-				}
-			}
-		}, {
-			key: 'checkboxChange',
-			value: function checkboxChange(event) {
-				var target = event.target;
-				var value = target.type === 'checkbox' ? target.checked : target.value;
-				var name = target.name;
-				this.setState(_defineProperty({}, name, value));
-			}
-		}, {
-			key: 'onFieldChange2',
-			value: function onFieldChange2(inputField, e) {
-				var multipleValues = {};
-				var pieces = inputField.split(",");
-				var index = pieces[1];
-				var variable = pieces[0];
-				console.log("input field: " + variable + "   index: " + index);
-				console.log("field value :" + this.state[variable][index]);
-				this.state[variable][Number(index)] = e;
-				console.log("field value :" + variable[Number(index)]);
-				multipleValues[variable] = this.state[variable];
-				this.setState(multipleValues);
-				console.log("state value :" + this.state[variable]);
-			}
-		}, {
-			key: 'getHash',
-			value: function getHash(input) {
-				var input = $.trim(input);
-				if (input) {
-					var hash = (0, _jsSha.keccak_256)(input);
-					return hash;
-				}
-				return input;
-			}
-		}, {
-			key: 'getFileDetails',
-			value: function getFileDetails(filedata) {
-				var obj = _defineProperty({}, this.state.tmpFile, filedata);
-				this.setState({ file_attrs: this.state.file_attrs.concat([obj]) });
-			}
-		}, {
-			key: 'getLabelValues',
-			value: function getLabelValues() {
-				var labelVals = [];
-				var _this = this;
-				$.each($("input[name^='label-']"), function (obj) {
-					var value = $.trim($(this).val());
-					if (value.length > 0) {
-						labelVals.push(_defineProperty({}, $(this).attr('name').replace("label-", ""), value));
-					}
-				});
-				return labelVals;
-			}
-	
-			//used in token form class for control token distribution list.. is called by appendInputControllers()
-	
-		}, {
-			key: 'getLabelValuesController',
-			value: function getLabelValuesController() {
-				var labelVals1 = [];
-				$.each($("input[name^='label1-']"), function (obj) {
-					var value = $.trim($(this).val());
-					if (value.length > 0) {
-						labelVals1.push(_defineProperty({}, $(this).attr('name').replace("label1-", ""), value));
-					}
-					console.log("obj: " + JSON.stringify(obj));
-				});
-				return labelVals1;
-			}
-	
-			//used in token form class for control token distribution list.. is called by appendInputOwners()
-	
-		}, {
-			key: 'getLabelValuesOwner',
-			value: function getLabelValuesOwner() {
-				var labelVals2 = [];
-				$.each($("input[name^='label2-']"), function (obj) {
-					var value = $.trim($(this).val());
-					if (value.length > 0) {
-						labelVals2.push(_defineProperty({}, $(this).attr('name').replace("label2-", ""), value));
-					}
-					console.log("obj: " + JSON.stringify(obj));
-				});
-				return labelVals2;
-			}
-		}, {
-			key: 'prepareJsonToSubmit',
-			value: function prepareJsonToSubmit() {
-				console.log();
-	
-				for (var x = 0; x < this.state.recovery_id.length; x++) {
-					var index = this.state.names.indexOf(this.state.recovery_id[x]);
-					if (index >= 0) {
-						this.state.recovery_id[x] = this.state.keys[index];
-					}
-				}
-				//make control_id an array of values and remove empty values
-				var tempArr3 = this.state.owner_id.toString().split(',');
-				var tempArr4 = this.state.owner_token_quantity.toString().split(',');
-				for (var x = 0; x < tempArr3.length; x++) {
-					if (tempArr3[x] == "") {
-						tempArr3.splice(x, 1);
-						tempArr4.splice(x, 1);
-					}
-				}
-				//return values to state var and replace names with pubkeys
-				this.state.owner_id = tempArr3;
-				this.state.owner_token_quantity = tempArr4;
-				for (var x = 0; x < this.state.owner_id.length; x++) {
-					var index = this.state.names.indexOf(this.state.owner_id[x]);
-					if (index >= 0) {
-						this.state.owner_id[x] = this.state.keys[index];
-						console.log("CHANGED: " + this.state.owner_id[x]);
-					}
-				}
-				//make control_id an array of values and remove empty values
-				var tempArr = this.state.control_id.toString().split(',');
-				var tempArr2 = this.state.control_token_quantity.toString().split(',');
-				for (var x = 0; x < tempArr.length; x++) {
-					if (tempArr[x] == "") {
-						tempArr.splice(x, 1);
-						tempArr2.splice(x, 1);
-					}
-				}
-				//return values to state var and replace names with pubkeys
-				this.state.control_id = tempArr;
-				this.state.control_token_quantity = tempArr2;
-				for (var x = 0; x < this.state.control_id.length; x++) {
-					var index = this.state.names.indexOf(this.state.control_id[x]);
-					if (index >= 0) {
-						this.state.control_id[x] = this.state.keys[index];
-					}
-				}
-	
-				for (var x = 0; x < this.state.validators.length; x++) {
-					var index = this.state.names.indexOf(this.state.validators[x]);
-					if (index >= 0) {
-						this.state.validators[x] = this.state.keys[index];
-					}
-				}
-				console.log("temparr1 :" + tempArr);
-				console.log("temparr2 :" + tempArr2);
-				console.log("temparr3 :" + tempArr3);
-				console.log("temparr4 :" + tempArr4);
-				this.prepareControlTokenDistribution();
-				this.prepareOwnershipTokenDistrbution();
-				this.prepareValidators(this.state.validators);
-	
-				var inputObj = {
-					"pubKey": this.refs.pubKey.value,
-					//"sig": this.refs.signature.value,	
-					//"msg": this.refs.message.value,
-					//"name": this.refs.nameReg.value,		no longer standalone part of JSON object (it is part of unique attributes)
-	
-					"uniqueId": this.createHashAttribute(this.state.file_attrs),
-					"uniqueIdAttributes": this.prepareUniqueIdAttrs(),
-	
-					"ownershipId": this.createHashAttribute(this.state.owner_id), //calculated from ownerIDlist
-					"ownerIdList": this.valueIntoHash(this.state.owner_id),
-					"controlId": this.createHashAttribute(this.state.control_id),
-					"controlIdList": this.valueIntoHash(this.state.control_id),
-	
-					//calculated. should be one time hashing of ownershipTokenAttributes and ownership token quantity
-					"ownershipTokenId": this.getHash(this.joinValuesOwnership()),
-					"ownershipTokenAttributes": this.state.owner_token_desc,
-					"ownershipTokenQuantity": this.state.owner_token_quantity,
-	
-					//calculated. should be one time hashing of controlTokenAttributes and control token quantity
-					"controlTokenId": this.getHash(this.joinValuesControl()),
-					"controlTokenAttributes": this.state.control_token_desc,
-					"controlTokenQuantity": this.state.control_token_quantity,
-	
-					//pubkeys used for recovery in the event COID is lost or stolen			
-					"identityRecoveryIdList": this.valueIntoHash(this.state.recovery_id),
-					"recoveryCondition": $("input[name^='recoveryCondition']").val(),
-	
-					"yesVotesRequiredToPass": 2, //needs to be taken out and hardcoded in app
-					"validatorList": this.state.validators,
-	
-					"delegateeIdList": [""],
-					"delegateeTokenQuantity": [""],
-	
-					"isHuman": false,
-					"timestamp": "",
-					"assetID": this.state.assetID,
-					"propType": 0,
-					"bigchainHash": "",
-					"bigchainID": "",
-					"coidAddr": ""
-	
-				};
-				if (this.state.isICA == true) {
-					inputObj.propType = 2;
-					inputObj.ownershipId = (0, _jsSha.keccak_256)(inputObj.pubKey).toUpperCase();
-					inputObj.ownerIdList = (0, _jsSha.keccak_256)(inputObj.pubKey).toUpperCase();
-					inputObj.controlId = "";
-					inputObj.controlIdList = [""];
-					inputObj.ownershipTokenId = "";
-					inputObj.ownershipTokenAttributes = [""];
-					inputObj.ownershipTokenQuantity = [""];
-					inputObj.controlTokenId = "";
-					inputObj.controlTokenAttributes = [""];
-					inputObj.controlTokenQuantity = [""];
-					inputObj.identityRecoveryIdList = [""];
-					inputObj.recoveryCondition = "";
-					inputObj.yesVotesRequiredToPass = "";
-					inputObj.delegateeIdList = [""];
-					inputObj.delegateeTokenQuantity = [""];
-				}
-				return inputObj;
-			}
-		}, {
-			key: 'joinValuesOwnership',
-			value: function joinValuesOwnership() {
-				var value1 = this.state.owner_token_desc;
-				var value2 = this.state.owner_token_quantity;
-				var tempArr = [];
-				tempArr.push(value1);
-				tempArr.push(value2);
-				tempArr = tempArr.join();
-				return tempArr;
-			}
-		}, {
-			key: 'joinValuesControl',
-			value: function joinValuesControl() {
-				var value1 = this.state.control_token_desc;
-				var value2 = this.state.control_token_quantity;
-				var tempArr = [];
-				tempArr.push(value1);
-				tempArr.push(value2);
-				tempArr = tempArr.join();
-				return tempArr;
-			}
-		}, {
-			key: 'createHashAttribute',
-			value: function createHashAttribute(values) {
-				if ($.isArray(values) && values.length > 0) {
-					if ($.isPlainObject(values[0])) {
-						var str = "";
-						for (var i = 0; i < values.length; i++) {
-							for (var key in values[i]) {
-								var hash, filehash;
-	
-								var _values$i$key$split = values[i][key].split("|");
-	
-								var _values$i$key$split2 = _slicedToArray(_values$i$key$split, 2);
-	
-								hash = _values$i$key$split2[0];
-								filehash = _values$i$key$split2[1];
-	
-								if (values.length - 1 == i) str += hash;else str += hash + "|";
-							}
-						}
-						return this.getHash(str);
-	
-						//if only one value in 'values'
-					} else {
-						var valStr = values.join("|");
-						return this.getHash(valStr);
-					}
-				}
-				return '';
-			}
-	
-			//hashes arrays (no delimiter)
-	
-		}, {
-			key: 'valueIntoHash',
-			value: function valueIntoHash(values) {
-				var newArr = [];
-				var _this = this;
-				if ($.isArray(values)) {
-					values.map(function (value) {
-						newArr.push(_this.getHash(value));
-					});
-				};
-				return newArr;
-			}
-		}, {
-			key: 'prepareUniqueIdAttrs',
-			value: function prepareUniqueIdAttrs() {
-				var newArr = [],
-				    labels = this.getLabelValues();
-				for (var i = 0; i < labels.length; i++) {
-					var tmpArr = [];
-					for (var key in labels[i]) {
-						tmpArr.push(labels[i][key]);
-						var ipfsHash, fileHash;
-	
-						var _state$file_attrs$i$k = this.state.file_attrs[i][key].split("|");
-	
-						var _state$file_attrs$i$k2 = _slicedToArray(_state$file_attrs$i$k, 2);
-	
-						ipfsHash = _state$file_attrs$i$k2[0];
-						fileHash = _state$file_attrs$i$k2[1];
-	
-						tmpArr.push(fileHash);
-						tmpArr.push(ipfsHash);
-					}
-					newArr.push(tmpArr);
-				}
-				return newArr;
-			}
-		}, {
-			key: 'prepareControlTokenDistribution',
-			value: function prepareControlTokenDistribution() {
-				var labels = this.getLabelValuesController();
-				for (var i = 0; i < labels.length; i += 2) {
-					for (var key in labels[i]) {
-						this.state.control_id.push(labels[i][key]);
-						this.state.control_token_quantity.push(labels[i + 1][key]);
-					}
-				}
-			}
-		}, {
-			key: 'prepareOwnershipTokenDistrbution',
-			value: function prepareOwnershipTokenDistrbution() {
-				var labels = this.getLabelValuesOwner();
-				for (var i = 0; i < labels.length; i += 2) {
-					for (var key in labels[i]) {
-						this.state.owner_id.push(labels[i][key]);
-						this.state.owner_token_quantity.push(labels[i + 1][key]);
-					}
-				}
-				console.log("owner_ID: " + JSON.stringify(this.state.owner_id));
-				console.log("owner_token_quantity: " + JSON.stringify(this.state.owner_token_quantity));
-			}
-		}, {
-			key: 'prepareValidators',
-			value: function prepareValidators(value) {
-				var tempArr = value;
-				for (var i = 0; i < tempArr.length; i++) {
-					tempArr[i] = this.getHash(tempArr[i]);
-				}
-				return tempArr;
-			}
-	
-			//hashing the pubkeys
-	
-		}, {
-			key: 'prepareTokenDistribution',
-			value: function prepareTokenDistribution(value) {
-				var tempArr = value;
-				for (var i = 0; i < tempArr.length; i += 2) {
-					tempArr[i] = this.getHash(tempArr[i]);
-				}
-				return tempArr;
-			}
-		}, {
-			key: 'submitCoid',
-			value: function submitCoid(e) {
-				e.preventDefault();
-				var json = this.prepareJsonToSubmit();
-				var privKey1 = new Buffer(this.state.privKey, "hex");
-				var msg_hash = (0, _jsSha.keccak_256)(JSON.stringify(json));
-				var msg_hash_buffer = new Buffer(msg_hash, "hex");
-				var signature1 = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1));
-	
-				signature1 = JSON.parse(signature1).signature;
-				signature1 = JSON.stringify(signature1);
-				signature1 = JSON.parse(signature1).data;
-				signature1 = new Buffer(signature1, "hex");
-				signature1 = signature1.toString("hex");
-	
-				console.log("sig" + signature1);
-				console.log(typeof signature1 === 'undefined' ? 'undefined' : _typeof(signature1));
-	
-				json.sig = signature1;
-				json.msg = msg_hash_buffer.toString("hex");
-				json.gatekeeperAddr = localStorage.getItem("gatekeeperAddr");
-				//this.setState({signature: signature1})
-	
-				var COID_controllers = this.state.control_id;
-				console.log("coid controllers... " + COID_controllers + "\n length: " + COID_controllers.length);
-	
-				console.log(json);
-				$.ajax({
-					url: twinUrl + 'request_new_COID',
-					type: 'POST',
-					data: json,
-					success: function (res) {
-						var sendMe = {};
-						sendMe.flag = 0; //owned asset
-						sendMe.fileName = json.assetID[0] + ".json";
-						sendMe.pubKey = (0, _jsSha.keccak_256)(localStorage.getItem("pubKey"));
-						sendMe.updateFlag = 0;
-						sendMe.data = json;
-	
-						console.log("sendMe object:  " + JSON.stringify(sendMe));
-						$.ajax({
-							//****************TODO
-							url: twinUrl + 'setAsset',
-							type: 'POST',
-							data: sendMe,
-							success: function (res) {
-								console.log("response from setAsset: " + res);
-							}.bind(this)
-						});
-					}.bind(this),
-					complete: function () {
-						var sendMe = {};
-						sendMe.flag = 1; //controlled core identity
-						sendMe.fileName = json.assetID[0] + ".json";
-						sendMe.updateFlag = 0; //new identity
-						sendMe.data = json;
-						for (var i = 0; i < COID_controllers.length; i++) {
-							console.log("setting asset for controller, " + COID_controllers[i]);
-							sendMe.pubKey = (0, _jsSha.keccak_256)(COID_controllers[i]);
-							$.ajax({
-								url: twinUrl + 'setAsset',
-								type: 'POST',
-								data: sendMe,
-								success: function success(res) {
-									console.log("response from setAsset: " + res);
-								}
-							});
-						}
-						// do something
-					}.bind(this)
-				});
-			}
-		}, {
-			key: 'handleHideModal',
-			value: function handleHideModal() {
-				this.setState({ showModal: false });
-			}
-		}, {
-			key: 'handleShowModal',
-			value: function handleShowModal(e) {
-				this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-			}
-	
-			//used in uniqueIdAttributesForm
-	
-		}, {
-			key: 'appendInput',
-			value: function appendInput() {
-				var inputLen = this.state.inputs.length;
-				if (inputLen < this.maxUniqAttr) {
-					var newInput = 'input-' + inputLen;
-					this.setState({ inputs: this.state.inputs.concat([newInput]) });
-				}
-			}
-		}, {
-			key: 'appendInputControllers',
-			value: function appendInputControllers() {
-				console.log("input name: " + this.state.inputs_control);
-				this.state.control_id.push([]);
-				this.state.control_token_quantity.push([]);
-				console.log("control id: " + this.state.control_id);
-				var inputLen = this.state.inputs_control.length;
-				if (inputLen < this.maxUniqAttr) {
-					var newInput1 = 'input1-' + inputLen;
-					var theID = inputLen + 4;
-					console.log("theID: " + theID);
-					var Attrs = {
-						addKeys: [13, 188], // Enter and comma
-						inputProps: {
-							placeholder: "use ENTER to add values",
-							style: { width: '30%' },
-							id: theID.toString()
-						}
-					};
-					this.state.suggest_attrs.push(Attrs);
-					this.setState({ inputs_control: this.state.inputs_control.concat([newInput1]) });
-				}
-			}
-		}, {
-			key: 'appendInputOwners',
-			value: function appendInputOwners() {
-				console.log("input name: " + this.state.inputs_ownership);
-				this.state.owner_id.push([]);
-				this.state.owner_token_quantity.push([]);
-				console.log("control id: " + this.state.owner_id);
-				var inputLen = this.state.inputs_ownership.length;
-				console.log("ownerlsit length: " + inputLen);
-				if (inputLen < this.maxUniqAttr) {
-					var newInput2 = 'input1-' + inputLen;
-					var theID = inputLen + 14;
-					console.log("theID: " + theID);
-					var Attrs = {
-						addKeys: [13, 188], // Enter and comma
-						inputProps: {
-							placeholder: "use ENTER to add values",
-							style: { width: '30%' },
-							id: theID.toString()
-						}
-					};
-					this.state.suggest_attrs2.push(Attrs);
-					this.setState({ inputs_ownership: this.state.inputs_ownership.concat([newInput2]) });
-				}
-			}
-		}, {
-			key: 'onChange',
-			value: function onChange(event, _ref, id) {
-				var newValue = _ref.newValue;
-	
-				console.log("onchange");
-				var arr = this.state.value;
-				console.log("state value:  " + this.state.value);
-				arr[Number(id)] = newValue;
-				this.setState({ value: arr });
-			}
-		}, {
-			key: 'render',
-			value: function render() {
-				var _this8 = this;
-	
-				$('div.react-autosuggest__container').css("display", "inline");
-				var that = this;
-	
-				function autocompleteRenderInput(_ref2) {
-					var addTag = _ref2.addTag;
-					var props = _ref2.props;
-	
-	
-					var passed = JSON.stringify(arguments[0]);
-					console.log("passed: " + passed);
-					passed = JSON.parse(passed);
-	
-					var handleOnChange = function handleOnChange(e, _ref3) {
-						var newValue = _ref3.newValue;
-						var method = _ref3.method;
-	
-						console.log("handleonchange params: " + e + "   " + newValue + "   " + method + "   " + passed.id);
-						if (method === 'enter' || method === 'click') {
-							that.state.value[passed.id] = "";
-							e.preventDefault();
-						} else {
-							that.onChange(e, { newValue: newValue }, passed.id);
-						}
-					};
-					var handleKeyPress = function handleKeyPress(event) {
-						console.log('enter press here! ' + event.key);
-						if (event.key == 'Enter') {
-							event.preventDefault();
-							addTag(that.state.value[passed.id]);
-							that.state.value[passed.id] = "";
-							console.log('current tags: ' + that.state.tags);
-						}
-					};
-	
-					var renderInputComponent = function renderInputComponent(inputProps) {
-						return _react2.default.createElement('input', inputProps);
-					};
-	
-					//////////////////////////////////////////////////////////////////////
-					var inputValue = that.state.value[Number(passed.id)] || "";
-					if (inputValue == 'undefined') {
-						inputValue = "";
-					}
-					var inputLength = inputValue.length || 0;
-	
-					var suggestions = that.state.names.filter(function (name) {
-						console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
-						return name.toLowerCase().slice(0, inputLength) === inputValue;
-					});
-	
-					var value = String(that.state.value[Number(passed.id)]) || "";
-					if (value == 'undefined') {
-						value = "";
-					}
-					//const suggestions = that.state.suggestions;
-					console.log("passed ID: " + passed.id);
-					console.log("suggestions: " + suggestions);
-					console.log("value: " + value);
-					var inputProps = {
-						placeholder: passed.placeholder,
-						value: value,
-						style: {
-							width: '30%',
-							height: '100%',
-							display: "initial"
-						},
-						onChange: handleOnChange,
-						onKeyPress: handleKeyPress,
-						className: "react-tagsinput-input",
-						id: passed.id
-					};
-					return _react2.default.createElement(_reactAutosuggest2.default, {
-						id: passed.id,
-						ref: passed.ref,
-						suggestions: suggestions,
-						shouldRenderSuggestions: function shouldRenderSuggestions(value) {
-							return value.length > 0;
-						},
-						getSuggestionValue: function getSuggestionValue(suggestion) {
-							return suggestion;
-						},
-						renderSuggestion: function renderSuggestion(suggestion) {
-							return _react2.default.createElement(
-								'span',
-								null,
-								suggestion
-							);
-						},
-						inputProps: inputProps,
-						onSuggestionSelected: function onSuggestionSelected(e, _ref4) {
-							var suggestion = _ref4.suggestion;
-	
-							console.log("SELECTED: " + suggestion);
-							addTag(suggestion);
-						},
-						onSuggestionsClearRequested: function onSuggestionsClearRequested() {},
-						onSuggestionsFetchRequested: function onSuggestionsFetchRequested() {},
-						renderInputComponent: renderInputComponent
-					});
-				}
-	
-				var basicAttrs = {
-					addKeys: [13, 188], // Enter and comma
-					inputProps: {
-						placeholder: "use ENTER to add values",
-						style: { width: '30%' }
-					}
-				};
-				var inputAttrs = {
-					addKeys: [13, 188], // Enter and comma
-					inputProps: {
-						placeholder: "use ENTER to add values",
-						style: { width: '30%' },
-						id: "0"
-					}
-				};
-				var inputAttrs2 = {
-					addKeys: [13, 188], // Enter and comma
-					inputProps: {
-						placeholder: "use ENTER to add values",
-						style: { width: '30%' },
-						id: "1"
-					}
-				};
-				var inputAttrs3 = {
-					addKeys: [13, 188], // Enter and comma
-					inputProps: {
-						placeholder: "use ENTER to add values",
-						style: { width: '30%' },
-						id: "2"
-					}
-				};
-				var inputAttrs4 = {
-					addKeys: [13, 188], // Enter and comma
-					inputProps: {
-						placeholder: "use ENTER to add values",
-						style: { width: '30%' },
-						id: "3"
-					}
-				};
-				var syle = {
-					marginRight: '15px'
-				};
-				var style = {
-					fontSize: '12.5px'
-				};
-	
-				var syle = {
-					marginRight: '15px'
-				};
-	
-				console.log("\n\nICA:  " + this.state.isICA);
-				if (this.state.isICA == false) {
-					return _react2.default.createElement(
-						'div',
-						{ id: 'CoreIdentityContainer' },
-						_react2.default.createElement(
-							'h1',
-							null,
-							'Create Asset or Device Identity'
-						),
-						_react2.default.createElement(
-							'form',
-							{ method: 'POST', id: 'register', role: 'form' },
-							_react2.default.createElement(
-								'label',
-								null,
-								'Is ICA:',
-								_react2.default.createElement('input', {
-									value: 'isICA',
-									name: 'isICA',
-									type: 'checkbox',
-									checked: this.state.isICA,
-									onChange: this.checkboxChange,
-									defaultChecked: false })
-							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'form-group' },
-								_react2.default.createElement(
-									'label',
-									{ htmlFor: 'unique_id' },
-									'Enter Unique ID Attributes'
-								),
-								this.state.inputs.map(function (input) {
-									return _react2.default.createElement(UniqueIDAttributesForm, { handleShowModal: _this8.handleShowModal.bind(_this8), min: _this8.state.subform_cont, max: '10', key: input, labelref: input });
-								})
-							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'form-group' },
-								_react2.default.createElement(
-									'div',
-									{ className: 'col-md-offset-6 col-md-6 ' },
-									_react2.default.createElement('p', null),
-									_react2.default.createElement(
-										'button',
-										{ type: 'button', className: 'btn btn-info pull-right', style: syle, onClick: this.appendInput.bind(this) },
-										_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
-										'Add More'
-									)
-								)
-							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'form-group' },
-								_react2.default.createElement(
-									'label',
-									{ htmlFor: 'assetID' },
-									'Name Your Asset. For example, \'My Diploma\'.'
-								),
-								_react2.default.createElement(_reactTagsinput2.default, _extends({}, basicAttrs, { value: this.state.assetID, onChange: function onChange(e) {
-										_this8.onFieldChange("assetID", e);
-									} }))
-							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'form-group' },
-								_react2.default.createElement(
-									'label',
-									{ htmlFor: 'owner_token_id' },
-									'Enter Ownership Token Description. For example, \'Spencer tokens\'.'
-								),
-								_react2.default.createElement(_reactTagsinput2.default, _extends({}, basicAttrs, { value: this.state.owner_token_desc, onChange: function onChange(e) {
-										_this8.onFieldChange("owner_token_desc", e);
-									} }))
-							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'form-group' },
-								_react2.default.createElement(
-									'label',
-									{ htmlFor: 'owner_dist' },
-									'Enter Owners and their ownership token(s).'
-								),
-								this.state.inputs_ownership.map(function (input, i) {
-									return _react2.default.createElement(
-										'div',
-										{ className: 'form-group col-md-12' },
-										_react2.default.createElement(
-											'div',
-											{ className: 'col-md-10' },
-											_react2.default.createElement(
-												'table',
-												{ className: 'table table-striped table-hover', style: style },
-												_react2.default.createElement(
-													'tbody',
-													null,
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'th',
-															null,
-															_react2.default.createElement(
-																'b',
-																null,
-																'Public Key of Owner'
-															)
-														),
-														_react2.default.createElement(
-															'th',
-															null,
-															_react2.default.createElement(
-																'b',
-																null,
-																'Owner Token Quantity'
-															)
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															_react2.default.createElement(_reactTagsinput2.default, _extends({}, _this8.state.suggest_attrs2[i], { maxTags: 1, renderInput: autocompleteRenderInput, className: 'form-control col-md-4', type: 'text', value: _this8.state.owner_id[i], onChange: function onChange(e) {
-																	_this8.onFieldChange2("owner_id," + i, e);
-																} }))
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															_react2.default.createElement(_reactTagsinput2.default, _extends({}, basicAttrs, { maxTags: 1, className: 'form-control col-md-4', type: 'text', value: _this8.state.owner_token_quantity[i], onChange: function onChange(e) {
-																	_this8.onFieldChange2("owner_token_quantity," + i, e);
-																} }))
-														)
-													)
-												)
-											)
-										)
-									);
-								})
-							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'form-group' },
-								_react2.default.createElement(
-									'div',
-									{ className: 'col-md-offset-6 col-md-6 ' },
-									_react2.default.createElement('p', null),
-									_react2.default.createElement(
-										'button',
-										{ type: 'button', className: 'btn btn-info pull-right', style: syle, onClick: this.appendInputOwners.bind(this) },
-										_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
-										'Add More'
-									)
-								)
-							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'form-group' },
-								_react2.default.createElement(
-									'label',
-									{ htmlFor: 'control_token_id' },
-									'Enter Control Token Description. For example, \'Spencer tokens\'.'
-								),
-								_react2.default.createElement(_reactTagsinput2.default, _extends({}, basicAttrs, { value: this.state.control_token_desc, onChange: function onChange(e) {
-										_this8.onFieldChange("control_token_desc", e);
-									} }))
-							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'form-group' },
-								_react2.default.createElement(
-									'label',
-									{ htmlFor: 'control_dist' },
-									'Enter Controllers and their control token(s).'
-								),
-								this.state.inputs_control.map(function (input, i) {
-									return _react2.default.createElement(
-										'div',
-										{ className: 'form-group col-md-12' },
-										_react2.default.createElement(
-											'div',
-											{ className: 'col-md-10' },
-											_react2.default.createElement(
-												'table',
-												{ className: 'table table-striped table-hover', style: style },
-												_react2.default.createElement(
-													'tbody',
-													null,
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'th',
-															null,
-															_react2.default.createElement(
-																'b',
-																null,
-																'Public Key of Controller'
-															)
-														),
-														_react2.default.createElement(
-															'th',
-															null,
-															_react2.default.createElement(
-																'b',
-																null,
-																'Control Token Quantity'
-															)
-														)
-													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															null,
-															_react2.default.createElement(_reactTagsinput2.default, _extends({}, _this8.state.suggest_attrs[i], { maxTags: 1, renderInput: autocompleteRenderInput, className: 'form-control col-md-4', type: 'text', value: _this8.state.control_id[i], onChange: function onChange(e) {
-																	_this8.onFieldChange2("control_id," + i, e);
-																} }))
-														),
-														_react2.default.createElement(
-															'td',
-															null,
-															_react2.default.createElement(_reactTagsinput2.default, _extends({}, basicAttrs, { maxTags: 1, className: 'form-control col-md-4', type: 'text', value: _this8.state.control_token_quantity[i], onChange: function onChange(e) {
-																	_this8.onFieldChange2("control_token_quantity," + i, e);
-																} }))
-														)
-													)
-												)
-											)
-										)
-									);
-								})
-							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'form-group' },
-								_react2.default.createElement(
-									'div',
-									{ className: 'col-md-offset-6 col-md-6 ' },
-									_react2.default.createElement('p', null),
-									_react2.default.createElement(
-										'button',
-										{ type: 'button', className: 'btn btn-info pull-right', style: syle, onClick: this.appendInputControllers.bind(this) },
-										_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
-										'Add More'
-									)
-								)
-							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'form-group' },
-								_react2.default.createElement(
-									'label',
-									{ htmlFor: 'recovery_id' },
-									'Recovery IDs (public keys of individuals who will attest to lost/stolen identity)'
-								),
-								_react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs2, { renderInput: autocompleteRenderInput, value: this.state.recovery_id, onChange: function onChange(e) {
-										_this8.onFieldChange("recovery_id", e);
-									} }))
-							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'form-group' },
-								_react2.default.createElement(
-									'label',
-									null,
-									'Recovery Condition (# of digital signatures of recovery ID owners needed to recover identity)'
-								),
-								_react2.default.createElement('input', { name: 'recoveryCondition', className: 'form-control col-md-4', type: 'text', placeholder: 'Recovery Condition' }),
-								'/>'
-							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'form-group' },
-								_react2.default.createElement(
-									'label',
-									{ htmlFor: 'validators' },
-									'Validators (public keys of the accounts which will verify this identity/asset)'
-								),
-								_react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs4, { maxTags: 10, renderInput: autocompleteRenderInput, value: this.state.validators, onChange: function onChange(e) {
-										_this8.onFieldChange("validators", e);
-									} }))
-							),
-							_react2.default.createElement(
-								'div',
-								{ className: 'form-group' },
-								_react2.default.createElement(
-									'div',
-									{ className: 'col-sm-6' },
-									_react2.default.createElement('br', null),
-									_react2.default.createElement('input', { className: 'form-control', ref: 'signature', type: 'hidden', value: this.state.signature }),
-									_react2.default.createElement('input', { type: 'hidden', name: 'pubkey', ref: 'pubKey', value: localStorage.getItem("pubKey") }),
-									_react2.default.createElement(
-										'button',
-										{ className: 'btn btn-primary', 'data-loading-text': 'Submit Identity', name: 'submit-form', type: 'button', onClick: this.submitCoid.bind(this) },
-										'Submit Identity'
-									)
-								)
-							)
-						),
-						this.state.showModal ? _react2.default.createElement(UploadIpfsFile, { pubKey: this.state.pubKey, dataHandler: this.getFileDetails.bind(this), handleHideModal: this.handleHideModal }) : null
-					);
-				} //end if
-				else {
-						return _react2.default.createElement(
-							'div',
-							{ id: 'CoreIdentityContainer' },
-							_react2.default.createElement(
-								'h1',
-								null,
-								'Create Asset or Device Identity'
-							),
-							_react2.default.createElement(
-								'form',
-								{ method: 'POST', id: 'register', role: 'form' },
-								_react2.default.createElement(
-									'label',
-									null,
-									'Is ICA:',
-									_react2.default.createElement('input', {
-										value: 'isICA',
-										name: 'isICA',
-										type: 'checkbox',
-										checked: this.state.isICA,
-										onChange: this.checkboxChange,
-										defaultChecked: true
-									})
-								),
-								_react2.default.createElement(
-									'div',
-									{ className: 'form-group' },
-									_react2.default.createElement(
-										'label',
-										{ htmlFor: 'unique_id' },
-										'Enter Unique ID Attributes'
-									),
-									this.state.inputs.map(function (input) {
-										return _react2.default.createElement(UniqueIDAttributesForm, { handleShowModal: _this8.handleShowModal.bind(_this8), min: _this8.state.subform_cont, max: '10', key: input, labelref: input });
-									})
-								),
-								_react2.default.createElement(
-									'div',
-									{ className: 'form-group' },
-									_react2.default.createElement(
-										'div',
-										{ className: 'col-md-offset-6 col-md-6 ' },
-										_react2.default.createElement('p', null),
-										_react2.default.createElement(
-											'button',
-											{ type: 'button', className: 'btn btn-info pull-right', style: syle, onClick: this.appendInput.bind(this) },
-											_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
-											'Add More'
-										)
-									)
-								),
-								_react2.default.createElement(
-									'div',
-									{ className: 'form-group' },
-									_react2.default.createElement(
-										'label',
-										{ htmlFor: 'assetID' },
-										'Name Your Asset. For example, \'My Diploma\'.'
-									),
-									_react2.default.createElement(_reactTagsinput2.default, _extends({}, basicAttrs, { value: this.state.assetID, onChange: function onChange(e) {
-											_this8.onFieldChange("assetID", e);
-										} }))
-								),
-								_react2.default.createElement(
-									'div',
-									{ className: 'form-group' },
-									_react2.default.createElement(
-										'label',
-										{ htmlFor: 'validators' },
-										'Validators (public keys of the accounts which will verify this identity/asset)'
-									),
-									_react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs4, { maxTags: 10, renderInput: autocompleteRenderInput, value: this.state.validators, onChange: function onChange(e) {
-											_this8.onFieldChange("validators", e);
-										} }))
-								),
-								_react2.default.createElement(
-									'div',
-									{ className: 'form-group' },
-									_react2.default.createElement(
-										'div',
-										{ className: 'col-sm-6' },
-										_react2.default.createElement('br', null),
-										_react2.default.createElement('input', { className: 'form-control', ref: 'signature', type: 'hidden', value: this.state.signature }),
-										_react2.default.createElement('input', { type: 'hidden', name: 'pubkey', ref: 'pubKey', value: localStorage.getItem("pubKey") }),
-										_react2.default.createElement(
-											'button',
-											{ className: 'btn btn-primary', 'data-loading-text': 'Submit Identity', name: 'submit-form', type: 'button', onClick: this.submitCoid.bind(this) },
-											'Submit Identity'
-										)
-									)
-								)
-							),
-							this.state.showModal ? _react2.default.createElement(UploadIpfsFile, { pubKey: this.state.pubKey, dataHandler: this.getFileDetails.bind(this), handleHideModal: this.handleHideModal }) : null
-						);
-					}
-			}
-		}]);
-	
-		return MyGatekeeper;
-	}(_react2.default.Component);
-	
-	exports.default = MyGatekeeper;
+	exports.default = Attestations;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/buffer/index.js */ 239).Buffer))
 
 /***/ }

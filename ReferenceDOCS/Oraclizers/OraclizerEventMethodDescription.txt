@@ -1,1 +1,0 @@
-The associated picture in this folder describes a way to refine the oraclizer. It will make Oraclizer contracts callable in a contract, rather than calling the contract from javascript.

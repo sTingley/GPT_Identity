@@ -16,6 +16,7 @@ class UniqueIDAttributesForm extends React.Component {
         return (<label htmlFor="unique_id_attrs"> Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research"</label>)
     }
     render() {
+        console.log("UniqueIDAttributeForm props: " + JSON.stringify(this.props));
         let style = { fontSize: '12.5px' }
         return (
             <div className="form-group col-md-12" style={style}>

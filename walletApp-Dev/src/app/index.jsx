@@ -13,16 +13,16 @@ import { Router, Route, IndexRedirect, hashHistory } from 'react-router';
 import Menu from './Components/menu.jsx';
 import Header from './Components/header.jsx';
 import Home from './Components/Home.jsx';
-import NameRegister from './Components/NameRegister.jsx';
-import CoreIdentity from './Components/CoreIdentityForm.jsx';
+//import NameRegister from './Components/NameRegister.jsx';
+import CoreIdentity from './Components/IdentityFederation/CoreIdentityForm.jsx';
 import UploadKeyStore from './Components/Upload.jsx';
 import ToVote from './Components/ToVote.jsx';
 import Notifications from './Components/Notifications.jsx';
 import Assets from './Components/Assets.jsx';
 import MyCOID from './Components/MyCOID.jsx';
-import IdentityDimension from './Components/IdentityDimension.jsx';
+import IdentityDimension from './Components/IdentityDimension/IdentityDimension.jsx';
 import Documents from './Components/Documents.jsx';
-import MyGateKeeper from './Components/MyGateKeeper.jsx';
+import MyGateKeeper from './Components/IdentityFederation/MyGateKeeper.jsx';
 import Attestations from './Components/Attestations.jsx';
 
 class App extends React.Component {
@@ -82,7 +82,6 @@ render((
 			<IndexRedirect to="/home" />
 			<Route path="home" component={Home} />
 			<Route path="upload" component={UploadKeyStore} />
-			<Route path="register" component={NameRegister} onEnter={validateLogin} />
 			<Route path="tovote" component={ToVote} onEnter={validateLogin} />
 			<Route path="notifications" component={Notifications} onEnter={validateLogin} />
 			<Route path="identity" component={CoreIdentity} onEnter={validateLogin} />

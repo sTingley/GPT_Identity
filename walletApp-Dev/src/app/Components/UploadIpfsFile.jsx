@@ -30,6 +30,10 @@ class UploadIpfsFile extends React.Component {
             $("#descriptors .modal").modal('show');
             $("#descriptors .modal").on('hidden.bs.modal', this.props.handleHideModal);
         }
+        if(this.props.addOfficialID) {
+            $("#assetDetails .modal").modal('show');
+            $("#assetDetails .modal").on('hidden.bs.modal', this.props.handleHideModal);
+        }
 
         $("#SubmitContainer .modal").modal('show');
         $("#SubmitContainer .modal").on('hidden.bs.modal', this.props.handleHideModal);

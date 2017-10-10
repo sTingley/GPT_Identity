@@ -717,7 +717,7 @@ class Modal extends Component {
 					<div className="modal-content modalstyle">
 
 						<div className="modal-header">
-							<button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times; </span></button>
+							<button type="button" id="asset" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times; </span></button>
 							<ul className="nav nav-pills" role="tablist">
 								<li role="presentation" className="active"><a href="#asset_details" role="tab" data-toggle="tab">Asset Details</a></li>
 								<li role="presentation"><a href="#menu1" role="tab" data-toggle="tab">Menu1</a></li>
@@ -996,7 +996,7 @@ class Modal extends Component {
                                                                 })(this)} */}
 																</tbody>
 															</table>
-															<div className="form-group col-md-8">
+															<div>
 																<label htmlFor="unique_id">Enter Unique ID Attributes:</label>
 																{this.state.inputs.map(input => <AttributeForm handleShowModal={this.handleShowModal.bind(this)} max="10" key={input} labelref={input} />)}
 															</div>
@@ -1282,7 +1282,7 @@ class Modal extends Component {
 
 								<div id="menu3" className="tab-pane fade">
 									<br></br>
-									<div className="col-md-offset-1 col-md-10">
+									<div>
 										<div className="panel-group" id="accordion">
 											<div className="panel panel-default">
 												<div className="panel-heading">

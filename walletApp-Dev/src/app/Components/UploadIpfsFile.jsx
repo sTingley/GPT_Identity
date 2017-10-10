@@ -77,7 +77,10 @@ class UploadIpfsFile extends React.Component {
                             var filedata = resp.uploded[0].hash + "|" + resp.uploded[0].file_hash;
                             //data handler forms JSON object
                             this.props.dataHandler(filedata);
-                            $("button.close").trigger("click");
+                            if ($("button.close").attr("id") == "asset"){
+                                console.log("we have hit the asset button");
+                                $("button.close").trigger("click");
+                            }
                         }
                     }.bind(this),
                     complete: () => {

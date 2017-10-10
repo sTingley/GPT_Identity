@@ -89,6 +89,10 @@ class AttributeForm extends React.Component {
 };
 class Modal extends Component {
 
+	//this.props.asset_details will have the selected asset object
+
+	//this.props.dimensions will have the dimension objects for selected asset
+
 	constructor(props) {
 		super(props);
 		this.pubKey = localStorage.getItem("pubKey");
@@ -587,6 +591,8 @@ class Modal extends Component {
 
 	render() {
 
+		console.log("this.props.dimensions: " + JSON.stringify(this.props.dimensions));
+
 		console.log("******" + JSON.stringify(this.state.qrCode_COID_device_relation))
 
 		var _this = this;
@@ -717,8 +723,7 @@ class Modal extends Component {
 								<li role="presentation"><a href="#menu1" role="tab" data-toggle="tab">Menu1</a></li>
 								<li role="presentation"><a href="#menu2" role="tab" data-toggle="tab">Menu2</a></li>
 								<li role="presentation"><a href="#menu3" role="tab" data-toggle="tab">Menu3</a></li>
-								<li role="presentation"><a href="#qrcode" role="tab" data-toggle="tab">QR Code</a></li>
-								<li role="presentation"><a href="#qrcode2" role="tab" data-toggle="tab">Validate ownership</a></li>
+								<li role="presentation"><a href="#qrcode" role="tab" data-toggle="tab">QR Codes</a></li>
 							</ul>
 						</div>
 
@@ -1234,8 +1239,47 @@ class Modal extends Component {
 
 								</div>{/*menu1*/}
 
-
 								<div id="menu2" className="tab-pane fade">
+									<div className="container">
+										<h2>Accordion Example</h2>
+										<p><strong>Note:</strong> The <strong>data-parent</strong> attribute makes sure that all collapsible elements under the specified parent will be closed when one of the collapsible item is shown.</p>
+										{(() => {
+											if (!$.isEmptyObject(this.props.dimensions)) {
+												return this.props.dimensions.map((dims, i) => {
+													return(
+													<div className="panel-group" id="accordion">
+														<div className="panel panel-default">
+															<div className="panel-heading">
+																<h4 className="panel-title">
+																	<a data-toggle="collapse" data-parent="#accordion" href={"#collapse_" + i}>{dims.dimensionName}</a>
+																</h4>
+															</div>
+															<div id={"collapse_" + i} className="panel-collapse collapse in">
+																<div className="panel-body">
+																	<table className="table table-striped table-hover" style={syle}>
+																		<tbody>
+																			<tr>
+																				<td>Contract Address</td>
+																				<td>{dims.coidAddr}</td>
+																			</tr>
+																			<tr>
+																				<td>Asset Owner List</td>
+																			</tr>
+																		</tbody>
+																	</table>
+																</div>
+															</div>
+														</div>
+													</div>)
+												})
+											}
+										})(this)}
+
+
+									</div>{/*container*/}
+								</div>{/*menu2*/}
+
+								<div id="menu3" className="tab-pane fade">
 									<br></br>
 									<div className="col-md-offset-1 col-md-10">
 										<div className="panel-group" id="accordion">
@@ -1319,20 +1363,10 @@ class Modal extends Component {
 										</div>
 									</div>
 								</div>
-								<div id="menu3" className="tab-pane fade">
-									<br></br>
-									<div className="col-md-offset-1 col-md-10">
-										<label>"Paste the code in persona which is already done"</label>
-
-									</div>
-								</div>
-
 
 								<div role="tabpanel" className="tab-pane center-block" id="qrcode" style={qrStyle}>
-									<QRCode value={qrConfig} size={200} />
-								</div>
-
-								<div role="tabpanel" className="tab-pane center-block" id="qrcode2" style={qrStyle}>
+									<QRCode value={qrConfig} size={200} /><hr />
+									{this.state.notCOID ? <h2>abc</h2> : null}
 									{this.state.notCOID ? <QRCode value={qrOwnedDevice} size={200} /> : null}
 								</div>
 
@@ -1777,7 +1811,7 @@ Dims.propTypes = {
 	hideHandler: React.PropTypes.func.isRequired // hideHandler method must exists in parent component
 };
 
-// <td>Token Amount: 1</td>
+//**************************************************************************************************************** */
 
 class Assets extends Component {
 
@@ -1788,7 +1822,10 @@ class Assets extends Component {
 			showDetails: false,
 			showDetails1: false, //set in dimensionHandler to render delegated data
 			wallet: { pubKey: localStorage.getItem("pubKey") },
+
 			own_assets: [],
+			owned_dimensions: [],
+
 			controlled_assets: [],
 			delegated_assets: [],
 			delegated_dims: [],
@@ -1839,13 +1876,99 @@ class Assets extends Component {
 				"txn_id": "requestCOID",
 				"uniqueId": "01547929f9184f362e1ab0126a15013087f4d1ab25d11ea971e8ffb159546d94",
 				"uniqueIdAttributes": ["spencertingley,557d1294ba620922e1655aa9b5c9be5f2c5dad876740dd2a9a22934b79ee164d,QmWbbhSo7GzZi6zyi7MpJyAfiqzPRcSfV1oHFRyCgT54iG"],
-				"yesVotesRequiredToPass": "2"
+				"yesVotesRequiredToPass": "2",
+				"dimensions": ["abcd.json", "1234.json"]
 			}
 		}]
 
-		this.setState({ own_assets: O })
+		this.setState({ own_assets: O });
 
-		localStorage.setItem("owned_assets", JSON.stringify(O));
+		let ownAssetsDimensionsCount = [];
+
+		//loop thru the owned assets
+		// for (var j = 0; j < this.state.own_assets.length; j++) {
+		// 	let dim = {};
+		// 	ownAssetsDimensionsCount[j] = this.state.own_assets[j].dimensions.length;
+
+		// }
+
+
+		let dimensions = [{
+			"dimensionName": "LIVING_ROOM",
+			"pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+			"address": "",
+			"flag": 0,
+			"ID": 0,
+			"coidAddr": "E2B24811DB9B23DDEA8313D82D11A82014C8E3BC",
+			"dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
+			"uniqueId": "9aaddf7caa690217bddc743102dc7e417608a93418ad5da2c0c82c501004f26f",
+			"owners": [
+				"59d110a3ab34a2ebd0ddb9d72ead24e8e906bebe794ea13c8c35b8a6c81314cd"
+			],
+			"controllers": [
+				"a016d3445c892d76d9efc222d9598b4bfaf889ef5c5323c5cec67ab20c96c01c",
+				"16f121833eee6c25847aa9e63d4aa1b5cc2bf72d0d48f46ad25316b6e9bc5976"
+			],
+			"delegations": [
+				{
+					"owner": "COID_OWNER",
+					"delegatee": "03683536757fdb821c10810b51caa51a84fc1dfab5c17edbf5246f9713ffe31adf",
+					"amount": "2",
+					"accessCategories": ""
+				}
+			],
+			"data": [
+				{
+					"descriptor": "smartTV",
+					"attribute": "QmXVFStSMEcoAWPVKLrxJ8wf5ohn2UdmdAxcnfB8TtSAZG",
+					"flag": 0
+				},
+				{
+					"descriptor": "family_laptop",
+					"attribute": "QmSMWeGPjtgzQ75Y1YXbnC4uByni8bwHcB4vPXrPVcUTUM",
+					"flag": 0
+				}
+			]
+		},
+		{
+			"dimensionName": "FINANCE",
+			"pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+			"address": "",
+			"flag": 0,
+			"ID": 0,
+			"coidAddr": "E2B24811DB9B23DDEA8313D82D11A82014C8E3BC",
+			"dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
+			"uniqueId": "9aaddf7caa690217bddc743102dc7e417608a93418ad5da2c0c82c501004f26f",
+			"owners": [
+				"59d110a3ab34a2ebd0ddb9d72ead24e8e906bebe794ea13c8c35b8a6c81314cd"
+			],
+			"controllers": [
+				"a016d3445c892d76d9efc222d9598b4bfaf889ef5c5323c5cec67ab20c96c01c",
+				"16f121833eee6c25847aa9e63d4aa1b5cc2bf72d0d48f46ad25316b6e9bc5976"
+			],
+			"delegations": [
+				{
+					"owner": "COID_OWNER",
+					"delegatee": "03683536757fdb821c10810b51caa51a84fc1dfab5c17edbf5246f9713ffe31adf",
+					"amount": "2",
+					"accessCategories": ""
+				}
+			],
+			"data": [
+				{
+					"descriptor": "Bank Statement",
+					"attribute": "QmXVFStSMEcoAWPVKLrxJ8wf5ohn2UdmdAxcnfB8TtSAZG",
+					"flag": 0
+				},
+				{
+					"descriptor": "AMEX Payment history",
+					"attribute": "QmSMWeGPjtgzQ75Y1YXbnC4uByni8bwHcB4vPXrPVcUTUM",
+					"flag": 0
+				}
+			]
+		}]
+
+		this.setState({ owned_dimensions: dimensions });
 
 		// -> -> -> -> -> -> -> -> -> -> -> -> -> -> ->
 		// -> -> -> START get OWNED assets -> -> ->
@@ -2219,7 +2342,7 @@ class Assets extends Component {
 					</div>
 				</div><br />
 
-				{this.state.showDetails ? <Modal hideHandler={this.hideHandler} asset={this.state.active_asset} /> : null}
+				{this.state.showDetails ? <Modal hideHandler={this.hideHandler} asset={this.state.active_asset} dimensions={this.state.owned_dimensions} /> : null}
 				{this.state.showDetails1 ? <Dims hideHandler={this.hideHandler1} dimension={this.state.active_dimension} /> : null}
 			</div>
 		);

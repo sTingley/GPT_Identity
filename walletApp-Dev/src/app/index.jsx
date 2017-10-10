@@ -22,7 +22,7 @@ import Assets from './Components/Assets.jsx';
 import MyCOID from './Components/MyCOID.jsx';
 import IdentityDimension from './Components/IdentityDimension/IdentityDimension.jsx';
 import Documents from './Components/Documents.jsx';
-import MyGateKeeper from './Components/IdentityFederation/MyGateKeeper.jsx';
+import MyGateKeeper from './Components/IdentityFederation/MyGatekeeper.jsx';
 import Attestations from './Components/Attestations.jsx';
 
 class App extends React.Component {

@@ -2,7 +2,7 @@ var webpack = require('webpack');
 var path = require('path');
 
 
-var DEPLOY_PATH = "/Users/Spencer/Desktop/GPT_Identity/walletApp-Production";
+var DEPLOY_PATH = "/home/training/Desktop/Identity/GPT_Identity/walletApp-Production";
 var BUILD_DIR = path.resolve(DEPLOY_PATH+'/js');
 var APP_DIR = path.resolve(__dirname, 'src/app');
 

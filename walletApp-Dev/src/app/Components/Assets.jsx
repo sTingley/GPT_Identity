@@ -955,7 +955,8 @@ class Modal extends Component {
 
 								<div id="menu1" className="tab-pane">
 									<br></br>
-									<div className="form-group col-md-offset-1 col-md-10">
+									
+									<div>
 										<div className="panel-group" id="accordion">
 											<div className="panel panel-default">
 												<div className="panel-heading">

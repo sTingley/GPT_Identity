@@ -110,7 +110,7 @@ class Modal extends Component {
 			showModal: false,
 
 			inputs_owners: ['input1-0'],
-			inputs_controllers: ['input1-0'],
+
 			recovery_list: [],
 			inputs_delegatees: ['input1-0'],
 			delegatee_id: [],
@@ -120,6 +120,23 @@ class Modal extends Component {
 			select_value: 'Choose Dimension:',
 			inputs_files: ['input-0'], //used in DimensionAttributeForm.jsx
 			dim_control_list: [], //used in DIMENSIONS----RENAME in dependent functions
+
+			inputs_controllers: ['inputCtrl-0'], //dimension controllers and their tokens
+            controllers_pubkeys: [],
+            controllers_tokens: [],
+            control_list: [],
+
+            delegations: ['input1-0'], //COME BACK TO THIS!!!!!!!!!!
+            deleValue: [[]],
+            deleToken: [[]],
+            suggest_attrs: [{
+                addKeys: [13, 188], // Enter and comma
+                inputProps: {
+                    placeholder: "use ENTER to add values",
+                    style: { width: '30%' },
+                    id: "1"
+                }
+            }],
 
 			asset: props.asset || {},
 			asset_class: this.tags.getAssetData("classes"),
@@ -1433,6 +1450,73 @@ class Modal extends Component {
 											</div>
 										</div>
 									</div>
+
+									<div className="panel-group" id="accordion">
+										<div className="panel panel-default">
+											<div className="panel-heading">
+												<div className="row">
+													<div className="col-xs-11">
+														<label>Update Control</label>
+													</div>
+													<div className="col-xs-1">
+														<a data-toggle="collapse" data-parent="#accordion" href="#collapseC">
+															<span className="glyphicon glyphicon-chevron-down"></span>
+														</a>
+													</div>
+												</div>
+											</div>
+											<div id="collapseC" className="panel-collapse collapse out">
+												<div className="panel-body">
+													<div className="row">
+														<table className="table table-striped table-hover" style={syle}>
+															<tbody>
+																<tr>
+																	<td>
+																		<label htmlFor="control_dist">with whom would you like to share your persona and how many times should that person be able to access?</label>
+																		{this.state.delegations.map((input, i) =>
+																			<DimensionDelegationForm attr={this.state.suggest_attrs[i]} max="10" key={input} labelref={input} autocompleteRenderInput={autocompleteRenderInput} deleValue={this.state.deleValue[i]} deleToken={this.state.deleToken[i]} passedFunction={(e) => { this.onFieldChange2("deleValue," + i, e) }} passedFunction2={(e) => { this.onFieldChange2("deleToken," + i, e) }} />)}
+																	</td>
+																</tr>
+																<tr>
+																	<td>
+																		<button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendDelegation.bind(this)}>
+																			<span className="glyphicon glyphicon-plus"></span>Add More</button>
+																	</td>
+																</tr>
+																{/*<tr>
+															<th><b>Delegate access to all attributes:</b></th>
+														</tr>
+														<tr>
+															<td><input id="allAttrs" type="checkbox" />YES</td>
+														</tr>*/}
+																<tr>
+																	<th><b>Access Categories (select 1 or many):</b></th>
+																</tr>
+																<tr>
+																	<td>
+																		<select id="accessCategories" className="selectpicker" multiple="multiple">
+																			{(() => {
+																				if (arrayOfArrays.length > 0) {
+																					return arrayOfArrays.map((attrs, i) => {
+																						return (<option key={i} value={i}>{attrs[0]}</option>)
+																					})
+
+																				}
+																			})(this)}
+																		</select>
+																	</td>
+																</tr>
+															</tbody>
+														</table>
+														<button type="button" className="btn btn-info" onClick={this.requestAddDelegation.bind(this)}>Delegate tokens</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+
+
 								</div>
 
 								<div role="tabpanel" className="tab-pane center-block" id="qrcode" style={qrStyle}>

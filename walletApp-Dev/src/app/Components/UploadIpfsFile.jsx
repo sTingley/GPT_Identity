@@ -67,7 +67,8 @@ class UploadIpfsFile extends React.Component {
         } else {
             //WE COME HERE WHEN WE CLICK SUBMIT?
             console.log("we are in the else");
-            console.log("button: " + ($("button.close").attr("id") == "ipfs"))
+            console.log("button: " + ($("button.close").attr("id")
+             == "ipfs"))
             if (this.state.files.size > 0) {
                 var fileInput = $("input[name=newdoc]");
                 var fData = new FormData();

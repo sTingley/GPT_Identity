@@ -924,7 +924,8 @@ class DimensionForm extends Component {
                                     </tr>
                                     <tr>
                                         <td>
-                                            <button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendDelegation.bind(this)}>
+                                            {/* onClick={this.appendDelegation.bind(this)} */}
+                                            <button type="button" className="btn btn-info pull-right" style={syle}>
                                                 <span className="glyphicon glyphicon-plus"></span>Add More</button>
                                         </td>
                                     </tr>

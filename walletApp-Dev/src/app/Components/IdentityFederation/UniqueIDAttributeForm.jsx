@@ -17,6 +17,9 @@ class UniqueIDAttributesForm extends React.Component {
     }
     render() {
         console.log("UniqueIDAttributeForm props: " + JSON.stringify(this.props));
+        // this.props = {"type":"MyCOID","max":"10","labelref":"input-0"} //for MyGatekeeper.jsx
+        // this.props = {"type":"IDF","max":"10","labelref":"input-0"} //for CoreIdentityForm.jsx
+        // this.props = {"type":"MyGK","max":"10","labelref":"input-0"} //for Assets.jsx (formerly MyCOID.jsx)
         let style = { fontSize: '12.5px' }
         return (
             <div className="form-group col-md-12" style={style}>

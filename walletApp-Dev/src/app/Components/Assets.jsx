@@ -5,6 +5,7 @@ import QRCode from 'qrcode.react';
 import AssetTags from './classAndSubClass.js';
 import DayPicker from 'react-day-picker';
 import UniqueIDAttributeForm from './IdentityFederation/UniqueIDAttributeForm.jsx';
+import DimensionAttributeForm from './IdentityDimension/DimensionAttributeForm.jsx';
 import UploadIpfsFile from './UploadIpfsFile.jsx';
 
 //import { Router, Route, IndexRedirect, hashHistory } from 'react-router';
@@ -114,8 +115,11 @@ class Modal extends Component {
 			inputs_delegatees: ['input1-0'],
 			delegatee_id: [],
 			delegatee_token_quantity: [],
-			//*********************************/
-
+			/********************************
+			Selecting a dimension in menu 3 of Asset view*/
+			select_value: 'Choose Dimension:',
+			inputs_files: ['input-0'], //used in DimensionAttributeForm.jsx
+			dim_control_list: [], //used in DIMENSIONS----RENAME in dependent functions
 
 			asset: props.asset || {},
 			asset_class: this.tags.getAssetData("classes"),
@@ -130,6 +134,7 @@ class Modal extends Component {
 			docs: {}
 
 		};
+		this.handleChange = this.handleChange.bind(this);
 		this.handleClassChange = this.handleClassChange.bind(this);
 		this.handleSubClassChange = this.handleSubClassChange.bind(this);
 		this.maxUniqAttr = 10;
@@ -143,6 +148,11 @@ class Modal extends Component {
 		var multipleValues = {};
 		multipleValues[inputField] = e;
 		this.setState(multipleValues);
+	}
+
+	handleChange(e) {
+		console.log("selected: " + e.target.value);
+		this.setState({ selectValue: e.target.value })
 	}
 
 	handleClassChange(tags) {
@@ -590,10 +600,10 @@ class Modal extends Component {
 
 
 	render() {
+		console.log("this.pubkey: " + this.pubKey);
 
 		console.log("this.props.dimensions: " + JSON.stringify(this.props.dimensions));
-
-		console.log("******" + JSON.stringify(this.state.qrCode_COID_device_relation))
+		//console.log("******" + JSON.stringify(this.state.qrCode_COID_device_relation))
 
 		var _this = this;
 
@@ -646,9 +656,10 @@ class Modal extends Component {
 		//  }
 		// }
 
-		console.log("asset_details.. " + JSON.stringify(prop));
-		console.log("names: " + this.names)
-		console.log("keys: " + this.keys);
+		//console.log("asset_details.. " + JSON.stringify(prop));
+		//console.log("names: " + this.names)
+		//console.log("keys: " + this.keys);
+
 		var style = {
 			fontSize: '12.5px'
 		}
@@ -717,12 +728,12 @@ class Modal extends Component {
 					<div className="modal-content modalstyle">
 
 						<div className="modal-header">
-							<button type="button" id="asset" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times; </span></button>
+							<button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times; </span></button>
 							<ul className="nav nav-pills" role="tablist">
 								<li role="presentation" className="active"><a href="#asset_details" role="tab" data-toggle="tab">Asset Details</a></li>
-								<li role="presentation"><a href="#menu1" role="tab" data-toggle="tab">Menu1</a></li>
-								<li role="presentation"><a href="#menu2" role="tab" data-toggle="tab">Menu2</a></li>
-								<li role="presentation"><a href="#menu3" role="tab" data-toggle="tab">Menu3</a></li>
+								<li role="presentation"><a href="#menu1" role="tab" data-toggle="tab">Edit Asset</a></li>
+								<li role="presentation"><a href="#menu2" role="tab" data-toggle="tab">Dimension Details</a></li>
+								<li role="presentation"><a href="#menu3" role="tab" data-toggle="tab">Edit Dimensions</a></li>
 								<li role="presentation"><a href="#qrcode" role="tab" data-toggle="tab">QR Codes</a></li>
 							</ul>
 						</div>
@@ -955,7 +966,7 @@ class Modal extends Component {
 
 								<div id="menu1" className="tab-pane">
 									<br></br>
-									
+
 									<div>
 										<div className="panel-group" id="accordion">
 											<div className="panel panel-default">
@@ -1112,12 +1123,14 @@ class Modal extends Component {
 																{this.state.inputs_controllers.map(input => <TokenDistributionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
 															</div>
 															<div className="col-md-offset-6 col-md-6 ">
-																<button type="button" className="btn btn-info pull-right" style={style} onClick={this.appendControllers.bind(this)}>
+																{/* onClick={this.appendControllers.bind(this)} */}
+																<button type="button" className="btn btn-info pull-right" style={style}>
 																	<span className="glyphicon glyphicon-plus"></span>Add More
 														</button>
 															</div>
 															<div className="form-group">
-																<button style={style} type="button" className="btn btn-primary" onClick={this.requestUpdateController.bind(this)}>
+																{/* onClick={this.requestUpdateController.bind(this)} */}
+																<button style={style} type="button" className="btn btn-primary">
 																	<span className="glyphicon glyphicon-plus"></span>Update Control
 														</button>
 															</div>
@@ -1241,13 +1254,12 @@ class Modal extends Component {
 								</div>{/*menu1*/}
 
 								<div id="menu2" className="tab-pane fade">
-									<div className="container">
-										<h2>Accordion Example</h2>
-										<p><strong>Note:</strong> The <strong>data-parent</strong> attribute makes sure that all collapsible elements under the specified parent will be closed when one of the collapsible item is shown.</p>
-										{(() => {
-											if (!$.isEmptyObject(this.props.dimensions)) {
-												return this.props.dimensions.map((dims, i) => {
-													return(
+									<h4>Data Repositories (Identity Dimensions)</h4>
+									{/*Note: data-parent attribute makes sure that all collapsible elements under the specified parent will be closed when one of the collapsible item is shown*/}
+									{(() => {
+										if (!$.isEmptyObject(this.props.dimensions)) {
+											return this.props.dimensions.map((dims, i) => {
+												return (
 													<div className="panel-group" id="accordion">
 														<div className="panel panel-default">
 															<div className="panel-heading">
@@ -1255,107 +1267,165 @@ class Modal extends Component {
 																	<a data-toggle="collapse" data-parent="#accordion" href={"#collapse_" + i}>{dims.dimensionName}</a>
 																</h4>
 															</div>
-															<div id={"collapse_" + i} className="panel-collapse collapse in">
+															<div id={"collapse_" + i} className="panel-collapse collapse out">
 																<div className="panel-body">
-																	<table className="table table-striped table-hover" style={syle}>
-																		<tbody>
-																			<tr>
-																				<td>Contract Address</td>
-																				<td>{dims.coidAddr}</td>
-																			</tr>
-																			<tr>
-																				<td>Asset Owner List</td>
-																			</tr>
-																		</tbody>
-																	</table>
+																	<div className="row">
+																		<table className="table table-striped table-hover" style={syle}>
+																			<tbody>
+																				<tr>
+																					<td>Contract Address</td>
+																					<td>{dims.coidAddr}</td>
+																				</tr>
+																				<tr>
+																					<td>Asset Owner List</td>
+																				</tr>
+																			</tbody>
+																		</table>
+																	</div>
 																</div>
 															</div>
 														</div>
 													</div>)
-												})
-											}
-										})(this)}
+											})
+										}
+									})(this)}
 
 
-									</div>{/*container*/}
+									{/* </div>container */}
 								</div>{/*menu2*/}
 
 								<div id="menu3" className="tab-pane fade">
-									<br></br>
-									<div>
-										<div className="panel-group" id="accordion">
-											<div className="panel panel-default">
-												<div className="panel-heading">
-													<div className="row">
-														<div className="col-xs-11">
-															<label>Manage Owner</label>
-														</div>
-														<div className="col-xs-1">
-															<a data-toggle="collapse" data-parent="#accordion" href="#collapseA">
-																<span className="glyphicon glyphicon-chevron-down"></span>
-															</a>
-														</div>
+									<br />
+									<label>Select Dimension:</label><br />
+									<select defaultValue={this.state.selectValue} onChange={this.handleChange}>
+										{(() => {
+											if (!$.isEmptyObject(this.props.dimensions)) {
+												return this.props.dimensions.map((dims, i) => {
+													return (
+														<option value={dims.dimensionName} key={i}>{dims.dimensionName} </option>
+													)
+												})
+											}
+											else return (<option>No Dimensions</option>)
+										})(this)}
+									</select>
+									<hr />
+									<div className="panel-group" id="accordion">
+										<div className="panel panel-default">
+											<div className="panel-heading">
+												<div className="row">
+													<div className="col-xs-11">
+														<label>Update Attributes</label>
+													</div>
+													<div className="col-xs-1">
+														<a data-toggle="collapse" data-parent="#accordion" href="#collapseA">
+															<span className="glyphicon glyphicon-chevron-down"></span>
+														</a>
 													</div>
 												</div>
-												<div id="collapseA" className="panel-collapse collapse out">
-													<div className="panel-body">
-														<div className="row">
-															<div className="col-md-8">
-																<label htmlFor="unique_id">Enter Unique ID Attributes</label>
-																<input className="form-control col-md-4" type="text" placeholder="e.g.Serial Numbers, MAC Addresse" />
+											</div>
+											<div id="collapseA" className="panel-collapse collapse out">
+												<div className="panel-body">
+													<div className="row">
+														<form method="POST" id="register" role="form">
+
+															<div className="form-group">
+																<label>Are you adding an attested identity claims as an entry?</label>
+																<select id="addICA" onChange={this.addICA}>
+																	<option value="selectOption">--- Please select ---</option>
+																	<option value="Yes">Yes</option>
+																	<option value="No">No</option>
+																</select>
 															</div>
-															<div className="col-md-4">
-																<div className="row">
-																	<button type="button" className="btn btn-md btn-warning "><span className="glyphicon glyphicon-upload">                                         </span>Upload File</button>
+															{(() => {
+																if (this.state.addingICA == true) {
+																	return (
+																		<div className="form-group">
+																			<h5><b>Select claim:</b></h5>
+																			<select id="ICAassetSelect" className="selectpicker show-tick" value={this.state.selectedAsset_addDimAttr} onChange={this.selectfromICAs}>
+																				<option value="">--- Please select ---</option>
+																				{(() => {
+																					if (this.state.ICA_assets.length > 0) {
+																						return this.state.ICA_assets.map((asset, i) => {
+																							console.log("element: " + JSON.stringify(asset));
+																							return <option key={i} value={asset.asset_id}>{asset.asset_id}</option>
+																						})
+																					}
+																					else { return <option>No claims found.</option> }
+																				})(this)}
+																			</select>
+																		</div>
+																	)
+																}
+															})(this)}
+
+															<div className="form-group" id="unique_id_div">
+																<label htmlFor="unique_id">Enter descriptor(s) and attribute(s):</label>
+																{this.state.inputs_files.map(input => <DimensionAttributeForm handleShowModal={this.handleShowModal.bind(this)} max="10" key={input} labelref={input} />)}
+															</div>
+
+															<div className="form-group" id="unique_id_btn">
+																<div className="col-md-offset-6 col-md-6 ">
+																	{/* onClick={this.appendAttribute.bind(this)} */}
+																	<button type="button" className="btn btn-info pull-right" style={syle}>
+																		<span className="glyphicon glyphicon-plus"></span>Add More
+																							</button>
 																</div>
-																<div className="row">
-																	<button type="button" className="btn btn-m btn-info addbutton">
-																		<span className="glyphicon glyphicon-plus"></span>Add More</button>
-																</div>
+															</div>
+														</form>
+
+														<div className="form-group">
+															<div className="col-sm-6">
+																{/* onClick={this.updateAttributes.bind(this)} */}
+																<button className="btn btn-primary" data-loading-text="Submit" name="submit-form">Add Attribute(s)</button>
 															</div>
 														</div>
+
+														{this.state.showModal ? <UploadIpfsFile pubKey={this.pubKey} flag={1} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}
 													</div>
 												</div>
 											</div>
 										</div>
-										<div className="panel-group" id="accordion">
-											<div className="panel panel-default">
-												<div className="panel-heading">
-													<div className="row">
-														<div className="col-xs-11">
-															<label>manage Ownership</label>
-														</div>
-														<div className="col-xs-1">
-															<a data-toggle="collapse" data-parent="#accordion" href="#collapseB">
-																<span className="glyphicon glyphicon-chevron-down"></span>
-															</a>
-														</div>
-														<div className="form-group">
-															<label htmlFor="unique_id">Enter Unique ID Attributes:</label>
-															{this.state.inputs.map(input => <UniqueIDAttributeForm type="MyCOID" handleShowModal={this.handleShowModal.bind(this)} max="10" key={input} labelref={input} />)}
-														</div>
-														<div className="col-md-offset-6 col-md-6 ">
-															<button type="button" className="btn btn-info pull-right" style={style} onClick={this.appendInput.bind(this)}>
-																<span className="glyphicon glyphicon-plus"></span>Add More
-							    							</button>
-														</div>
+									</div>
+									<div className="panel-group" id="accordion">
+										<div className="panel panel-default">
+											<div className="panel-heading">
+												<div className="row">
+													<div className="col-xs-11">
+														<label>Update Control</label>
+													</div>
+													<div className="col-xs-1">
+														<a data-toggle="collapse" data-parent="#accordion" href="#collapseB">
+															<span className="glyphicon glyphicon-chevron-down"></span>
+														</a>
 													</div>
 												</div>
-												<div id="collapseB" className="panel-collapse collapse out">
-													<div className="panel-body">
-														<div className="row">
-															<div className="col-md-8">
-																<label htmlFor="unique_id">Enter Unique ID Attributes</label>
-																<input className="form-control col-md-4" type="text" placeholder="e.g.Serial Numbers, MAC Addresse" />
+											</div>
+											<div id="collapseB" className="panel-collapse collapse out">
+												<div className="panel-body">
+													<div className="row">
+														<form method="POST" id="add_controller" role="form">
+
+															<div className="form-group">
+																{/* renderInput={autocompleteRenderInput} */}
+																<label htmlFor="control_dist">Enter additional persona controllers. Note: Core Identity controllers will automatically be controllers of the persona.</label>
+																<TagsInput maxTags={10} value={this.state.dim_control_list} onChange={(e) => { this.onFieldChange("dim_control_list", e) }} />
 															</div>
-															<div className="col-md-4">
-																<div className="row">
-																	<button type="button" className="btn btn-md btn-warning "><span className="glyphicon glyphicon-upload">                                         </span>Upload File</button>
+
+															<div className="form-group" id="controllers_dimension_btn">
+																<div className="col-md-offset-6 col-md-6 ">
+																	{/* onClick={this.addController.bind(this)} */}
+																	<button type="button" className="btn btn-info pull-right" style={syle}>
+																		<span className="glyphicon glyphicon-plus"></span>Add More
+																																				</button>
 																</div>
-																<div className="row">
-																	<button type="button" className="btn btn-m btn-info addbutton">
-																		<span className="glyphicon glyphicon-plus"></span>Add More</button>
-																</div>
+															</div>
+														</form>
+
+														<div className="form-group">
+															<div className="col-sm-6">
+																{/* onClick={this.requestAddController.bind(this)} */}
+																<button className="btn btn-primary" data-loading-text="Submit" name="submit-form">Add Controller(s)</button>
 															</div>
 														</div>
 													</div>
@@ -1367,7 +1437,7 @@ class Modal extends Component {
 
 								<div role="tabpanel" className="tab-pane center-block" id="qrcode" style={qrStyle}>
 									<QRCode value={qrConfig} size={200} /><hr />
-									{this.state.notCOID ? <h2>abc</h2> : null}
+									{this.state.notCOID ? <h6>Validate Owner-Device Relationship</h6> : null}
 									{this.state.notCOID ? <QRCode value={qrOwnedDevice} size={200} /> : null}
 								</div>
 
@@ -1709,7 +1779,7 @@ class Dims extends Component {
 					<div className="modal-content">
 
 						<div className="modal-header">
-							<button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times; </span></button>
+							<button type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times; </span></button>
 							<ul id="mytabs" className="nav nav-pills" role="tablist">
 								<li role="presentation" className="active"><a href="#asset_details" role="tab" data-toggle="tab">Dimension Details</a></li>
 								<li role="presentation"><a href="#show_descriptors" role="tab" data-toggle="tab">Descriptors</a></li>

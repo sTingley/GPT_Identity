@@ -37,8 +37,8 @@ class MyGatekeeper extends React.Component {
 			signature: '',
 			assetID: [],
 			dimensions: '',
-			names: localStorage.getItem("contactNames").split(','),
-			keys: localStorage.getItem("contactPubKeys").split(','),
+			//names: localStorage.getItem("contactNames").split(','),
+			//keys: localStorage.getItem("contactPubKeys").split(','),
 			value: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
 			suggest_attrs: [{
 				addKeys: [13, 188],	// Enter and comma
@@ -673,54 +673,54 @@ class MyGatekeeper extends React.Component {
 			if (inputValue == 'undefined') { inputValue = ""; }
 			var inputLength = inputValue.length || 0
 
-			const suggestions = that.state.names.filter((name) => {
-				console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
-				console.log(inputValue);
-				var re = new RegExp(inputValue, "i");
-				return (Boolean(name.slice(0, inputLength).search(re) + 1))
-				//return (name.toLowerCase().slice(0, inputLength) === inputValue  || name.toUpperCase().slice(0, inputLength) === inputValue)
-			})
+			// const suggestions = that.state.names.filter((name) => {
+			// 	console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
+			// 	console.log(inputValue);
+			// 	var re = new RegExp(inputValue, "i");
+			// 	return (Boolean(name.slice(0, inputLength).search(re) + 1))
+			// 	//return (name.toLowerCase().slice(0, inputLength) === inputValue  || name.toUpperCase().slice(0, inputLength) === inputValue)
+			// })
 
-			var value = String(that.state.value[Number(passed.id)]) || "";
-			if (value == 'undefined') { value = ""; }
-			//const suggestions = that.state.suggestions;
-			console.log("passed ID: " + passed.id);
-			console.log("suggestions: " + suggestions);
-			console.log("value: " + value);
-			const inputProps = {
-				placeholder: passed.placeholder,
-				value,
-				style: {
-					width: '30%',
-					height: '100%',
-					display: "initial"
-				},
-				onChange: handleOnChange,
-				onKeyPress: handleKeyPress,
-				className: "react-tagsinput-input",
-				id: passed.id
-			};
-			return (
-				<Autosuggest
-					id={passed.id}
-					ref={passed.ref}
-					suggestions={suggestions}
-					shouldRenderSuggestions={(value) => value.length > 0}
-					getSuggestionValue={(suggestion) => suggestion}
-					renderSuggestion={(suggestion) => <span>{suggestion}</span>}
-					inputProps={inputProps}
-					onSuggestionSelected={(e, { suggestion, method }) => {
-						console.log("SELECTED: " + method)
-						if (method == 'click') {
-							addTag(suggestion)
-							that.state.value[passed.id] = "";
-						}
-					}}
-					onSuggestionsClearRequested={() => { }}
-					onSuggestionsFetchRequested={() => { }}
-					renderInputComponent={renderInputComponent}
-				/>
-			)
+			// var value = String(that.state.value[Number(passed.id)]) || "";
+			// if (value == 'undefined') { value = ""; }
+			// //const suggestions = that.state.suggestions;
+			// console.log("passed ID: " + passed.id);
+			// console.log("suggestions: " + suggestions);
+			// console.log("value: " + value);
+			// const inputProps = {
+			// 	placeholder: passed.placeholder,
+			// 	value,
+			// 	style: {
+			// 		width: '30%',
+			// 		height: '100%',
+			// 		display: "initial"
+			// 	},
+			// 	onChange: handleOnChange,
+			// 	onKeyPress: handleKeyPress,
+			// 	className: "react-tagsinput-input",
+			// 	id: passed.id
+			// };
+			// return (
+			// 	<Autosuggest
+			// 		id={passed.id}
+			// 		ref={passed.ref}
+			// 		suggestions={suggestions}
+			// 		shouldRenderSuggestions={(value) => value.length > 0}
+			// 		getSuggestionValue={(suggestion) => suggestion}
+			// 		renderSuggestion={(suggestion) => <span>{suggestion}</span>}
+			// 		inputProps={inputProps}
+			// 		onSuggestionSelected={(e, { suggestion, method }) => {
+			// 			console.log("SELECTED: " + method)
+			// 			if (method == 'click') {
+			// 				addTag(suggestion)
+			// 				that.state.value[passed.id] = "";
+			// 			}
+			// 		}}
+			// 		onSuggestionsClearRequested={() => { }}
+			// 		onSuggestionsFetchRequested={() => { }}
+			// 		renderInputComponent={renderInputComponent}
+			// 	/>
+			// )
 		}
 
 		var basicAttrs = {

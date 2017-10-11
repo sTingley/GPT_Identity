@@ -1001,8 +1001,8 @@ class IdentityDimensions extends Component {
                 }
             }],
 
-            names: localStorage.getItem("contactNames").split(','),
-            keys: localStorage.getItem("contactPubKeys").split(','),
+            //names: localStorage.getItem("contactNames").split(','),
+            //keys: localStorage.getItem("contactPubKeys").split(','),
             value: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
 
             //******************************************************FOR SUGGESTIONS */
@@ -1528,36 +1528,36 @@ class IdentityDimensions extends Component {
         //^^^^^ for the ajax
 
         //************************************************************************* */
-        var tempArr = this.state.control_list.toString().split(',');
-        for (var x = 0; x < tempArr.length; x++) {
-            if (tempArr[x] == "") {
-                tempArr.splice(x, 1);
-            }
-        }
-        this.state.control_list = tempArr;
-        for (var x = 0; x < this.state.control_list.length; x++) {
-            var index = this.state.names.indexOf(this.state.control_list[x]);
-            if (index >= 0) {
-                this.state.control_list[x] = this.state.keys[index];
-            }
-        }
-        //**********************flatten 2D array, remove empty values, and replace word values with publick keys*************************************************
-        var tempArr = this.state.deleValue.toString().split(',');
-        var tempArr2 = this.state.deleToken.toString().split(',');
-        for (var x = 0; x < tempArr.length; x++) {
-            if (tempArr[x] == "") {
-                tempArr.splice(x, 1);
-                tempArr2.splice(x, 1);
-            }
-        }
-        this.state.deleValue = tempArr;
-        this.state.deleToken = tempArr2;
-        for (var x = 0; x < this.state.deleValue.length; x++) {
-            var index = this.state.names.indexOf(this.state.deleValue[x]);
-            if (index >= 0) {
-                this.state.deleValue[x] = this.state.keys[index];
-            }
-        }
+        // var tempArr = this.state.control_list.toString().split(',');
+        // for (var x = 0; x < tempArr.length; x++) {
+        //     if (tempArr[x] == "") {
+        //         tempArr.splice(x, 1);
+        //     }
+        // }
+        // this.state.control_list = tempArr;
+        // for (var x = 0; x < this.state.control_list.length; x++) {
+        //     var index = this.state.names.indexOf(this.state.control_list[x]);
+        //     if (index >= 0) {
+        //         this.state.control_list[x] = this.state.keys[index];
+        //     }
+        // }
+        // //**********************flatten 2D array, remove empty values, and replace word values with publick keys*************************************************
+        // var tempArr = this.state.deleValue.toString().split(',');
+        // var tempArr2 = this.state.deleToken.toString().split(',');
+        // for (var x = 0; x < tempArr.length; x++) {
+        //     if (tempArr[x] == "") {
+        //         tempArr.splice(x, 1);
+        //         tempArr2.splice(x, 1);
+        //     }
+        // }
+        // this.state.deleValue = tempArr;
+        // this.state.deleToken = tempArr2;
+        // for (var x = 0; x < this.state.deleValue.length; x++) {
+        //     var index = this.state.names.indexOf(this.state.deleValue[x]);
+        //     if (index >= 0) {
+        //         this.state.deleValue[x] = this.state.keys[index];
+        //     }
+        // }
         //*************************************************************************
         //*************************************************************************
         //*************************************************************************

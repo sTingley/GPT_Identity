@@ -26,17 +26,22 @@ class UploadIpfsFile extends React.Component {
             }.bind(this)
         });
 
-        if(this.props.flag) {
-            $("#descriptors .modal").modal('show');
-            $("#descriptors .modal").on('hidden.bs.modal', this.props.handleHideModal);
-        }
+        //COMMENTED OUT BC WE ARE MOVING AWAY FROM THE SEPERATE IDENTITYDIMENSION.jsx
+        //this comes from IdentityDimension.jsx, DimensionForm updateAttrs flow
+        // if(this.props.flag) {
+        //     $("#descriptors .modal").modal('show');
+        //     $("#descriptors .modal").on('hidden.bs.modal', this.props.handleHideModal);
+        // }
+
         if(this.props.addOfficialID) {
             $("#assetDetails .modal").modal('show');
             $("#assetDetails .modal").on('hidden.bs.modal', this.props.handleHideModal);
         }
+        else{
+            $("#SubmitContainer .modal").modal('show');
+            $("#SubmitContainer .modal").on('hidden.bs.modal', this.props.handleHideModal);
+        }
 
-        $("#SubmitContainer .modal").modal('show');
-        $("#SubmitContainer .modal").on('hidden.bs.modal', this.props.handleHideModal);
     }
 
     uploadHandler(data, additionalParams) {
@@ -56,9 +61,13 @@ class UploadIpfsFile extends React.Component {
         e.preventDefault();
         if (this.state.selected != "0") {
             var hash, fileHash;
+            //dataHandler is bound to the parent and passed back 'selected'
             this.props.dataHandler(this.state.selected);
             $("button.close").trigger("click");
         } else {
+            //WE COME HERE WHEN WE CLICK SUBMIT?
+            console.log("we are in the else");
+            console.log("button: " + ($("button.close").attr("id") == "ipfs"))
             if (this.state.files.size > 0) {
                 var fileInput = $("input[name=newdoc]");
                 var fData = new FormData();
@@ -77,10 +86,7 @@ class UploadIpfsFile extends React.Component {
                             var filedata = resp.uploded[0].hash + "|" + resp.uploded[0].file_hash;
                             //data handler forms JSON object
                             this.props.dataHandler(filedata);
-                            if ($("button.close").attr("id") == "asset"){
-                                console.log("we have hit the asset button");
-                                $("button.close").trigger("click");
-                            }
+                            $("button.close").trigger("click");
                         }
                     }.bind(this),
                     complete: () => {
@@ -101,16 +107,18 @@ class UploadIpfsFile extends React.Component {
     }
 
     render() {
-        //console.log("UploadIpfsFile state: " + JSON.stringify(this.state))
-        var center = {
-            textAlign: 'center'
-        };
+        console.log("UploadIpfsFile props: " + JSON.stringify(this.props));
+        //this.props = UploadIpfsFile props: {"pubKey":"02c3b8b123806fb420e6daa17f87a9eae3246260da62b50f775acb4c701d0d79ef"} //CoreIdentityForm.jsx
+        //this.props = UploadIpfsFile props: {"pubKey":"02c3b8b123806fb420e6daa17f87a9eae3246260da62b50f775acb4c701d0d79ef"} //MyGatekeeper.jsx
+        //this.props = {"addOfficialID":true,"pubKey":"02c3b8b123806fb420e6daa17f87a9eae3246260da62b50f775acb4c701d0d79ef"} //Assets.jsx (formerly MyCOID.jsx) adding attrs
+        var center = { textAlign: 'center' };
+
         return (
             <div className="modal fade">
                 <div className="modal-dialog">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <button type="button" id="ipfs_button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                             <h4 className="modal-title">Upload Document</h4>
                         </div>
                         <div className="modal-body">

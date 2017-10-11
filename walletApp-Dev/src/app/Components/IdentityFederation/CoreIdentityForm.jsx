@@ -34,9 +34,9 @@ class CoreIdentity extends React.Component {
 			pubKey: localStorage.getItem("pubKey"),
 			privKey: localStorage.getItem("privKey"),
 			signature: '',
-			names: localStorage.getItem("contactNames").split(','),
-			keys: localStorage.getItem("contactPubKeys").split(','),
-			value: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+			//names: localStorage.getItem("contactNames").split(','),
+			//keys: localStorage.getItem("contactPubKeys").split(','),
+			//value: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
 			suggest_attrs: [{
 				addKeys: [13, 188],	// Enter and comma
 				inputProps: {
@@ -144,37 +144,37 @@ class CoreIdentity extends React.Component {
 		console.log("we will call createHashAttribute, to get uniqueId: " + this.createHashAttribute(this.state.file_attrs));
 
 		//replace any values that are not pubkeys, if they are in your contacts list
-		for (var x = 0; x < this.state.recovery_id.length; x++) {
-			var index = this.state.names.indexOf(this.state.recovery_id[x]);
-			if (index >= 0) {
-				this.state.recovery_id[x] = this.state.keys[index];
-			}
-		}
-		for (var x = 0; x < this.state.owner_id.length; x++) {
-			var index = this.state.names.indexOf(this.state.owner_id[x]);
-			if (index >= 0) {
-				this.state.owner_id[x] = this.state.keys[index];
-				console.log("CHANGED: " + this.state.owner_id[x]);
-			}
-		}
-		var tempArr = this.state.control_id.toString().split(',');
-		var tempArr2 = this.state.control_token_quantity.toString().split(',');
-		for (var x = 0; x < tempArr.length; x++) {
-			if (tempArr[x] == "") {
-				tempArr.splice(x, 1);
-				tempArr2.splice(x, 1);
-			}
-		}
-		this.state.control_id = tempArr;
-		this.state.control_token_quantity = tempArr2;
+		// for (var x = 0; x < this.state.recovery_id.length; x++) {
+		// 	var index = this.state.names.indexOf(this.state.recovery_id[x]);
+		// 	if (index >= 0) {
+		// 		this.state.recovery_id[x] = this.state.keys[index];
+		// 	}
+		// }
+		// for (var x = 0; x < this.state.owner_id.length; x++) {
+		// 	var index = this.state.names.indexOf(this.state.owner_id[x]);
+		// 	if (index >= 0) {
+		// 		this.state.owner_id[x] = this.state.keys[index];
+		// 		console.log("CHANGED: " + this.state.owner_id[x]);
+		// 	}
+		// }
+		// var tempArr = this.state.control_id.toString().split(',');
+		// var tempArr2 = this.state.control_token_quantity.toString().split(',');
+		// for (var x = 0; x < tempArr.length; x++) {
+		// 	if (tempArr[x] == "") {
+		// 		tempArr.splice(x, 1);
+		// 		tempArr2.splice(x, 1);
+		// 	}
+		// }
+		// this.state.control_id = tempArr;
+		// this.state.control_token_quantity = tempArr2;
 
-		console.log("tempArr: " + tempArr);
-		for (var x = 0; x < this.state.control_id.length; x++) {
-			var index = this.state.names.indexOf(this.state.control_id[x]);
-			if (index >= 0) {
-				this.state.control_id[x] = this.state.keys[index];
-			}
-		}
+		// console.log("tempArr: " + tempArr);
+		// for (var x = 0; x < this.state.control_id.length; x++) {
+		// 	var index = this.state.names.indexOf(this.state.control_id[x]);
+		// 	if (index >= 0) {
+		// 		this.state.control_id[x] = this.state.keys[index];
+		// 	}
+		// }
 		var inputObj = {
 			"pubKey": this.refs.pubKey.value,
 			//"sig": this.refs.signature.value,
@@ -440,84 +440,84 @@ class CoreIdentity extends React.Component {
 
 		function autocompleteRenderInput({ addTag, props }) {
 
-			var passed = JSON.stringify(arguments[0]);
-			console.log("passed: " + passed + JSON.stringify(arguments[1]));
-			passed = JSON.parse(passed);
+		// 	var passed = JSON.stringify(arguments[0]);
+		// 	console.log("passed: " + passed + JSON.stringify(arguments[1]));
+		// 	passed = JSON.parse(passed);
 
-			const handleOnChange = (e, { newValue, method }) => {
-				console.log("handleonchange params: " + e + "   " + newValue + "   " + method + "   " + passed.id);
-				if (method === 'enter' || method === 'click') {
-					that.state.value[passed.id] = "";
-					e.preventDefault()
-				} else {
-					that.onChange(e, { newValue }, passed.id)
-				}
-			}
-			const handleKeyPress = (event) => {
-				console.log('enter press here! ' + event.key)
-				if (event.key == 'Enter') {
-					event.preventDefault()
-					addTag(that.state.value[passed.id])
-					that.state.value[passed.id] = "";
-					console.log('current tags: ' + that.state.tags)
-				}
-			}
+		// 	const handleOnChange = (e, { newValue, method }) => {
+		// 		console.log("handleonchange params: " + e + "   " + newValue + "   " + method + "   " + passed.id);
+		// 		if (method === 'enter' || method === 'click') {
+		// 			that.state.value[passed.id] = "";
+		// 			e.preventDefault()
+		// 		} else {
+		// 			that.onChange(e, { newValue }, passed.id)
+		// 		}
+		// 	}
+		// 	const handleKeyPress = (event) => {
+		// 		console.log('enter press here! ' + event.key)
+		// 		if (event.key == 'Enter') {
+		// 			event.preventDefault()
+		// 			addTag(that.state.value[passed.id])
+		// 			that.state.value[passed.id] = "";
+		// 			console.log('current tags: ' + that.state.tags)
+		// 		}
+		// 	}
 
-			const renderInputComponent = inputProps => (
-				<input {...inputProps} />
-			);
-			var inputValue = that.state.value[Number(passed.id)] || "";
-			if (inputValue == 'undefined') { inputValue = ""; }
-			var inputLength = inputValue.length || 0
+		// 	const renderInputComponent = inputProps => (
+		// 		<input {...inputProps} />
+		// 	);
+		// 	var inputValue = that.state.value[Number(passed.id)] || "";
+		// 	if (inputValue == 'undefined') { inputValue = ""; }
+		// 	var inputLength = inputValue.length || 0
 
-			const suggestions = that.state.names.filter((name) => {
-				console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
-				return name.toLowerCase().slice(0, inputLength) === inputValue
-			})
-			///////////////////////////////////////
+		// 	const suggestions = that.state.names.filter((name) => {
+		// 		console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
+		// 		return name.toLowerCase().slice(0, inputLength) === inputValue
+		// 	})
+		// 	///////////////////////////////////////
 
 
 
-			var value = String(that.state.value[Number(passed.id)]) || "";
-			if (value == 'undefined') { value = ""; }
-			//const suggestions = that.state.suggestions;
-			console.log("passed ID: " + passed.id);
-			console.log("suggestions: " + suggestions);
-			console.log("value: " + value);
-			const inputProps = {
-				placeholder: passed.placeholder,
-				value,
-				style: {
-					width: '30%',
-					height: '100%',
-					display: "initial"
-				},
-				onChange: handleOnChange,
-				onKeyPress: handleKeyPress,
-				className: "react-tagsinput-input",
-				id: passed.id
-			};
-			return (
-				<Autosuggest
-					id={passed.id}
-					ref={passed.ref}
-					suggestions={suggestions}
-					shouldRenderSuggestions={(value) => value.length > 0}
-					getSuggestionValue={(suggestion) => suggestion}
-					renderSuggestion={(suggestion) => <span>{suggestion}</span>}
-					inputProps={inputProps}
-					onSuggestionSelected={(e, { suggestion, method }) => {
-						console.log("SELECTED: " + method)
-						if (method == 'click') {
-							addTag(suggestion)
-							that.state.value[passed.id] = "";
-						}
-					}}
-					onSuggestionsClearRequested={() => { }}
-					onSuggestionsFetchRequested={() => { }}
-					renderInputComponent={renderInputComponent}
-				/>
-			)
+		// 	var value = String(that.state.value[Number(passed.id)]) || "";
+		// 	if (value == 'undefined') { value = ""; }
+		// 	//const suggestions = that.state.suggestions;
+		// 	console.log("passed ID: " + passed.id);
+		// 	console.log("suggestions: " + suggestions);
+		// 	console.log("value: " + value);
+		// 	const inputProps = {
+		// 		placeholder: passed.placeholder,
+		// 		value,
+		// 		style: {
+		// 			width: '30%',
+		// 			height: '100%',
+		// 			display: "initial"
+		// 		},
+		// 		onChange: handleOnChange,
+		// 		onKeyPress: handleKeyPress,
+		// 		className: "react-tagsinput-input",
+		// 		id: passed.id
+		// 	};
+		// 	return (
+		// 		<Autosuggest
+		// 			id={passed.id}
+		// 			ref={passed.ref}
+		// 			suggestions={suggestions}
+		// 			shouldRenderSuggestions={(value) => value.length > 0}
+		// 			getSuggestionValue={(suggestion) => suggestion}
+		// 			renderSuggestion={(suggestion) => <span>{suggestion}</span>}
+		// 			inputProps={inputProps}
+		// 			onSuggestionSelected={(e, { suggestion, method }) => {
+		// 				console.log("SELECTED: " + method)
+		// 				if (method == 'click') {
+		// 					addTag(suggestion)
+		// 					that.state.value[passed.id] = "";
+		// 				}
+		// 			}}
+		// 			onSuggestionsClearRequested={() => { }}
+		// 			onSuggestionsFetchRequested={() => { }}
+		// 			renderInputComponent={renderInputComponent}
+		// 		/>
+		// 	)
 		}
 
 

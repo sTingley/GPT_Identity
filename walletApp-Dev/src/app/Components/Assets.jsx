@@ -152,7 +152,7 @@ class Modal extends Component {
 			docs: {}
 
 		};
-		this.handleChange = this.handleChange.bind(this);
+		this.handleSelectViewDimension = this.handleSelectViewDimension.bind(this);
 		this.handleClassChange = this.handleClassChange.bind(this);
 		this.handleSubClassChange = this.handleSubClassChange.bind(this);
 		this.maxUniqAttr = 10;
@@ -168,7 +168,7 @@ class Modal extends Component {
 		this.setState(multipleValues);
 	}
 
-	handleChange(e) {
+	handleSelectViewDimension(e) {
 		console.log("selected: " + e.target.value);
 		this.setState({ selectValue: e.target.value })
 	}
@@ -297,7 +297,7 @@ class Modal extends Component {
 	}
 
 	//**********************************************************************
-	// START OFFICAL ID FUNCTIONS:
+	// START ASSET OFFICAL ID FUNCTIONS:
 
 	appendInput() {
 		console.log("hit append Input")
@@ -397,12 +397,12 @@ class Modal extends Component {
 		})
 
 	}
-	// END OFFICIAL ID FUNCTIONS:
+	// END ASSET OFFICIAL ID FUNCTIONS:
 	//**********************************************************************
 	//**********************************************************************
 	// START OWNERSHIP UPDATE FUNCTIONS:
 
-	//used in tokendistrubtionform
+	//used in tokendistrubtionform (ASSETS)
 	appendOwners() {
 		var inputLen = this.state.inputs_owners.length;
 		if (inputLen < 10) {
@@ -549,7 +549,7 @@ class Modal extends Component {
 	// END CONTROLLER UPDATE FUNCTIONS:
 	//**********************************************************************
 	//**********************************************************************
-	// START DELEGATEE FUNCTIONS
+	// START ASSET DELEGATION FUNCTIONS
 
 	//used in tokendistrubtionform
 	appendDelegatees() {
@@ -742,6 +742,8 @@ class Modal extends Component {
 
 		return (
 			<div className="modal fade" id="assetDetails" key={this.props.asset.asset_id} tabIndex="-1" role="dialog" aria-labelledby="asset">
+				
+				
 				<div className="modal-dialog modal-lg" role="document" style={popUpWidth}>
 					<div className="modal-content modalstyle">
 
@@ -752,6 +754,7 @@ class Modal extends Component {
 								<li role="presentation"><a href="#menu1" role="tab" data-toggle="tab">Edit Asset</a></li>
 								<li role="presentation"><a href="#menu2" role="tab" data-toggle="tab">Dimension Details</a></li>
 								<li role="presentation"><a href="#menu3" role="tab" data-toggle="tab">Edit Dimensions</a></li>
+								<li role="presentation"><a href="#menu4" role="tab" data-toggle="tab">Create Dimension</a></li>
 								<li role="presentation"><a href="#qrcode" role="tab" data-toggle="tab">QR Codes</a></li>
 							</ul>
 						</div>
@@ -1271,7 +1274,7 @@ class Modal extends Component {
 
 								</div>{/*menu1*/}
 
-								<div id="menu2" className="tab-pane fade">
+								<div id="menu2" className="tab-pane">
 									<h4>Data Repositories (Identity Dimensions)</h4>
 									{/*Note: data-parent attribute makes sure that all collapsible elements under the specified parent will be closed when one of the collapsible item is shown*/}
 									{(() => {
@@ -1312,10 +1315,10 @@ class Modal extends Component {
 									{/* </div>container */}
 								</div>{/*menu2*/}
 
-								<div id="menu3" className="tab-pane fade">
-									<br />
+								<div id="menu3" className="tab-pane">
+									<a href="#identitydimension">CREATE NEW</a><br />
 									<label>Select Dimension:</label><br />
-									<select defaultValue={this.state.selectValue} onChange={this.handleChange}>
+									<select defaultValue={this.state.selectValue} onChange={this.handleSelectViewDimension}>
 										{(() => {
 											if (!$.isEmptyObject(this.props.dimensions)) {
 												return this.props.dimensions.map((dims, i) => {
@@ -1520,6 +1523,11 @@ class Modal extends Component {
 									</div>
 
 
+
+								</div>
+
+								<div id="menu4" className="tab-pane">
+									HERE WE WILL ADD THE CREATE DIMENSION!!!!!!
 
 								</div>
 

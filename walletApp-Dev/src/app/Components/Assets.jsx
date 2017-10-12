@@ -4,97 +4,21 @@ import TagsInput from 'react-tagsinput';
 import QRCode from 'qrcode.react';
 import AssetTags from './classAndSubClass.js';
 import DayPicker from 'react-day-picker';
+import TokenDistributionForm from './TokenDistributionForm.jsx';
 import UniqueIDAttributeForm from './IdentityFederation/UniqueIDAttributeForm.jsx';
 import DimensionAttributeForm from './IdentityDimension/DimensionAttributeForm.jsx';
 import DimensionDelegationForm from './IdentityDimension/DimensionDelegationForm.jsx';
 import UploadIpfsFile from './UploadIpfsFile.jsx';
 
-//import { Router, Route, IndexRedirect, hashHistory } from 'react-router';
-
-//var crypto = require('crypto');
+//USED TO SIGN REQUESTS
 var secp256k1 = require('secp256k1');
 var keccak_256 = require('js-sha3').keccak_256;
 
 // TODO: Static public/private keys has to be changed
-
-class TokenDistributionForm extends React.Component {
-
-	constructor(props) {
-		super(props)
-	}
-
-	render() {
-		var style = {
-			fontSize: '12.5px'
-		}
-		return (
-			<div className="form-group col-md-12">
-				<div className="col-md-10">
-					<table className="table table-striped table-hover" style={style}>
-						<tbody>
-							<tr>
-								<th><b>Public Key</b></th>
-								<th><b>Token Quantity</b></th>
-							</tr>
-							<tr>
-								<td><input name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Public Key" /></td>
-								<td><input name={'label1-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Token Quantity" /></td>
-							</tr>
-						</tbody>
-					</table>
-
-				</div>
-			</div>
-		);
-	}
-};
-
-// class AttributeForm extends React.Component {
-
-// 	constructor(props) {
-// 		super(props)
-// 		this.state = {
-// 			tmpFile: '',
-// 			showModal: false,
-// 		}
-// 		this.maxAttributes = this.props.max
-// 	}
-
-// 	handleShowModal(e) {
-// 		this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-// 	}
-
-// 	handleHideModal() {
-// 		this.setState({ showModal: false });
-// 	}
-
-// 	render() {
-// 		console.log("attribute form props: " + JSON.stringify(this.props))
-
-// 		var style = {
-// 			fontSize: '12.5px'
-// 		}
-// 		return (
-// 			<div className="form-group col-md-12" style={style}>
-// 				<div className="col-md-10">
-
-// 					<input name={'label-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="E.g. My college transcript Chase Bank KYC" />
-// 				</div>
-// 				<div>
-// 					<button style={style} type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn btn-warning pull-right">
-// 						<span className="glyphicon glyphicon-upload"></span>Upload File
-//                     </button>
-// 				</div>
-// 			</div>
-// 		);
-// 	}
-// };
 class Modal extends Component {
 
 	//this.props.asset_details will have the selected asset object
-
 	//this.props.dimensions will have the dimension objects for selected asset
-
 	constructor(props) {
 		super(props);
 		this.pubKey = localStorage.getItem("pubKey");
@@ -105,10 +29,10 @@ class Modal extends Component {
 		this.state = {
 
 			//added from MYCOID.jsx
-			file_attrs: [],
-			inputs: ['input-0'],
-			tmpFile: '',
-			showModal: false,
+			file_attrs: [], //updating asset OfficialIDs
+			inputs: ['input-0'], //updating asset OfficialIDs
+			tmpFile: '', //comes from UploadIpfsFile class
+			showModal: false, //set to true when we want to use UploadIpfsFile class
 
 			inputs_owners: ['input1-0'],
 
@@ -1233,7 +1157,7 @@ class Modal extends Component {
 																{/*  style={this.state.removeIfMyCOID}> */}
 																<div className="form-group">
 																	<label htmlFor="control_dist">Enter Owners and their ownership token(s).</label>
-																	{this.state.inputs_owners.map(input => <TokenDistributionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+																	{this.state.inputs_owners.map(input => <TokenDistributionForm min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
 																</div>
 																<div className="col-md-offset-6 col-md-6 ">
 																	<button type="button" className="btn btn-info pull-right" style={style} onClick={this.appendOwners.bind(this)}>
@@ -1288,7 +1212,7 @@ class Modal extends Component {
 
 															<div className="form-group">
 																<label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
-																{this.state.inputs_controllers.map(input => <TokenDistributionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+																{this.state.inputs_controllers.map(input => <TokenDistributionForm min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
 															</div>
 															<div className="col-md-offset-6 col-md-6 ">
 																{/* onClick={this.appendControllers.bind(this)} */}
@@ -1400,7 +1324,7 @@ class Modal extends Component {
 															</table>
 															<div className="form-group">
 																<label htmlFor="delegatee_dist">Enter Delegatees and their delegated control token(s).</label>
-																{this.state.inputs_delegatees.map(input => <TokenDistributionForm handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+																{this.state.inputs_delegatees.map(input => <TokenDistributionForm min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
 															</div>
 															<div className="col-md-offset-6 col-md-6 ">
 																<button type="button" className="btn btn-info pull-right" style={style} onClick={this.appendDelegatees.bind(this)}>
@@ -1669,8 +1593,9 @@ class Modal extends Component {
 								</div>
 
 								<div role="tabpanel" className="tab-pane center-block" id="qrcode" style={qrStyle}>
+									<h6>Digital Identity</h6>
 									<QRCode value={qrConfig} size={200} /><hr />
-									{this.state.notCOID ? <h6>Validate Owner-Device Relationship</h6> : null}
+									{this.state.notCOID ? <h6>Owner-Device Relationship</h6> : null}
 									{this.state.notCOID ? <QRCode value={qrOwnedDevice} size={200} /> : null}
 								</div>
 

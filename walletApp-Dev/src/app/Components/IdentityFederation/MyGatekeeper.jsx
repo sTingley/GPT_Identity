@@ -820,10 +820,10 @@ class MyGatekeeper extends React.Component {
 												{this.state.inputs.map(input => <UniqueIDAttributeForm type="MyGK" handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
 											</div>
 
-											<div>
+											<div className="form-group">
 												<button type="button" className="btn-sm btn-info pull-right" style={marginRight15} onClick={this.appendInput.bind(this)}>
 													<span className="glyphicon glyphicon-plus"></span>Add More
-													</button>
+												</button>
 											</div>
 										</div>
 									</div>
@@ -995,12 +995,10 @@ class MyGatekeeper extends React.Component {
 						</div>
 
 						<div className="form-group">
-							<div className="col-sm-6">
-								<br />
-								<input className="form-control" ref="signature" type="hidden" value={this.state.signature} />
-								<input type="hidden" name="pubkey" ref="pubKey" value={localStorage.getItem("pubKey")} />
-								<button className="btn-md btn-primary pull-right" data-loading-text="Submit Identity" name="submit-form" type="button" onClick={this.submitCoid.bind(this)}>Submit Identity</button>
-							</div>
+							<br />
+							<input className="form-control" ref="signature" type="hidden" value={this.state.signature} />
+							<input type="hidden" name="pubkey" ref="pubKey" value={localStorage.getItem("pubKey")} />
+							<button className="btn-md btn-primary pull-right" data-loading-text="Submit Identity" name="submit-form" type="button" onClick={this.submitCoid.bind(this)}>Submit Identity</button>
 						</div>
 					</form>
 					{this.state.showModal ? <UploadIpfsFile pubKey={this.state.pubKey} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}
@@ -1047,7 +1045,6 @@ class MyGatekeeper extends React.Component {
 							</select>
 						</div>
 
-
 						<div className="panel-group" id="accordion_1">
 							<div className="panel panel-default">
 								<div className="panel-heading">
@@ -1069,11 +1066,10 @@ class MyGatekeeper extends React.Component {
 												<label htmlFor="unique_id">Enter Unique Attributes</label>
 												{this.state.inputs.map(input => <UniqueIDAttributeForm type="MyGK" handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
 											</div>
-
-											<div className="col-md-offset-4 col-md-6">
+											<div className="form-group">
 												<button type="button" className="btn-sm btn-info pull-right" style={marginRight15} onClick={this.appendInput.bind(this)}>
 													<span className="glyphicon glyphicon-plus"></span>Add More
-													</button>
+												</button>
 											</div>
 										</div>
 									</div>
@@ -1107,7 +1103,6 @@ class MyGatekeeper extends React.Component {
 								</div>
 							</div>
 						</div>
-
 						<div className="form-group">
 							<input type="hidden" ref="signature" value={this.state.signature} />
 							<input type="hidden" name="pubkey" ref="pubKey" value={localStorage.getItem("pubKey")} />

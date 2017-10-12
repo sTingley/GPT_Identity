@@ -842,7 +842,7 @@ class IdentityDimensions extends Component {
             }
         };
 
-        let syle = { marginRight: '15px' };
+        let marginRight15 = { marginRight: '15px' };
         let table = { margin: '0 auto' };
 
 
@@ -959,11 +959,9 @@ class IdentityDimensions extends Component {
                                                         <DimensionAttributeForm handleShowModal={this.handleShowModal.bind(this)} max="10" key={input} labelref={input} />)}
                                                 </div>
                                                 <div className="form-group" id="unique_id_btn">
-                                                    <div className="col-md-offset-6 col-md-6 ">
-                                                        <button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendAttribute.bind(this)}>
-                                                            <span className="glyphicon glyphicon-plus"></span>Add More
-							                            </button>
-                                                    </div>
+                                                    <button type="button" className="btn btn-info pull-right" style={marginRight15} onClick={this.appendAttribute.bind(this)}>
+                                                        <span className="glyphicon glyphicon-plus"></span>Add More
+                                                    </button>
                                                 </div>
 
                                             </div>
@@ -995,7 +993,7 @@ class IdentityDimensions extends Component {
                                                 </div>
                                                 <div className="form-group">
                                                     <div className="col-md-offset-6 col-md-6 ">
-                                                        <button type="button" className="btn btn-info pull-right" onClick={this.addController.bind(this)} style={syle}>
+                                                        <button type="button" className="btn btn-info pull-right" onClick={this.addController.bind(this)} style={marginRight15}>
                                                             <span className="glyphicon glyphicon-plus"></span>Add More
                                                         </button>
                                                     </div>
@@ -1031,7 +1029,7 @@ class IdentityDimensions extends Component {
                                                 </div>
                                                 <div className="form-group">
                                                     <div className="col-md-offset-6 col-md-6 ">
-                                                        <button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendDelegation.bind(this)}>
+                                                        <button type="button" className="btn btn-info pull-right" style={marginRight15} onClick={this.appendDelegation.bind(this)}>
                                                             <span className="glyphicon glyphicon-plus"></span>Add More
                                                         </button>
                                                     </div>

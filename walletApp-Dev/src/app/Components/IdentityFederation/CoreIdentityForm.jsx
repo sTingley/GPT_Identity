@@ -440,84 +440,84 @@ class CoreIdentity extends React.Component {
 
 		function autocompleteRenderInput({ addTag, props }) {
 
-		// 	var passed = JSON.stringify(arguments[0]);
-		// 	console.log("passed: " + passed + JSON.stringify(arguments[1]));
-		// 	passed = JSON.parse(passed);
+			// 	var passed = JSON.stringify(arguments[0]);
+			// 	console.log("passed: " + passed + JSON.stringify(arguments[1]));
+			// 	passed = JSON.parse(passed);
 
-		// 	const handleOnChange = (e, { newValue, method }) => {
-		// 		console.log("handleonchange params: " + e + "   " + newValue + "   " + method + "   " + passed.id);
-		// 		if (method === 'enter' || method === 'click') {
-		// 			that.state.value[passed.id] = "";
-		// 			e.preventDefault()
-		// 		} else {
-		// 			that.onChange(e, { newValue }, passed.id)
-		// 		}
-		// 	}
-		// 	const handleKeyPress = (event) => {
-		// 		console.log('enter press here! ' + event.key)
-		// 		if (event.key == 'Enter') {
-		// 			event.preventDefault()
-		// 			addTag(that.state.value[passed.id])
-		// 			that.state.value[passed.id] = "";
-		// 			console.log('current tags: ' + that.state.tags)
-		// 		}
-		// 	}
+			// 	const handleOnChange = (e, { newValue, method }) => {
+			// 		console.log("handleonchange params: " + e + "   " + newValue + "   " + method + "   " + passed.id);
+			// 		if (method === 'enter' || method === 'click') {
+			// 			that.state.value[passed.id] = "";
+			// 			e.preventDefault()
+			// 		} else {
+			// 			that.onChange(e, { newValue }, passed.id)
+			// 		}
+			// 	}
+			// 	const handleKeyPress = (event) => {
+			// 		console.log('enter press here! ' + event.key)
+			// 		if (event.key == 'Enter') {
+			// 			event.preventDefault()
+			// 			addTag(that.state.value[passed.id])
+			// 			that.state.value[passed.id] = "";
+			// 			console.log('current tags: ' + that.state.tags)
+			// 		}
+			// 	}
 
-		// 	const renderInputComponent = inputProps => (
-		// 		<input {...inputProps} />
-		// 	);
-		// 	var inputValue = that.state.value[Number(passed.id)] || "";
-		// 	if (inputValue == 'undefined') { inputValue = ""; }
-		// 	var inputLength = inputValue.length || 0
+			// 	const renderInputComponent = inputProps => (
+			// 		<input {...inputProps} />
+			// 	);
+			// 	var inputValue = that.state.value[Number(passed.id)] || "";
+			// 	if (inputValue == 'undefined') { inputValue = ""; }
+			// 	var inputLength = inputValue.length || 0
 
-		// 	const suggestions = that.state.names.filter((name) => {
-		// 		console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
-		// 		return name.toLowerCase().slice(0, inputLength) === inputValue
-		// 	})
-		// 	///////////////////////////////////////
+			// 	const suggestions = that.state.names.filter((name) => {
+			// 		console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
+			// 		return name.toLowerCase().slice(0, inputLength) === inputValue
+			// 	})
+			// 	///////////////////////////////////////
 
 
 
-		// 	var value = String(that.state.value[Number(passed.id)]) || "";
-		// 	if (value == 'undefined') { value = ""; }
-		// 	//const suggestions = that.state.suggestions;
-		// 	console.log("passed ID: " + passed.id);
-		// 	console.log("suggestions: " + suggestions);
-		// 	console.log("value: " + value);
-		// 	const inputProps = {
-		// 		placeholder: passed.placeholder,
-		// 		value,
-		// 		style: {
-		// 			width: '30%',
-		// 			height: '100%',
-		// 			display: "initial"
-		// 		},
-		// 		onChange: handleOnChange,
-		// 		onKeyPress: handleKeyPress,
-		// 		className: "react-tagsinput-input",
-		// 		id: passed.id
-		// 	};
-		// 	return (
-		// 		<Autosuggest
-		// 			id={passed.id}
-		// 			ref={passed.ref}
-		// 			suggestions={suggestions}
-		// 			shouldRenderSuggestions={(value) => value.length > 0}
-		// 			getSuggestionValue={(suggestion) => suggestion}
-		// 			renderSuggestion={(suggestion) => <span>{suggestion}</span>}
-		// 			inputProps={inputProps}
-		// 			onSuggestionSelected={(e, { suggestion, method }) => {
-		// 				console.log("SELECTED: " + method)
-		// 				if (method == 'click') {
-		// 					addTag(suggestion)
-		// 					that.state.value[passed.id] = "";
-		// 				}
-		// 			}}
-		// 			onSuggestionsClearRequested={() => { }}
-		// 			onSuggestionsFetchRequested={() => { }}
-		// 			renderInputComponent={renderInputComponent}
-		// 		/>
-		// 	)
+			// 	var value = String(that.state.value[Number(passed.id)]) || "";
+			// 	if (value == 'undefined') { value = ""; }
+			// 	//const suggestions = that.state.suggestions;
+			// 	console.log("passed ID: " + passed.id);
+			// 	console.log("suggestions: " + suggestions);
+			// 	console.log("value: " + value);
+			// 	const inputProps = {
+			// 		placeholder: passed.placeholder,
+			// 		value,
+			// 		style: {
+			// 			width: '30%',
+			// 			height: '100%',
+			// 			display: "initial"
+			// 		},
+			// 		onChange: handleOnChange,
+			// 		onKeyPress: handleKeyPress,
+			// 		className: "react-tagsinput-input",
+			// 		id: passed.id
+			// 	};
+			// 	return (
+			// 		<Autosuggest
+			// 			id={passed.id}
+			// 			ref={passed.ref}
+			// 			suggestions={suggestions}
+			// 			shouldRenderSuggestions={(value) => value.length > 0}
+			// 			getSuggestionValue={(suggestion) => suggestion}
+			// 			renderSuggestion={(suggestion) => <span>{suggestion}</span>}
+			// 			inputProps={inputProps}
+			// 			onSuggestionSelected={(e, { suggestion, method }) => {
+			// 				console.log("SELECTED: " + method)
+			// 				if (method == 'click') {
+			// 					addTag(suggestion)
+			// 					that.state.value[passed.id] = "";
+			// 				}
+			// 			}}
+			// 			onSuggestionsClearRequested={() => { }}
+			// 			onSuggestionsFetchRequested={() => { }}
+			// 			renderInputComponent={renderInputComponent}
+			// 		/>
+			// 	)
 		}
 
 
@@ -563,73 +563,165 @@ class CoreIdentity extends React.Component {
 
 		return (
 			<div id="SubmitContainer">
-				<h1>Core Identity Submission Form</h1>
+				<h1>Core Identity Submission Form</h1><hr/>
 				<form method="POST" id="register" role="form">
-					<div className="form-group">
-						<label htmlFor="unique_id">Enter Unique Attributes. The first Attribute has to be name (first, last). Then add any official identification such as SSN or national ID number(s). Make sure to add the supporting file(s) through "Upload File".</label>
-						{this.state.inputs.map(input => <UniqueIDAttributeForm type="IDF" handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
-					</div>
-					<div className="col-md-offset-4 col-md-6">
-						<button type="button" className="btn-sm btn-info pull-right" style={marginRight15} onClick={this.appendInput.bind(this)}>
-							<span className="glyphicon glyphicon-plus"></span>Add More
-						</button>
-					</div>
-					<div className="form-group">
-						<label htmlFor="owner_id">Enter Owners. Only one owner for an individual (self).</label>
-						<TagsInput {...inputAttrs} maxTags={1} renderInput={autocompleteRenderInput} value={this.state.owner_id} onChange={(e) => { this.onFieldChange("owner_id", e) }} />
-					</div>
-					<div className="form-group">
-						<label htmlFor="owner_token_id">Enter Owner Token Description. For example, 'Spencer's tokens'.</label>
-						<TagsInput {...basicAttrs} maxTags={1} value={this.state.owner_token_desc} onChange={(e) => { this.onFieldChange("owner_token_desc", e) }} />
-					</div>
-					<div className="form-group">
-						<label htmlFor="owner_token_id">Enter Token Quantity. For example, 1 token for an individual.</label>
-						<TagsInput {...basicAttrs} maxTags={1} value={this.state.owner_token_quantity} onChange={(e) => { this.onFieldChange("owner_token_quantity", e) }} />
-					</div>
-					<div className="form-group">
-						<label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
-						{this.state.inputs_name.map((input, i) =>
-								<div className="col-md-10">
-									<table className="table table-striped table-hover" style={style}>
-										<tbody>
-											<tr>
-												<th><b>Controller</b></th>
-												<th><b>Token Quantity</b></th>
-											</tr>
-											<tr>
-												<td><TagsInput {...this.state.suggest_attrs[i]} maxTags={1} renderInput={autocompleteRenderInput} className="form-control col-md-4" type="text" value={this.state.control_id[i]} onChange={(e) => { this.onFieldChange2("control_id," + i, e) }} />
-												</td>
-												<td><TagsInput {...basicAttrs} maxTags={1} className="form-control col-md-4" type="text" value={this.state.control_token_quantity[i]} onChange={(e) => { this.onFieldChange2("control_token_quantity," + i, e) }} /></td>
-											</tr>
-										</tbody>
-									</table>
+
+					<div className="panel-group" id="accordion1">
+						<div className="panel panel-default">
+							<div className="panel-heading">
+								<div className="row">
+									<div className="col-xs-11">
+										<label>Uniqueness</label>
+									</div>
+									<div className="col-xs-1">
+										<a data-toggle="collapse" data-parent="#accordion" href="#collapse1">
+											<span className="glyphicon glyphicon-chevron-down"></span>
+										</a>
+									</div>
 								</div>
-						)}
-					</div>
-					<div className="form-group col-md-offset-4 col-md-6">
-						<button type="button" className="btn-sm btn-info pull-right" style={marginRight15} onClick={this.appendInput2.bind(this)}>
-							<span className="glyphicon glyphicon-plus"></span>Add More
-						</button>
-					</div>
-					<div className="form-group">
-						<label htmlFor="control_token_id">Enter Control Token Description. For example, 'Spencer's tokens'.</label>
-						<TagsInput {...basicAttrs} maxTags={1} value={this.state.control_token_desc} onChange={(e) => { this.onFieldChange("control_token_desc", e) }} />
-					</div>
-					<div className="form-group">
-						<label>Identity Recovery: trusted identities who will attest that your identity has been lost or stolen</label>
-						<TagsInput {...inputAttrs2} renderInput={autocompleteRenderInput} value={this.state.recovery_id} onChange={(e) => { this.onFieldChange("recovery_id", e) }} />
-					</div>
-					<div className="form-group">
-						<label>Recovery Condition (# of trusted individuals required to initiate your identity recovery)</label>
-						<input name="recoveryCondition" className="form-control col-md-4" type="text" placeholder="Label" />
-					</div>
-					<div className="form-group">
-						<div className="col-sm-6">
-							<br />
-							<input className="form-control" ref="signature" type="hidden" value={this.state.signature} />
-							<input type="hidden" name="pubkey" ref="pubKey" value={localStorage.getItem("pubKey")} />
-							<button className="btn btn-primary" data-loading-text="Submit Identity" name="submit-form" type="button" onClick={this.submitCoid.bind(this)}>Submit</button>
+							</div>
+							<div id="collapse1" className="panel-collapse collapse out">
+								<div className="panel-body">
+									<div className="row">
+										<div className="form-group">
+											<label htmlFor="unique_id">Enter Unique Attributes. The first Attribute has to be name (first, last). Then add any official identification such as SSN or national ID number(s). Make sure to add the supporting file(s) through "Upload File".</label>
+											{this.state.inputs.map(input => <UniqueIDAttributeForm type="IDF" handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+										</div>
+										<div className="form-group">
+											<button type="button" className="btn-sm btn-info pull-right" style={marginRight15} onClick={this.appendInput.bind(this)}>
+												<span className="glyphicon glyphicon-plus"></span>Add More
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
+					</div>
+
+					<div className="panel-group" id="accordion2">
+						<div className="panel panel-default">
+							<div className="panel-heading">
+								<div className="row">
+									<div className="col-xs-11">
+										<label>Ownership</label>
+									</div>
+									<div className="col-xs-1">
+										<a data-toggle="collapse" data-parent="#accordion2" href="#collapse2">
+											<span className="glyphicon glyphicon-chevron-down"></span>
+										</a>
+									</div>
+								</div>
+							</div>
+							<div id="collapse2" className="panel-collapse collapse out">
+								<div className="panel-body">
+									<div className="row">
+										<div className="form-group">
+											<label htmlFor="owner_id">Enter Owners. Only one owner for an individual (self).</label>
+											<TagsInput {...inputAttrs} maxTags={1} renderInput={autocompleteRenderInput} value={this.state.owner_id} onChange={(e) => { this.onFieldChange("owner_id", e) }} />
+										</div>
+										<div className="form-group">
+											<label htmlFor="owner_token_id">Enter Owner Token Description. For example, 'Spencer's tokens'.</label>
+											<TagsInput {...basicAttrs} maxTags={1} value={this.state.owner_token_desc} onChange={(e) => { this.onFieldChange("owner_token_desc", e) }} />
+										</div>
+										<div className="form-group">
+											<label htmlFor="owner_token_id">Enter Token Quantity. For example, 1 token for an individual.</label>
+											<TagsInput {...basicAttrs} maxTags={1} value={this.state.owner_token_quantity} onChange={(e) => { this.onFieldChange("owner_token_quantity", e) }} />
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div className="panel-group" id="accordion3">
+						<div className="panel panel-default">
+							<div className="panel-heading">
+								<div className="row">
+									<div className="col-xs-11" div>
+										<label>Control</label>
+									</div>
+									<div className="col-xs-1">
+										<a data-toggle="collapse" data-parent="#accordion3" href="#collapse3">
+											<span className="glyphicon glyphicon-chevron-down"></span>
+										</a>
+									</div>
+								</div>
+							</div>
+							<div id="collapse3" className="panel-collapse collapse out">
+								<div className="panel-body">
+									<div className="row">
+										<div className="form-group">
+											<label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
+											{this.state.inputs_name.map((input, i) =>
+												<div className="col-md-10">
+													<table className="table table-striped table-hover" style={style}>
+														<tbody>
+															<tr>
+																<th><b>Controller</b></th>
+																<th><b>Token Quantity</b></th>
+															</tr>
+															<tr>
+																<td><TagsInput {...this.state.suggest_attrs[i]} maxTags={1} renderInput={autocompleteRenderInput} className="form-control col-md-4" type="text" value={this.state.control_id[i]} onChange={(e) => { this.onFieldChange2("control_id," + i, e) }} />
+																</td>
+																<td><TagsInput {...basicAttrs} maxTags={1} className="form-control col-md-4" type="text" value={this.state.control_token_quantity[i]} onChange={(e) => { this.onFieldChange2("control_token_quantity," + i, e) }} /></td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+											)}
+										</div>
+										<div className="form-group col-md-offset-4 col-md-6">
+											<button type="button" className="btn-sm btn-info pull-right" style={marginRight15} onClick={this.appendInput2.bind(this)}>
+												<span className="glyphicon glyphicon-plus"></span>Add More
+											</button>
+										</div>
+										<div className="form-group">
+											<label htmlFor="control_token_id">Enter Control Token Description. For example, 'Spencer's tokens'.</label>
+											<TagsInput {...basicAttrs} maxTags={1} value={this.state.control_token_desc} onChange={(e) => { this.onFieldChange("control_token_desc", e) }} />
+										</div>
+
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div className="panel-group" id="accordion4">
+						<div className="panel panel-default">
+							<div className="panel-heading">
+								<div className="row">
+									<div className="col-xs-11">
+										<label>Recovery</label>
+									</div>
+									<div className="col-xs-1">
+										<a data-toggle="collapse" data-parent="#accordion4" href="#collapse4">
+											<span className="glyphicon glyphicon-chevron-down"></span>
+										</a>
+									</div>
+								</div>
+							</div>
+							<div id="collapse4" className="panel-collapse collapse out">
+								<div className="panel-body">
+									<div className="row">
+										<div className="form-group">
+											<label>Identity Recovery: trusted identities who will attest that your identity has been lost or stolen</label>
+											<TagsInput {...inputAttrs2} renderInput={autocompleteRenderInput} value={this.state.recovery_id} onChange={(e) => { this.onFieldChange("recovery_id", e) }} />
+										</div>
+										<div className="form-group">
+											<label>Recovery Condition (# of trusted individuals required to initiate your identity recovery)</label>
+											<input name="recoveryCondition" className="form-control col-md-4" type="text" placeholder="Label" />
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div className="form-group">
+						<br />
+						<input className="form-control" ref="signature" type="hidden" value={this.state.signature} />
+						<input type="hidden" name="pubkey" ref="pubKey" value={localStorage.getItem("pubKey")} />
+						<button className="btn-md btn-primary" data-loading-text="Submit Identity" name="submit-form" type="button" onClick={this.submitCoid.bind(this)}>Submit</button>
 					</div>
 				</form>
 				{this.state.showModal ? <UploadIpfsFile pubKey={this.state.pubKey} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}

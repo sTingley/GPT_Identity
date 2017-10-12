@@ -322,6 +322,10 @@ class ToVote extends React.Component {
 	}
 
 	componentDidMount() {
+
+		console.log("hash of empty: " + keccak_256(""));
+		console.log("hash of spencer: " + keccak_256("spencer"));
+
 		$.ajax({
 			url: twinUrl + "ballot/readNotify/" + keccak_256(localStorage.getItem("pubKey")).toUpperCase(),
 			dataType: 'json',
@@ -360,6 +364,8 @@ class ToVote extends React.Component {
 	}
 
 	render() {
+		console.log("hash of empty: " + keccak_256(""));
+		console.log("hash of spencer: " + keccak_256("spencer"));
 		console.log("STATE: " + JSON.stringify(this.state));
 		var _that = this;
 		return (

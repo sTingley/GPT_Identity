@@ -49,46 +49,46 @@ class TokenDistributionForm extends React.Component {
 	}
 };
 
-class AttributeForm extends React.Component {
+// class AttributeForm extends React.Component {
 
-	constructor(props) {
-		super(props)
-		this.state = {
-			tmpFile: '',
-			showModal: false,
-		}
-		this.maxAttributes = this.props.max
-	}
+// 	constructor(props) {
+// 		super(props)
+// 		this.state = {
+// 			tmpFile: '',
+// 			showModal: false,
+// 		}
+// 		this.maxAttributes = this.props.max
+// 	}
 
-	handleShowModal(e) {
-		this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-	}
+// 	handleShowModal(e) {
+// 		this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
+// 	}
 
-	handleHideModal() {
-		this.setState({ showModal: false });
-	}
+// 	handleHideModal() {
+// 		this.setState({ showModal: false });
+// 	}
 
-	render() {
-		console.log("attribute form props: " + JSON.stringify(this.props))
+// 	render() {
+// 		console.log("attribute form props: " + JSON.stringify(this.props))
 
-		var style = {
-			fontSize: '12.5px'
-		}
-		return (
-			<div className="form-group col-md-12" style={style}>
-				<div className="col-md-10">
+// 		var style = {
+// 			fontSize: '12.5px'
+// 		}
+// 		return (
+// 			<div className="form-group col-md-12" style={style}>
+// 				<div className="col-md-10">
 
-					<input name={'label-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="E.g. My college transcript Chase Bank KYC" />
-				</div>
-				<div className="col-md-2">
-					<button style={style} type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn btn-warning pull-right">
-						<span className="glyphicon glyphicon-upload"></span>Upload File
-                    </button>
-				</div>
-			</div>
-		);
-	}
-};
+// 					<input name={'label-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="E.g. My college transcript Chase Bank KYC" />
+// 				</div>
+// 				<div>
+// 					<button style={style} type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn btn-warning pull-right">
+// 						<span className="glyphicon glyphicon-upload"></span>Upload File
+//                     </button>
+// 				</div>
+// 			</div>
+// 		);
+// 	}
+// };
 class Modal extends Component {
 
 	//this.props.asset_details will have the selected asset object
@@ -615,7 +615,23 @@ class Modal extends Component {
 	// END DELEGATEE FUNCTIONS:
 	//**********************************************************************
 	//**********************************************************************
+	//START DIMENSION FUNCTION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+	//*****************************************************************************
+    //when we click Add More, a new value is pushed into this.state.inputs_files,
+    //and a new DimensionAttributeForm is rendered
+    appendAttribute() {
+        var inputLen = this.state.inputs_files.length;
+        if (inputLen < 10) {
+            var newInput = `input-${inputLen}`;
+            this.setState({ inputs_files: this.state.inputs_files.concat([newInput]) });
+            //inputs: input-0
+        }
+	}
+	
+	updateAttributes(){
+		console.log("we hit update attributes..");
+	}
 
 	render() {
 		console.log("this.pubkey: " + this.pubKey);
@@ -724,7 +740,7 @@ class Modal extends Component {
 			textAlign: "center"
 		};
 
-		var syle = {
+		var marginRight15 = {
 			marginRight: '15px'
 		}
 
@@ -1028,17 +1044,17 @@ class Modal extends Component {
                                                                 })(this)} */}
 																</tbody>
 															</table>
-															<div>
+															<div className="form-group">
 																<label htmlFor="unique_id">Enter Unique ID Attributes:</label>
-																{this.state.inputs.map(input => <AttributeForm handleShowModal={this.handleShowModal.bind(this)} max="10" key={input} labelref={input} />)}
-															</div>
-															<div className="col-md-offset-4 col-md-4 ">
-																<button type="button" className="btn btn-info pull-right" style={style} onClick={this.appendInput.bind(this)}>
-																	<span className="glyphicon glyphicon-plus"></span>Add More
-                                                            </button>
+																{this.state.inputs.map(input => <UniqueIDAttributeForm type={"MyCOID"} handleShowModal={this.handleShowModal.bind(this)} max="10" key={input} labelref={input} />)}
 															</div>
 															<div className="form-group">
-																<button style={style} type="button" className="btn btn-primary" onClick={this.requestUpdateOfficalIDs.bind(this)}>
+																<button type="button" className="btn-sm btn-info pull-right" style={marginRight15} onClick={this.appendInput.bind(this)}>
+																		<span className="glyphicon glyphicon-plus"></span>Add More
+																</button>
+															</div>
+															<div className="form-group">
+																<button style={style} type="button" className="btn-sm btn-primary" onClick={this.requestUpdateOfficalIDs.bind(this)}>
 																	<span className="glyphicon glyphicon-plus"></span>Update Official IDs
                                                             </button>
 															</div>
@@ -1291,7 +1307,7 @@ class Modal extends Component {
 															<div id={"collapse_" + i} className="panel-collapse collapse out">
 																<div className="panel-body">
 																	<div className="row">
-																		<table className="table table-striped table-hover" style={syle}>
+																		<table className="table table-striped table-hover" style={marginRight15}>
 																			<tbody>
 																				<tr>
 																					<td>Contract Address</td>
@@ -1380,26 +1396,19 @@ class Modal extends Component {
 																}
 															})(this)}
 
-															<div className="form-group" id="unique_id_div">
+															<div className="form-group">
 																<label htmlFor="unique_id">Enter descriptor(s) and attribute(s):</label>
 																{this.state.inputs_files.map(input => <DimensionAttributeForm handleShowModal={this.handleShowModal.bind(this)} max="10" key={input} labelref={input} />)}
 															</div>
-
-															<div className="form-group" id="unique_id_btn">
-																<div className="col-md-offset-6 col-md-6 ">
-																	{/* onClick={this.appendAttribute.bind(this)} */}
-																	<button type="button" className="btn btn-info pull-right" style={syle}>
-																		<span className="glyphicon glyphicon-plus"></span>Add More
-																							</button>
-																</div>
+															<div className="form-group">
+																<button type="button" className="btn-sm btn-info pull-right" style={marginRight15} onClick={this.appendAttribute.bind(this)}>
+																	<span className="glyphicon glyphicon-plus"></span>Add More
+																</button>
 															</div>
 														</form>
 
 														<div className="form-group">
-															<div className="col-sm-6">
-																{/* onClick={this.updateAttributes.bind(this)} */}
-																<button className="btn btn-primary" data-loading-text="Submit" name="submit-form">Add Attribute(s)</button>
-															</div>
+															<button className="btn-sm btn-primary" onClick={this.updateAttributes.bind(this)} data-loading-text="Submit" name="submit-form">Add Attribute(s)</button>
 														</div>
 
 														{this.state.showModal ? <UploadIpfsFile pubKey={this.pubKey} flag={1} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}
@@ -1436,7 +1445,7 @@ class Modal extends Component {
 															<div className="form-group" id="controllers_dimension_btn">
 																<div className="col-md-offset-6 col-md-6 ">
 																	{/* onClick={this.addController.bind(this)} */}
-																	<button type="button" className="btn btn-info pull-right" style={syle}>
+																	<button type="button" className="btn btn-info pull-right" style={marginRight15}>
 																		<span className="glyphicon glyphicon-plus"></span>Add More
 																																				</button>
 																</div>
@@ -1472,7 +1481,7 @@ class Modal extends Component {
 											<div id="collapseC" className="panel-collapse collapse out">
 												<div className="panel-body">
 													<div className="row">
-														<table className="table table-striped table-hover" style={syle}>
+														<table className="table table-striped table-hover" style={marginRight15}>
 															<tbody>
 																<tr>
 																	<td>
@@ -1485,7 +1494,7 @@ class Modal extends Component {
 																<tr>
 																	<td>
 																		{/* onClick={this.appendDelegation.bind(this)} */}
-																		<button type="button" className="btn btn-info pull-right" style={syle}>
+																		<button type="button" className="btn btn-info pull-right" style={marginRight15}>
 																			<span className="glyphicon glyphicon-plus"></span>Add More</button>
 																	</td>
 																</tr>
@@ -1865,7 +1874,7 @@ class Dims extends Component {
 			textAlign: "center"
 		};
 
-		var syle = {
+		var marginRight15 = {
 			marginRight: '15px'
 		}
 

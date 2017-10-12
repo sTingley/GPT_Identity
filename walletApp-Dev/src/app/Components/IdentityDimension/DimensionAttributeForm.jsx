@@ -24,20 +24,19 @@ class DimensionAttributeForm extends React.Component {
 
     render() {
         //console.log("dimensionform props...\n" + JSON.stringify(this.props));
+        let style = { fontSize: '12.5px' }
         return (
-            <div className="form-group col-md-12">
-                <div className="col-md-10">
-                    <label htmlFor="unique_id_attrs"> Persona Descriptor e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research". </label>
-                    <input name={'label-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Descriptor" />
-                    <div className="form-group">
-                        <label> Descriptor privacy: </label>
-                        <select name={'privacy-' + this.props.labelref} id="privacy" onChange={this.selectPrivacy}>
-                            <option value="selectVisibility">--- Please select ---</option>
-                            <option value="Public">Public</option>
-                            <option value="Private">Private</option>
-                        </select>
-                    </div>
-                    <button type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn-sm btn-warning pull-right"><span className="glyphicon glyphicon-upload"></span>Upload File</button>
+            <div className="form-group" style={style}>
+                <label htmlFor="unique_id_attrs"> Persona Descriptor e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research". </label>
+                <input name={'label-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Descriptor" />
+                <button type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn-sm btn-warning pull-right"><span className="glyphicon glyphicon-upload"></span>Upload File</button>
+                <div>
+                    <label> Descriptor privacy: </label>
+                    <select name={'privacy-' + this.props.labelref} id="privacy" onChange={this.selectPrivacy}>
+                        <option value="selectVisibility">--- Please select ---</option>
+                        <option value="Public">Public</option>
+                        <option value="Private">Private</option>
+                    </select>
                 </div>
             </div>
         );

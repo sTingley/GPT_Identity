@@ -1,6 +1,6 @@
 import React from 'react';
 
-class UniqueIDAttributesForm extends React.Component {
+class UniqueIDAttributeForm extends React.Component {
 
     constructor(props) {
         super(props);
@@ -17,22 +17,20 @@ class UniqueIDAttributesForm extends React.Component {
     }
     render() {
         console.log("UniqueIDAttributeForm props: " + JSON.stringify(this.props));
-        // this.props = {"type":"MyCOID","max":"10","labelref":"input-0"} //for MyGatekeeper.jsx
+        // this.props = {"type":"MyGK","max":"10","labelref":"input-0"} //for MyGatekeeper.jsx
         // this.props = {"type":"IDF","max":"10","labelref":"input-0"} //for CoreIdentityForm.jsx
-        // this.props = {"type":"MyGK","max":"10","labelref":"input-0"} //for Assets.jsx (formerly MyCOID.jsx)
+        // this.props = {"type":"MyCOID","max":"10","labelref":"input-0"} //for Assets.jsx (formerly MyCOID.jsx)
         let style = { fontSize: '12.5px' }
         return (
-            <div className="form-group col-md-12" style={style}>
-                <div className="col-md-10">
-                    {this.props.type == "IDF" ? this.renderIDF() : null}
-                    {this.props.type == "MyGK" ? this.renderMyGK() : null}
-                    {this.props.type == "MyCOID" ? this.renderMyCOID() : null}
-                    <input name={'label-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Label" />
-                    <button type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn-sm btn-warning pull-right"><span className="glyphicon glyphicon-upload"></span>Upload File</button>
-                </div>
+            <div className="form-group" style={style}>
+                {this.props.type == "IDF" ? this.renderIDF() : null}
+                {this.props.type == "MyGK" ? this.renderMyGK() : null}
+                {this.props.type == "MyCOID" ? this.renderMyCOID() : null}
+                <input name={'label-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Label" />
+                <button type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn-sm btn-warning pull-right"><span className="glyphicon glyphicon-upload"></span>Upload File</button>
             </div>
         );
     }
 };
 
-export default UniqueIDAttributesForm;
+export default UniqueIDAttributeForm;

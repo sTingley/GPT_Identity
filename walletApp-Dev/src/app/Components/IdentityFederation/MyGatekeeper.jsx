@@ -762,9 +762,7 @@ class MyGatekeeper extends React.Component {
 				id: "3"
 			}
 		};
-		var syle = {
-			marginRight: '15px'
-		}
+
 		var style = {
 			fontSize: '12.5px'
 		}
@@ -773,7 +771,7 @@ class MyGatekeeper extends React.Component {
 			marginTop: '26px'
 		}
 
-		var syle = {
+		var marginRight15 = {
 			marginRight: '15px'
 		}
 
@@ -822,8 +820,8 @@ class MyGatekeeper extends React.Component {
 												{this.state.inputs.map(input => <UniqueIDAttributeForm type="MyGK" handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
 											</div>
 
-											<div className="col-md-offset-4 col-md-6">
-												<button type="button" className="btn-sm btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
+											<div>
+												<button type="button" className="btn-sm btn-info pull-right" style={marginRight15} onClick={this.appendInput.bind(this)}>
 													<span className="glyphicon glyphicon-plus"></span>Add More
 													</button>
 											</div>
@@ -871,7 +869,7 @@ class MyGatekeeper extends React.Component {
 												)}
 											</div>
 											<div className="col-md-offset-4 col-md-6">
-												<button type="button" className="btn-sm btn-info pull-right" style={syle} onClick={this.appendInputOwners.bind(this)}>
+												<button type="button" className="btn-sm btn-info pull-right" style={marginRight15} onClick={this.appendInputOwners.bind(this)}>
 													<span className="glyphicon glyphicon-plus"></span>Add More
 													</button>
 											</div>
@@ -924,7 +922,7 @@ class MyGatekeeper extends React.Component {
 												)}
 											</div>
 											<div className="col-md-offset-4 col-md-6">
-												<button type="button" className="btn-sm btn-info pull-right" style={syle} onClick={this.appendInputControllers.bind(this)}>
+												<button type="button" className="btn-sm btn-info pull-right" style={marginRight15} onClick={this.appendInputControllers.bind(this)}>
 													<span className="glyphicon glyphicon-plus"></span>Add More
 													</button>
 											</div>
@@ -1073,7 +1071,7 @@ class MyGatekeeper extends React.Component {
 											</div>
 
 											<div className="col-md-offset-4 col-md-6">
-												<button type="button" className="btn-sm btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
+												<button type="button" className="btn-sm btn-info pull-right" style={marginRight15} onClick={this.appendInput.bind(this)}>
 													<span className="glyphicon glyphicon-plus"></span>Add More
 													</button>
 											</div>

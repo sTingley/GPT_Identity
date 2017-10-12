@@ -1044,7 +1044,6 @@ class IdentityDimensions extends Component {
                             </div>
 
 
-
                             <div className="form-group">
                                 <div className="col-sm-6">
                                     <button className="btn btn-primary" data-loading-text="Submit" name="submit-form" type="button" onClick={this.createDimension.bind(this)}>Create</button>

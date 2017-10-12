@@ -129,6 +129,8 @@
 	
 	//import NameRegister from './Components/NameRegister.jsx';
 	
+	//import AssetUtilities from './Components/AssetUtilities';
+	
 	
 	var App = function (_React$Component) {
 		_inherits(App, _React$Component);
@@ -51754,7 +51756,7 @@
 						id: "2"
 					}
 				};
-				var syle = {
+				var marginRight15 = {
 					marginRight: '15px'
 				};
 				var style = {
@@ -51789,7 +51791,7 @@
 							{ className: 'col-md-offset-4 col-md-6' },
 							_react2.default.createElement(
 								'button',
-								{ type: 'button', className: 'btn-sm btn-info pull-right', style: syle, onClick: this.appendInput.bind(this) },
+								{ type: 'button', className: 'btn-sm btn-info pull-right', style: marginRight15, onClick: this.appendInput.bind(this) },
 								_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
 								'Add More'
 							)
@@ -51898,7 +51900,7 @@
 							{ className: 'form-group col-md-offset-4 col-md-6' },
 							_react2.default.createElement(
 								'button',
-								{ type: 'button', className: 'btn-sm btn-info pull-right', style: syle, onClick: this.appendInput2.bind(this) },
+								{ type: 'button', className: 'btn-sm btn-info pull-right', style: marginRight15, onClick: this.appendInput2.bind(this) },
 								_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
 								'Add More'
 							)
@@ -55902,19 +55904,19 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var UniqueIDAttributesForm = function (_React$Component) {
-	    _inherits(UniqueIDAttributesForm, _React$Component);
+	var UniqueIDAttributeForm = function (_React$Component) {
+	    _inherits(UniqueIDAttributeForm, _React$Component);
 	
-	    function UniqueIDAttributesForm(props) {
-	        _classCallCheck(this, UniqueIDAttributesForm);
+	    function UniqueIDAttributeForm(props) {
+	        _classCallCheck(this, UniqueIDAttributeForm);
 	
-	        var _this = _possibleConstructorReturn(this, (UniqueIDAttributesForm.__proto__ || Object.getPrototypeOf(UniqueIDAttributesForm)).call(this, props));
+	        var _this = _possibleConstructorReturn(this, (UniqueIDAttributeForm.__proto__ || Object.getPrototypeOf(UniqueIDAttributeForm)).call(this, props));
 	
 	        _this.maxAttributes = _this.props.max;
 	        return _this;
 	    }
 	
-	    _createClass(UniqueIDAttributesForm, [{
+	    _createClass(UniqueIDAttributeForm, [{
 	        key: "renderIDF",
 	        value: function renderIDF() {
 	            return _react2.default.createElement(
@@ -55945,37 +55947,33 @@
 	        key: "render",
 	        value: function render() {
 	            console.log("UniqueIDAttributeForm props: " + JSON.stringify(this.props));
-	            // this.props = {"type":"MyCOID","max":"10","labelref":"input-0"} //for MyGatekeeper.jsx
+	            // this.props = {"type":"MyGK","max":"10","labelref":"input-0"} //for MyGatekeeper.jsx
 	            // this.props = {"type":"IDF","max":"10","labelref":"input-0"} //for CoreIdentityForm.jsx
-	            // this.props = {"type":"MyGK","max":"10","labelref":"input-0"} //for Assets.jsx (formerly MyCOID.jsx)
+	            // this.props = {"type":"MyCOID","max":"10","labelref":"input-0"} //for Assets.jsx (formerly MyCOID.jsx)
 	            var style = { fontSize: '12.5px' };
 	            return _react2.default.createElement(
 	                "div",
-	                { className: "form-group col-md-12", style: style },
+	                { className: "form-group", style: style },
+	                this.props.type == "IDF" ? this.renderIDF() : null,
+	                this.props.type == "MyGK" ? this.renderMyGK() : null,
+	                this.props.type == "MyCOID" ? this.renderMyCOID() : null,
+	                _react2.default.createElement("input", { name: 'label-' + this.props.labelref, className: "form-control col-md-4", type: "text", placeholder: "Label" }),
 	                _react2.default.createElement(
-	                    "div",
-	                    { className: "col-md-10" },
-	                    this.props.type == "IDF" ? this.renderIDF() : null,
-	                    this.props.type == "MyGK" ? this.renderMyGK() : null,
-	                    this.props.type == "MyCOID" ? this.renderMyCOID() : null,
-	                    _react2.default.createElement("input", { name: 'label-' + this.props.labelref, className: "form-control col-md-4", type: "text", placeholder: "Label" }),
-	                    _react2.default.createElement(
-	                        "button",
-	                        { type: "button", "data-id": this.props.labelref, onClick: this.props.handleShowModal, className: "btn-sm btn-warning pull-right" },
-	                        _react2.default.createElement("span", { className: "glyphicon glyphicon-upload" }),
-	                        "Upload File"
-	                    )
+	                    "button",
+	                    { type: "button", "data-id": this.props.labelref, onClick: this.props.handleShowModal, className: "btn-sm btn-warning pull-right" },
+	                    _react2.default.createElement("span", { className: "glyphicon glyphicon-upload" }),
+	                    "Upload File"
 	                )
 	            );
 	        }
 	    }]);
 	
-	    return UniqueIDAttributesForm;
+	    return UniqueIDAttributeForm;
 	}(_react2.default.Component);
 	
 	;
 	
-	exports.default = UniqueIDAttributesForm;
+	exports.default = UniqueIDAttributeForm;
 
 /***/ }),
 /* 407 */
@@ -56873,6 +56871,10 @@
 		}, {
 			key: 'componentDidMount',
 			value: function componentDidMount() {
+	
+				console.log("hash of empty: " + keccak_256(""));
+				console.log("hash of spencer: " + keccak_256("spencer"));
+	
 				$.ajax({
 					url: twinUrl + "ballot/readNotify/" + keccak_256(localStorage.getItem("pubKey")).toUpperCase(),
 					dataType: 'json',
@@ -56919,6 +56921,8 @@
 			value: function render() {
 				var _this6 = this;
 	
+				console.log("hash of empty: " + keccak_256(""));
+				console.log("hash of spencer: " + keccak_256("spencer"));
 				console.log("STATE: " + JSON.stringify(this.state));
 				var _that = this;
 				return _react2.default.createElement(
@@ -60291,66 +60295,46 @@
 	
 	;
 	
-	var AttributeForm = function (_React$Component2) {
-		_inherits(AttributeForm, _React$Component2);
+	// class AttributeForm extends React.Component {
 	
-		function AttributeForm(props) {
-			_classCallCheck(this, AttributeForm);
+	// 	constructor(props) {
+	// 		super(props)
+	// 		this.state = {
+	// 			tmpFile: '',
+	// 			showModal: false,
+	// 		}
+	// 		this.maxAttributes = this.props.max
+	// 	}
 	
-			var _this3 = _possibleConstructorReturn(this, (AttributeForm.__proto__ || Object.getPrototypeOf(AttributeForm)).call(this, props));
+	// 	handleShowModal(e) {
+	// 		this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
+	// 	}
 	
-			_this3.state = {
-				tmpFile: '',
-				showModal: false
-			};
-			_this3.maxAttributes = _this3.props.max;
-			return _this3;
-		}
+	// 	handleHideModal() {
+	// 		this.setState({ showModal: false });
+	// 	}
 	
-		_createClass(AttributeForm, [{
-			key: 'handleShowModal',
-			value: function handleShowModal(e) {
-				this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-			}
-		}, {
-			key: 'handleHideModal',
-			value: function handleHideModal() {
-				this.setState({ showModal: false });
-			}
-		}, {
-			key: 'render',
-			value: function render() {
-				console.log("attribute form props: " + JSON.stringify(this.props));
+	// 	render() {
+	// 		console.log("attribute form props: " + JSON.stringify(this.props))
 	
-				var style = {
-					fontSize: '12.5px'
-				};
-				return _react2.default.createElement(
-					'div',
-					{ className: 'form-group col-md-12', style: style },
-					_react2.default.createElement(
-						'div',
-						{ className: 'col-md-10' },
-						_react2.default.createElement('input', { name: 'label-' + this.props.labelref, className: 'form-control col-md-4', type: 'text', placeholder: 'E.g. My college transcript Chase Bank KYC' })
-					),
-					_react2.default.createElement(
-						'div',
-						{ className: 'col-md-2' },
-						_react2.default.createElement(
-							'button',
-							{ style: style, type: 'button', 'data-id': this.props.labelref, onClick: this.props.handleShowModal, className: 'btn btn-warning pull-right' },
-							_react2.default.createElement('span', { className: 'glyphicon glyphicon-upload' }),
-							'Upload File'
-						)
-					)
-				);
-			}
-		}]);
+	// 		var style = {
+	// 			fontSize: '12.5px'
+	// 		}
+	// 		return (
+	// 			<div className="form-group col-md-12" style={style}>
+	// 				<div className="col-md-10">
 	
-		return AttributeForm;
-	}(_react2.default.Component);
-	
-	;
+	// 					<input name={'label-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="E.g. My college transcript Chase Bank KYC" />
+	// 				</div>
+	// 				<div>
+	// 					<button style={style} type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn btn-warning pull-right">
+	// 						<span className="glyphicon glyphicon-upload"></span>Upload File
+	//                     </button>
+	// 				</div>
+	// 			</div>
+	// 		);
+	// 	}
+	// };
 	
 	var Modal = function (_Component) {
 		_inherits(Modal, _Component);
@@ -60362,14 +60346,14 @@
 		function Modal(props) {
 			_classCallCheck(this, Modal);
 	
-			var _this4 = _possibleConstructorReturn(this, (Modal.__proto__ || Object.getPrototypeOf(Modal)).call(this, props));
+			var _this3 = _possibleConstructorReturn(this, (Modal.__proto__ || Object.getPrototypeOf(Modal)).call(this, props));
 	
-			_this4.pubKey = localStorage.getItem("pubKey");
-			_this4.privKey = localStorage.getItem("privKey");
-			_this4.tags = new _classAndSubClass2.default(_this4.pubKey, props.asset.asset_id);
+			_this3.pubKey = localStorage.getItem("pubKey");
+			_this3.privKey = localStorage.getItem("privKey");
+			_this3.tags = new _classAndSubClass2.default(_this3.pubKey, props.asset.asset_id);
 			//this.names = localStorage.getItem("contactNames").split(',');
 			//this.keys = localStorage.getItem("contactPubKeys").split(',');
-			_this4.state = {
+			_this3.state = {
 	
 				//added from MYCOID.jsx
 				file_attrs: [],
@@ -60407,8 +60391,8 @@
 				}],
 	
 				asset: props.asset || {},
-				asset_class: _this4.tags.getAssetData("classes"),
-				asset_subclass: _this4.tags.getAssetData("subclasses"),
+				asset_class: _this3.tags.getAssetData("classes"),
+				asset_subclass: _this3.tags.getAssetData("subclasses"),
 				qrCode_signature: {},
 	
 				qrCode_COID_device_relation: {},
@@ -60419,13 +60403,13 @@
 				docs: {}
 	
 			};
-			_this4.handleSelectViewDimension = _this4.handleSelectViewDimension.bind(_this4);
-			_this4.handleClassChange = _this4.handleClassChange.bind(_this4);
-			_this4.handleSubClassChange = _this4.handleSubClassChange.bind(_this4);
-			_this4.maxUniqAttr = 10;
-			_this4.bigchainGet = _this4.bigchainGet.bind(_this4);
-			_this4.onFieldChange = _this4.onFieldChange.bind(_this4); //recoverers
-			return _this4;
+			_this3.handleSelectViewDimension = _this3.handleSelectViewDimension.bind(_this3);
+			_this3.handleClassChange = _this3.handleClassChange.bind(_this3);
+			_this3.handleSubClassChange = _this3.handleSubClassChange.bind(_this3);
+			_this3.maxUniqAttr = 10;
+			_this3.bigchainGet = _this3.bigchainGet.bind(_this3);
+			_this3.onFieldChange = _this3.onFieldChange.bind(_this3); //recoverers
+			return _this3;
 		}
 	
 		//*****************************************************************************
@@ -60922,12 +60906,31 @@
 			// END DELEGATEE FUNCTIONS:
 			//**********************************************************************
 			//**********************************************************************
+			//START DIMENSION FUNCTION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	
+			//*****************************************************************************
+			//when we click Add More, a new value is pushed into this.state.inputs_files,
+			//and a new DimensionAttributeForm is rendered
 	
+		}, {
+			key: 'appendAttribute',
+			value: function appendAttribute() {
+				var inputLen = this.state.inputs_files.length;
+				if (inputLen < 10) {
+					var newInput = 'input-' + inputLen;
+					this.setState({ inputs_files: this.state.inputs_files.concat([newInput]) });
+					//inputs: input-0
+				}
+			}
+		}, {
+			key: 'updateAttributes',
+			value: function updateAttributes() {
+				console.log("we hit update attributes..");
+			}
 		}, {
 			key: 'render',
 			value: function render() {
-				var _this5 = this;
+				var _this4 = this;
 	
 				console.log("this.pubkey: " + this.pubKey);
 	
@@ -61035,7 +61038,7 @@
 					textAlign: "center"
 				};
 	
-				var syle = {
+				var marginRight15 = {
 					marginRight: '15px'
 				};
 	
@@ -61385,7 +61388,7 @@
 																				_react2.default.createElement(
 																					'a',
 																					{ href: 'javascript:', onClick: function onClick(e) {
-																							_this5.bigchainGet(ids[2]);
+																							_this4.bigchainGet(ids[2]);
 																						} },
 																					ids[2]
 																				)
@@ -61762,7 +61765,7 @@
 																				_react2.default.createElement(
 																					'a',
 																					{ href: 'javascript:', onClick: function onClick(e) {
-																							_this5.bigchainGet(ids[2]);
+																							_this4.bigchainGet(ids[2]);
 																						} },
 																					ids[2]
 																				)
@@ -61954,22 +61957,22 @@
 																),
 																_react2.default.createElement(
 																	'div',
-																	null,
+																	{ className: 'form-group' },
 																	_react2.default.createElement(
 																		'label',
 																		{ htmlFor: 'unique_id' },
 																		'Enter Unique ID Attributes:'
 																	),
 																	this.state.inputs.map(function (input) {
-																		return _react2.default.createElement(AttributeForm, { handleShowModal: _this5.handleShowModal.bind(_this5), max: '10', key: input, labelref: input });
+																		return _react2.default.createElement(_UniqueIDAttributeForm2.default, { type: "MyCOID", handleShowModal: _this4.handleShowModal.bind(_this4), max: '10', key: input, labelref: input });
 																	})
 																),
 																_react2.default.createElement(
 																	'div',
-																	{ className: 'col-md-offset-4 col-md-4 ' },
+																	{ className: 'form-group' },
 																	_react2.default.createElement(
 																		'button',
-																		{ type: 'button', className: 'btn btn-info pull-right', style: style, onClick: this.appendInput.bind(this) },
+																		{ type: 'button', className: 'btn-sm btn-info pull-right', style: marginRight15, onClick: this.appendInput.bind(this) },
 																		_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
 																		'Add More'
 																	)
@@ -61979,7 +61982,7 @@
 																	{ className: 'form-group' },
 																	_react2.default.createElement(
 																		'button',
-																		{ style: style, type: 'button', className: 'btn btn-primary', onClick: this.requestUpdateOfficalIDs.bind(this) },
+																		{ style: style, type: 'button', className: 'btn-sm btn-primary', onClick: this.requestUpdateOfficalIDs.bind(this) },
 																		_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
 																		'Update Official IDs'
 																	)
@@ -62080,7 +62083,7 @@
 																			'Enter Owners and their ownership token(s).'
 																		),
 																		this.state.inputs_owners.map(function (input) {
-																			return _react2.default.createElement(TokenDistributionForm, { handleShowModal: _this5.handleShowModal.bind(_this5), min: _this5.state.subform_cont, max: '10', key: input, labelref: input });
+																			return _react2.default.createElement(TokenDistributionForm, { handleShowModal: _this4.handleShowModal.bind(_this4), min: _this4.state.subform_cont, max: '10', key: input, labelref: input });
 																		})
 																	),
 																	_react2.default.createElement(
@@ -62196,7 +62199,7 @@
 																		'Enter Controllers and their control token(s).'
 																	),
 																	this.state.inputs_controllers.map(function (input) {
-																		return _react2.default.createElement(TokenDistributionForm, { handleShowModal: _this5.handleShowModal.bind(_this5), min: _this5.state.subform_cont, max: '10', key: input, labelref: input });
+																		return _react2.default.createElement(TokenDistributionForm, { handleShowModal: _this4.handleShowModal.bind(_this4), min: _this4.state.subform_cont, max: '10', key: input, labelref: input });
 																	})
 																),
 																_react2.default.createElement(
@@ -62339,7 +62342,7 @@
 																		'Enter Recovery ID(s).'
 																	),
 																	_react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs, { value: this.state.recovery_list, onChange: function onChange(e) {
-																			_this5.onFieldChange("recovery_list", e);
+																			_this4.onFieldChange("recovery_list", e);
 																		} }))
 																),
 																_react2.default.createElement('br', null),
@@ -62445,7 +62448,7 @@
 																		'Enter Delegatees and their delegated control token(s).'
 																	),
 																	this.state.inputs_delegatees.map(function (input) {
-																		return _react2.default.createElement(TokenDistributionForm, { handleShowModal: _this5.handleShowModal.bind(_this5), min: _this5.state.subform_cont, max: '10', key: input, labelref: input });
+																		return _react2.default.createElement(TokenDistributionForm, { handleShowModal: _this4.handleShowModal.bind(_this4), min: _this4.state.subform_cont, max: '10', key: input, labelref: input });
 																	})
 																),
 																_react2.default.createElement(
@@ -62484,8 +62487,8 @@
 											'Data Repositories (Identity Dimensions)'
 										),
 										function () {
-											if (!$.isEmptyObject(_this5.props.dimensions)) {
-												return _this5.props.dimensions.map(function (dims, i) {
+											if (!$.isEmptyObject(_this4.props.dimensions)) {
+												return _this4.props.dimensions.map(function (dims, i) {
 													return _react2.default.createElement(
 														'div',
 														{ className: 'panel-group', id: 'accordion' },
@@ -62516,7 +62519,7 @@
 																		{ className: 'row' },
 																		_react2.default.createElement(
 																			'table',
-																			{ className: 'table table-striped table-hover', style: syle },
+																			{ className: 'table table-striped table-hover', style: marginRight15 },
 																			_react2.default.createElement(
 																				'tbody',
 																				null,
@@ -62573,8 +62576,8 @@
 											'select',
 											{ defaultValue: this.state.selectValue, onChange: this.handleSelectViewDimension },
 											function () {
-												if (!$.isEmptyObject(_this5.props.dimensions)) {
-													return _this5.props.dimensions.map(function (dims, i) {
+												if (!$.isEmptyObject(_this4.props.dimensions)) {
+													return _this4.props.dimensions.map(function (dims, i) {
 														return _react2.default.createElement(
 															'option',
 															{ value: dims.dimensionName, key: i },
@@ -62663,7 +62666,7 @@
 																	)
 																),
 																function () {
-																	if (_this5.state.addingICA == true) {
+																	if (_this4.state.addingICA == true) {
 																		return _react2.default.createElement(
 																			'div',
 																			{ className: 'form-group' },
@@ -62678,15 +62681,15 @@
 																			),
 																			_react2.default.createElement(
 																				'select',
-																				{ id: 'ICAassetSelect', className: 'selectpicker show-tick', value: _this5.state.selectedAsset_addDimAttr, onChange: _this5.selectfromICAs },
+																				{ id: 'ICAassetSelect', className: 'selectpicker show-tick', value: _this4.state.selectedAsset_addDimAttr, onChange: _this4.selectfromICAs },
 																				_react2.default.createElement(
 																					'option',
 																					{ value: '' },
 																					'--- Please select ---'
 																				),
 																				function () {
-																					if (_this5.state.ICA_assets.length > 0) {
-																						return _this5.state.ICA_assets.map(function (asset, i) {
+																					if (_this4.state.ICA_assets.length > 0) {
+																						return _this4.state.ICA_assets.map(function (asset, i) {
 																							console.log("element: " + JSON.stringify(asset));
 																							return _react2.default.createElement(
 																								'option',
@@ -62701,35 +62704,31 @@
 																							'No claims found.'
 																						);
 																					}
-																				}(_this5)
+																				}(_this4)
 																			)
 																		);
 																	}
 																}(this),
 																_react2.default.createElement(
 																	'div',
-																	{ className: 'form-group', id: 'unique_id_div' },
+																	{ className: 'form-group' },
 																	_react2.default.createElement(
 																		'label',
 																		{ htmlFor: 'unique_id' },
 																		'Enter descriptor(s) and attribute(s):'
 																	),
 																	this.state.inputs_files.map(function (input) {
-																		return _react2.default.createElement(_DimensionAttributeForm2.default, { handleShowModal: _this5.handleShowModal.bind(_this5), max: '10', key: input, labelref: input });
+																		return _react2.default.createElement(_DimensionAttributeForm2.default, { handleShowModal: _this4.handleShowModal.bind(_this4), max: '10', key: input, labelref: input });
 																	})
 																),
 																_react2.default.createElement(
 																	'div',
-																	{ className: 'form-group', id: 'unique_id_btn' },
+																	{ className: 'form-group' },
 																	_react2.default.createElement(
-																		'div',
-																		{ className: 'col-md-offset-6 col-md-6 ' },
-																		_react2.default.createElement(
-																			'button',
-																			{ type: 'button', className: 'btn btn-info pull-right', style: syle },
-																			_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
-																			'Add More'
-																		)
+																		'button',
+																		{ type: 'button', className: 'btn-sm btn-info pull-right', style: marginRight15, onClick: this.appendAttribute.bind(this) },
+																		_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
+																		'Add More'
 																	)
 																)
 															),
@@ -62737,13 +62736,9 @@
 																'div',
 																{ className: 'form-group' },
 																_react2.default.createElement(
-																	'div',
-																	{ className: 'col-sm-6' },
-																	_react2.default.createElement(
-																		'button',
-																		{ className: 'btn btn-primary', 'data-loading-text': 'Submit', name: 'submit-form' },
-																		'Add Attribute(s)'
-																	)
+																	'button',
+																	{ className: 'btn-sm btn-primary', onClick: this.updateAttributes.bind(this), 'data-loading-text': 'Submit', name: 'submit-form' },
+																	'Add Attribute(s)'
 																)
 															),
 															this.state.showModal ? _react2.default.createElement(_UploadIpfsFile2.default, { pubKey: this.pubKey, flag: 1, dataHandler: this.getFileDetails.bind(this), handleHideModal: this.handleHideModal }) : null
@@ -62805,7 +62800,7 @@
 																		'Enter additional persona controllers. Note: Core Identity controllers will automatically be controllers of the persona.'
 																	),
 																	_react2.default.createElement(_reactTagsinput2.default, { maxTags: 10, value: this.state.dim_control_list, onChange: function onChange(e) {
-																			_this5.onFieldChange("dim_control_list", e);
+																			_this4.onFieldChange("dim_control_list", e);
 																		} })
 																),
 																_react2.default.createElement(
@@ -62816,7 +62811,7 @@
 																		{ className: 'col-md-offset-6 col-md-6 ' },
 																		_react2.default.createElement(
 																			'button',
-																			{ type: 'button', className: 'btn btn-info pull-right', style: syle },
+																			{ type: 'button', className: 'btn btn-info pull-right', style: marginRight15 },
 																			_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
 																			'Add More'
 																		)
@@ -62884,7 +62879,7 @@
 															{ className: 'row' },
 															_react2.default.createElement(
 																'table',
-																{ className: 'table table-striped table-hover', style: syle },
+																{ className: 'table table-striped table-hover', style: marginRight15 },
 																_react2.default.createElement(
 																	'tbody',
 																	null,
@@ -62900,10 +62895,10 @@
 																				'with whom would you like to share your persona and how many times should that person be able to access?'
 																			),
 																			this.state.delegations.map(function (input, i) {
-																				return _react2.default.createElement(_DimensionDelegationForm2.default, { attr: _this5.state.suggest_attrs[i], max: '10', key: input, labelref: input, deleValue: _this5.state.deleValue[i], deleToken: _this5.state.deleToken[i], passedFunction: function passedFunction(e) {
-																						_this5.onFieldChange2("deleValue," + i, e);
+																				return _react2.default.createElement(_DimensionDelegationForm2.default, { attr: _this4.state.suggest_attrs[i], max: '10', key: input, labelref: input, deleValue: _this4.state.deleValue[i], deleToken: _this4.state.deleToken[i], passedFunction: function passedFunction(e) {
+																						_this4.onFieldChange2("deleValue," + i, e);
 																					}, passedFunction2: function passedFunction2(e) {
-																						_this5.onFieldChange2("deleToken," + i, e);
+																						_this4.onFieldChange2("deleToken," + i, e);
 																					} });
 																			})
 																		)
@@ -62916,7 +62911,7 @@
 																			null,
 																			_react2.default.createElement(
 																				'button',
-																				{ type: 'button', className: 'btn btn-info pull-right', style: syle },
+																				{ type: 'button', className: 'btn btn-info pull-right', style: marginRight15 },
 																				_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
 																				'Add More'
 																			)
@@ -62998,17 +62993,17 @@
 		function Dims(props) {
 			_classCallCheck(this, Dims);
 	
-			var _this6 = _possibleConstructorReturn(this, (Dims.__proto__ || Object.getPrototypeOf(Dims)).call(this, props));
+			var _this5 = _possibleConstructorReturn(this, (Dims.__proto__ || Object.getPrototypeOf(Dims)).call(this, props));
 	
-			_this6.pubKey = localStorage.getItem("pubKey");
-			_this6.privKey = localStorage.getItem("privKey");
-			_this6.tags = new _classAndSubClass2.default(_this6.pubKey, props.dimension.dimension_id);
-			_this6.names = localStorage.getItem("contactNames").split(',');
-			_this6.keys = localStorage.getItem("contactPubKeys").split(',');
-			_this6.state = {
+			_this5.pubKey = localStorage.getItem("pubKey");
+			_this5.privKey = localStorage.getItem("privKey");
+			_this5.tags = new _classAndSubClass2.default(_this5.pubKey, props.dimension.dimension_id);
+			_this5.names = localStorage.getItem("contactNames").split(',');
+			_this5.keys = localStorage.getItem("contactPubKeys").split(',');
+			_this5.state = {
 	
-				asset_class: _this6.tags.getAssetData("classes"),
-				asset_subclass: _this6.tags.getAssetData("subclasses"),
+				asset_class: _this5.tags.getAssetData("classes"),
+				asset_subclass: _this5.tags.getAssetData("subclasses"),
 	
 				inputs: ['input-0'],
 	
@@ -63019,10 +63014,10 @@
 				signICA: false
 	
 			};
-			_this6.handleClassChange = _this6.handleClassChange.bind(_this6);
-			_this6.handleSubClassChange = _this6.handleSubClassChange.bind(_this6);
-			_this6.maxUniqAttr = 10;
-			return _this6;
+			_this5.handleClassChange = _this5.handleClassChange.bind(_this5);
+			_this5.handleSubClassChange = _this5.handleSubClassChange.bind(_this5);
+			_this5.maxUniqAttr = 10;
+			return _this5;
 		}
 	
 		_createClass(Dims, [{
@@ -63270,7 +63265,7 @@
 		}, {
 			key: 'render',
 			value: function render() {
-				var _this7 = this;
+				var _this6 = this;
 	
 				var prop = this.props.dimension;
 	
@@ -63315,7 +63310,7 @@
 					textAlign: "center"
 				};
 	
-				var syle = {
+				var marginRight15 = {
 					marginRight: '15px'
 				};
 	
@@ -63512,13 +63507,13 @@
 											_react2.default.createElement(
 												'button',
 												{ className: 'btn btn-success', onClick: function onClick(e) {
-														return _this7.signICA();
+														return _this6.signICA();
 													} },
 												'Sign Identity Claim'
 											)
 										),
 										this.state.signICA ? _react2.default.createElement(_reactDayPicker2.default, { disabledDays: { daysOfWeek: [0] }, onDayClick: function onDayClick(day) {
-												return _this7.selectDay(day);
+												return _this6.selectDay(day);
 											} }) : null
 									),
 									_react2.default.createElement(
@@ -63560,7 +63555,7 @@
 																	null,
 																	_react2.default.createElement(
 																		'button',
-																		{ type: 'button', className: 'btn btn-primary btn-sm', 'data-val': i, onClick: _this7.showAttrs.bind(_this7) },
+																		{ type: 'button', className: 'btn btn-primary btn-sm', 'data-val': i, onClick: _this6.showAttrs.bind(_this6) },
 																		'Spend Token'
 																	)
 																)
@@ -63604,9 +63599,9 @@
 		function Assets(props) {
 			_classCallCheck(this, Assets);
 	
-			var _this8 = _possibleConstructorReturn(this, (Assets.__proto__ || Object.getPrototypeOf(Assets)).call(this, props));
+			var _this7 = _possibleConstructorReturn(this, (Assets.__proto__ || Object.getPrototypeOf(Assets)).call(this, props));
 	
-			_this8.state = {
+			_this7.state = {
 				showDetails: false,
 				showDetails1: false, //set in dimensionHandler to render delegated data
 				wallet: { pubKey: localStorage.getItem("pubKey") },
@@ -63622,14 +63617,14 @@
 			};
 	
 			// event handlers must attached with current scope
-			_this8.assetHandler = _this8.assetHandler.bind(_this8);
-			_this8.dimensionHandler = _this8.dimensionHandler.bind(_this8);
-			_this8.hideHandler = _this8.hideHandler.bind(_this8);
+			_this7.assetHandler = _this7.assetHandler.bind(_this7);
+			_this7.dimensionHandler = _this7.dimensionHandler.bind(_this7);
+			_this7.hideHandler = _this7.hideHandler.bind(_this7);
 	
-			_this8.hideHandler1 = _this8.hideHandler1.bind(_this8);
+			_this7.hideHandler1 = _this7.hideHandler1.bind(_this7);
 	
-			_this8.searchHandler = _this8.searchHandler.bind(_this8);
-			return _this8;
+			_this7.searchHandler = _this7.searchHandler.bind(_this7);
+			return _this7;
 		}
 	
 		//*******************************************************************************
@@ -64031,7 +64026,7 @@
 		}, {
 			key: 'render',
 			value: function render() {
-				var _this9 = this;
+				var _this8 = this;
 	
 				return _react2.default.createElement(
 					'div',
@@ -64101,15 +64096,15 @@
 								{ className: 'row assets' },
 								this.state.own_assets.map(function (asset, i) {
 									var cssClass = "btn btn-success";
-									if (_this9.state.show_only.length > 0) {
-										if (_this9.state.show_only.toString().indexOf(asset.asset_id.toString()) == -1) {
+									if (_this8.state.show_only.length > 0) {
+										if (_this8.state.show_only.toString().indexOf(asset.asset_id.toString()) == -1) {
 											cssClass += " hidden";
 										} else cssClass.replace("hidden", "");
 									}
 									return _react2.default.createElement(
 										'button',
 										{ type: 'button', key: i, className: cssClass, onClick: function onClick() {
-												return _this9.assetHandler(asset);
+												return _this8.assetHandler(asset);
 											} },
 										_react2.default.createElement('span', { className: 'glyphicon glyphicon-ok-circle' }),
 										asset.asset_id
@@ -64136,15 +64131,15 @@
 								{ className: 'row assets' },
 								this.state.controlled_assets.map(function (asset) {
 									var cssClass = "btn btn-info";
-									if (_this9.state.show_only.length > 0) {
-										if (_this9.state.show_only.toString().indexOf(asset.asset_id.toString()) >= 0) {
+									if (_this8.state.show_only.length > 0) {
+										if (_this8.state.show_only.toString().indexOf(asset.asset_id.toString()) >= 0) {
 											cssClass += " show";
 										} else cssClass += " hidden";
 									}
 									return _react2.default.createElement(
 										'button',
 										{ type: 'button', key: asset.asset_id, className: cssClass, onClick: function onClick() {
-												return _this9.assetHandler(asset);
+												return _this8.assetHandler(asset);
 											} },
 										_react2.default.createElement('span', { className: 'glyphicon glyphicon-link' }),
 										asset.asset_id
@@ -64171,15 +64166,15 @@
 								{ className: 'row assets' },
 								this.state.delegated_dims.map(function (dimension, i) {
 									var cssClass = "btn btn-danger";
-									if (_this9.state.show_only.length > 0) {
-										if (_this9.state.show_only.toString().indexOf(dimension.dimension_id.toString()) >= 0) {
+									if (_this8.state.show_only.length > 0) {
+										if (_this8.state.show_only.toString().indexOf(dimension.dimension_id.toString()) >= 0) {
 											cssClass += " show";
 										} else cssClass += " hidden";
 									}
 									return _react2.default.createElement(
 										'button',
 										{ type: 'button', key: i, className: cssClass, onClick: function onClick() {
-												return _this9.dimensionHandler(dimension);
+												return _this8.dimensionHandler(dimension);
 											} },
 										_react2.default.createElement('span', { className: 'glyphicon glyphicon-piggy-bank' }),
 										dimension.dimension_id
@@ -65737,51 +65732,48 @@
 	        key: "render",
 	        value: function render() {
 	            //console.log("dimensionform props...\n" + JSON.stringify(this.props));
+	            var style = { fontSize: '12.5px' };
 	            return _react2.default.createElement(
 	                "div",
-	                { className: "form-group col-md-12" },
+	                { className: "form-group", style: style },
+	                _react2.default.createElement(
+	                    "label",
+	                    { htmlFor: "unique_id_attrs" },
+	                    " Persona Descriptor e.g. \"My college transcript\", \"Chase Bank KYC\", or \"My blockchain research\". "
+	                ),
+	                _react2.default.createElement("input", { name: 'label-' + this.props.labelref, className: "form-control col-md-4", type: "text", placeholder: "Descriptor" }),
+	                _react2.default.createElement(
+	                    "button",
+	                    { type: "button", "data-id": this.props.labelref, onClick: this.props.handleShowModal, className: "btn-sm btn-warning pull-right" },
+	                    _react2.default.createElement("span", { className: "glyphicon glyphicon-upload" }),
+	                    "Upload File"
+	                ),
 	                _react2.default.createElement(
 	                    "div",
-	                    { className: "col-md-10" },
+	                    null,
 	                    _react2.default.createElement(
 	                        "label",
-	                        { htmlFor: "unique_id_attrs" },
-	                        " Persona Descriptor e.g. \"My college transcript\", \"Chase Bank KYC\", or \"My blockchain research\". "
+	                        null,
+	                        " Descriptor privacy: "
 	                    ),
-	                    _react2.default.createElement("input", { name: 'label-' + this.props.labelref, className: "form-control col-md-4", type: "text", placeholder: "Descriptor" }),
 	                    _react2.default.createElement(
-	                        "div",
-	                        { className: "form-group" },
+	                        "select",
+	                        { name: 'privacy-' + this.props.labelref, id: "privacy", onChange: this.selectPrivacy },
 	                        _react2.default.createElement(
-	                            "label",
-	                            null,
-	                            " Descriptor privacy: "
+	                            "option",
+	                            { value: "selectVisibility" },
+	                            "--- Please select ---"
 	                        ),
 	                        _react2.default.createElement(
-	                            "select",
-	                            { name: 'privacy-' + this.props.labelref, id: "privacy", onChange: this.selectPrivacy },
-	                            _react2.default.createElement(
-	                                "option",
-	                                { value: "selectVisibility" },
-	                                "--- Please select ---"
-	                            ),
-	                            _react2.default.createElement(
-	                                "option",
-	                                { value: "Public" },
-	                                "Public"
-	                            ),
-	                            _react2.default.createElement(
-	                                "option",
-	                                { value: "Private" },
-	                                "Private"
-	                            )
+	                            "option",
+	                            { value: "Public" },
+	                            "Public"
+	                        ),
+	                        _react2.default.createElement(
+	                            "option",
+	                            { value: "Private" },
+	                            "Private"
 	                        )
-	                    ),
-	                    _react2.default.createElement(
-	                        "button",
-	                        { type: "button", "data-id": this.props.labelref, onClick: this.props.handleShowModal, className: "btn-sm btn-warning pull-right" },
-	                        _react2.default.createElement("span", { className: "glyphicon glyphicon-upload" }),
-	                        "Upload File"
 	                    )
 	                )
 	            );
@@ -70272,9 +70264,7 @@
 						id: "3"
 					}
 				};
-				var syle = {
-					marginRight: '15px'
-				};
+	
 				var style = {
 					fontSize: '12.5px'
 				};
@@ -70283,7 +70273,7 @@
 					marginTop: '26px'
 				};
 	
-				var syle = {
+				var marginRight15 = {
 					marginRight: '15px'
 				};
 	
@@ -70383,10 +70373,10 @@
 												),
 												_react2.default.createElement(
 													'div',
-													{ className: 'col-md-offset-4 col-md-6' },
+													null,
 													_react2.default.createElement(
 														'button',
-														{ type: 'button', className: 'btn-sm btn-info pull-right', style: syle, onClick: this.appendInput.bind(this) },
+														{ type: 'button', className: 'btn-sm btn-info pull-right', style: marginRight15, onClick: this.appendInput.bind(this) },
 														_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
 														'Add More'
 													)
@@ -70505,7 +70495,7 @@
 													{ className: 'col-md-offset-4 col-md-6' },
 													_react2.default.createElement(
 														'button',
-														{ type: 'button', className: 'btn-sm btn-info pull-right', style: syle, onClick: this.appendInputOwners.bind(this) },
+														{ type: 'button', className: 'btn-sm btn-info pull-right', style: marginRight15, onClick: this.appendInputOwners.bind(this) },
 														_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
 														'Add More'
 													)
@@ -70636,7 +70626,7 @@
 													{ className: 'col-md-offset-4 col-md-6' },
 													_react2.default.createElement(
 														'button',
-														{ type: 'button', className: 'btn-sm btn-info pull-right', style: syle, onClick: this.appendInputControllers.bind(this) },
+														{ type: 'button', className: 'btn-sm btn-info pull-right', style: marginRight15, onClick: this.appendInputControllers.bind(this) },
 														_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
 														'Add More'
 													)
@@ -70947,7 +70937,7 @@
 														{ className: 'col-md-offset-4 col-md-6' },
 														_react2.default.createElement(
 															'button',
-															{ type: 'button', className: 'btn-sm btn-info pull-right', style: syle, onClick: this.appendInput.bind(this) },
+															{ type: 'button', className: 'btn-sm btn-info pull-right', style: marginRight15, onClick: this.appendInput.bind(this) },
 															_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
 															'Add More'
 														)

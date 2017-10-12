@@ -554,7 +554,7 @@ class CoreIdentity extends React.Component {
 				id: "2"
 			}
 		};
-		var syle = {
+		var marginRight15 = {
 			marginRight: '15px'
 		}
 		var style = {
@@ -570,7 +570,7 @@ class CoreIdentity extends React.Component {
 						{this.state.inputs.map(input => <UniqueIDAttributeForm type="IDF" handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
 					</div>
 					<div className="col-md-offset-4 col-md-6">
-						<button type="button" className="btn-sm btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
+						<button type="button" className="btn-sm btn-info pull-right" style={marginRight15} onClick={this.appendInput.bind(this)}>
 							<span className="glyphicon glyphicon-plus"></span>Add More
 						</button>
 					</div>
@@ -607,7 +607,7 @@ class CoreIdentity extends React.Component {
 						)}
 					</div>
 					<div className="form-group col-md-offset-4 col-md-6">
-						<button type="button" className="btn-sm btn-info pull-right" style={syle} onClick={this.appendInput2.bind(this)}>
+						<button type="button" className="btn-sm btn-info pull-right" style={marginRight15} onClick={this.appendInput2.bind(this)}>
 							<span className="glyphicon glyphicon-plus"></span>Add More
 						</button>
 					</div>

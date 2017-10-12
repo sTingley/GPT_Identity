@@ -612,10 +612,15 @@ class Modal extends Component {
 		})
 
 	}
-	// END DELEGATEE FUNCTIONS:
+	// END DELEGATEE FUNCTIONS
+	// END ASSET FUNCTIONS
 	//**********************************************************************
 	//**********************************************************************
-	//START DIMENSION FUNCTION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//**********************************************************************
+	//**********************************************************************
+	//**********************************************************************
+	//**********************************************************************
+	//START DIMENSION FUNCTIONS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	//*****************************************************************************
     //when we click Add More, a new value is pushed into this.state.inputs_files,
@@ -629,9 +634,135 @@ class Modal extends Component {
         }
 	}
 	
-	updateAttributes(){
-		console.log("we hit update attributes..");
-	}
+    //*****************************************************************************/
+    updateAttributes() {
+        //e.preventDefault();
+
+        let dimension = this.state.dimension;
+        let json = {};
+
+        json.dimensionName = dimension.dimensionName;
+        json.pubKey = keccak_256(localStorage.getItem("pubKey"));
+        json.address = dimension.address;
+
+        let selected_asset = this.state.selectedAsset_addDimAttr;
+        console.log("selected asset: " + selected_asset);
+
+        let bigchainTrxnID; //we will pass this to prepareAttributes function
+        this.state.own_assets.forEach(function (asset, index) {
+            if (selected_asset == asset.asset_id) {
+                console.log("\n\n SELECTED ASSET: " + selected_asset + "  Owned assetID: " + asset.asset_id);
+                bigchainTrxnID = asset.asset_bigchainID
+            }
+        })
+        // this.state.control_assets.forEach(function (asset, index) {
+        //     if (selected_asset == asset.asset_id) {
+        //         console.log("\n\n SELECTED ASSET: " + selected_asset + "  Controlled assetID: " + asset.asset_id);
+        //         bigchainTrxnID = asset.asset_bigchainID
+        //     }
+        // })
+
+        //WE CANNOT PASS A NORMAL ASSET ... ONLY ICA CLAIM CAN BE ADDED WITH THIS CURRENT LOGIC
+
+        json.ID = 0;
+
+        if (this.state.owned == true) { json.flag = 0; }
+        else json.flag = 1;
+
+        json.dimensionCtrlAddr = dimension.dimensionCtrlAddr;
+
+        let attributes = this.prepareAttributes(selected_asset, bigchainTrxnID);
+        json.data = attributes;
+
+        //json.controllers_dimension = controllers_dimension
+
+        var signature = this.getSignature(json);
+        var msg_hash = keccak_256(JSON.stringify(json));
+        var msg_hash_buffer = new Buffer(msg_hash, "hex");
+        json.msg = msg_hash_buffer.toString("hex");
+        json.sig = signature;
+
+        $.ajax({
+            type: "POST",
+            url: twinUrl + 'dimensions/addEntry',
+            data: json,
+            success: function (result) {
+                var data = result;
+                if ($.type(result) != "object") {
+                    data = JSON.parseJSON(result)
+                }
+                console.log("response addEntry: " + JSON.stringify(data))
+
+            }.bind(this),
+            complete: function () {
+                // do something
+                //ST: HERE WE COULD WRITE DIMENSIONS INTO COID JSON?
+            },
+        })
+        console.log("JSON: " + JSON.stringify(json))
+    }
+
+	 //*****************************************************************************
+	 requestAddDelegation() {
+		
+				let dimension = this.state.dimension
+				//*********************************************/
+				var json = {}
+		
+				json.publicKey = localStorage.getItem("pubKey");
+				json.typeInput = dimension.dimensionName;
+				json.owners = dimension.owners
+				json.coidAddr = dimension.coidAddr
+				json.dimensionCtrlAddr = dimension.dimensionCtrlAddr
+				//json.flag   UNCOMMENT THIS!!!!!!!!!!!!
+		
+				//*********************************************************************
+				//checking if they want to delegate access to all attrs
+				//this mean accessCategories (contract) will be null
+				// var x = $("#allAttrs").is(":checked");
+				// console.log("checkbox: " + x)
+				// if ($("#allAttrs").is(":checked")) {
+				//     $('#accessCategories').hide();
+				// }
+		
+				let accessCategories = []
+		
+				//Getting the value (index) of selected access categories
+				//the index represents the desriptor/attribute
+				$('#accessCategories option:selected').each(function () {
+					accessCategories.push($(this).val());
+					//accessCategories now contains the selected indices
+				});
+		
+				console.log("selectedCategories: " + accessCategories)
+		
+				accessCategories.forEach(function (element) {
+					//console.log("got element: " + element)
+					json.accessCategories += dimension.data[element].descriptor + ","
+				})
+		
+				//this will get rid of the last trailing comma
+				json.accessCategories = json.accessCategories.substring(0, json.accessCategories.length - 1)
+		
+				let delegations = this.prepareDelegationDistribution(dimension.dimensionName, json.owners);
+				json.delegations = delegations;
+		
+				json.propType = 2;
+		
+				console.log("\n JSON body: " + JSON.stringify(json))
+				$.ajax({
+					url: twinUrl + 'dimensions/delegate',
+					type: 'POST',
+					data: json,
+					success: function (res) {
+						console.log("response delegate: " + res);
+						//if (res.status == "Ok" && res.msg == "true") {
+						//var i_dimension = this.state.dimension.ID
+						//}
+					}
+				});
+		
+			}//requestAddDelegation
 
 	render() {
 		console.log("this.pubkey: " + this.pubKey);
@@ -1161,13 +1292,13 @@ class Modal extends Component {
 															</div>
 															<div className="col-md-offset-6 col-md-6 ">
 																{/* onClick={this.appendControllers.bind(this)} */}
-																<button type="button" className="btn btn-info pull-right" style={style}>
+																<button type="button" className="btn-sm btn-info pull-right" style={style}>
 																	<span className="glyphicon glyphicon-plus"></span>Add More
 														</button>
 															</div>
 															<div className="form-group">
 																{/* onClick={this.requestUpdateController.bind(this)} */}
-																<button style={style} type="button" className="btn btn-primary">
+																<button style={style} type="button" className="btn-sm btn-primary">
 																	<span className="glyphicon glyphicon-plus"></span>Update Control
 														</button>
 															</div>
@@ -1443,20 +1574,17 @@ class Modal extends Component {
 															</div>
 
 															<div className="form-group" id="controllers_dimension_btn">
-																<div className="col-md-offset-6 col-md-6 ">
-																	{/* onClick={this.addController.bind(this)} */}
-																	<button type="button" className="btn btn-info pull-right" style={marginRight15}>
-																		<span className="glyphicon glyphicon-plus"></span>Add More
-																																				</button>
-																</div>
+																{/* onClick={this.addController.bind(this)} */}
+																{/* <button type="button" className="btn btn-info pull-right" style={marginRight15}>
+																	<span className="glyphicon glyphicon-plus"></span>Add More
+																</button> */}
 															</div>
+
 														</form>
 
 														<div className="form-group">
-															<div className="col-sm-6">
-																{/* onClick={this.requestAddController.bind(this)} */}
-																<button className="btn btn-primary" data-loading-text="Submit" name="submit-form">Add Controller(s)</button>
-															</div>
+															{/* onClick={this.requestAddController.bind(this)} */}
+															<button className="btn-sm btn-primary" data-loading-text="Submit" name="submit-form">Add Controller(s)</button>
 														</div>
 													</div>
 												</div>
@@ -1485,7 +1613,7 @@ class Modal extends Component {
 															<tbody>
 																<tr>
 																	<td>
-																		<label htmlFor="control_dist">with whom would you like to share your persona and how many times should that person be able to access?</label>
+																		<label htmlFor="control_dist">With whom would you like to share your persona and how many times should that person be able to access?</label>
 																		{/* autocompleteRenderInput={autocompleteRenderInput} */}
 																		{this.state.delegations.map((input, i) =>
 																			<DimensionDelegationForm attr={this.state.suggest_attrs[i]} max="10" key={input} labelref={input} deleValue={this.state.deleValue[i]} deleToken={this.state.deleToken[i]} passedFunction={(e) => { this.onFieldChange2("deleValue," + i, e) }} passedFunction2={(e) => { this.onFieldChange2("deleToken," + i, e) }} />)}
@@ -1494,7 +1622,7 @@ class Modal extends Component {
 																<tr>
 																	<td>
 																		{/* onClick={this.appendDelegation.bind(this)} */}
-																		<button type="button" className="btn btn-info pull-right" style={marginRight15}>
+																		<button type="button" className="btn-sm btn-info pull-right" style={marginRight15}>
 																			<span className="glyphicon glyphicon-plus"></span>Add More</button>
 																	</td>
 																</tr>
@@ -1505,7 +1633,7 @@ class Modal extends Component {
 															<td><input id="allAttrs" type="checkbox" />YES</td>
 														</tr>*/}
 																<tr>
-																	<th><b>Access Categories (select 1 or many):</b></th>
+																	{/* <th><b>Access Categories (select 1 or many):</b></th> */}
 																</tr>
 																<tr>
 																	<td>

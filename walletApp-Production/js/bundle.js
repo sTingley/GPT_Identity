@@ -60903,10 +60903,15 @@
 					}.bind(this)
 				});
 			}
-			// END DELEGATEE FUNCTIONS:
+			// END DELEGATEE FUNCTIONS
+			// END ASSET FUNCTIONS
 			//**********************************************************************
 			//**********************************************************************
-			//START DIMENSION FUNCTION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			//**********************************************************************
+			//**********************************************************************
+			//**********************************************************************
+			//**********************************************************************
+			//START DIMENSION FUNCTIONS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	
 			//*****************************************************************************
 			//when we click Add More, a new value is pushed into this.state.inputs_files,
@@ -60922,11 +60927,142 @@
 					//inputs: input-0
 				}
 			}
+	
+			//*****************************************************************************/
+	
 		}, {
 			key: 'updateAttributes',
 			value: function updateAttributes() {
-				console.log("we hit update attributes..");
+				//e.preventDefault();
+	
+				var dimension = this.state.dimension;
+				var json = {};
+	
+				json.dimensionName = dimension.dimensionName;
+				json.pubKey = keccak_256(localStorage.getItem("pubKey"));
+				json.address = dimension.address;
+	
+				var selected_asset = this.state.selectedAsset_addDimAttr;
+				console.log("selected asset: " + selected_asset);
+	
+				var bigchainTrxnID = void 0; //we will pass this to prepareAttributes function
+				this.state.own_assets.forEach(function (asset, index) {
+					if (selected_asset == asset.asset_id) {
+						console.log("\n\n SELECTED ASSET: " + selected_asset + "  Owned assetID: " + asset.asset_id);
+						bigchainTrxnID = asset.asset_bigchainID;
+					}
+				});
+				// this.state.control_assets.forEach(function (asset, index) {
+				//     if (selected_asset == asset.asset_id) {
+				//         console.log("\n\n SELECTED ASSET: " + selected_asset + "  Controlled assetID: " + asset.asset_id);
+				//         bigchainTrxnID = asset.asset_bigchainID
+				//     }
+				// })
+	
+				//WE CANNOT PASS A NORMAL ASSET ... ONLY ICA CLAIM CAN BE ADDED WITH THIS CURRENT LOGIC
+	
+				json.ID = 0;
+	
+				if (this.state.owned == true) {
+					json.flag = 0;
+				} else json.flag = 1;
+	
+				json.dimensionCtrlAddr = dimension.dimensionCtrlAddr;
+	
+				var attributes = this.prepareAttributes(selected_asset, bigchainTrxnID);
+				json.data = attributes;
+	
+				//json.controllers_dimension = controllers_dimension
+	
+				var signature = this.getSignature(json);
+				var msg_hash = keccak_256(JSON.stringify(json));
+				var msg_hash_buffer = new Buffer(msg_hash, "hex");
+				json.msg = msg_hash_buffer.toString("hex");
+				json.sig = signature;
+	
+				$.ajax({
+					type: "POST",
+					url: twinUrl + 'dimensions/addEntry',
+					data: json,
+					success: function (result) {
+						var data = result;
+						if ($.type(result) != "object") {
+							data = JSON.parseJSON(result);
+						}
+						console.log("response addEntry: " + JSON.stringify(data));
+					}.bind(this),
+					complete: function complete() {
+						// do something
+						//ST: HERE WE COULD WRITE DIMENSIONS INTO COID JSON?
+					}
+				});
+				console.log("JSON: " + JSON.stringify(json));
 			}
+	
+			//*****************************************************************************
+	
+		}, {
+			key: 'requestAddDelegation',
+			value: function requestAddDelegation() {
+	
+				var dimension = this.state.dimension;
+				//*********************************************/
+				var json = {};
+	
+				json.publicKey = localStorage.getItem("pubKey");
+				json.typeInput = dimension.dimensionName;
+				json.owners = dimension.owners;
+				json.coidAddr = dimension.coidAddr;
+				json.dimensionCtrlAddr = dimension.dimensionCtrlAddr;
+				//json.flag   UNCOMMENT THIS!!!!!!!!!!!!
+	
+				//*********************************************************************
+				//checking if they want to delegate access to all attrs
+				//this mean accessCategories (contract) will be null
+				// var x = $("#allAttrs").is(":checked");
+				// console.log("checkbox: " + x)
+				// if ($("#allAttrs").is(":checked")) {
+				//     $('#accessCategories').hide();
+				// }
+	
+				var accessCategories = [];
+	
+				//Getting the value (index) of selected access categories
+				//the index represents the desriptor/attribute
+				$('#accessCategories option:selected').each(function () {
+					accessCategories.push($(this).val());
+					//accessCategories now contains the selected indices
+				});
+	
+				console.log("selectedCategories: " + accessCategories);
+	
+				accessCategories.forEach(function (element) {
+					//console.log("got element: " + element)
+					json.accessCategories += dimension.data[element].descriptor + ",";
+				});
+	
+				//this will get rid of the last trailing comma
+				json.accessCategories = json.accessCategories.substring(0, json.accessCategories.length - 1);
+	
+				var delegations = this.prepareDelegationDistribution(dimension.dimensionName, json.owners);
+				json.delegations = delegations;
+	
+				json.propType = 2;
+	
+				console.log("\n JSON body: " + JSON.stringify(json));
+				$.ajax({
+					url: twinUrl + 'dimensions/delegate',
+					type: 'POST',
+					data: json,
+					success: function success(res) {
+						console.log("response delegate: " + res);
+						//if (res.status == "Ok" && res.msg == "true") {
+						//var i_dimension = this.state.dimension.ID
+						//}
+					}
+				});
+			} //requestAddDelegation
+	
 		}, {
 			key: 'render',
 			value: function render() {
@@ -62207,7 +62343,7 @@
 																	{ className: 'col-md-offset-6 col-md-6 ' },
 																	_react2.default.createElement(
 																		'button',
-																		{ type: 'button', className: 'btn btn-info pull-right', style: style },
+																		{ type: 'button', className: 'btn-sm btn-info pull-right', style: style },
 																		_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
 																		'Add More'
 																	)
@@ -62217,7 +62353,7 @@
 																	{ className: 'form-group' },
 																	_react2.default.createElement(
 																		'button',
-																		{ style: style, type: 'button', className: 'btn btn-primary' },
+																		{ style: style, type: 'button', className: 'btn-sm btn-primary' },
 																		_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
 																		'Update Control'
 																	)
@@ -62803,32 +62939,15 @@
 																			_this4.onFieldChange("dim_control_list", e);
 																		} })
 																),
-																_react2.default.createElement(
-																	'div',
-																	{ className: 'form-group', id: 'controllers_dimension_btn' },
-																	_react2.default.createElement(
-																		'div',
-																		{ className: 'col-md-offset-6 col-md-6 ' },
-																		_react2.default.createElement(
-																			'button',
-																			{ type: 'button', className: 'btn btn-info pull-right', style: marginRight15 },
-																			_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
-																			'Add More'
-																		)
-																	)
-																)
+																_react2.default.createElement('div', { className: 'form-group', id: 'controllers_dimension_btn' })
 															),
 															_react2.default.createElement(
 																'div',
 																{ className: 'form-group' },
 																_react2.default.createElement(
-																	'div',
-																	{ className: 'col-sm-6' },
-																	_react2.default.createElement(
-																		'button',
-																		{ className: 'btn btn-primary', 'data-loading-text': 'Submit', name: 'submit-form' },
-																		'Add Controller(s)'
-																	)
+																	'button',
+																	{ className: 'btn-sm btn-primary', 'data-loading-text': 'Submit', name: 'submit-form' },
+																	'Add Controller(s)'
 																)
 															)
 														)
@@ -62892,7 +63011,7 @@
 																			_react2.default.createElement(
 																				'label',
 																				{ htmlFor: 'control_dist' },
-																				'with whom would you like to share your persona and how many times should that person be able to access?'
+																				'With whom would you like to share your persona and how many times should that person be able to access?'
 																			),
 																			this.state.delegations.map(function (input, i) {
 																				return _react2.default.createElement(_DimensionDelegationForm2.default, { attr: _this4.state.suggest_attrs[i], max: '10', key: input, labelref: input, deleValue: _this4.state.deleValue[i], deleToken: _this4.state.deleToken[i], passedFunction: function passedFunction(e) {
@@ -62911,25 +63030,13 @@
 																			null,
 																			_react2.default.createElement(
 																				'button',
-																				{ type: 'button', className: 'btn btn-info pull-right', style: marginRight15 },
+																				{ type: 'button', className: 'btn-sm btn-info pull-right', style: marginRight15 },
 																				_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
 																				'Add More'
 																			)
 																		)
 																	),
-																	_react2.default.createElement(
-																		'tr',
-																		null,
-																		_react2.default.createElement(
-																			'th',
-																			null,
-																			_react2.default.createElement(
-																				'b',
-																				null,
-																				'Access Categories (select 1 or many):'
-																			)
-																		)
-																	),
+																	_react2.default.createElement('tr', null),
 																	_react2.default.createElement(
 																		'tr',
 																		null,

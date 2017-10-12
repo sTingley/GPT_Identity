@@ -625,12 +625,12 @@ class MyGatekeeper extends React.Component {
 	};
 
 
-	renderNormalAsset(){
+	renderNormalAsset() {
 
 	}
 
-	renderICA(){
-		
+	renderICA() {
+
 	}
 
 
@@ -769,6 +769,9 @@ class MyGatekeeper extends React.Component {
 			fontSize: '12.5px'
 		}
 
+		var syle2 = {
+			marginTop: '26px'
+		}
 
 		var syle = {
 			marginRight: '15px'
@@ -796,98 +799,209 @@ class MyGatekeeper extends React.Component {
 									defaultChecked={false} />
 							</label>
 						</div>
-						<div className="form-group">
-							<label htmlFor="unique_id">Enter Unique Attributes</label>
-							{this.state.inputs.map(input => <UniqueIDAttributeForm type="MyGK" handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
-						</div>
 
-						<div className="col-md-offset-4 col-md-6">
-							<button type="button" className="btn-sm btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
-								<span className="glyphicon glyphicon-plus"></span>Add More
-							</button>
-						</div>
-
-						<div className="form-group">
-							<label htmlFor="owner_dist">Enter Owners and their ownership token(s).</label>
-							{this.state.inputs_ownership.map((input, i) =>
-								<div className="col-md-10">
-									<table className="table table-striped table-hover" style={style}>
-										<tbody>
-											<tr>
-												<th><b>Owner</b></th>
-												<th><b>Token Quantity</b></th>
-											</tr>
-											<tr>
-												<td><TagsInput {...this.state.suggest_attrs2[i]} maxTags={1} renderInput={autocompleteRenderInput} className="form-control col-md-4" type="text" value={this.state.owner_id[i]} onChange={(e) => { this.onFieldChange2("owner_id," + i, e) }} />
-												</td>
-												<td><TagsInput {...basicAttrs} maxTags={1} className="form-control col-md-4" type="text" value={this.state.owner_token_quantity[i]} onChange={(e) => { this.onFieldChange2("owner_token_quantity," + i, e) }} /></td>
-											</tr>
-										</tbody>
-									</table>
+						<div className="panel-group" id="accordion1">
+							<div className="panel panel-default">
+								<div className="panel-heading">
+									<div className="row">
+										<div className="col-xs-11">
+											<label>Uniqueness</label>
+										</div>
+										<div className="col-xs-1">
+											<a data-toggle="collapse" data-parent="#accordion" href="#collapse1">
+												<span className="glyphicon glyphicon-chevron-down"></span>
+											</a>
+										</div>
+									</div>
 								</div>
-							)}
+								<div id="collapse1" className="panel-collapse collapse out">
+									<div className="panel-body">
+										<div className="row">
+											<div className="form-group">
+												<label htmlFor="unique_id">Enter Unique Attributes</label>
+												{this.state.inputs.map(input => <UniqueIDAttributeForm type="MyGK" handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+											</div>
+
+											<div className="col-md-offset-4 col-md-6">
+												<button type="button" className="btn-sm btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
+													<span className="glyphicon glyphicon-plus"></span>Add More
+													</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
 
-						<div className="col-md-offset-4 col-md-6">
-							<button type="button" className="btn-sm btn-info pull-right" style={syle} onClick={this.appendInputOwners.bind(this)}>
-								<span className="glyphicon glyphicon-plus"></span>Add More
-							</button>
-						</div>
-						<div className="form-group">
-							<label htmlFor="owner_token_id">Enter Owner Token Description. For example, 'Spencer's tokens'.</label>
-							<TagsInput {...basicAttrs} value={this.state.owner_token_desc} onChange={(e) => { this.onFieldChange("owner_token_desc", e) }} />
-						</div>
-						
-						<div className="form-group">
-							<label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
-							{this.state.inputs_control.map((input, i) =>
-								<div className="col-md-10">
-									<table className="table table-striped table-hover" style={style}>
-										<tbody>
-											<tr>
-												<th><b>Controller</b></th>
-												<th><b>Token Quantity</b></th>
-											</tr>
-											<tr>
-												<td><TagsInput {...this.state.suggest_attrs[i]} maxTags={1} renderInput={autocompleteRenderInput} className="form-control col-md-4" type="text" value={this.state.control_id[i]} onChange={(e) => { this.onFieldChange2("control_id," + i, e) }} />
-												</td>
-												<td><TagsInput {...basicAttrs} maxTags={1} className="form-control col-md-4" type="text" value={this.state.control_token_quantity[i]} onChange={(e) => { this.onFieldChange2("control_token_quantity," + i, e) }} /></td>
-											</tr>
-										</tbody>
-									</table>
-								</div>	
-							)}
+						<div className="panel-group" id="accordion2">
+							<div className="panel panel-default">
+								<div className="panel-heading">
+									<div className="row">
+										<div className="col-xs-11">
+											<label>Ownership</label>
+										</div>
+										<div className="col-xs-1">
+											<a data-toggle="collapse" data-parent="#accordion2" href="#collapse2">
+												<span className="glyphicon glyphicon-chevron-down"></span>
+											</a>
+										</div>
+									</div>
+								</div>
+								<div id="collapse2" className="panel-collapse collapse out">
+									<div className="panel-body">
+										<div className="row">
+											<div className="form-group">
+												<label htmlFor="owner_dist">Enter Owners and their ownership token(s).</label>
+												{this.state.inputs_ownership.map((input, i) =>
+													<div className="col-md-10">
+														<table className="table table-striped table-hover" style={style}>
+															<tbody>
+																<tr>
+																	<th><b>Owner</b></th>
+																	<th><b>Token Quantity</b></th>
+																</tr>
+																<tr>
+																	<td><TagsInput {...this.state.suggest_attrs2[i]} maxTags={1} renderInput={autocompleteRenderInput} className="form-control col-md-4" type="text" value={this.state.owner_id[i]} onChange={(e) => { this.onFieldChange2("owner_id," + i, e) }} />
+																	</td>
+																	<td><TagsInput {...basicAttrs} maxTags={1} className="form-control col-md-4" type="text" value={this.state.owner_token_quantity[i]} onChange={(e) => { this.onFieldChange2("owner_token_quantity," + i, e) }} /></td>
+																</tr>
+															</tbody>
+														</table>
+													</div>
+												)}
+											</div>
+											<div className="col-md-offset-4 col-md-6">
+												<button type="button" className="btn-sm btn-info pull-right" style={syle} onClick={this.appendInputOwners.bind(this)}>
+													<span className="glyphicon glyphicon-plus"></span>Add More
+													</button>
+											</div>
+											<div className="form-group">
+												<label htmlFor="owner_token_id">Enter Owner Token Description. For example, 'Spencer's tokens'.</label>
+												<TagsInput {...basicAttrs} value={this.state.owner_token_desc} onChange={(e) => { this.onFieldChange("owner_token_desc", e) }} />
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
 
-						<div className="col-md-offset-4 col-md-6">
-							<button type="button" className="btn-sm btn-info pull-right" style={syle} onClick={this.appendInputControllers.bind(this)}>
-								<span className="glyphicon glyphicon-plus"></span>Add More
-							</button>
+
+						<div className="panel-group" id="accordion3">
+							<div className="panel panel-default">
+								<div className="panel-heading">
+									<div className="row">
+										<div className="col-xs-11" div>
+											<label>Control</label>
+										</div>
+										<div className="col-xs-1">
+											<a data-toggle="collapse" data-parent="#accordion3" href="#collapse3">
+												<span className="glyphicon glyphicon-chevron-down"></span>
+											</a>
+										</div>
+									</div>
+								</div>
+								<div id="collapse3" className="panel-collapse collapse out">
+									<div className="panel-body">
+										<div className="row">
+											<div className="form-group">
+												<label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
+												{this.state.inputs_control.map((input, i) =>
+													<div className="col-md-10">
+														<table className="table table-striped table-hover" style={style}>
+															<tbody>
+																<tr>
+																	<th><b>Controller</b></th>
+																	<th><b>Token Quantity</b></th>
+																</tr>
+																<tr>
+																	<td><TagsInput {...this.state.suggest_attrs[i]} maxTags={1} renderInput={autocompleteRenderInput} className="form-control col-md-4" type="text" value={this.state.control_id[i]} onChange={(e) => { this.onFieldChange2("control_id," + i, e) }} />
+																	</td>
+																	<td><TagsInput {...basicAttrs} maxTags={1} className="form-control col-md-4" type="text" value={this.state.control_token_quantity[i]} onChange={(e) => { this.onFieldChange2("control_token_quantity," + i, e) }} /></td>
+																</tr>
+															</tbody>
+														</table>
+													</div>
+												)}
+											</div>
+											<div className="col-md-offset-4 col-md-6">
+												<button type="button" className="btn-sm btn-info pull-right" style={syle} onClick={this.appendInputControllers.bind(this)}>
+													<span className="glyphicon glyphicon-plus"></span>Add More
+													</button>
+											</div>
+											<div className="form-group">
+												<label htmlFor="control_token_id">Enter Control Token Description. For example, 'Spencer's tokens'.</label>
+												<TagsInput {...basicAttrs} value={this.state.control_token_desc} onChange={(e) => { this.onFieldChange("control_token_desc", e) }} />
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
 
-						<div className="form-group">
-							<label htmlFor="control_token_id">Enter Control Token Description. For example, 'Spencer's tokens'.</label>
-							<TagsInput {...basicAttrs} value={this.state.control_token_desc} onChange={(e) => { this.onFieldChange("control_token_desc", e) }} />
+						<div className="panel-group" id="accordion4">
+							<div className="panel panel-default">
+								<div className="panel-heading">
+									<div className="row">
+										<div className="col-xs-11">
+											<label>Recovery</label>
+										</div>
+										<div className="col-xs-1">
+											<a data-toggle="collapse" data-parent="#accordion4" href="#collapse4">
+												<span className="glyphicon glyphicon-chevron-down"></span>
+											</a>
+										</div>
+									</div>
+								</div>
+								<div id="collapse4" className="panel-collapse collapse out">
+									<div className="panel-body">
+										<div className="row">
+											<div className="form-group">
+												<label htmlFor="recovery_id">Identity Recovery: trusted identities who will attest that your identity has been lost or stolen</label>
+												<TagsInput {...inputAttrs2} className="form-control col-md-4" renderInput={autocompleteRenderInput} value={this.state.recovery_id} onChange={(e) => { this.onFieldChange("recovery_id", e) }} />
+											</div>
+											<div className="form-group">
+												<label>Recovery Condition (# of trusted individuals required to initiate your identity recovery)</label>
+												<input name="recoveryCondition" className="form-control col-md-4" type="text" placeholder="Recovery Condition" />
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
-						<div className="form-group">
-							<label htmlFor="recovery_id">Identity Recovery: trusted identities who will attest that your identity has been lost or stolen</label>
-							<TagsInput {...inputAttrs2} renderInput={autocompleteRenderInput} value={this.state.recovery_id} onChange={(e) => { this.onFieldChange("recovery_id", e) }} />
-						</div>
-						<div className="form-group">
-							<label>Recovery Condition (# of trusted individuals required to initiate your identity recovery)</label>
-							<input name="recoveryCondition" className="form-control col-md-4" type="text" placeholder="Recovery Condition" />/>
-					</div>
 
-						<div className="form-group">
-							<label htmlFor="validators">Attestors (individuals who will very the authenticity of this identity/asset)</label>
-							<TagsInput {...inputAttrs4} maxTags={10} renderInput={autocompleteRenderInput} value={this.state.validators} onChange={(e) => { this.onFieldChange("validators", e) }} />
+						<div className="panel-group" id="accordion5">
+							<div className="panel panel-default">
+								<div className="panel-heading">
+									<div className="row">
+										<div className="col-xs-11">
+											<label>Attestation</label>
+										</div>
+										<div className="col-xs-1">
+											<a data-toggle="collapse" data-parent="#accordion4" href="#collapse5">
+												<span className="glyphicon glyphicon-chevron-down"></span>
+											</a>
+										</div>
+									</div>
+								</div>
+								<div id="collapse5" className="panel-collapse collapse out">
+									<div className="panel-body">
+										<div className="row">
+											<div className="form-group">
+												<label htmlFor="validators">Attestors (individuals who will very the authenticity of this identity/asset)</label>
+												<TagsInput {...inputAttrs4} className="form-control col-md-4" maxTags={10} renderInput={autocompleteRenderInput} value={this.state.validators} onChange={(e) => { this.onFieldChange("validators", e) }} />
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
+
 						<div className="form-group">
 							<div className="col-sm-6">
 								<br />
 								<input className="form-control" ref="signature" type="hidden" value={this.state.signature} />
 								<input type="hidden" name="pubkey" ref="pubKey" value={localStorage.getItem("pubKey")} />
-								<button className="btn btn-primary" data-loading-text="Submit Identity" name="submit-form" type="button" onClick={this.submitCoid.bind(this)}>Submit Identity</button>
+								<button className="btn-md btn-primary pull-right" data-loading-text="Submit Identity" name="submit-form" type="button" onClick={this.submitCoid.bind(this)}>Submit Identity</button>
 							</div>
 						</div>
 					</form>
@@ -896,77 +1010,117 @@ class MyGatekeeper extends React.Component {
 			);
 		} //end if
 		else {
-
 			//this.renderICA();
 			return (
-			<div id="SubmitContainer">
-				<h1>Create Asset or Device Identity</h1>
-				<form method="POST" id="register" role="form">
-					<div className="form-group">
-						<label htmlFor="assetID">Name Your Asset. For example, 'My Diploma'.</label>
-						<TagsInput {...basicAttrs} value={this.state.assetID} onChange={(e) => { this.onFieldChange("assetID", e) }} />
-					</div>
-					<div className="form-group">
-						<label>
-							Request is an identity claim:
+				<div id="SubmitContainer">
+					<h1>Create Asset or Device Identity</h1>
+					<form method="POST" id="register" role="form">
+						<div className="form-group">
+							<label htmlFor="assetID">Name Your Asset. For example, 'My Diploma'.</label>
+							<TagsInput {...basicAttrs} value={this.state.assetID} onChange={(e) => { this.onFieldChange("assetID", e) }} />
+						</div>
+						<div className="form-group">
+							<label>
+								Request is an identity claim:
 							<input
-								value="isICA"
-								name="isICA"
-								type="checkbox"
-								checked={this.state.isICA}
-								onChange={this.checkboxChange}
-								defaultChecked={true} />
-						</label>
-					</div>
-					<div className="form-group">
-						<h5><b>Select asset to which this claim will reference:</b></h5>
-						<select id="assetSelect" className="selectpicker show-tick" value={this.state.currentAsset} onChange={this.pickerChange}>
-							<option selected value="">--- Please select ---</option>
-							<optgroup label="Owned Assets">
-								{(() => {
-									if (this.state.owned_assets.length > 0) {
-										return this.state.owned_assets.map((asset, i) => {
-											//let val = label.split(',') //get rid of the .json
-											return <option key={i} value={asset.asset_id}>{asset.asset_id}</option>
-										})
-									}
-									else { return <option>No Owned Assets</option> }
-								})(this)}
-							</optgroup>
-						</select>
-					</div>
+									value="isICA"
+									name="isICA"
+									type="checkbox"
+									checked={this.state.isICA}
+									onChange={this.checkboxChange}
+									defaultChecked={true} />
+							</label>
+						</div>
+						<div className="form-group">
+							<h5><b>Select asset to which this claim will reference:</b></h5>
+							<select id="assetSelect" className="selectpicker show-tick" value={this.state.currentAsset} onChange={this.pickerChange}>
+								<option selected value="">--- Please select ---</option>
+								<optgroup label="Owned Assets">
+									{(() => {
+										if (this.state.owned_assets.length > 0) {
+											return this.state.owned_assets.map((asset, i) => {
+												//let val = label.split(',') //get rid of the .json
+												return <option key={i} value={asset.asset_id}>{asset.asset_id}</option>
+											})
+										}
+										else { return <option>No Owned Assets</option> }
+									})(this)}
+								</optgroup>
+							</select>
+						</div>
 
-					<div className="form-group">
-						<label htmlFor="unique_id">Enter Unique Attributes</label>
-						{this.state.inputs.map(input => <UniqueIDAttributeForm type="MyGK" handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
-					</div>
-					<div className="form-group">
-						<div className="col-md-offset-6 col-md-6 ">
-							<p></p>
-							<button type="button" className="btn btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
-								<span className="glyphicon glyphicon-plus"></span>Add More
-						</button>
+
+						<div className="panel-group" id="accordion_1">
+							<div className="panel panel-default">
+								<div className="panel-heading">
+									<div className="row">
+										<div className="col-xs-11">
+											<label>Uniqueness</label>
+										</div>
+										<div className="col-xs-1">
+											<a data-toggle="collapse" data-parent="#accordion" href="#collapse_1">
+												<span className="glyphicon glyphicon-chevron-down"></span>
+											</a>
+										</div>
+									</div>
+								</div>
+								<div id="collapse_1" className="panel-collapse collapse out">
+									<div className="panel-body">
+										<div className="row">
+											<div className="form-group">
+												<label htmlFor="unique_id">Enter Unique Attributes</label>
+												{this.state.inputs.map(input => <UniqueIDAttributeForm type="MyGK" handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
+											</div>
+
+											<div className="col-md-offset-4 col-md-6">
+												<button type="button" className="btn-sm btn-info pull-right" style={syle} onClick={this.appendInput.bind(this)}>
+													<span className="glyphicon glyphicon-plus"></span>Add More
+													</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
-					</div>
-					<div className="form-group">
-						<label htmlFor="validators">Attestors (individuals who will very the authenticity of this identity/asset)</label>
-						<TagsInput {...inputAttrs4} maxTags={10} renderInput={autocompleteRenderInput} value={this.state.validators} onChange={(e) => { this.onFieldChange("validators", e) }} />
-					</div>
-					<div className="form-group">
-						<div className="col-sm-6">
-							<br />
-							<input className="form-control" ref="signature" type="hidden" value={this.state.signature} />
+
+						<div className="panel-group" id="accordion_5">
+							<div className="panel panel-default">
+								<div className="panel-heading">
+									<div className="row">
+										<div className="col-xs-11">
+											<label>Attestation</label>
+										</div>
+										<div className="col-xs-1">
+											<a data-toggle="collapse" data-parent="#accordion4" href="#collapse_5">
+												<span className="glyphicon glyphicon-chevron-down"></span>
+											</a>
+										</div>
+									</div>
+								</div>
+								<div id="collapse_5" className="panel-collapse collapse out">
+									<div className="panel-body">
+										<div className="row">
+											<div className="form-group">
+												<label htmlFor="validators">Attestors (individuals who will very the authenticity of this identity/asset)</label>
+												<TagsInput {...inputAttrs4} className="form-control col-md-4" maxTags={10} renderInput={autocompleteRenderInput} value={this.state.validators} onChange={(e) => { this.onFieldChange("validators", e) }} />
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div className="form-group">
+							<input type="hidden" ref="signature" value={this.state.signature} />
 							<input type="hidden" name="pubkey" ref="pubKey" value={localStorage.getItem("pubKey")} />
-							<button className="btn btn-primary" data-loading-text="Submit Identity" name="submit-form" type="button" onClick={this.submitCoid.bind(this)}>Submit</button>
+							<button className="btn-med btn-primary pull-right" data-loading-text="Submit Identity" name="submit-form" type="button" onClick={this.submitCoid.bind(this)}>Submit</button>
 						</div>
-					</div>
-				</form>
-				{this.state.showModal ? <UploadIpfsFile pubKey={this.state.pubKey} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}
-			</div>
-		)
+					</form>
+					{this.state.showModal ? <UploadIpfsFile pubKey={this.state.pubKey} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}
+				</div>
+			)
 		}
 
-
-	}
+	}//end render
 }
 export default MyGatekeeper;

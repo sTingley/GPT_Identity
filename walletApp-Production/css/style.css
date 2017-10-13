@@ -309,3 +309,197 @@ body {
   background: white;
   box-shadow: 0 2px 5px rgba(0, 0, 0, .15);
 }
+
+/*ADDED THIS CODE WITH THE DASHBOARD AFTER IT WAS SHARED*/
+
+/*core identity code starts here*/
+/* .form-inline .form-unique { margin-right:10px; }*/
+
+  /*.glyphicon { margin-right:5px; } */
+  .butn_algn{
+    padding-left:10px;
+    padding-top:30px;
+    text-align:center;
+    }
+    .collapse_heading{
+    padding: 10px;
+    }
+    .map {
+      height: 300px;
+    }
+     
+    @media screen and (min-width: 1024px){
+        .map {
+            height: 500px;
+        }
+    }
+  
+    /* marker start */
+  
+    .centered {
+    
+      width: 40px;
+      height: 40px;
+      background-color: red;
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -webkit-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      opacity: 0.8;
+      z-index: 1;
+      }
+      .centered1 {
+        
+          width: 40px;
+          height: 40px;
+          background-color: red;
+          border-radius: 50%;
+          position: absolute;
+          top: 70%;
+          left: 40%;
+          -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+          z-index: 1;
+          opacity: 0.8;
+          z-index: 1;
+          }
+          .centered2 {
+            
+              width: 40px;
+              height: 40px;
+              background-color: red;
+              border-radius: 50%;
+              position: absolute;
+              top: 80%;
+              left: 30%;
+              -webkit-transform: translate(-50%, -50%);
+              transform: translate(-50%, -50%);
+              z-index: 1;
+              opacity: 0.8;
+              z-index: 1;
+              }
+              .centered3 {
+                
+                  width: 40px;
+                  height: 40px;
+                  background-color: red;
+                  border-radius: 50%;
+                  position: absolute;
+                  top: 90%;
+                  left: 60%;
+                  -webkit-transform: translate(-50%, -50%);
+                  transform: translate(-50%, -50%);
+                  z-index: 1;
+                  opacity: 0.8;
+                  z-index: 1;
+                  }
+                  .centered4 {
+                    
+                      width: 40px;
+                      height: 40px;
+                      background-color: red;
+                      border-radius: 50%;
+                      position: absolute;
+                      top: 90%;
+                      left: 10%;
+                      -webkit-transform: translate(-50%, -50%);
+                      transform: translate(-50%, -50%);
+                      z-index: 1;
+                      opacity: 0.8;
+                      z-index: 1;
+                      }
+                      .centered5 {
+                        
+                          width: 40px;
+                          height: 40px;
+                          background-color: #66bb6a;
+                          border-radius: 50%;
+                          position: absolute;
+                          top: 61%;
+                          left: 6%;
+                          -webkit-transform: translate(-50%, -50%);
+                          transform: translate(-50%, -50%);
+                          z-index: 1;
+                          opacity: 0.8;
+                          z-index: 1;
+                          }
+                          .centered6 {
+                            
+                              width: 40px;
+                              height: 40px;
+                              background-color: #66bb6a;
+                              border-radius: 50%;
+                              position: absolute;
+                              top: 68%;
+                              left: 88%;
+                              -webkit-transform: translate(-50%, -50%);
+                              transform: translate(-50%, -50%);
+                              z-index: 1;
+                              opacity: 0.8;
+                              z-index: 1;
+                              }
+                              .centered7 {
+                                
+                                  width: 40px;
+                                  height: 40px;
+                                  background-color: #26c6da;
+                                  border-radius: 50%;
+                                  position: absolute;
+                                  top: 90%;
+                                  left: 10%;
+                                  -webkit-transform: translate(-50%, -50%);
+                                  transform: translate(-50%, -50%);
+                                  z-index: 1;
+                                  opacity: 0.8;
+                                  z-index: 1;
+                                  }
+                                  .centered8 {
+                                    
+                                      width: 40px;
+                                      height: 40px;
+                                      background-color: #26c6da;
+                                      border-radius: 50%;
+                                      position: absolute;
+                                      top: 75%;
+                                      left: 74%;
+                                      -webkit-transform: translate(-50%, -50%);
+                                      transform: translate(-50%, -50%);
+                                      z-index: 1;
+                                      opacity: 0.8;
+                                      z-index: 1;
+                                      }
+                                      .tooltip {
+                                        
+                                        display: inline-block;
+                                        border-bottom: 1px dotted black;
+                                    }
+                                    
+                                    .tooltip .tooltiptext {
+                                        visibility: hidden;
+                                        width: 120px;
+                                        background-color: black;
+                                        color: #fff;
+                                        text-align: center;
+                                        border-radius: 6px;
+                                        padding: 5px 0;
+                                    
+                                        /* Position the tooltip */
+                                        position: absolute;
+                                        z-index: 1;
+                                    }
+                                    
+                                    .tooltip:hover .tooltiptext {
+                                        visibility: visible;
+                                    }
+                                       
+  /* marker end */
+  
+  /*  speedo shadow start*/
+  .speedo-shadow{
+    box-shadow: 0 11px 8px 0 rgba(0, 0, 0, 0.2); 
+  }
+   
+  /* speedo shadow end */

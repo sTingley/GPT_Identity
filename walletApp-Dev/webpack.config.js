@@ -3,7 +3,7 @@ var path = require('path');
 
 
 var DEPLOY_PATH = "/home/training/Desktop/Identity/GPT_Identity/walletApp-Production";
-var BUILD_DIR = path.resolve(DEPLOY_PATH+'/js');
+var BUILD_DIR = path.resolve(DEPLOY_PATH + '/js');
 var APP_DIR = path.resolve(__dirname, 'src/app');
 
 var config = {
@@ -12,16 +12,25 @@ var config = {
     path: BUILD_DIR,
     filename: 'bundle.js'
   },
-  module : {
-    loaders : [
+  module: {
+    loaders: [
       {
-        test : /\.jsx?/,
-        include : APP_DIR,
-        loader : 'babel'
+        test: /\.jsx?/,
+        include: APP_DIR,
+        loader: 'babel'
       },
-      { test: /\.json$/, loader: "json" }
+      { test: /\.json$/, loader: 'json' }
     ]
-  }
+  },
+
+  // resolve: {
+  //   extensions: ['', '.js', '.jsx', '.json'],
+  //   root: 'node_modules/',
+  //   alias: {
+  //     'json': 'json-loader/index.js',
+  //   },
+  // },
+
 };
 
 module.exports = config;

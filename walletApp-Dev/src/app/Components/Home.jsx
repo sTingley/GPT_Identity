@@ -15,7 +15,7 @@ class DownloadFile extends React.Component{
 	render(){
 		return (
 			<div className="download_container row"><hr/>
-			<h1>Success! Your wallet has been generated.</h1>
+			<h1>Success! Your account has been created.</h1>
 			<div className="col-md-6">
 				<div className="form-group">
 					<label htmlFor="download_button">Keystore/JSON File (Encrypted)</label>
@@ -69,15 +69,15 @@ class Home extends React.Component {
 	render () {
 	    return (
 	    	<div id="HomeContainer">
-	    		<h1>Keypair Generation</h1>
+	    		<h1>Account Generation</h1>
+				<hr/>
 		    	<form method="POST" id="key-gen-form" role="form" onSubmit={this.keyGenerate}>
-      				<p>Please enter your password and generate Keypair to get started</p>
       				<div className="form-group">
-	      				<label htmlFor="pwd">Enter your password</label>
+	      				<label htmlFor="pwd">Enter a password that will be used to generate your account file</label>
 						<input className="form-control" id="wallet-pwd" type="password" name="pwd" />
 					</div>
 					<div className="form-group">
-						<button className="btn btn-primary" type="submit">Generate Keypair</button>
+						<button className="btn btn-primary" type="submit">Generate Account</button>
 					</div>
 				</form>
 				{ this.state.hashCreated ? <DownloadFile params={[this.state.pwd, this.state.download_url, this.state.public_key]} /> : null }

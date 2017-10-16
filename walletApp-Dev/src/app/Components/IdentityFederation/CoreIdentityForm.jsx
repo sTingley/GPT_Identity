@@ -36,7 +36,7 @@ class CoreIdentity extends React.Component {
 			signature: '',
 			//names: localStorage.getItem("contactNames").split(','),
 			//keys: localStorage.getItem("contactPubKeys").split(','),
-			//value: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+			value: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
 			suggest_attrs: [{
 				addKeys: [13, 188],	// Enter and comma
 				inputProps: {
@@ -440,84 +440,87 @@ class CoreIdentity extends React.Component {
 
 		function autocompleteRenderInput({ addTag, props }) {
 
-			// 	var passed = JSON.stringify(arguments[0]);
-			// 	console.log("passed: " + passed + JSON.stringify(arguments[1]));
-			// 	passed = JSON.parse(passed);
+				var passed = JSON.stringify(arguments[0]);
+				console.log("passed: " + passed + JSON.stringify(arguments[1]));
+				passed = JSON.parse(passed);
 
-			// 	const handleOnChange = (e, { newValue, method }) => {
-			// 		console.log("handleonchange params: " + e + "   " + newValue + "   " + method + "   " + passed.id);
-			// 		if (method === 'enter' || method === 'click') {
-			// 			that.state.value[passed.id] = "";
-			// 			e.preventDefault()
-			// 		} else {
-			// 			that.onChange(e, { newValue }, passed.id)
-			// 		}
-			// 	}
-			// 	const handleKeyPress = (event) => {
-			// 		console.log('enter press here! ' + event.key)
-			// 		if (event.key == 'Enter') {
-			// 			event.preventDefault()
-			// 			addTag(that.state.value[passed.id])
-			// 			that.state.value[passed.id] = "";
-			// 			console.log('current tags: ' + that.state.tags)
-			// 		}
-			// 	}
+				const handleOnChange = (e, { newValue, method }) => {
+					console.log("handleonchange params: " + e + "   " + newValue + "   " + method + "   " + passed.id);
+					if (method === 'enter' || method === 'click') {
+						that.state.value[passed.id] = "";
+						e.preventDefault()
+					} else {
+						that.onChange(e, { newValue }, passed.id)
+					}
+				}
+				const handleKeyPress = (event) => {
+					console.log('enter press here! ' + event.key)
+					if (event.key == 'Enter') {
+						event.preventDefault()
+						addTag(that.state.value[passed.id])
+						that.state.value[passed.id] = "";
+						console.log('current tags: ' + that.state.tags)
+					}
+				}
 
-			// 	const renderInputComponent = inputProps => (
-			// 		<input {...inputProps} />
-			// 	);
-			// 	var inputValue = that.state.value[Number(passed.id)] || "";
-			// 	if (inputValue == 'undefined') { inputValue = ""; }
-			// 	var inputLength = inputValue.length || 0
+				const renderInputComponent = inputProps => (
+					<input {...inputProps} />
+				);
+				var inputValue = that.state.value[Number(passed.id)] || "";
+				if (inputValue == 'undefined') { inputValue = ""; }
+				var inputLength = inputValue.length || 0
 
-			// 	const suggestions = that.state.names.filter((name) => {
-			// 		console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
-			// 		return name.toLowerCase().slice(0, inputLength) === inputValue
-			// 	})
-			// 	///////////////////////////////////////
+				let names = ["Moodys","Steve Smith CFA","Joe Schmo LLC", "AuditBody1"];
+
+				//NEED TO COMMENT BACK IN 'that.state.names' ...
+				const suggestions = names.filter((name) => {
+					console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
+					return name.toLowerCase().slice(0, inputLength) === inputValue
+				})
+				///////////////////////////////////////
 
 
 
-			// 	var value = String(that.state.value[Number(passed.id)]) || "";
-			// 	if (value == 'undefined') { value = ""; }
-			// 	//const suggestions = that.state.suggestions;
-			// 	console.log("passed ID: " + passed.id);
-			// 	console.log("suggestions: " + suggestions);
-			// 	console.log("value: " + value);
-			// 	const inputProps = {
-			// 		placeholder: passed.placeholder,
-			// 		value,
-			// 		style: {
-			// 			width: '30%',
-			// 			height: '100%',
-			// 			display: "initial"
-			// 		},
-			// 		onChange: handleOnChange,
-			// 		onKeyPress: handleKeyPress,
-			// 		className: "react-tagsinput-input",
-			// 		id: passed.id
-			// 	};
-			// 	return (
-			// 		<Autosuggest
-			// 			id={passed.id}
-			// 			ref={passed.ref}
-			// 			suggestions={suggestions}
-			// 			shouldRenderSuggestions={(value) => value.length > 0}
-			// 			getSuggestionValue={(suggestion) => suggestion}
-			// 			renderSuggestion={(suggestion) => <span>{suggestion}</span>}
-			// 			inputProps={inputProps}
-			// 			onSuggestionSelected={(e, { suggestion, method }) => {
-			// 				console.log("SELECTED: " + method)
-			// 				if (method == 'click') {
-			// 					addTag(suggestion)
-			// 					that.state.value[passed.id] = "";
-			// 				}
-			// 			}}
-			// 			onSuggestionsClearRequested={() => { }}
-			// 			onSuggestionsFetchRequested={() => { }}
-			// 			renderInputComponent={renderInputComponent}
-			// 		/>
-			// 	)
+				var value = String(that.state.value[Number(passed.id)]) || "";
+				if (value == 'undefined') { value = ""; }
+				//const suggestions = that.state.suggestions;
+				console.log("passed ID: " + passed.id);
+				console.log("suggestions: " + suggestions);
+				console.log("value: " + value);
+				const inputProps = {
+					placeholder: passed.placeholder,
+					value,
+					style: {
+						width: '30%',
+						height: '100%',
+						display: "initial"
+					},
+					onChange: handleOnChange,
+					onKeyPress: handleKeyPress,
+					className: "react-tagsinput-input",
+					id: passed.id
+				};
+				return (
+					<Autosuggest
+						id={passed.id}
+						ref={passed.ref}
+						suggestions={suggestions}
+						shouldRenderSuggestions={(value) => value.length > 0}
+						getSuggestionValue={(suggestion) => suggestion}
+						renderSuggestion={(suggestion) => <span>{suggestion}</span>}
+						inputProps={inputProps}
+						onSuggestionSelected={(e, { suggestion, method }) => {
+							console.log("SELECTED: " + method)
+							if (method == 'click') {
+								addTag(suggestion)
+								that.state.value[passed.id] = "";
+							}
+						}}
+						onSuggestionsClearRequested={() => { }}
+						onSuggestionsFetchRequested={() => { }}
+						renderInputComponent={renderInputComponent}
+					/>
+				)
 		}
 
 
@@ -563,7 +566,7 @@ class CoreIdentity extends React.Component {
 
 		return (
 			<div id="SubmitContainer">
-				<h1>Core Identity Submission Form</h1><hr/>
+				<h1>Membership Application</h1><hr/>
 				<form method="POST" id="register" role="form">
 
 					<div className="panel-group" id="accordion1">
@@ -571,7 +574,7 @@ class CoreIdentity extends React.Component {
 							<div className="panel-heading">
 								<div className="row">
 									<div className="col-xs-11">
-										<label>Uniqueness</label>
+										<label>Membership Attributes</label>
 									</div>
 									<div className="col-xs-1">
 										<a data-toggle="collapse" data-parent="#accordion" href="#collapse1">
@@ -603,7 +606,7 @@ class CoreIdentity extends React.Component {
 							<div className="panel-heading">
 								<div className="row">
 									<div className="col-xs-11">
-										<label>Ownership</label>
+										<label>Membership Holding</label>
 									</div>
 									<div className="col-xs-1">
 										<a data-toggle="collapse" data-parent="#accordion2" href="#collapse2">
@@ -616,15 +619,15 @@ class CoreIdentity extends React.Component {
 								<div className="panel-body">
 									<div className="row">
 										<div className="form-group">
-											<label htmlFor="owner_id">Enter Owners. Only one owner for an individual (self).</label>
+											<label htmlFor="owner_id">Enter yourself as your own Membership Holder.</label>
 											<TagsInput {...inputAttrs} maxTags={1} renderInput={autocompleteRenderInput} value={this.state.owner_id} onChange={(e) => { this.onFieldChange("owner_id", e) }} />
 										</div>
 										<div className="form-group">
-											<label htmlFor="owner_token_id">Enter Owner Token Description. For example, 'Spencer's tokens'.</label>
+											<label htmlFor="owner_token_id">Membership Holding Description. For example, 'My Identity Ownership Tokens'.</label>
 											<TagsInput {...basicAttrs} maxTags={1} value={this.state.owner_token_desc} onChange={(e) => { this.onFieldChange("owner_token_desc", e) }} />
 										</div>
 										<div className="form-group">
-											<label htmlFor="owner_token_id">Enter Token Quantity. For example, 1 token for an individual.</label>
+											<label htmlFor="owner_token_id">Enter Token Quantity</label>
 											<TagsInput {...basicAttrs} maxTags={1} value={this.state.owner_token_quantity} onChange={(e) => { this.onFieldChange("owner_token_quantity", e) }} />
 										</div>
 									</div>
@@ -638,7 +641,7 @@ class CoreIdentity extends React.Component {
 							<div className="panel-heading">
 								<div className="row">
 									<div className="col-xs-11" div>
-										<label>Control</label>
+										<label>Membership Delegation</label>
 									</div>
 									<div className="col-xs-1">
 										<a data-toggle="collapse" data-parent="#accordion3" href="#collapse3">
@@ -651,13 +654,13 @@ class CoreIdentity extends React.Component {
 								<div className="panel-body">
 									<div className="row">
 										<div className="form-group">
-											<label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
+											<label htmlFor="control_dist">Enter Delegatee Token Holders</label>
 											{this.state.inputs_name.map((input, i) =>
 												<div className="col-md-10">
 													<table className="table table-striped table-hover" style={style}>
 														<tbody>
 															<tr>
-																<th><b>Controller</b></th>
+																<th><b>Delegatees</b></th>
 																<th><b>Token Quantity</b></th>
 															</tr>
 															<tr>
@@ -676,7 +679,7 @@ class CoreIdentity extends React.Component {
 											</button>
 										</div>
 										<div className="form-group">
-											<label htmlFor="control_token_id">Enter Control Token Description. For example, 'Spencer's tokens'.</label>
+											<label htmlFor="control_token_id">Enter Delegation Token Description. For example, 'My digital identity access tokens'.</label>
 											<TagsInput {...basicAttrs} maxTags={1} value={this.state.control_token_desc} onChange={(e) => { this.onFieldChange("control_token_desc", e) }} />
 										</div>
 
@@ -691,7 +694,7 @@ class CoreIdentity extends React.Component {
 							<div className="panel-heading">
 								<div className="row">
 									<div className="col-xs-11">
-										<label>Recovery</label>
+										<label>Theft or Loss Recovery</label>
 									</div>
 									<div className="col-xs-1">
 										<a data-toggle="collapse" data-parent="#accordion4" href="#collapse4">
@@ -704,7 +707,7 @@ class CoreIdentity extends React.Component {
 								<div className="panel-body">
 									<div className="row">
 										<div className="form-group">
-											<label>Identity Recovery: trusted identities who will attest that your identity has been lost or stolen</label>
+											<label>Trusted identities who will attest that your identity has been lost or stolen</label>
 											<TagsInput {...inputAttrs2} renderInput={autocompleteRenderInput} value={this.state.recovery_id} onChange={(e) => { this.onFieldChange("recovery_id", e) }} />
 										</div>
 										<div className="form-group">

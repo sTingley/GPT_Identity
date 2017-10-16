@@ -673,54 +673,57 @@ class MyGatekeeper extends React.Component {
 			if (inputValue == 'undefined') { inputValue = ""; }
 			var inputLength = inputValue.length || 0
 
-			// const suggestions = that.state.names.filter((name) => {
-			// 	console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
-			// 	console.log(inputValue);
-			// 	var re = new RegExp(inputValue, "i");
-			// 	return (Boolean(name.slice(0, inputLength).search(re) + 1))
-			// 	//return (name.toLowerCase().slice(0, inputLength) === inputValue  || name.toUpperCase().slice(0, inputLength) === inputValue)
-			// })
+			let names = ["Moodys","Steve, CFA","Joe Schmo", "AuditBody1"];
 
-			// var value = String(that.state.value[Number(passed.id)]) || "";
-			// if (value == 'undefined') { value = ""; }
-			// //const suggestions = that.state.suggestions;
-			// console.log("passed ID: " + passed.id);
-			// console.log("suggestions: " + suggestions);
-			// console.log("value: " + value);
-			// const inputProps = {
-			// 	placeholder: passed.placeholder,
-			// 	value,
-			// 	style: {
-			// 		width: '30%',
-			// 		height: '100%',
-			// 		display: "initial"
-			// 	},
-			// 	onChange: handleOnChange,
-			// 	onKeyPress: handleKeyPress,
-			// 	className: "react-tagsinput-input",
-			// 	id: passed.id
-			// };
-			// return (
-			// 	<Autosuggest
-			// 		id={passed.id}
-			// 		ref={passed.ref}
-			// 		suggestions={suggestions}
-			// 		shouldRenderSuggestions={(value) => value.length > 0}
-			// 		getSuggestionValue={(suggestion) => suggestion}
-			// 		renderSuggestion={(suggestion) => <span>{suggestion}</span>}
-			// 		inputProps={inputProps}
-			// 		onSuggestionSelected={(e, { suggestion, method }) => {
-			// 			console.log("SELECTED: " + method)
-			// 			if (method == 'click') {
-			// 				addTag(suggestion)
-			// 				that.state.value[passed.id] = "";
-			// 			}
-			// 		}}
-			// 		onSuggestionsClearRequested={() => { }}
-			// 		onSuggestionsFetchRequested={() => { }}
-			// 		renderInputComponent={renderInputComponent}
-			// 	/>
-			// )
+			//NOTE: WE NEED TO CHANGES names back to 'that.state.names'
+			const suggestions = names.filter((name) => {
+				console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
+				console.log(inputValue);
+				var re = new RegExp(inputValue, "i");
+				return (Boolean(name.slice(0, inputLength).search(re) + 1))
+				//return (name.toLowerCase().slice(0, inputLength) === inputValue  || name.toUpperCase().slice(0, inputLength) === inputValue)
+			})
+
+			var value = String(that.state.value[Number(passed.id)]) || "";
+			if (value == 'undefined') { value = ""; }
+			//const suggestions = that.state.suggestions;
+			console.log("passed ID: " + passed.id);
+			console.log("suggestions: " + suggestions);
+			console.log("value: " + value);
+			const inputProps = {
+				placeholder: passed.placeholder,
+				value,
+				style: {
+					width: '30%',
+					height: '100%',
+					display: "initial"
+				},
+				onChange: handleOnChange,
+				onKeyPress: handleKeyPress,
+				className: "react-tagsinput-input",
+				id: passed.id
+			};
+			return (
+				<Autosuggest
+					id={passed.id}
+					ref={passed.ref}
+					suggestions={suggestions}
+					shouldRenderSuggestions={(value) => value.length > 0}
+					getSuggestionValue={(suggestion) => suggestion}
+					renderSuggestion={(suggestion) => <span>{suggestion}</span>}
+					inputProps={inputProps}
+					onSuggestionSelected={(e, { suggestion, method }) => {
+						console.log("SELECTED: " + method)
+						if (method == 'click') {
+							addTag(suggestion)
+							that.state.value[passed.id] = "";
+						}
+					}}
+					onSuggestionsClearRequested={() => { }}
+					onSuggestionsFetchRequested={() => { }}
+					renderInputComponent={renderInputComponent}
+				/>
+			)
 		}
 
 		var basicAttrs = {
@@ -775,27 +778,13 @@ class MyGatekeeper extends React.Component {
 			marginRight: '15px'
 		}
 
-		console.log("\n\nICA:  " + this.state.isICA);
-		if (this.state.isICA == false) {
 			return (
 				<div id="SubmitContainer">
-					<h1>Create Asset or Device Identity</h1>
+					<h1>Create Asset</h1>
 					<form method="POST" id="register" role="form">
 						<div className="form-group">
-							<label htmlFor="assetID">Name Your Asset. For example, 'My Diploma'.</label>
+							<label htmlFor="assetID">Notary Label. For example, 'My car'.</label>
 							<TagsInput {...basicAttrs} value={this.state.assetID} onChange={(e) => { this.onFieldChange("assetID", e) }} />
-						</div>
-						<div className="form-group">
-							<label>
-								Request is an identity claim:
-								<input
-									value="isICA"
-									name="isICA"
-									type="checkbox"
-									checked={this.state.isICA}
-									onChange={this.checkboxChange}
-									defaultChecked={false} />
-							</label>
 						</div>
 
 						<div className="panel-group" id="accordion1">
@@ -803,7 +792,7 @@ class MyGatekeeper extends React.Component {
 								<div className="panel-heading">
 									<div className="row">
 										<div className="col-xs-11">
-											<label>Uniqueness</label>
+											<label>Membership Attributes</label>
 										</div>
 										<div className="col-xs-1">
 											<a data-toggle="collapse" data-parent="#accordion" href="#collapse1">
@@ -836,7 +825,7 @@ class MyGatekeeper extends React.Component {
 								<div className="panel-heading">
 									<div className="row">
 										<div className="col-xs-11">
-											<label>Ownership</label>
+											<label>Membership Holding</label>
 										</div>
 										<div className="col-xs-1">
 											<a data-toggle="collapse" data-parent="#accordion2" href="#collapse2">
@@ -849,13 +838,13 @@ class MyGatekeeper extends React.Component {
 									<div className="panel-body">
 										<div className="row">
 											<div className="form-group">
-												<label htmlFor="owner_dist">Enter Owners and their ownership token(s).</label>
+												<label htmlFor="owner_dist">Membership Holding Information</label>
 												{this.state.inputs_ownership.map((input, i) =>
 													<div className="col-md-10">
 														<table className="table table-striped table-hover" style={style}>
 															<tbody>
 																<tr>
-																	<th><b>Owner</b></th>
+																	<th><b>Holder</b></th>
 																	<th><b>Token Quantity</b></th>
 																</tr>
 																<tr>
@@ -874,7 +863,7 @@ class MyGatekeeper extends React.Component {
 													</button>
 											</div>
 											<div className="form-group">
-												<label htmlFor="owner_token_id">Enter Owner Token Description. For example, 'Spencer's tokens'.</label>
+												<label htmlFor="owner_token_id">Membership Holding Description. For example, 'My Asset Ownership Tokens'.</label>
 												<TagsInput {...basicAttrs} value={this.state.owner_token_desc} onChange={(e) => { this.onFieldChange("owner_token_desc", e) }} />
 											</div>
 										</div>
@@ -889,7 +878,7 @@ class MyGatekeeper extends React.Component {
 								<div className="panel-heading">
 									<div className="row">
 										<div className="col-xs-11" div>
-											<label>Control</label>
+											<label>Membership Delegation</label>
 										</div>
 										<div className="col-xs-1">
 											<a data-toggle="collapse" data-parent="#accordion3" href="#collapse3">
@@ -902,13 +891,13 @@ class MyGatekeeper extends React.Component {
 									<div className="panel-body">
 										<div className="row">
 											<div className="form-group">
-												<label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
+												<label htmlFor="control_dist">Enter delegatees and their control token(s).</label>
 												{this.state.inputs_control.map((input, i) =>
 													<div className="col-md-10">
 														<table className="table table-striped table-hover" style={style}>
 															<tbody>
 																<tr>
-																	<th><b>Controller</b></th>
+																	<th><b>Delegatee</b></th>
 																	<th><b>Token Quantity</b></th>
 																</tr>
 																<tr>
@@ -927,7 +916,7 @@ class MyGatekeeper extends React.Component {
 													</button>
 											</div>
 											<div className="form-group">
-												<label htmlFor="control_token_id">Enter Control Token Description. For example, 'Spencer's tokens'.</label>
+												<label htmlFor="control_token_id">Enter Delegation Token Description. For example, 'My asset access tokens'.</label>
 												<TagsInput {...basicAttrs} value={this.state.control_token_desc} onChange={(e) => { this.onFieldChange("control_token_desc", e) }} />
 											</div>
 										</div>
@@ -941,7 +930,7 @@ class MyGatekeeper extends React.Component {
 								<div className="panel-heading">
 									<div className="row">
 										<div className="col-xs-11">
-											<label>Recovery</label>
+											<label>Theft or Loss Recovery</label>
 										</div>
 										<div className="col-xs-1">
 											<a data-toggle="collapse" data-parent="#accordion4" href="#collapse4">
@@ -954,7 +943,7 @@ class MyGatekeeper extends React.Component {
 									<div className="panel-body">
 										<div className="row">
 											<div className="form-group">
-												<label htmlFor="recovery_id">Identity Recovery: trusted identities who will attest that your identity has been lost or stolen</label>
+												<label htmlFor="recovery_id">Trusted identities who will attest that your identity has been lost or stolen</label>
 												<TagsInput {...inputAttrs2} className="form-control col-md-4" renderInput={autocompleteRenderInput} value={this.state.recovery_id} onChange={(e) => { this.onFieldChange("recovery_id", e) }} />
 											</div>
 											<div className="form-group">
@@ -1004,115 +993,6 @@ class MyGatekeeper extends React.Component {
 					{this.state.showModal ? <UploadIpfsFile pubKey={this.state.pubKey} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}
 				</div>
 			);
-		} //end if
-		else {
-			//this.renderICA();
-			return (
-				<div id="SubmitContainer">
-					<h1>Create Asset or Device Identity</h1>
-					<form method="POST" id="register" role="form">
-						<div className="form-group">
-							<label htmlFor="assetID">Name Your Asset. For example, 'My Diploma'.</label>
-							<TagsInput {...basicAttrs} value={this.state.assetID} onChange={(e) => { this.onFieldChange("assetID", e) }} />
-						</div>
-						<div className="form-group">
-							<label>
-								Request is an identity claim:
-							<input
-									value="isICA"
-									name="isICA"
-									type="checkbox"
-									checked={this.state.isICA}
-									onChange={this.checkboxChange}
-									defaultChecked={true} />
-							</label>
-						</div>
-						<div className="form-group">
-							<h5><b>Select asset to which this claim will reference:</b></h5>
-							<select id="assetSelect" className="selectpicker show-tick" value={this.state.currentAsset} onChange={this.pickerChange}>
-								<option selected value="">--- Please select ---</option>
-								<optgroup label="Owned Assets">
-									{(() => {
-										if (this.state.owned_assets.length > 0) {
-											return this.state.owned_assets.map((asset, i) => {
-												//let val = label.split(',') //get rid of the .json
-												return <option key={i} value={asset.asset_id}>{asset.asset_id}</option>
-											})
-										}
-										else { return <option>No Owned Assets</option> }
-									})(this)}
-								</optgroup>
-							</select>
-						</div>
-
-						<div className="panel-group" id="accordion_1">
-							<div className="panel panel-default">
-								<div className="panel-heading">
-									<div className="row">
-										<div className="col-xs-11">
-											<label>Uniqueness</label>
-										</div>
-										<div className="col-xs-1">
-											<a data-toggle="collapse" data-parent="#accordion" href="#collapse_1">
-												<span className="glyphicon glyphicon-chevron-down"></span>
-											</a>
-										</div>
-									</div>
-								</div>
-								<div id="collapse_1" className="panel-collapse collapse out">
-									<div className="panel-body">
-										<div className="row">
-											<div className="form-group">
-												<label htmlFor="unique_id">Enter Unique Attributes</label>
-												{this.state.inputs.map(input => <UniqueIDAttributeForm type="MyGK" handleShowModal={this.handleShowModal.bind(this)} min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
-											</div>
-											<div className="form-group">
-												<button type="button" className="btn-sm btn-info pull-right" style={marginRight15} onClick={this.appendInput.bind(this)}>
-													<span className="glyphicon glyphicon-plus"></span>Add More
-												</button>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div className="panel-group" id="accordion_5">
-							<div className="panel panel-default">
-								<div className="panel-heading">
-									<div className="row">
-										<div className="col-xs-11">
-											<label>Attestation</label>
-										</div>
-										<div className="col-xs-1">
-											<a data-toggle="collapse" data-parent="#accordion4" href="#collapse_5">
-												<span className="glyphicon glyphicon-chevron-down"></span>
-											</a>
-										</div>
-									</div>
-								</div>
-								<div id="collapse_5" className="panel-collapse collapse out">
-									<div className="panel-body">
-										<div className="row">
-											<div className="form-group">
-												<label htmlFor="validators">Attestors (individuals who will very the authenticity of this identity/asset)</label>
-												<TagsInput {...inputAttrs4} className="form-control col-md-4" maxTags={10} renderInput={autocompleteRenderInput} value={this.state.validators} onChange={(e) => { this.onFieldChange("validators", e) }} />
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div className="form-group">
-							<input type="hidden" ref="signature" value={this.state.signature} />
-							<input type="hidden" name="pubkey" ref="pubKey" value={localStorage.getItem("pubKey")} />
-							<button className="btn-med btn-primary pull-right" data-loading-text="Submit Identity" name="submit-form" type="button" onClick={this.submitCoid.bind(this)}>Submit</button>
-						</div>
-					</form>
-					{this.state.showModal ? <UploadIpfsFile pubKey={this.state.pubKey} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}
-				</div>
-			)
-		}
 
 	}//end render
 }

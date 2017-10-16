@@ -25,6 +25,7 @@ import MyCOID from './Components/MyCOID.jsx';
 import IdentityDimension from './Components/IdentityDimension/IdentityDimension.jsx';
 import Documents from './Components/Documents.jsx';
 import MyGateKeeper from './Components/IdentityFederation/MyGatekeeper.jsx';
+import IcaForm from './Components/IdentityFederation/IcaForm.jsx';
 import Attestations from './Components/Attestations.jsx';
 
 class App extends React.Component {
@@ -92,6 +93,7 @@ render((
 			{/* <Route path="assetUtilities" component={AssetUtilities} onEnter={validateLogin}/> */}
 			<Route path="docs" component={Documents} onEnter={validateLogin} />
 			<Route path="myGateKeeper" component={MyGateKeeper} onEnter={validateLogin} />
+			<Route path="icaForm" component={IcaForm} onEnter={validateLogin} />
 			<Route path="mycoreidentity" component={MyCOID} onEnter={validateLogin} />
 			<Route path="identitydimension" component={IdentityDimension} onEnter={validateLogin} />
 			<Route path="Attestations" component={Attestations} onEnter={validateLogin} />

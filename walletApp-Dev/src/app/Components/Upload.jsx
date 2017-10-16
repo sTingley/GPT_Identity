@@ -66,9 +66,10 @@ class UploadKeyStore extends React.Component {
 		if (this.state.fileread) cssClass = 'show';
 		return (
 			<div className="panel panel-default">
-				<div className="panel-heading"><strong>Upload Key Store File</strong> <small>JSON(.json) file format only supported</small></div>
+				{/* <small>JSON(.json) file format only supported</small> */}
+				<div className="panel-heading"><strong>Upload Login Credentials</strong></div>
 				<div className="panel-body">
-					<h4>Select key file from your computer to login</h4>
+					<h4>Select account file from your computer</h4>
 					<form action="" method="post" encType="multipart/form-data" id="js-upload-form" onSubmit={this.uploadFile}>
 						<div className="form-inline">
 							<div className="form-group">

@@ -15,7 +15,7 @@ class Header extends React.Component {
               <span className="icon-bar"></span>
               <span className="icon-bar"></span>
             </button>
-            <a className="navbar-brand" href="#">Your Digital Identity Wallet</a>
+            <a className="navbar-brand" href="#">Your Moody's Membership Wallet</a>
           </div>
           <div id="navbar" className="navbar-collapse collapse">
              <ul className="nav navbar-nav hidden-lg">

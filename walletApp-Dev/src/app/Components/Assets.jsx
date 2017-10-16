@@ -846,7 +846,7 @@ class Modal extends Component {
 													<td>Asset Class<p className="text-info">Use comma/enter to add class </p></td>
 													<td><TagsInput {...classInput} /></td>
 												</tr>
-												<tr>
+												{/* <tr>
 													<td>Asset SubClass<p className="text-info">Use comma/enter to add sub class </p></td>
 													<td><TagsInput {...subClassInput} /></td>
 												</tr>
@@ -869,7 +869,7 @@ class Modal extends Component {
 												<tr>
 													<td>BigchainDB Transaction Hash</td>
 													<td><p> {prop.bigchainHash} </p></td>
-												</tr>
+												</tr> */}
 												<tr>
 													<td colSpan="2"><b>Official IDs</b></td>
 												</tr>
@@ -2084,29 +2084,32 @@ class Assets extends Component {
 				"bigchainID": "",
 				"coidAddr": "",
 				"controlId": "aae858de3899d2ff096ddb5384365c6a86ce7964f1c4f1f22878944d39bd943a",
-				"controlIdList": ["aae858de3899d2ff096ddb5384365c6a86ce7964f1c4f1f22878944d39bd943a"],
-				"controlTokenAttributes": "mytoken",
+				"controlIdList": ["Myself","My Company LLC"],
+				"controlTokenAttributes": "My Delegated Identity Tokens",
 				"controlTokenId": "289d3c526086b3832f4fd1338e5b0f437e7c84d6d7c556f53ef7d2eaf4e316a4",
-				"controlTokenQuantity": ["0"],
+				"controlTokenQuantity": ["10", "5"],
 				"dimensions": "",
 				"gatekeeperAddr": "",
-				"identityRecoveryIdList": ["aae858de3899d2ff096ddb5384365c6a86ce7964f1c4f1f22878944d39bd943a"],
+				"identityRecoveryIdList": ["My Wife", "My Father"],
 				"isHuman": "true",
 				"msg": "e98cfaa4317c583cd87fb1d538bb64eafea1f516adf02b193fe224d2a60610f6",
-				"ownerIdList": ["8b44edd090224a5c2350c1b2f3f57ee2d3443744462bb7c3c970c337e570eac4"],
+				"ownerIdList": ["Myself"],
 				"ownershipId": "8b44edd090224a5c2350c1b2f3f57ee2d3443744462bb7c3c970c337e570eac4",
-				"ownershipTokenAttributes": "mytoken",
+				"ownershipTokenAttributes": "My Identity Tokens",
 				"ownershipTokenId": "289d3c526086b3832f4fd1338e5b0f437e7c84d6d7c556f53ef7d2eaf4e316a4",
-				"ownershipTokenQuantity": ["0"],
+				"ownershipTokenQuantity": ["10"],
 				"pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
 				"recoveryCondition": "2",
 				"sig": "4fb1eaab7042e093ed6ca3251af91dca3ec417ef579fe5ea8f079125bd1e6e3c35472aa559fbc6023f2c7c438c1b038b5bc58269b59e3651a65aa3524b22b621",
 				"timestamp": "",
 				"txn_id": "requestCOID",
 				"uniqueId": "01547929f9184f362e1ab0126a15013087f4d1ab25d11ea971e8ffb159546d94",
-				"uniqueIdAttributes": ["spencertingley,557d1294ba620922e1655aa9b5c9be5f2c5dad876740dd2a9a22934b79ee164d,QmWbbhSo7GzZi6zyi7MpJyAfiqzPRcSfV1oHFRyCgT54iG"],
+
+				"uniqueIdAttributes": [["Bejoy George CPA","557d1294ba620922e1655aa9b5c9be5f2c5dad876740dd2a9a22934b79ee164d","QmWbbhSo7GzZi6zyi7MpJyAfiqzPRcSfV1oHFRyCgT54iG"],
+				["label2","557d1294ba620922e1655aa9b5c9be5f2c5dad876740dd2a9a22934b79ee164d","QmWbbhSo7GzZi6zyi7MpJyAfiqzPRcSfV1oHFRyCgT54iG"]],
+				
 				"yesVotesRequiredToPass": "2",
-				"dimensions": ["abcd.json", "1234.json"]
+				"dimensions": ["LIVING_ROOM.json", "Finance.json"]
 			}
 		}]
 

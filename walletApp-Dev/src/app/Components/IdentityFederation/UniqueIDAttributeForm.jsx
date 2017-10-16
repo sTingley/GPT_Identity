@@ -12,6 +12,9 @@ class UniqueIDAttributeForm extends React.Component {
     renderMyGK() {
         return (<label htmlFor="unique_id_attrs"> Unique Identfiers e.g. Serial Numbers, MAC Addresses, Vehicle Identitfication Numbers</label>)
     }
+    renderICA() {
+        return(<label htmlFor="unique_id_attrs">Clams e.g. "My payment history" or "My current vehicle inspection"</label>)
+    }
     renderMyCOID() {
         return (<label htmlFor="unique_id_attrs"> Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research"</label>)
     }
@@ -25,6 +28,7 @@ class UniqueIDAttributeForm extends React.Component {
             <div className="form-group" style={style}>
                 {this.props.type == "IDF" ? this.renderIDF() : null}
                 {this.props.type == "MyGK" ? this.renderMyGK() : null}
+                {this.props.type == "ICA" ? this.renderICA(): null}
                 {this.props.type == "MyCOID" ? this.renderMyCOID() : null}
                 <input name={'label-' + this.props.labelref} className="form-control col-md-4" type="text" placeholder="Label" />
                 <button type="button" data-id={this.props.labelref} onClick={this.props.handleShowModal} className="btn-sm btn-warning pull-right"><span className="glyphicon glyphicon-upload"></span>Upload File</button>

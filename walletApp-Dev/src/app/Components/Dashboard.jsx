@@ -4,7 +4,7 @@ import { VictoryPie } from 'victory';
 import { VictoryChart } from 'victory';
 import { VictoryBar } from 'victory';
 import { VictoryTheme } from 'victory';
-import { VictoryLabel } from 'victory';
+//import { VictoryLabel } from 'victory';
 import { VictoryAxis } from 'victory';
 import GoogleMapReact from 'google-map-react';
 // import Marker from 'react-google-maps';

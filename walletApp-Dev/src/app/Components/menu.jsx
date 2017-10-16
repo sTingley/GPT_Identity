@@ -21,13 +21,14 @@ class Menu extends React.Component {
 				<ul className="nav nav-pills nav-stacked">
 					<li><Link to='/home' activeClassName="active">Home</Link></li>
 					<li><Link to='/upload' activeClassName="active">Login</Link></li>
-					{prop.loggedin ? <li><Link to='/identity' activeClassName="active"><b>Membership</b></Link></li> : ''}
+					{prop.loggedin ? <li><Link to='/identity' activeClassName="active">Membership</Link></li> : ''}
 					{prop.loggedin ? <li><Link to='/myGatekeeper' activeClassName="active">Asset Creation</Link></li> : ''}
+					{prop.loggedin ? <li><Link to='/icaForm' activeClassName="active">Asset Notary</Link></li> : ''}
 					{prop.loggedin ? <li><Link to='/tovote' activeClassName="active">Notarization Requests</Link></li> : ''}
 					{prop.loggedin ? <li><Link to='/Attestations' activeClassName="active">Notarized Items</Link></li> : ''}
 					{prop.loggedin ? <li><Link to='/assets' activeClassName="active">My Assets</Link></li> : ''}
 					{prop.loggedin ? <li><Link to='/dashboard' activeClassName="active">Investor Dashboard</Link></li> : ''}
-					{prop.loggedin ? <li><Link to='/docs' activeClassName="active">My Documents</Link></li> : ''}
+					{/* {prop.loggedin ? <li><Link to='/docs' activeClassName="active">My Documents</Link></li> : ''} */}
 					{prop.loggedin ? <li><Link to='/notifications' activeClassName="active">Notifications</Link></li> : ''}
 					{prop.loggedin ? <li><Link to='/mycoreidentity' activeClassName="active">Manage Identities and Assets</Link></li> : ''}
 				</ul>

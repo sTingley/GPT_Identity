@@ -29470,6 +29470,28 @@
 							null,
 							_react2.default.createElement(
 								_reactRouter.Link,
+								{ to: '/identity', activeClassName: 'active' },
+								_react2.default.createElement(
+									'b',
+									null,
+									'Create Core Identity'
+								)
+							)
+						) : '',
+						prop.loggedin ? _react2.default.createElement(
+							'li',
+							null,
+							_react2.default.createElement(
+								_reactRouter.Link,
+								{ to: '/myGatekeeper', activeClassName: 'active' },
+								'My Gatekeeper'
+							)
+						) : '',
+						prop.loggedin ? _react2.default.createElement(
+							'li',
+							null,
+							_react2.default.createElement(
+								_reactRouter.Link,
 								{ to: '/tovote', activeClassName: 'active' },
 								'Attestations'
 							)
@@ -29492,28 +29514,7 @@
 								'Notifications'
 							)
 						) : '',
-						prop.loggedin ? _react2.default.createElement(
-							'li',
-							null,
-							_react2.default.createElement(
-								_reactRouter.Link,
-								{ to: '/identity', activeClassName: 'active' },
-								_react2.default.createElement(
-									'b',
-									null,
-									'Create Core Identity'
-								)
-							)
-						) : '',
-						prop.loggedin ? _react2.default.createElement(
-							'li',
-							null,
-							_react2.default.createElement(
-								_reactRouter.Link,
-								{ to: '/myGatekeeper', activeClassName: 'active' },
-								'My Gatekeeper'
-							)
-						) : '',
+						'     ',
 						prop.loggedin ? _react2.default.createElement(
 							'li',
 							null,

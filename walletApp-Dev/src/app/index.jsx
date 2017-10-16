@@ -19,6 +19,7 @@ import UploadKeyStore from './Components/Upload.jsx';
 import ToVote from './Components/ToVote.jsx';
 import Notifications from './Components/Notifications.jsx';
 import Assets from './Components/Assets.jsx';
+import Dashboard from './Components/Dashboard.jsx';
 //import AssetUtilities from './Components/AssetUtilities';
 import MyCOID from './Components/MyCOID.jsx';
 import IdentityDimension from './Components/IdentityDimension/IdentityDimension.jsx';
@@ -87,6 +88,7 @@ render((
 			<Route path="notifications" component={Notifications} onEnter={validateLogin} />
 			<Route path="identity" component={CoreIdentity} onEnter={validateLogin} />
 			<Route path="assets" component={Assets} onEnter={validateLogin} />
+			<Route path="dashboard" component={Dashboard} onEnter={validateLogin} />
 			{/* <Route path="assetUtilities" component={AssetUtilities} onEnter={validateLogin}/> */}
 			<Route path="docs" component={Documents} onEnter={validateLogin} />
 			<Route path="myGateKeeper" component={MyGateKeeper} onEnter={validateLogin} />

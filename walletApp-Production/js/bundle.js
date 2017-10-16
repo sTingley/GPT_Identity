@@ -54722,7 +54722,7 @@
 						_react2.default.createElement(
 							'td',
 							null,
-							'Recovery IDs'
+							'Trusted ID List'
 						),
 						_react2.default.createElement(
 							'td',

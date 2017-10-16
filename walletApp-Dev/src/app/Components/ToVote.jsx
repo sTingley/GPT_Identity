@@ -252,7 +252,7 @@ class ModalWin extends React.Component {
 					<td><p> {this.state.proposal_data.controlTokenQuantity}</p></td>
 				</tr>
 				<tr>
-					<td>Recovery IDs</td>
+					<td>Trusted ID List</td>
 					<td>{(() => {
 						if (!$.isEmptyObject(this.state.proposal_data)) {
 							return this.state.proposal_data.identityRecoveryIdList.map((ids, i) => {

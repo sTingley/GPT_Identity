@@ -111,11 +111,11 @@
 	
 	var _MyGatekeeper2 = _interopRequireDefault(_MyGatekeeper);
 	
-	var _IcaForm = __webpack_require__(/*! ./Components/IdentityFederation/IcaForm.jsx */ 840);
+	var _IcaForm = __webpack_require__(/*! ./Components/IdentityFederation/IcaForm.jsx */ 838);
 	
 	var _IcaForm2 = _interopRequireDefault(_IcaForm);
 	
-	var _Attestations = __webpack_require__(/*! ./Components/Attestations.jsx */ 838);
+	var _Attestations = __webpack_require__(/*! ./Components/Attestations.jsx */ 839);
 	
 	var _Attestations2 = _interopRequireDefault(_Attestations);
 	
@@ -50462,7 +50462,7 @@
 					}
 					var inputLength = inputValue.length || 0;
 	
-					var names = ["Moodys", "Steve Smith CFA", "Joe Schmo LLC", "AuditBody1"];
+					var names = ["Moodys", "Steve Smith CFA", "Joe Schmo LLC", "AuditBody1", "Emily Lu", "Josh Phillips", "Aaron Bartwell"];
 	
 					//NEED TO COMMENT BACK IN 'that.state.names' ...
 					var suggestions = names.filter(function (name) {
@@ -50692,7 +50692,7 @@
 												_react2.default.createElement(
 													'label',
 													{ htmlFor: 'owner_id' },
-													'Enter yourself as your own Membership Holder.'
+													'Enter yourself as Membership Holder.'
 												),
 												_react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs, { maxTags: 1, renderInput: autocompleteRenderInput, value: this.state.owner_id, onChange: function onChange(e) {
 														_this3.onFieldChange("owner_id", e);
@@ -50795,7 +50795,7 @@
 																		_react2.default.createElement(
 																			'b',
 																			null,
-																			'Delegatees'
+																			'Delegatee'
 																		)
 																	),
 																	_react2.default.createElement(
@@ -53987,7 +53987,7 @@
 	            return _react2.default.createElement(
 	                "label",
 	                { htmlFor: "unique_id_attrs" },
-	                " Official IDs e.g. SSN, Passport, Driver's License, Digital retinal scans and/or digital fingerprints"
+	                "Official IDs e.g. SSN, Passport, Driver's License, Digital retinal scans and/or digital fingerprints"
 	            );
 	        }
 	    }, {
@@ -53996,7 +53996,7 @@
 	            return _react2.default.createElement(
 	                "label",
 	                { htmlFor: "unique_id_attrs" },
-	                " Unique Identfiers e.g. Serial Numbers, MAC Addresses, Vehicle Identitfication Numbers"
+	                "Unique Identfiers e.g. Serial Numbers, MAC Addresses, Vehicle Identitfication Numbers"
 	            );
 	        }
 	    }, {
@@ -54005,7 +54005,7 @@
 	            return _react2.default.createElement(
 	                "label",
 	                { htmlFor: "unique_id_attrs" },
-	                "Clams e.g. \"My payment history\" or \"My current vehicle inspection\""
+	                "Claims e.g. \"My 120 day payment history\""
 	            );
 	        }
 	    }, {
@@ -54014,7 +54014,7 @@
 	            return _react2.default.createElement(
 	                "label",
 	                { htmlFor: "unique_id_attrs" },
-	                " Attributes e.g. \"My college transcript\", \"Chase Bank KYC\", or \"My blockchain research\""
+	                "Attributes e.g. \"My college transcript\", \"Chase Bank KYC\", or \"My blockchain research\""
 	            );
 	        }
 	    }, {
@@ -54230,8 +54230,6 @@
 		value: true
 	});
 	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	var _react = __webpack_require__(/*! react */ 1);
@@ -54243,6 +54241,8 @@
 	var _reactDayPicker2 = _interopRequireDefault(_reactDayPicker);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -54349,44 +54349,84 @@
 			key: 'componentDidMount',
 			value: function componentDidMount() {
 				var _this = this;
-				var propType = this.state.proposal.propType;
-				console.log("propType: " + propType);
+				//let propType = this.state.proposal.propType;
+				//console.log("propType: " + propType);
 	
-				$.ajax({
-					type: "POST",
-					url: twinUrl + 'getCoidData',
-					data: {
-						"publicKey": localStorage.getItem("pubKey"),
-						"proposalId": this.state.proposal.proposal_id,
-						"gatekeeperAddr": this.state.proposal.gatekeeperAddr,
-						"isHuman": this.state.proposal.isHuman
-					}, //.bind(this)
-					success: function success(result) {
-						var fileValidation = true;
-						// Fill up data in Modal window
-						//data.publicKey
-						if ($.type(result) == "string") {
-							result = JSON.parse(result);
-						}
-						var ownerArray = [];
-						for (var i = 0; i < result.ownershipTokenQuantity.length; i++) {
-							var temp = [];
-							temp[0] = result.ownerIdList[i];
-							temp[1] = result.ownershipTokenQuantity[i];
-							ownerArray.push(temp);
-						}
-						result.ownerArray = ownerArray;
-						//console.log(result.ownerArray)
-						console.log('result of getCoidData' + JSON.stringify(result));
+				// _this.state.proposal.propType = 0;
 	
-						_this.setState({
-							proposal_data: result
-						});
+				var data1 = _defineProperty({
+					"Type": "non_cash",
+					"assetID": "MyCOID",
+					"bigchainHash": "",
+					"bigchainID": "",
+					"coidAddr": "",
+					"controlId": "aae858de3899d2ff096ddb5384365c6a86ce7964f1c4f1f22878944d39bd943a",
+					"controlIdList": ["Jen Smith"],
+					"controlTokenAttributes": "My Delegated Identity Tokens",
+					"controlTokenId": "289d3c526086b3832f4fd1338e5b0f437e7c84d6d7c556f53ef7d2eaf4e316a4",
+					"controlTokenQuantity": ["5"],
+					"dimensions": "",
+					"gatekeeperAddr": "",
+					"identityRecoveryIdList": ["Jen Smith", "Joseph Smith"],
+					"isHuman": "true",
+					"msg": "e98cfaa4317c583cd87fb1d538bb64eafea1f516adf02b193fe224d2a60610f6",
+					"ownerIdList": ["Steve Smith"],
+					"ownershipId": "8b44edd090224a5c2350c1b2f3f57ee2d3443744462bb7c3c970c337e570eac4",
+					"ownershipTokenAttributes": "My Identity Tokens",
+					"ownershipTokenId": "289d3c526086b3832f4fd1338e5b0f437e7c84d6d7c556f53ef7d2eaf4e316a4",
+					"ownershipTokenQuantity": ["10"],
+					"pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+					"recoveryCondition": "2",
+					"sig": "4fb1eaab7042e093ed6ca3251af91dca3ec417ef579fe5ea8f079125bd1e6e3c35472aa559fbc6023f2c7c438c1b038b5bc58269b59e3651a65aa3524b22b621",
+					"timestamp": "",
+					"txn_id": "requestCOID",
+					"uniqueId": "01547929f9184f362e1ab0126a15013087f4d1ab25d11ea971e8ffb159546d94",
 	
-						$("#proposalDetails").modal('show');
-						$("#proposalDetails").on('hidden.bs.modal', _this.props.hideHandler);
-					} //end success
-				});
+					"uniqueIdAttributes": [["Steve Smith birth cert.", "557d1294ba620922e1655aa9b5c9be5f2c5dad876740dd2a9a22934b79ee164d", "QmWbbhSo7GzZi6zyi7MpJyAfiqzPRcSfV1oHFRyCgT54iG"], ["passport USA", "557d1294ba620922e1655aa9b5c9be5f2c5dad876740dd2a9a22934b79ee164d", "QmWbbhSo7GzZi6zyi7MpJyAfiqzPRcSfV1oHFRyCgT54iG"]],
+	
+					"yesVotesRequiredToPass": "2"
+				}, 'dimensions', ["LIVING_ROOM.json", "Finance.json"]);
+	
+				_this.setState({ proposal_data: data1 });
+	
+				$("#proposalDetails").modal('show');
+				$("#proposalDetails").on('hidden.bs.modal', _this.props.hideHandler);
+	
+				// $.ajax({
+				// 	type: "POST",
+				// 	url: twinUrl + 'getCoidData',
+				// 	data: {
+				// 		"publicKey": localStorage.getItem("pubKey"),
+				// 		"proposalId": this.state.proposal.proposal_id,
+				// 		"gatekeeperAddr": this.state.proposal.gatekeeperAddr,
+				// 		"isHuman": this.state.proposal.isHuman
+				// 	},//.bind(this)
+				// 	success: function (result) {
+				// 		var fileValidation = true;
+				// 		// Fill up data in Modal window
+				// 		//data.publicKey
+				// 		if ($.type(result) == "string") {
+				// 			result = JSON.parse(result);
+				// 		}
+				// 		var ownerArray = [];
+				// 		for (var i = 0; i < result.ownershipTokenQuantity.length; i++) {
+				// 			var temp = [];
+				// 			temp[0] = result.ownerIdList[i];
+				// 			temp[1] = result.ownershipTokenQuantity[i];
+				// 			ownerArray.push(temp)
+				// 		}
+				// 		result.ownerArray = ownerArray
+				// 		//console.log(result.ownerArray)
+				// 		console.log('result of getCoidData' + JSON.stringify(result));
+	
+				// 		_this.setState({
+				// 			proposal_data: result
+				// 		});
+	
+				// 		$("#proposalDetails").modal('show');
+				// 		$("#proposalDetails").on('hidden.bs.modal', _this.props.hideHandler);
+				// 	}//end success
+				// });
 			}
 	
 			//*****************************************************************************
@@ -54424,7 +54464,7 @@
 							_react2.default.createElement(
 								'b',
 								null,
-								'Official IDs'
+								'Unique Attributes'
 							)
 						)
 					),
@@ -54446,13 +54486,13 @@
 										_react2.default.createElement(
 											'p',
 											null,
-											'File hash: ',
+											'Validation ID: ',
 											ids[2]
 										),
 										_react2.default.createElement(
 											'p',
 											null,
-											'IPFS hash: ',
+											'Data Pointer: ',
 											_react2.default.createElement(
 												'a',
 												{ target: '_blank', href: ipfs_url + "/" + ids[1] },
@@ -54480,7 +54520,7 @@
 						_react2.default.createElement(
 							'td',
 							null,
-							'Ownership ID'
+							'Membership Holding ID'
 						),
 						_react2.default.createElement(
 							'td',
@@ -54494,7 +54534,7 @@
 						_react2.default.createElement(
 							'td',
 							null,
-							'Ownership ID List'
+							'Membership Holding ID List'
 						),
 						_react2.default.createElement(
 							'td',
@@ -54525,7 +54565,7 @@
 						_react2.default.createElement(
 							'td',
 							null,
-							'Ownership Token ID'
+							'Membership Holding Token ID'
 						),
 						_react2.default.createElement(
 							'td',
@@ -54544,7 +54584,7 @@
 						_react2.default.createElement(
 							'td',
 							null,
-							'Ownership Token Description'
+							'Membership Holding Token Description'
 						),
 						_react2.default.createElement(
 							'td',
@@ -54562,7 +54602,7 @@
 						_react2.default.createElement(
 							'td',
 							null,
-							'Ownership Token Quantity'
+							'Membership Holding Token Quantity'
 						),
 						_react2.default.createElement(
 							'td',
@@ -54581,7 +54621,7 @@
 						_react2.default.createElement(
 							'td',
 							null,
-							'Control ID'
+							'Delegation ID'
 						),
 						_react2.default.createElement(
 							'td',
@@ -54600,7 +54640,7 @@
 						_react2.default.createElement(
 							'td',
 							null,
-							'Control ID List'
+							'Delegation ID List'
 						),
 						_react2.default.createElement(
 							'td',
@@ -54625,7 +54665,7 @@
 						_react2.default.createElement(
 							'td',
 							null,
-							'Control Token ID'
+							'Delegation Token ID'
 						),
 						_react2.default.createElement(
 							'td',
@@ -54645,7 +54685,7 @@
 						_react2.default.createElement(
 							'td',
 							null,
-							'Control Token Description'
+							'Delegation Token Description'
 						),
 						_react2.default.createElement(
 							'td',
@@ -54663,7 +54703,7 @@
 						_react2.default.createElement(
 							'td',
 							null,
-							'Control Token Quantity'
+							'Delegation Token Quantity'
 						),
 						_react2.default.createElement(
 							'td',
@@ -54794,13 +54834,13 @@
 										_react2.default.createElement(
 											'p',
 											null,
-											'File hash: ',
+											'Validation ID: ',
 											ids[2]
 										),
 										_react2.default.createElement(
 											'p',
 											null,
-											'IPFS hash: ',
+											'Data Pointer: ',
 											_react2.default.createElement(
 												'a',
 												{ target: '_blank', href: ipfs_url + "/" + ids[1] },
@@ -54875,7 +54915,7 @@
 								_react2.default.createElement(
 									'h4',
 									{ className: 'modal-title', id: 'asset' },
-									'COID Proposal Details'
+									'Membership Proposal Details'
 								)
 							),
 							_react2.default.createElement(
@@ -54944,24 +54984,28 @@
 				console.log("hash of empty: " + keccak_256(""));
 				console.log("hash of spencer: " + keccak_256("spencer"));
 	
-				$.ajax({
-					url: twinUrl + "ballot/readNotify/" + keccak_256(localStorage.getItem("pubKey")).toUpperCase(),
-					dataType: 'json',
-					cache: false,
-					success: function (result) {
-						console.log("result: " + JSON.stringify(result));
-						if ((typeof result === 'undefined' ? 'undefined' : _typeof(result)) != "object") {
-							var data = JSON.parse(result);
-						} else {
-							var data = result;
-							var test = JSON.parse(result.data);
-							test = JSON.parse(JSON.stringify(test.messages));
-							console.log(test[0].type);
-						}
-						this.setState({ coid: test });
-						console.log("result: " + JSON.stringify(result.data));
-					}.bind(this)
-				});
+				// $.ajax({
+				// 	url: twinUrl + "ballot/readNotify/" + keccak_256(localStorage.getItem("pubKey")).toUpperCase(),
+				// 	dataType: 'json',
+				// 	cache: false,
+				// 	success: function (result) {
+				// 		console.log("result: " + JSON.stringify((result)));
+				// 		if (typeof (result) != "object") {
+				// 			var data = JSON.parse(result);
+				// 		} else {
+				// 			var data = result;
+				// 			var test = JSON.parse((result.data));
+				// 			test = JSON.parse(JSON.stringify(test.messages));
+				// 			console.log(test[0].type);
+				// 		}
+				// 		this.setState({ coid: test });
+				// 		console.log("result: " + JSON.stringify((result.data)));
+				// 	}.bind(this)
+				// });
+				var coidData = { "data": "{\"id\":\"252B21496C1BB4BD63A26751A09350ABA052B8185A713C6C7FFA8B01DC2B8F1A\",\"messages\":[{\"type\":\"proposal\",\"proposal_id\":\"E6D67871E5D8C63FEE0C756D3BDB979AE3F3585ECAB4B106E274C399B4660F65\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1508145049990,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"},{\"type\":\"proposal\",\"proposal_id\":\"EF904896BED7C07BD3E42163415FD64A8E46C3415DAC0302218E6978C688251E\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1508143256055,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"},{\"type\":\"proposal\",\"proposal_id\":\"D263CCFE3D47B87FA7B2E383F0834D7DD0FDC9FC92ECF361399B1CC3E63BB18E\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1508137339494,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"},{\"type\":\"proposal\",\"proposal_id\":\"B4A24A37903F1F79B57B82F170925CF9D409F774111B947982C1C2447DAE2D1B\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1508136875822,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"},{\"type\":\"proposal\",\"proposal_id\":\"3B08D0AE54888B07DF2BDAD9846153AFCFF2E1E515D8FD41DD083D14EA566879\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1508135783055,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"},{\"type\":\"proposal\",\"proposal_id\":\"D7D6F5CF0E7B6E633D0AC31E1539B62CD7530FF6BF6E36DB8A2191406C74FB7E\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1508134006740,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"},{\"type\":\"proposal\",\"proposal_id\":\"B83BA4A36711D35F65572437E347998F95870C5618018A14FDDFF5891A959A22\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1508126411714,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"},{\"type\":\"proposal\",\"proposal_id\":\"EF6F5DB37441A379B302BA5D9CEA3D9271AD5B21F5AECE3F04D8CC86AC7A4F17\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1507785222153,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"}]}" };
+				var test = JSON.parse(coidData.data);
+				test = JSON.parse(JSON.stringify(test.messages));
+				this.setState({ coid: test });
 			}
 		}, {
 			key: 'hideHandler',
@@ -54990,8 +55034,8 @@
 			value: function render() {
 				var _this6 = this;
 	
-				console.log("hash of empty: " + keccak_256(""));
-				console.log("hash of spencer: " + keccak_256("spencer"));
+				var names = ["Membership request, Steve Smith", "Attestation request, James Rodriguez has 0 delinquent mortgage payments", "Membership request, Emily Lou", "Membership request, Shane Gield", "Attestion request, Steve Smith has valid Chase bank acct", "Attestation request, Joe Schmo has a credit score of 780 as of Oct 1, 2017", "Membership request, James Rodriguez' car loan has been closed", "Membership request, Shane Gield has a credit score of 600", "Attestation request, Shane Gield opened a loan with BAC Florida on Jul 6, 2011"];
+	
 				console.log("STATE: " + JSON.stringify(this.state));
 				var _that = this;
 				return _react2.default.createElement(
@@ -55000,7 +55044,7 @@
 					_react2.default.createElement(
 						'h1',
 						null,
-						'Identity and Asset Proposals Pending for Your Action'
+						'Notary Requests Pending for Your Action'
 					),
 					' ',
 					_react2.default.createElement('hr', null),
@@ -55038,6 +55082,16 @@
 														'Published On: '
 													),
 													_that.getDateFormat(el.time)
+												),
+												_react2.default.createElement(
+													'div',
+													null,
+													_react2.default.createElement(
+														'b',
+														null,
+														'Description: '
+													),
+													names[i]
 												)
 											),
 											_react2.default.createElement(
@@ -55046,7 +55100,7 @@
 												_react2.default.createElement(
 													'button',
 													{ type: 'button', title: 'View proposal to vote', 'data-item': el, 'data-index': i, onClick: _that.showHandler, className: 'btn btn-primary' },
-													'View Proposal'
+													'View'
 												)
 											)
 										);
@@ -57252,6 +57306,10 @@
 	
 	var _UploadIpfsFile2 = _interopRequireDefault(_UploadIpfsFile);
 	
+	var _reactAutosuggest = __webpack_require__(/*! react-autosuggest */ 371);
+	
+	var _reactAutosuggest2 = _interopRequireDefault(_reactAutosuggest);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -57319,6 +57377,8 @@
 						id: "1"
 					}
 				}],
+	
+				value: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
 	
 				asset: props.asset || {},
 				asset_class: _this2.tags.getAssetData("classes"),
@@ -57429,12 +57489,13 @@
 				var standardAsset = document.getElementById("standardAsset");
 				var KYC = document.getElementById("KYC");
 	
-				if (this.props.asset.asset_details.propType == 2) {
-					standardAsset.style.display = 'none';
-					KYC.style.display = 'block';
-				} else {
-					KYC.style.display = 'none';
-				}
+				// if (this.props.asset.asset_details.propType == 2) {
+				// 	standardAsset.style.display = 'none';
+				// 	KYC.style.display = 'block';
+				// }
+				// else { KYC.style.display = 'none' }
+	
+				KYC.style.display = 'none';
 	
 				var prop = this.props.asset.asset_details;
 	
@@ -58004,8 +58065,94 @@
 				//console.log("******" + JSON.stringify(this.state.qrCode_COID_device_relation))
 	
 				var _this = this;
+				var that = this; //ADDED BY ST OCT 16!!!!!!!!
 	
 				var prop = this.props.asset.asset_details;
+	
+				var dims1 = {
+					"dimensionName": "Mortgage History BAC Florida",
+					"pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+					"address": "",
+					"flag": 0,
+					"ID": 0,
+					"coidAddr": "E2B24811DB9B23DDEA8313D82D11A82014C8E3BC",
+					"dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
+					"uniqueId": "9aaddf7caa690217bddc743102dc7e417608a93418ad5da2c0c82c501004f26f",
+					"owners": ["59d110a3ab34a2ebd0ddb9d72ead24e8e906bebe794ea13c8c35b8a6c81314cd"],
+					"controllers": ["Steve Smith", "BAC Florida"],
+					"delegations": [{
+						"owner": "Steve Smith",
+						"delegatee": "Moodys",
+						"amount": "2",
+						"accessCategories": ""
+					}],
+					"data": [{
+						"descriptor": "Payment confirmation BAC Florida June-2016",
+						"attribute": "QmXVFStSMEcoAWPVKLrxJ8wf5ohn2UdmdAxcnfB8TtSAZG",
+						"flag": 0
+					}, {
+						"descriptor": "Loan ID 122235 Summary 2015",
+						"attribute": "QmSMWeGPjtgzQ75Y1YXbnC4uByni8bwHcB4vPXrPVcUTUM",
+						"flag": 0
+					}]
+					// },
+					// {
+					// 	"dimensionName": "Car Loan Honda City FL",
+					// 	"pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+					// 	"address": "",
+					// 	"flag": 0,
+					// 	"ID": 0,
+					// 	"coidAddr": "E2B24811DB9B23DDEA8313D82D11A82014C8E3BC",
+					// 	"dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
+					// 	"uniqueId": "9aaddf7caa690217bddc743102dc7e417608a93418ad5da2c0c82c501004f26f",
+					// 	"owners": [
+					// 		"Steve Smith"
+					// 	],
+					// 	"controllers": [
+					// 		"Steve Smith",
+					// 		"BAC Florida"
+					// 	],
+					// 	"delegations": [
+					// 		{
+					// 			"owner": "Steve Smith",
+					// 			"delegatee": "Moodys",
+					// 			"amount": "2",
+					// 			"accessCategories": ""
+					// 		}
+					// 	],
+					// 	"data": [
+					// 		{
+					// 			"descriptor": "Leasing Document Signed June-2015",
+					// 			"attribute": "QmXVFStSMEcoAWPVKLrxJ8wf5ohn2UdmdAxcnfB8TtSAZG",
+					// 			"flag": 0
+					// 		},
+					// 		{
+					// 			"descriptor": "Payment Confirmation Oct-2017",
+					// 			"attribute": "QmSMWeGPjtgzQ75Y1YXbnC4uByni8bwHcB4vPXrPVcUTUM",
+					// 			"flag": 0
+					// 		}
+					// 	]
+					// }]
+	
+				};var dataArray1 = [];
+				//var data = this.props.dimension.dimension_details.data
+				var data = dims1.data;
+				//{"descriptor":"jan_history","attribute":"QmTok8Hgi4CCYS3fkxS83XpRjHjfegQZNszU6ekSFFq65s","flag":0}
+				Object.keys(data).forEach(function (key) {
+					dataArray1.push(data[key].descriptor);
+					dataArray1.push(data[key].attribute);
+					dataArray1.push(data[key].flag);
+				});
+				var arrayOfArrays1 = [];
+				for (var i = 0; i < data.length; i++) {
+					var element = [dataArray1[3 * i + 0], dataArray1[3 * i + 1], dataArray1[3 * i + 2]]; /*, dataArray[4 * i + 3]*/
+					arrayOfArrays1.push(element);
+				}
+	
+				console.log("array of Arrays: " + arrayOfArrays1);
+				//this.setState({ dimensionDataArray: arrayOfArrays })
+	
+	
 				// var hashedKeys = [];
 				// for (var i = 0; i < this.keys.length; i++) {
 				//  hashedKeys[i] = keccak_256(this.keys[i]);
@@ -58120,6 +58267,113 @@
 					}
 				};
 	
+				function autocompleteRenderInput(_ref) {
+					var addTag = _ref.addTag,
+					    props = _ref.props;
+	
+	
+					var passed = JSON.stringify(arguments[0]);
+					console.log("passed: " + passed + JSON.stringify(arguments[1]));
+					passed = JSON.parse(passed);
+	
+					var handleOnChange = function handleOnChange(e, _ref2) {
+						var newValue = _ref2.newValue,
+						    method = _ref2.method;
+	
+						console.log("handleonchange params: " + e + "   " + newValue + "   " + method + "   " + passed.id);
+						if (method === 'enter' || method === 'click') {
+							that.state.value[passed.id] = "";
+							e.preventDefault();
+						} else {
+							that.onChange(e, { newValue: newValue }, passed.id);
+						}
+					};
+					var handleKeyPress = function handleKeyPress(event) {
+						console.log('enter press here! ' + event.key);
+						if (event.key == 'Enter') {
+							event.preventDefault();
+							addTag(that.state.value[passed.id]);
+							that.state.value[passed.id] = "";
+							console.log('current tags: ' + that.state.tags);
+						}
+					};
+	
+					var renderInputComponent = function renderInputComponent(inputProps) {
+						return _react2.default.createElement('input', inputProps);
+					};
+					var inputValue = that.state.value[Number(passed.id)] || "";
+					if (inputValue == 'undefined') {
+						inputValue = "";
+					}
+					var inputLength = inputValue.length || 0;
+	
+					var names = ["Moodys", "Steve Smith CFA", "Joe Schmo LLC", "AuditBody1"];
+	
+					//PUT BACK IN 'that.state.names'
+					var suggestions = names.filter(function (name) {
+						//console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
+						//console.log(inputValue);
+						var re = new RegExp(inputValue, "i");
+						return Boolean(name.slice(0, inputLength).search(re) + 1);
+						//return (name.toLowerCase().slice(0, inputLength) === inputValue  || name.toUpperCase().slice(0, inputLength) === inputValue)
+					});
+					/////////////////////////////////////
+	
+					var value = String(that.state.value[Number(passed.id)]) || "";
+					if (value == 'undefined') {
+						value = "";
+					}
+					//const suggestions = that.state.suggestions;
+					console.log("passed ID: " + passed.id);
+					console.log("suggestions: " + suggestions);
+					console.log("value: " + value);
+					var inputProps = {
+						placeholder: passed.placeholder,
+						value: value,
+						style: {
+							width: '30%',
+							height: '100%',
+							display: "initial"
+						},
+						onChange: handleOnChange,
+						onKeyPress: handleKeyPress,
+						className: "react-tagsinput-input",
+						id: passed.id
+					};
+					return _react2.default.createElement(_reactAutosuggest2.default, {
+						id: passed.id,
+						ref: passed.ref,
+						suggestions: suggestions,
+						shouldRenderSuggestions: function shouldRenderSuggestions(value) {
+							return value.length > 0;
+						},
+						getSuggestionValue: function getSuggestionValue(suggestion) {
+							return suggestion;
+						},
+						renderSuggestion: function renderSuggestion(suggestion) {
+							return _react2.default.createElement(
+								'span',
+								null,
+								suggestion
+							);
+						},
+						inputProps: inputProps,
+						onSuggestionSelected: function onSuggestionSelected(e, _ref3) {
+							var suggestion = _ref3.suggestion,
+							    method = _ref3.method;
+	
+							console.log("SELECTED: " + method);
+							if (method == 'click') {
+								addTag(suggestion);
+								that.state.value[passed.id] = "";
+							}
+						},
+						onSuggestionsClearRequested: function onSuggestionsClearRequested() {},
+						onSuggestionsFetchRequested: function onSuggestionsFetchRequested() {},
+						renderInputComponent: renderInputComponent
+					});
+				}
+	
 				return _react2.default.createElement(
 					'div',
 					{ className: 'modal fade', id: 'assetDetails', key: this.props.asset.asset_id, tabIndex: '-1', role: 'dialog', 'aria-labelledby': 'asset' },
@@ -58150,7 +58404,7 @@
 										_react2.default.createElement(
 											'a',
 											{ href: '#asset_details', role: 'tab', 'data-toggle': 'tab' },
-											'Asset Details'
+											'Asset Info'
 										)
 									),
 									_react2.default.createElement(
@@ -58168,7 +58422,7 @@
 										_react2.default.createElement(
 											'a',
 											{ href: '#menu2', role: 'tab', 'data-toggle': 'tab' },
-											'Dimension Details'
+											'Data Repository Info'
 										)
 									),
 									_react2.default.createElement(
@@ -58177,7 +58431,7 @@
 										_react2.default.createElement(
 											'a',
 											{ href: '#menu3', role: 'tab', 'data-toggle': 'tab' },
-											'Edit Dimensions'
+											'Edit Repositories'
 										)
 									),
 									_react2.default.createElement(
@@ -58186,7 +58440,7 @@
 										_react2.default.createElement(
 											'a',
 											{ href: '#menu4', role: 'tab', 'data-toggle': 'tab' },
-											'Create Dimension'
+											'Create Repository'
 										)
 									),
 									_react2.default.createElement(
@@ -58195,7 +58449,7 @@
 										_react2.default.createElement(
 											'a',
 											{ href: '#qrcode', role: 'tab', 'data-toggle': 'tab' },
-											'QR Codes'
+											'Proofs'
 										)
 									)
 								)
@@ -58251,19 +58505,6 @@
 															_react2.default.createElement(_reactTagsinput2.default, classInput)
 														)
 													),
-													_react2.default.createElement(
-														'tr',
-														null,
-														_react2.default.createElement(
-															'td',
-															{ colSpan: '2' },
-															_react2.default.createElement(
-																'b',
-																null,
-																'Official IDs'
-															)
-														)
-													),
 													function () {
 														var ipfs_url = "http://10.101.114.231:8080/ipfs/";
 														if (!$.isEmptyObject(prop.uniqueIdAttributes)) {
@@ -58283,13 +58524,13 @@
 																			_react2.default.createElement(
 																				'p',
 																				null,
-																				'File hash: ',
+																				'Validation ID: ',
 																				ids[1]
 																			),
 																			_react2.default.createElement(
 																				'p',
 																				null,
-																				'IPFS hash: ',
+																				'Data Pointer: ',
 																				_react2.default.createElement(
 																					'a',
 																					{ target: '_blank', href: ipfs_url + "/" + ids[2] },
@@ -58313,13 +58554,13 @@
 																			_react2.default.createElement(
 																				'p',
 																				null,
-																				'File hash: ',
+																				'Validation ID: ',
 																				ids[1]
 																			),
 																			_react2.default.createElement(
 																				'p',
 																				null,
-																				'BigChain hash: ',
+																				'Data Pointer: ',
 																				_react2.default.createElement(
 																					'a',
 																					{ href: 'javascript:', onClick: function onClick(e) {
@@ -58350,7 +58591,7 @@
 														_react2.default.createElement(
 															'td',
 															null,
-															'Ownership Token Description'
+															'Membership Holding Token Description'
 														),
 														_react2.default.createElement(
 															'td',
@@ -58368,7 +58609,7 @@
 														_react2.default.createElement(
 															'td',
 															null,
-															'Ownership ID'
+															'Membership Holding ID'
 														),
 														_react2.default.createElement(
 															'td',
@@ -58387,7 +58628,7 @@
 														_react2.default.createElement(
 															'td',
 															null,
-															'Ownership ID List'
+															'Membership Holding ID List'
 														),
 														_react2.default.createElement(
 															'td',
@@ -58412,7 +58653,7 @@
 														_react2.default.createElement(
 															'td',
 															null,
-															'Ownership Token Quantity'
+															'Membership Holding Token Quantity'
 														),
 														_react2.default.createElement(
 															'td',
@@ -58437,7 +58678,7 @@
 														_react2.default.createElement(
 															'td',
 															null,
-															'Ownership Token ID'
+															'Membership Holding Token ID'
 														),
 														_react2.default.createElement(
 															'td',
@@ -58456,7 +58697,7 @@
 														_react2.default.createElement(
 															'td',
 															null,
-															'Control Token Description'
+															'Delegation Token Description'
 														),
 														_react2.default.createElement(
 															'td',
@@ -58474,7 +58715,7 @@
 														_react2.default.createElement(
 															'td',
 															null,
-															'Control ID'
+															'Delegation ID'
 														),
 														_react2.default.createElement(
 															'td',
@@ -58493,7 +58734,7 @@
 														_react2.default.createElement(
 															'td',
 															null,
-															'Control ID List'
+															'Delegation ID List'
 														),
 														_react2.default.createElement(
 															'td',
@@ -58518,7 +58759,7 @@
 														_react2.default.createElement(
 															'td',
 															null,
-															'Control Token Quantity'
+															'Delegation Token Quantity'
 														),
 														_react2.default.createElement(
 															'td',
@@ -58543,7 +58784,7 @@
 														_react2.default.createElement(
 															'td',
 															null,
-															'Control Token ID'
+															'Delegation Token ID'
 														),
 														_react2.default.createElement(
 															'td',
@@ -58846,7 +59087,7 @@
 																_react2.default.createElement(
 																	'label',
 																	null,
-																	'Uniqueness'
+																	'Membership Attributes'
 																)
 															),
 															_react2.default.createElement(
@@ -58870,33 +59111,12 @@
 																'div',
 																{ className: 'row' },
 																_react2.default.createElement(
-																	'table',
-																	{ className: 'table table-striped table-hover' },
-																	_react2.default.createElement(
-																		'tbody',
-																		null,
-																		_react2.default.createElement(
-																			'tr',
-																			null,
-																			_react2.default.createElement(
-																				'td',
-																				{ colSpan: '2' },
-																				_react2.default.createElement(
-																					'b',
-																					null,
-																					'Official IDs'
-																				)
-																			)
-																		)
-																	)
-																),
-																_react2.default.createElement(
 																	'div',
 																	{ className: 'form-group' },
 																	_react2.default.createElement(
 																		'label',
 																		{ htmlFor: 'unique_id' },
-																		'Enter Unique ID Attributes:'
+																		'Unique ID Attributes:'
 																	),
 																	this.state.inputs.map(function (input) {
 																		return _react2.default.createElement(_UniqueIDAttributeForm2.default, { type: "MyCOID", handleShowModal: _this3.handleShowModal.bind(_this3), max: '10', key: input, labelref: input });
@@ -58945,7 +59165,7 @@
 																_react2.default.createElement(
 																	'label',
 																	null,
-																	'Ownership'
+																	'Membership Holding'
 																)
 															),
 															_react2.default.createElement(
@@ -58984,7 +59204,7 @@
 																				_react2.default.createElement(
 																					'b',
 																					null,
-																					'Owner ID List'
+																					'Membership Holding ID List'
 																				)
 																			),
 																			_react2.default.createElement(
@@ -59015,7 +59235,7 @@
 																		_react2.default.createElement(
 																			'label',
 																			{ htmlFor: 'control_dist' },
-																			'Enter Owners and their ownership token(s).'
+																			'Enter holders and their membership token(s).'
 																		),
 																		this.state.inputs_owners.map(function (input) {
 																			return _react2.default.createElement(_TokenDistributionForm2.default, { min: _this3.state.subform_cont, max: '10', key: input, labelref: input });
@@ -59038,7 +59258,7 @@
 																			'button',
 																			{ style: style, type: 'button', className: 'btn btn-primary', onClick: this.requestUpdateOwners.bind(this) },
 																			_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
-																			'Update Ownership'
+																			'Update Membership Holdings'
 																		)
 																	)
 																)
@@ -59065,7 +59285,7 @@
 																_react2.default.createElement(
 																	'label',
 																	null,
-																	'Control'
+																	'Delegation'
 																)
 															),
 															_react2.default.createElement(
@@ -59103,7 +59323,7 @@
 																				_react2.default.createElement(
 																					'b',
 																					null,
-																					'Control ID List'
+																					'Delegation ID List'
 																				)
 																			),
 																			_react2.default.createElement(
@@ -59131,7 +59351,7 @@
 																	_react2.default.createElement(
 																		'label',
 																		{ htmlFor: 'control_dist' },
-																		'Enter Controllers and their control token(s).'
+																		'Enter Delegatees and their delegated token(s).'
 																	),
 																	this.state.inputs_controllers.map(function (input) {
 																		return _react2.default.createElement(_TokenDistributionForm2.default, { min: _this3.state.subform_cont, max: '10', key: input, labelref: input });
@@ -59314,7 +59534,7 @@
 																_react2.default.createElement(
 																	'label',
 																	null,
-																	'Delegations'
+																	'One-Time or Temporary Delegation'
 																)
 															),
 															_react2.default.createElement(
@@ -59352,7 +59572,7 @@
 																				_react2.default.createElement(
 																					'b',
 																					null,
-																					'Delegations List'
+																					'Temporary Delegations List'
 																				)
 																			),
 																			_react2.default.createElement(
@@ -59380,7 +59600,7 @@
 																	_react2.default.createElement(
 																		'label',
 																		{ htmlFor: 'delegatee_dist' },
-																		'Enter Delegatees and their delegated control token(s).'
+																		'Enter Delegatees and their delegated token(s).'
 																	),
 																	this.state.inputs_delegatees.map(function (input) {
 																		return _react2.default.createElement(_TokenDistributionForm2.default, { min: _this3.state.subform_cont, max: '10', key: input, labelref: input });
@@ -59419,7 +59639,7 @@
 										_react2.default.createElement(
 											'h4',
 											null,
-											'Data Repositories (Identity Dimensions)'
+											'Data Repositories'
 										),
 										function () {
 											if (!$.isEmptyObject(_this3.props.dimensions)) {
@@ -59478,9 +59698,62 @@
 																					_react2.default.createElement(
 																						'td',
 																						null,
-																						'Asset Owner List'
+																						'Membership Holding List'
+																					),
+																					_react2.default.createElement(
+																						'td',
+																						null,
+																						'Steve Smith'
 																					)
-																				)
+																				),
+																				_react2.default.createElement(
+																					'tr',
+																					null,
+																					_react2.default.createElement(
+																						'td',
+																						{ colSpan: '2' },
+																						_react2.default.createElement(
+																							'b',
+																							null,
+																							'Descriptors'
+																						)
+																					)
+																				),
+																				function () {
+																					if (arrayOfArrays1.length > 0) {
+																						return arrayOfArrays1.map(function (attrs, i) {
+																							console.log("attrs[0]: " + attrs[0] + ", attrs[1]:" + attrs[1] + ", attrs[2]: " + attrs[2]);
+																							return _react2.default.createElement(
+																								'tr',
+																								{ key: i },
+																								_react2.default.createElement(
+																									'td',
+																									null,
+																									attrs[0]
+																								),
+																								_react2.default.createElement(
+																									'td',
+																									null,
+																									_react2.default.createElement(
+																										'button',
+																										{ type: 'button', className: 'btn btn-primary btn-sm', 'data-val': i },
+																										'Spend Token'
+																									)
+																								)
+																							);
+																						});
+																					} else {
+																						return _react2.default.createElement(
+																							'tr',
+																							null,
+																							_react2.default.createElement(
+																								'td',
+																								{ colSpan: '2' },
+																								'No descriptors found.'
+																							)
+																						);
+																					}
+																				}(_this3)
 																			)
 																		)
 																	)
@@ -59496,15 +59769,9 @@
 										'div',
 										{ id: 'menu3', className: 'tab-pane' },
 										_react2.default.createElement(
-											'a',
-											{ href: '#identitydimension' },
-											'CREATE NEW'
-										),
-										_react2.default.createElement('br', null),
-										_react2.default.createElement(
 											'label',
 											null,
-											'Select Dimension:'
+											'Select Repository:'
 										),
 										_react2.default.createElement('br', null),
 										_react2.default.createElement(
@@ -59577,78 +59844,6 @@
 																	{ className: 'form-group' },
 																	_react2.default.createElement(
 																		'label',
-																		null,
-																		'Are you adding an attested identity claims as an entry?'
-																	),
-																	_react2.default.createElement(
-																		'select',
-																		{ id: 'addICA', onChange: this.addICA },
-																		_react2.default.createElement(
-																			'option',
-																			{ value: 'selectOption' },
-																			'--- Please select ---'
-																		),
-																		_react2.default.createElement(
-																			'option',
-																			{ value: 'Yes' },
-																			'Yes'
-																		),
-																		_react2.default.createElement(
-																			'option',
-																			{ value: 'No' },
-																			'No'
-																		)
-																	)
-																),
-																function () {
-																	if (_this3.state.addingICA == true) {
-																		return _react2.default.createElement(
-																			'div',
-																			{ className: 'form-group' },
-																			_react2.default.createElement(
-																				'h5',
-																				null,
-																				_react2.default.createElement(
-																					'b',
-																					null,
-																					'Select claim:'
-																				)
-																			),
-																			_react2.default.createElement(
-																				'select',
-																				{ id: 'ICAassetSelect', className: 'selectpicker show-tick', value: _this3.state.selectedAsset_addDimAttr, onChange: _this3.selectfromICAs },
-																				_react2.default.createElement(
-																					'option',
-																					{ value: '' },
-																					'--- Please select ---'
-																				),
-																				function () {
-																					if (_this3.state.ICA_assets.length > 0) {
-																						return _this3.state.ICA_assets.map(function (asset, i) {
-																							console.log("element: " + JSON.stringify(asset));
-																							return _react2.default.createElement(
-																								'option',
-																								{ key: i, value: asset.asset_id },
-																								asset.asset_id
-																							);
-																						});
-																					} else {
-																						return _react2.default.createElement(
-																							'option',
-																							null,
-																							'No claims found.'
-																						);
-																					}
-																				}(_this3)
-																			)
-																		);
-																	}
-																}(this),
-																_react2.default.createElement(
-																	'div',
-																	{ className: 'form-group' },
-																	_react2.default.createElement(
-																		'label',
 																		{ htmlFor: 'unique_id' },
 																		'Enter descriptor(s) and attribute(s):'
 																	),
@@ -59700,7 +59895,7 @@
 															_react2.default.createElement(
 																'label',
 																null,
-																'Update Control'
+																'Delegation'
 															)
 														),
 														_react2.default.createElement(
@@ -59732,7 +59927,7 @@
 																	_react2.default.createElement(
 																		'label',
 																		{ htmlFor: 'control_dist' },
-																		'Enter additional persona controllers. Note: Core Identity controllers will automatically be controllers of the persona.'
+																		'Enter additional persona delegations'
 																	),
 																	_react2.default.createElement(_reactTagsinput2.default, { maxTags: 10, value: this.state.dim_control_list, onChange: function onChange(e) {
 																			_this3.onFieldChange("dim_control_list", e);
@@ -59772,7 +59967,7 @@
 															_react2.default.createElement(
 																'label',
 																null,
-																'Add Delegations'
+																'Temporary Data Delegation'
 															)
 														),
 														_react2.default.createElement(
@@ -59810,7 +60005,7 @@
 																			_react2.default.createElement(
 																				'label',
 																				{ htmlFor: 'control_dist' },
-																				'With whom would you like to share your persona and how many times should that person be able to access?'
+																				'Share this data repository with a 3rd party? How often?'
 																			),
 																			this.state.delegations.map(function (input, i) {
 																				return _react2.default.createElement(_DimensionDelegationForm2.default, { attr: _this3.state.suggest_attrs[i], max: '10', key: input, labelref: input, deleValue: _this3.state.deleValue[i], deleToken: _this3.state.deleToken[i], passedFunction: function passedFunction(e) {
@@ -59834,16 +60029,6 @@
 																				'Add More'
 																			)
 																		)
-																	),
-																	_react2.default.createElement('tr', null),
-																	_react2.default.createElement(
-																		'tr',
-																		null,
-																		_react2.default.createElement(
-																			'td',
-																			null,
-																			_react2.default.createElement('select', { id: 'accessCategories', className: 'selectpicker', multiple: 'multiple' })
-																		)
 																	)
 																)
 															),
@@ -59861,7 +60046,252 @@
 									_react2.default.createElement(
 										'div',
 										{ id: 'menu4', className: 'tab-pane' },
-										'HERE WE WILL ADD THE CREATE DIMENSION!!!!!!'
+										_react2.default.createElement(
+											'div',
+											{ id: 'SubmitContainer' },
+											_react2.default.createElement(
+												'form',
+												{ method: 'POST', id: 'register', role: 'form' },
+												_react2.default.createElement(
+													'div',
+													{ className: 'form-group' },
+													_react2.default.createElement(
+														'label',
+														{ htmlFor: 'dimensionName' },
+														'Data Repository name:'
+													),
+													_react2.default.createElement('input', { name: 'dimensionName', className: 'form-control col-md-4', type: 'text', placeholder: 'Dimension Name' }),
+													_react2.default.createElement('hr', null)
+												),
+												_react2.default.createElement('hr', null),
+												_react2.default.createElement(
+													'div',
+													{ className: 'panel-group', id: 'accordion2A' },
+													_react2.default.createElement(
+														'div',
+														{ className: 'panel panel-default' },
+														_react2.default.createElement(
+															'div',
+															{ className: 'panel-heading' },
+															_react2.default.createElement(
+																'div',
+																{ className: 'row' },
+																_react2.default.createElement(
+																	'div',
+																	{ className: 'col-xs-11' },
+																	_react2.default.createElement(
+																		'label',
+																		null,
+																		'Repository Attributes'
+																	)
+																),
+																_react2.default.createElement(
+																	'div',
+																	{ className: 'col-xs-1' },
+																	_react2.default.createElement(
+																		'a',
+																		{ 'data-toggle': 'collapse', 'data-parent': '#accordion', href: '#collapse2A' },
+																		_react2.default.createElement('span', { className: 'glyphicon glyphicon-chevron-down' })
+																	)
+																)
+															)
+														),
+														_react2.default.createElement(
+															'div',
+															{ id: 'collapse2A', className: 'panel-collapse collapse out' },
+															_react2.default.createElement(
+																'div',
+																{ className: 'panel-body' },
+																_react2.default.createElement(
+																	'div',
+																	{ className: 'row' },
+																	_react2.default.createElement(
+																		'div',
+																		{ className: 'form-group', id: 'unique_id_div' },
+																		_react2.default.createElement(
+																			'label',
+																			{ htmlFor: 'unique_id' },
+																			'Enter descriptor(s) and attribute(s):'
+																		),
+																		this.state.inputs.map(function (input) {
+																			return _react2.default.createElement(_DimensionAttributeForm2.default, { handleShowModal: _this3.handleShowModal.bind(_this3), max: '10', key: input, labelref: input });
+																		})
+																	),
+																	_react2.default.createElement(
+																		'div',
+																		{ className: 'form-group', id: 'unique_id_btn' },
+																		_react2.default.createElement(
+																			'button',
+																			{ type: 'button', className: 'btn-sm btn-info pull-right', style: marginRight15 },
+																			_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
+																			'Add More'
+																		)
+																	)
+																)
+															)
+														)
+													)
+												),
+												_react2.default.createElement(
+													'div',
+													{ className: 'panel-group', id: 'accordion3A' },
+													_react2.default.createElement(
+														'div',
+														{ className: 'panel panel-default' },
+														_react2.default.createElement(
+															'div',
+															{ className: 'panel-heading' },
+															_react2.default.createElement(
+																'div',
+																{ className: 'row' },
+																_react2.default.createElement(
+																	'div',
+																	{ className: 'col-xs-11' },
+																	_react2.default.createElement(
+																		'label',
+																		null,
+																		'Delegations'
+																	)
+																),
+																_react2.default.createElement(
+																	'div',
+																	{ className: 'col-xs-1' },
+																	_react2.default.createElement(
+																		'a',
+																		{ 'data-toggle': 'collapse', 'data-parent': '#accordion', href: '#collapse3A' },
+																		_react2.default.createElement('span', { className: 'glyphicon glyphicon-chevron-down' })
+																	)
+																)
+															)
+														),
+														_react2.default.createElement(
+															'div',
+															{ id: 'collapse3A', className: 'panel-collapse collapse out' },
+															_react2.default.createElement(
+																'div',
+																{ className: 'panel-body' },
+																_react2.default.createElement(
+																	'div',
+																	{ className: 'row' },
+																	_react2.default.createElement(
+																		'div',
+																		{ className: 'form-group' },
+																		_react2.default.createElement(
+																			'label',
+																			{ htmlFor: 'control_list' },
+																			'Enter additional persona controllers. Note: Core Identity controllers will automatically be controllers of the persona.'
+																		),
+																		_react2.default.createElement(_reactTagsinput2.default, { maxTags: 10, renderInput: autocompleteRenderInput, value: this.state.control_list, onChange: function onChange(e) {
+																				_this3.onFieldChange("control_list", e);
+																			} })
+																	),
+																	_react2.default.createElement(
+																		'div',
+																		{ className: 'form-group' },
+																		_react2.default.createElement(
+																			'div',
+																			{ className: 'col-md-offset-6 col-md-6 ' },
+																			_react2.default.createElement(
+																				'button',
+																				{ type: 'button', className: 'btn btn-info pull-right', style: marginRight15 },
+																				_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
+																				'Add More'
+																			)
+																		)
+																	)
+																)
+															)
+														)
+													)
+												),
+												_react2.default.createElement(
+													'div',
+													{ className: 'panel-group', id: 'accordion4' },
+													_react2.default.createElement(
+														'div',
+														{ className: 'panel panel-default' },
+														_react2.default.createElement(
+															'div',
+															{ className: 'panel-heading' },
+															_react2.default.createElement(
+																'div',
+																{ className: 'row' },
+																_react2.default.createElement(
+																	'div',
+																	{ className: 'col-xs-11' },
+																	_react2.default.createElement(
+																		'label',
+																		null,
+																		'One-Time or Temporary Delegations'
+																	)
+																),
+																_react2.default.createElement(
+																	'div',
+																	{ className: 'col-xs-1' },
+																	_react2.default.createElement(
+																		'a',
+																		{ 'data-toggle': 'collapse', 'data-parent': '#accordion', href: '#collapse4' },
+																		_react2.default.createElement('span', { className: 'glyphicon glyphicon-chevron-down' })
+																	)
+																)
+															)
+														),
+														_react2.default.createElement(
+															'div',
+															{ id: 'collapse4', className: 'panel-collapse collapse out' },
+															_react2.default.createElement(
+																'div',
+																{ className: 'panel-body' },
+																_react2.default.createElement(
+																	'div',
+																	{ className: 'row' },
+																	_react2.default.createElement(
+																		'div',
+																		{ className: 'form-group' },
+																		_react2.default.createElement(
+																			'label',
+																			{ htmlFor: 'control_dist' },
+																			'Share this data repository with a 3rd party? How often?'
+																		),
+																		this.state.delegations.map(function (input, i) {
+																			return _react2.default.createElement(_DimensionDelegationForm2.default, { attr: _this3.state.suggest_attrs[i], max: '10', key: input, labelref: input, autocompleteRenderInput: autocompleteRenderInput, deleValue: _this3.state.deleValue[i], deleToken: _this3.state.deleToken[i], passedFunction: function passedFunction(e) {
+																					_this3.onFieldChange2("deleValue," + i, e);
+																				}, passedFunction2: function passedFunction2(e) {
+																					_this3.onFieldChange2("deleToken," + i, e);
+																				} });
+																		})
+																	),
+																	_react2.default.createElement(
+																		'div',
+																		{ className: 'form-group' },
+																		_react2.default.createElement(
+																			'div',
+																			{ className: 'col-md-offset-6 col-md-6 ' },
+																			_react2.default.createElement(
+																				'button',
+																				{ type: 'button', className: 'btn btn-info pull-right', style: marginRight15 },
+																				_react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
+																				'Add More'
+																			)
+																		)
+																	)
+																)
+															)
+														)
+													)
+												),
+												_react2.default.createElement(
+													'div',
+													{ className: 'form-group' },
+													_react2.default.createElement(
+														'button',
+														{ className: 'btn btn-primary', 'data-loading-text': 'Submit', name: 'submit-form', type: 'button' },
+														'Create'
+													)
+												)
+											),
+											this.state.showModal ? _react2.default.createElement(_UploadIpfsFile2.default, { pubKey: this.state.pubKey, dataHandler: this.getFileDetails.bind(this), handleHideModal: this.handleHideModal }) : null
+										)
 									),
 									_react2.default.createElement(
 										'div',
@@ -59869,14 +60299,14 @@
 										_react2.default.createElement(
 											'h6',
 											null,
-											'Digital Identity'
+											'Proof of Membership'
 										),
 										_react2.default.createElement(_qrcode2.default, { value: qrConfig, size: 200 }),
 										_react2.default.createElement('hr', null),
 										this.state.notCOID ? _react2.default.createElement(
 											'h6',
 											null,
-											'Owner-Device Relationship'
+											'Proof of Asset Ownership'
 										) : null,
 										this.state.notCOID ? _react2.default.createElement(_qrcode2.default, { value: qrOwnedDevice, size: 200 }) : null
 									)
@@ -59909,8 +60339,8 @@
 			_this4.pubKey = localStorage.getItem("pubKey");
 			_this4.privKey = localStorage.getItem("privKey");
 			_this4.tags = new _classAndSubClass2.default(_this4.pubKey, props.dimension.dimension_id);
-			_this4.names = localStorage.getItem("contactNames").split(',');
-			_this4.keys = localStorage.getItem("contactPubKeys").split(',');
+			//this.names = localStorage.getItem("contactNames").split(',');
+			//this.keys = localStorage.getItem("contactPubKeys").split(',');
 			_this4.state = {
 	
 				asset_class: _this4.tags.getAssetData("classes"),
@@ -59975,12 +60405,14 @@
 	
 				var prop = this.props.dimension.dimension_details;
 	
-				if (prop.propType == 2) {
-					standardDim.style.display = 'none';
-					ICA_Dim.style.display = 'block';
-				} else {
-					ICA_Dim.style.display = 'none';
-				}
+				ICA_Dim.style.display = 'none';
+	
+				// if (prop.propType == 2) {
+				// 	standardDim.style.display = 'none';
+				// 	ICA_Dim.style.display = 'block';
+				// }
+				// else { ICA_Dim.style.display = 'none' }
+	
 			}
 		}, {
 			key: 'appendInput',
@@ -60181,17 +60613,17 @@
 				var prop = this.props.dimension;
 	
 				var hashedKeys = [];
-				for (var i = 0; i < this.keys.length; i++) {
-					hashedKeys[i] = keccak_256(this.keys[i]);
-				}
+				// for (var i = 0; i < this.keys.length; i++) {
+				// 	hashedKeys[i] = keccak_256(this.keys[i]);
+				// }
 	
-				for (var x = 0; x < prop.dimension_details.owners.length; x++) {
-					var index = hashedKeys.indexOf(prop.dimension_details.owners[x]);
-					if (index >= 0) {
-						prop.dimension_details.owners[x] = this.names[index];
-						console.log("\n\nCHANGED: " + prop.dimension_details.owners[x]);
-					}
-				}
+				// for (var x = 0; x < prop.dimension_details.owners.length; x++) {
+				// 	var index = hashedKeys.indexOf(prop.dimension_details.owners[x]);
+				// 	if (index >= 0) {
+				// 		prop.dimension_details.owners[x] = this.names[index];
+				// 		console.log("\n\nCHANGED: " + prop.dimension_details.owners[x]);
+				// 	}
+				// }
 	
 				console.log("dimension(props): " + JSON.stringify(prop));
 	
@@ -60547,9 +60979,10 @@
 			value: function componentWillMount() {
 	
 				var O = [{
-					"asset_id": "MYCOID", "asset_details": _defineProperty({
+					"asset_id": "Steve Smith",
+					"asset_details": _defineProperty({
 						"Type": "non_cash",
-						"assetID": "MyCOID",
+						"assetID": "Steve Smith",
 						"bigchainHash": "",
 						"bigchainID": "",
 						"coidAddr": "",
@@ -60575,7 +61008,40 @@
 						"txn_id": "requestCOID",
 						"uniqueId": "01547929f9184f362e1ab0126a15013087f4d1ab25d11ea971e8ffb159546d94",
 	
-						"uniqueIdAttributes": [["Bejoy George CPA", "557d1294ba620922e1655aa9b5c9be5f2c5dad876740dd2a9a22934b79ee164d", "QmWbbhSo7GzZi6zyi7MpJyAfiqzPRcSfV1oHFRyCgT54iG"], ["label2", "557d1294ba620922e1655aa9b5c9be5f2c5dad876740dd2a9a22934b79ee164d", "QmWbbhSo7GzZi6zyi7MpJyAfiqzPRcSfV1oHFRyCgT54iG"]],
+						"uniqueIdAttributes": [["Steve Smith birth cert.", "557d1294ba620922e1655aa9b5c9be5f2c5dad876740dd2a9a22934b79ee164d", "QmWbbhSo7GzZi6zyi7MpJyAfiqzPRcSfV1oHFRyCgT54iG"], ["passport USA", "557d1294ba620922e1655aa9b5c9be5f2c5dad876740dd2a9a22934b79ee164d", "QmWbbhSo7GzZi6zyi7MpJyAfiqzPRcSfV1oHFRyCgT54iG"]],
+	
+						"yesVotesRequiredToPass": "2"
+					}, 'dimensions', ["LIVING_ROOM.json", "Finance.json"])
+				}, {
+					"asset_id": "Honda Accord", "asset_details": _defineProperty({
+						"Type": "non_cash",
+						"assetID": "Honda Accord",
+						"bigchainHash": "",
+						"bigchainID": "",
+						"coidAddr": "",
+						"controlId": "aae858de3899d2ff096ddb5384365c6a86ce7964f1c4f1f22878944d39bd943a",
+						"controlIdList": ["Myself", "My wife", "My son"],
+						"controlTokenAttributes": "My Delegated Honda Control Tokens",
+						"controlTokenId": "289d3c526086b3832f4fd1338e5b0f437e7c84d6d7c556f53ef7d2eaf4e316a4",
+						"controlTokenQuantity": ["10", "5", "5"],
+						"dimensions": "",
+						"gatekeeperAddr": "",
+						"identityRecoveryIdList": ["My Wife", "My Son"],
+						"isHuman": "true",
+						"msg": "e98cfaa4317c583cd87fb1d538bb64eafea1f516adf02b193fe224d2a60610f6",
+						"ownerIdList": ["Myself"],
+						"ownershipId": "8b44edd090224a5c2350c1b2f3f57ee2d3443744462bb7c3c970c337e570eac4",
+						"ownershipTokenAttributes": "My Honda's Ownership Tokens",
+						"ownershipTokenId": "289d3c526086b3832f4fd1338e5b0f437e7c84d6d7c556f53ef7d2eaf4e316a4",
+						"ownershipTokenQuantity": ["10"],
+						"pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+						"recoveryCondition": "2",
+						"sig": "4fb1eaab7042e093ed6ca3251af91dca3ec417ef579fe5ea8f079125bd1e6e3c35472aa559fbc6023f2c7c438c1b038b5bc58269b59e3651a65aa3524b22b621",
+						"timestamp": "",
+						"txn_id": "requestCOID",
+						"uniqueId": "01547929f9184f362e1ab0126a15013087f4d1ab25d11ea971e8ffb159546d94",
+	
+						"uniqueIdAttributes": [["Dealership receipt", "557d1294ba620922e1655aa9b5c9be5f2c5dad876740dd2a9a22934b79ee164d", "QmWbbhSo7GzZi6zyi7MpJyAfiqzPRcSfV1oHFRyCgT54iG"], ["VIN information document", "557d1294ba620922e1655aa9b5c9be5f2c5dad876740dd2a9a22934b79ee164d", "QmWbbhSo7GzZi6zyi7MpJyAfiqzPRcSfV1oHFRyCgT54iG"]],
 	
 						"yesVotesRequiredToPass": "2"
 					}, 'dimensions', ["LIVING_ROOM.json", "Finance.json"])
@@ -60594,7 +61060,7 @@
 	
 	
 				var dimensions = [{
-					"dimensionName": "LIVING_ROOM",
+					"dimensionName": "Mortgage History BAC Florida",
 					"pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
 					"address": "",
 					"flag": 0,
@@ -60603,24 +61069,24 @@
 					"dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
 					"uniqueId": "9aaddf7caa690217bddc743102dc7e417608a93418ad5da2c0c82c501004f26f",
 					"owners": ["59d110a3ab34a2ebd0ddb9d72ead24e8e906bebe794ea13c8c35b8a6c81314cd"],
-					"controllers": ["a016d3445c892d76d9efc222d9598b4bfaf889ef5c5323c5cec67ab20c96c01c", "16f121833eee6c25847aa9e63d4aa1b5cc2bf72d0d48f46ad25316b6e9bc5976"],
+					"controllers": ["Steve Smith", "BAC Florida"],
 					"delegations": [{
-						"owner": "COID_OWNER",
-						"delegatee": "03683536757fdb821c10810b51caa51a84fc1dfab5c17edbf5246f9713ffe31adf",
+						"owner": "Steve Smith",
+						"delegatee": "Moodys",
 						"amount": "2",
 						"accessCategories": ""
 					}],
 					"data": [{
-						"descriptor": "smartTV",
+						"descriptor": "Payment confirmation BAC Florida June-2016",
 						"attribute": "QmXVFStSMEcoAWPVKLrxJ8wf5ohn2UdmdAxcnfB8TtSAZG",
 						"flag": 0
 					}, {
-						"descriptor": "family_laptop",
+						"descriptor": "Loan ID 122235, Summary 2015",
 						"attribute": "QmSMWeGPjtgzQ75Y1YXbnC4uByni8bwHcB4vPXrPVcUTUM",
 						"flag": 0
 					}]
 				}, {
-					"dimensionName": "FINANCE",
+					"dimensionName": "Car Loan Honda City FL",
 					"pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
 					"address": "",
 					"flag": 0,
@@ -60628,20 +61094,20 @@
 					"coidAddr": "E2B24811DB9B23DDEA8313D82D11A82014C8E3BC",
 					"dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
 					"uniqueId": "9aaddf7caa690217bddc743102dc7e417608a93418ad5da2c0c82c501004f26f",
-					"owners": ["59d110a3ab34a2ebd0ddb9d72ead24e8e906bebe794ea13c8c35b8a6c81314cd"],
-					"controllers": ["a016d3445c892d76d9efc222d9598b4bfaf889ef5c5323c5cec67ab20c96c01c", "16f121833eee6c25847aa9e63d4aa1b5cc2bf72d0d48f46ad25316b6e9bc5976"],
+					"owners": ["Steve Smith"],
+					"controllers": ["Steve Smith", "BAC Florida"],
 					"delegations": [{
-						"owner": "COID_OWNER",
-						"delegatee": "03683536757fdb821c10810b51caa51a84fc1dfab5c17edbf5246f9713ffe31adf",
+						"owner": "Steve Smith",
+						"delegatee": "Moodys",
 						"amount": "2",
 						"accessCategories": ""
 					}],
 					"data": [{
-						"descriptor": "Bank Statement",
+						"descriptor": "Leasing Document Signed June-2015",
 						"attribute": "QmXVFStSMEcoAWPVKLrxJ8wf5ohn2UdmdAxcnfB8TtSAZG",
 						"flag": 0
 					}, {
-						"descriptor": "AMEX Payment history",
+						"descriptor": "Payment Confirmation Oct-2017",
 						"attribute": "QmSMWeGPjtgzQ75Y1YXbnC4uByni8bwHcB4vPXrPVcUTUM",
 						"flag": 0
 					}]
@@ -60866,10 +61332,80 @@
 	
 				//                      var delegatedDims = this.state.delegated_dims;
 	
+				// let O = [{
+				// 	"asset_id": "Steve Smith", 
+				// 	"asset_details": {
+	
+				var idims = [{
+					"dimension_id": "Mortgate Info Steve Smith",
+					"dimension_details": {
+	
+						"dimensionName": "Mortgage History BAC Florida",
+						"pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+						"address": "",
+						"flag": 0,
+						"ID": 0,
+						"coidAddr": "E2B24811DB9B23DDEA8313D82D11A82014C8E3BC",
+						"dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
+						"uniqueId": "9aaddf7caa690217bddc743102dc7e417608a93418ad5da2c0c82c501004f26f",
+						"owners": ["59d110a3ab34a2ebd0ddb9d72ead24e8e906bebe794ea13c8c35b8a6c81314cd"],
+						"controllers": ["Steve Smith", "BAC Florida"],
+						"delegations": [{
+							"owner": "Steve Smith",
+							"delegatee": "Moodys",
+							"amount": "2",
+							"accessCategories": ""
+						}],
+						"data": [{
+							"descriptor": "Payment confirmation BAC Florida June-2016",
+							"attribute": "QmXVFStSMEcoAWPVKLrxJ8wf5ohn2UdmdAxcnfB8TtSAZG",
+							"flag": 0
+						}, {
+							"descriptor": "Loan ID 122235, Summary 2015",
+							"attribute": "QmSMWeGPjtgzQ75Y1YXbnC4uByni8bwHcB4vPXrPVcUTUM",
+							"flag": 0
+						}]
+					}
+				}, {
+					"dimension_id": "Loan AAA Bundle Miami Fl",
+	
+					"dimension_details": {
+						"dimensionName": "Car Loan Honda City FL",
+						"pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+						"address": "",
+						"flag": 0,
+						"ID": 0,
+						"coidAddr": "E2B24811DB9B23DDEA8313D82D11A82014C8E3BC",
+						"dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
+						"uniqueId": "9aaddf7caa690217bddc743102dc7e417608a93418ad5da2c0c82c501004f26f",
+						"owners": ["Steve Smith"],
+						"controllers": ["Steve Smith", "BAC Florida"],
+						"delegations": [{
+							"owner": "Steve Smith",
+							"delegatee": "Moodys",
+							"amount": "2",
+							"accessCategories": ""
+						}],
+						"data": [{
+							"descriptor": "Leasing Document Signed June-2015",
+							"attribute": "QmXVFStSMEcoAWPVKLrxJ8wf5ohn2UdmdAxcnfB8TtSAZG",
+							"flag": 0
+						}, {
+							"descriptor": "Payment Confirmation Oct-2017",
+							"attribute": "QmSMWeGPjtgzQ75Y1YXbnC4uByni8bwHcB4vPXrPVcUTUM",
+							"flag": 0
+						}]
+					}
+				}];
+	
+				this.setState({ delegated_dims: idims });
+	
 				//                      delegatedDims[delegatedDims.length] = {
 				//                          dimension_id: dataResult.dimension.dimensionName,
 				//                          dimension_details: dataResult.dimension
 				//                      }
+	
+	
 				//                      this.setState({ delegated_dims: delegatedDims });
 	
 				//                      console.log("dataResult get Dimension: \n " + JSON.stringify(dataResult))
@@ -60896,7 +61432,7 @@
 		}, {
 			key: 'dimensionHandler',
 			value: function dimensionHandler(dimension) {
-				console.log("dimension handler.. " + dimension);
+				console.log("dimension handler.. " + JSON.stringify(dimension));
 				var dimensionID = dimension.dimension_id;
 				if (dimensionID) {
 					console.log("dimensionID: " + dimensionID);
@@ -62754,7 +63290,7 @@
 	                _react2.default.createElement(
 	                    "label",
 	                    { htmlFor: "unique_id_attrs" },
-	                    " Persona Descriptor e.g. \"My college transcript\", \"Chase Bank KYC\", or \"My blockchain research\". "
+	                    " Persona Descriptor e.g. \"My 120 day payment history\". "
 	                ),
 	                _react2.default.createElement("input", { name: 'label-' + this.props.labelref, className: "form-control col-md-4", type: "text", placeholder: "Descriptor" }),
 	                _react2.default.createElement(
@@ -63069,6 +63605,7 @@
 	    _createClass(Dashboard, [{
 	        key: 'render',
 	        value: function render() {
+	
 	            var cardStyle1 = {
 	                width: '800px', marginTop: '30px'
 	
@@ -63111,7 +63648,6 @@
 	                backgroundColor: '#aaaaaa',
 	                width: '103%',
 	                height: '300px'
-	
 	            };
 	
 	            var maprops = {
@@ -63120,7 +63656,6 @@
 	                title: 'The marker`s title will appear as a tooltip.',
 	                name: 'SOMA',
 	                position: { lat: 37.778519, lng: -122.405640 }
-	
 	            };
 	
 	            // const data = [
@@ -63133,6 +63668,8 @@
 	            return _react2.default.createElement(
 	                'div',
 	                null,
+	                _react2.default.createElement('hr', null),
+	                _react2.default.createElement('br', null),
 	                _react2.default.createElement(
 	                    'div',
 	                    { className: 'row' },
@@ -63173,7 +63710,7 @@
 	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'col-xs-5 speedo-shadow' },
-	                        _react2.default.createElement('img', { src: './img/screenshot2.png', style: cardStyle2 })
+	                        _react2.default.createElement('img', { src: '/home/training/Desktop/Identity/GPT_Identity/walletApp-Dev/src/app/Components/screenshot2.png', style: cardStyle2 })
 	                    )
 	                ),
 	                _react2.default.createElement('br', null),
@@ -63183,7 +63720,6 @@
 	                    _react2.default.createElement(_googleMapReact2.default, {
 	                        center: maprops.center,
 	                        defaultZoom: maprops.zoom
-	
 	                    })
 	                ),
 	                _react2.default.createElement(
@@ -63387,29 +63923,20 @@
 	                                        theme: _victory.VictoryTheme.material
 	                                        //padding={{ top: 80, bottom: 80 }}
 	                                        , height: 200,
-	
 	                                        index: 2
-	
 	                                    },
 	                                    _react2.default.createElement(_victory.VictoryBar, { horizontal: true,
 	                                        style: {
 	                                            data: { fill: "#c43a31" }
-	
 	                                        }
-	
 	                                    }),
 	                                    _react2.default.createElement(_victory.VictoryAxis, {
-	
 	                                        label: 'Destruction',
 	
 	                                        style: {
-	
 	                                            axis: { stroke: "#756f6a" },
-	
 	                                            axisLabel: { fontSize: 10, padding: 30 },
-	
 	                                            tickLabels: { padding: 5 }
-	
 	                                        }
 	
 	                                    }),
@@ -63418,13 +63945,9 @@
 	                                        label: 'Asset',
 	
 	                                        style: {
-	
 	                                            axis: { stroke: "#756f6a" },
-	
 	                                            axisLabel: { fontSize: 10, padding: 30 },
-	
 	                                            tickLabels: { padding: 5 }
-	
 	                                        }
 	
 	                                    })
@@ -63562,42 +64085,29 @@
 	                                        theme: _victory.VictoryTheme.material
 	                                        //padding={{ top: 80, bottom: 80 }}
 	                                        , height: 200,
-	
 	                                        index: 2
-	
 	                                    },
 	                                    _react2.default.createElement(_victory.VictoryBar, { horizontal: true,
 	                                        style: {
 	                                            data: { fill: "#43a047" }
-	
 	                                        }
 	
 	                                    }),
 	                                    _react2.default.createElement(_victory.VictoryAxis, {
-	
 	                                        label: 'Destruction',
 	
 	                                        style: {
-	
 	                                            axis: { stroke: "#756f6a" },
-	
 	                                            axisLabel: { fontSize: 10, padding: 30 },
-	
 	                                            tickLabels: { padding: 5 }
-	
 	                                        }
-	
 	                                    }),
 	                                    _react2.default.createElement(_victory.VictoryAxis, { dependentAxis: true,
-	
 	                                        label: 'Asset',
 	
 	                                        style: {
-	
 	                                            axis: { stroke: "#756f6a" },
-	
 	                                            axisLabel: { fontSize: 10, padding: 30 },
-	
 	                                            tickLabels: { padding: 5 }
 	
 	                                        }
@@ -63737,46 +64247,30 @@
 	                                        theme: _victory.VictoryTheme.material
 	                                        //padding={{ top: 80, bottom: 80 }}
 	                                        , height: 200,
-	
 	                                        index: 2
-	
 	                                    },
 	                                    _react2.default.createElement(_victory.VictoryBar, { horizontal: true,
 	                                        style: {
 	                                            data: { fill: "#00acc1" }
-	
 	                                        }
-	
 	                                    }),
 	                                    _react2.default.createElement(_victory.VictoryAxis, {
-	
 	                                        label: 'Destruction',
 	
 	                                        style: {
-	
 	                                            axis: { stroke: "#756f6a" },
-	
 	                                            axisLabel: { fontSize: 10, padding: 30 },
-	
 	                                            tickLabels: { padding: 5 }
-	
 	                                        }
-	
 	                                    }),
 	                                    _react2.default.createElement(_victory.VictoryAxis, { dependentAxis: true,
-	
 	                                        label: 'Asset',
 	
 	                                        style: {
-	
 	                                            axis: { stroke: "#756f6a" },
-	
 	                                            axisLabel: { fontSize: 10, padding: 30 },
-	
 	                                            tickLabels: { padding: 5 }
-	
 	                                        }
-	
 	                                    })
 	                                )
 	                            ),
@@ -106211,13 +106705,15 @@
 	            if (passBigchainObj.selectedIndex == 0) {
 	                alert('select one answer');
 	            }
-	            if (passBigchainObj.selectedIndex == 1) {
-	                var objKYC = {};
-	                objKYC.descriptor = "bigchainID";
-	                objKYC.attribute = bigchainTrxnID;
-	                objKYC.flag = 0;
-	                objArray.push(objKYC);
-	            }
+	            //NOTE: WE ARE HARD CODING THIS TO 1 so we will pass the Bigchain object
+	            //for the asset !!!!!!!!!!!!!!!!!
+	            //if (passBigchainObj.selectedIndex == 1) {
+	            var objKYC = {};
+	            objKYC.descriptor = "bigchainID";
+	            objKYC.attribute = bigchainTrxnID;
+	            objKYC.flag = 0;
+	            objArray.push(objKYC);
+	            //}
 	
 	            //needed to stringify this obj Array for backend
 	            return JSON.stringify(objArray);
@@ -106458,10 +106954,15 @@
 	            // GET PROPER DATA FROM SELECTED ASSET (we will pass owners to prepareDelegations)
 	            var selected_asset = this.state.currentAsset; //$("#assetSelect option:selected").text();
 	
-	            var ICA_claim = document.getElementById("ICA");
-	            if (ICA_claim.selectedIndex == 1) {
-	                json.propType = 2;
-	            } else json.propType = 0;
+	            // let ICA_claim = document.getElementById("ICA");
+	            // if (ICA_claim.selectedIndex == 1) {
+	            //     json.propType = 2;
+	            // }
+	            // else json.propType = 0;
+	
+	            //NOTE: WE NEED TO ADD THIS BACK IN AFTER THE VIDEO!!!!!!!!!!!!!!!
+	            // -ST
+	            json.propType = 0;
 	
 	            var bigchainTrxnID = void 0; //we will pass this to prepareAttributes function
 	            this.state.own_assets.forEach(function (asset, index) {
@@ -106620,56 +107121,71 @@
 	                }
 	                var inputLength = inputValue.length || 0;
 	
-	                //const suggestions = that.state.names.filter((name) => {
-	                // //console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
-	                // //console.log(inputValue);
-	                // var re = new RegExp(inputValue, "i");
-	                // return (Boolean(name.slice(0, inputLength).search(re) + 1))
-	                // //return (name.toLowerCase().slice(0, inputLength) === inputValue  || name.toUpperCase().slice(0, inputLength) === inputValue)
-	                //})
-	                ///////////////////////////////////////
+	                var names = ["Moodys", "Steve Smith CFA", "Joe Schmo LLC", "AuditBody1"];
 	
+	                //PUT BACK IN 'that.state.names'
+	                var suggestions = names.filter(function (name) {
+	                    //console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
+	                    //console.log(inputValue);
+	                    var re = new RegExp(inputValue, "i");
+	                    return Boolean(name.slice(0, inputLength).search(re) + 1);
+	                    //return (name.toLowerCase().slice(0, inputLength) === inputValue  || name.toUpperCase().slice(0, inputLength) === inputValue)
+	                });
+	                /////////////////////////////////////
 	
-	                // var value = String(that.state.value[Number(passed.id)]) || "";
-	                // if (value == 'undefined') { value = ""; }
-	                // //const suggestions = that.state.suggestions;
-	                // console.log("passed ID: " + passed.id);
-	                // console.log("suggestions: " + suggestions);
-	                // console.log("value: " + value);
-	                // const inputProps = {
-	                //     placeholder: passed.placeholder,
-	                //     value,
-	                //     style: {
-	                //         width: '30%',
-	                //         height: '100%',
-	                //         display: "initial"
-	                //     },
-	                //     onChange: handleOnChange,
-	                //     onKeyPress: handleKeyPress,
-	                //     className: "react-tagsinput-input",
-	                //     id: passed.id
-	                // };
-	                // return (
-	                //     <Autosuggest
-	                //         id={passed.id}
-	                //         ref={passed.ref}
-	                //         suggestions={suggestions}
-	                //         shouldRenderSuggestions={(value) => value.length > 0}
-	                //         getSuggestionValue={(suggestion) => suggestion}
-	                //         renderSuggestion={(suggestion) => <span>{suggestion}</span>}
-	                //         inputProps={inputProps}
-	                //         onSuggestionSelected={(e, { suggestion, method }) => {
-	                //             console.log("SELECTED: " + method)
-	                //             if (method == 'click') {
-	                //                 addTag(suggestion)
-	                //                 that.state.value[passed.id] = "";
-	                //             }
-	                //         }}
-	                //         onSuggestionsClearRequested={() => { }}
-	                //         onSuggestionsFetchRequested={() => { }}
-	                //         renderInputComponent={renderInputComponent}
-	                //     />
-	                // )
+	                var value = String(that.state.value[Number(passed.id)]) || "";
+	                if (value == 'undefined') {
+	                    value = "";
+	                }
+	                //const suggestions = that.state.suggestions;
+	                console.log("passed ID: " + passed.id);
+	                console.log("suggestions: " + suggestions);
+	                console.log("value: " + value);
+	                var inputProps = {
+	                    placeholder: passed.placeholder,
+	                    value: value,
+	                    style: {
+	                        width: '30%',
+	                        height: '100%',
+	                        display: "initial"
+	                    },
+	                    onChange: handleOnChange,
+	                    onKeyPress: handleKeyPress,
+	                    className: "react-tagsinput-input",
+	                    id: passed.id
+	                };
+	                return _react2.default.createElement(_reactAutosuggest2.default, {
+	                    id: passed.id,
+	                    ref: passed.ref,
+	                    suggestions: suggestions,
+	                    shouldRenderSuggestions: function shouldRenderSuggestions(value) {
+	                        return value.length > 0;
+	                    },
+	                    getSuggestionValue: function getSuggestionValue(suggestion) {
+	                        return suggestion;
+	                    },
+	                    renderSuggestion: function renderSuggestion(suggestion) {
+	                        return _react2.default.createElement(
+	                            'span',
+	                            null,
+	                            suggestion
+	                        );
+	                    },
+	                    inputProps: inputProps,
+	                    onSuggestionSelected: function onSuggestionSelected(e, _ref4) {
+	                        var suggestion = _ref4.suggestion,
+	                            method = _ref4.method;
+	
+	                        console.log("SELECTED: " + method);
+	                        if (method == 'click') {
+	                            addTag(suggestion);
+	                            that.state.value[passed.id] = "";
+	                        }
+	                    },
+	                    onSuggestionsClearRequested: function onSuggestionsClearRequested() {},
+	                    onSuggestionsFetchRequested: function onSuggestionsFetchRequested() {},
+	                    renderInputComponent: renderInputComponent
+	                });
 	            }
 	
 	            var inputAttrs = {
@@ -106728,46 +107244,16 @@
 	                            _react2.default.createElement(
 	                                'optgroup',
 	                                { label: 'Owned' },
-	                                function () {
-	                                    if (_this3.state.owned_assets_label.length > 0) {
-	                                        return _this3.state.owned_assets_label.map(function (label, i) {
-	                                            //let val = label.split(',') //get rid of the .json
-	                                            return _react2.default.createElement(
-	                                                'option',
-	                                                { key: i, value: label },
-	                                                label
-	                                            );
-	                                        });
-	                                    } else {
-	                                        return _react2.default.createElement(
-	                                            'option',
-	                                            null,
-	                                            'None'
-	                                        );
-	                                    }
-	                                }(this)
-	                            ),
-	                            _react2.default.createElement(
-	                                'optgroup',
-	                                { label: 'Controlled' },
-	                                function () {
-	                                    if (_this3.state.controlled_assets_label.length > 0) {
-	                                        return _this3.state.controlled_assets_label.map(function (label, i) {
-	                                            //let val = label.split(',') //get rid of the .json
-	                                            return _react2.default.createElement(
-	                                                'option',
-	                                                { key: i, value: label },
-	                                                label
-	                                            );
-	                                        });
-	                                    } else {
-	                                        return _react2.default.createElement(
-	                                            'option',
-	                                            null,
-	                                            'None'
-	                                        );
-	                                    }
-	                                }(this)
+	                                _react2.default.createElement(
+	                                    'option',
+	                                    null,
+	                                    'Steve Smith'
+	                                ),
+	                                _react2.default.createElement(
+	                                    'option',
+	                                    null,
+	                                    'Honda Accord'
+	                                )
 	                            )
 	                        )
 	                    ),
@@ -106789,108 +107275,6 @@
 	                            ),
 	                            _react2.default.createElement(
 	                                'div',
-	                                { className: 'panel-group', id: 'accordion1' },
-	                                _react2.default.createElement(
-	                                    'div',
-	                                    { className: 'panel panel-default' },
-	                                    _react2.default.createElement(
-	                                        'div',
-	                                        { className: 'panel-heading' },
-	                                        _react2.default.createElement(
-	                                            'div',
-	                                            { className: 'row' },
-	                                            _react2.default.createElement(
-	                                                'div',
-	                                                { className: 'col-xs-11' },
-	                                                _react2.default.createElement(
-	                                                    'label',
-	                                                    null,
-	                                                    'Describe this persona'
-	                                                )
-	                                            ),
-	                                            _react2.default.createElement(
-	                                                'div',
-	                                                { className: 'col-xs-1' },
-	                                                _react2.default.createElement(
-	                                                    'a',
-	                                                    { 'data-toggle': 'collapse', 'data-parent': '#accordion', href: '#collapse1' },
-	                                                    _react2.default.createElement('span', { className: 'glyphicon glyphicon-chevron-down' })
-	                                                )
-	                                            )
-	                                        )
-	                                    ),
-	                                    _react2.default.createElement(
-	                                        'div',
-	                                        { id: 'collapse1', className: 'panel-collapse collapse out' },
-	                                        _react2.default.createElement(
-	                                            'div',
-	                                            { className: 'panel-body' },
-	                                            _react2.default.createElement(
-	                                                'div',
-	                                                { className: 'row' },
-	                                                _react2.default.createElement(
-	                                                    'div',
-	                                                    { className: 'form-group' },
-	                                                    _react2.default.createElement(
-	                                                        'label',
-	                                                        null,
-	                                                        'Is this persona for sharing attested identity claims (stored in BigchainDB) with others?'
-	                                                    ),
-	                                                    _react2.default.createElement(
-	                                                        'select',
-	                                                        { id: 'passBigchainID' },
-	                                                        _react2.default.createElement(
-	                                                            'option',
-	                                                            { value: 'selectOption' },
-	                                                            '--- Please select ---'
-	                                                        ),
-	                                                        _react2.default.createElement(
-	                                                            'option',
-	                                                            { value: 'Yes' },
-	                                                            'Yes'
-	                                                        ),
-	                                                        _react2.default.createElement(
-	                                                            'option',
-	                                                            { value: 'No' },
-	                                                            'No'
-	                                                        )
-	                                                    )
-	                                                ),
-	                                                _react2.default.createElement(
-	                                                    'div',
-	                                                    { className: 'form-group' },
-	                                                    _react2.default.createElement(
-	                                                        'label',
-	                                                        null,
-	                                                        'Allow shared identity claims tokens to be signed by the party with whom the token was shared?'
-	                                                    ),
-	                                                    _react2.default.createElement(
-	                                                        'select',
-	                                                        { id: 'ICA' },
-	                                                        _react2.default.createElement(
-	                                                            'option',
-	                                                            { value: 'selectOption' },
-	                                                            '--- Please select ---'
-	                                                        ),
-	                                                        _react2.default.createElement(
-	                                                            'option',
-	                                                            { value: 'Yes' },
-	                                                            'Yes'
-	                                                        ),
-	                                                        _react2.default.createElement(
-	                                                            'option',
-	                                                            { value: 'No' },
-	                                                            'No'
-	                                                        )
-	                                                    )
-	                                                )
-	                                            )
-	                                        )
-	                                    )
-	                                )
-	                            ),
-	                            _react2.default.createElement(
-	                                'div',
 	                                { className: 'panel-group', id: 'accordion2' },
 	                                _react2.default.createElement(
 	                                    'div',
@@ -106907,7 +107291,7 @@
 	                                                _react2.default.createElement(
 	                                                    'label',
 	                                                    null,
-	                                                    'Official (Unique) IDs'
+	                                                    'Repository Attributes'
 	                                                )
 	                                            ),
 	                                            _react2.default.createElement(
@@ -106947,7 +107331,7 @@
 	                                                    { className: 'form-group', id: 'unique_id_btn' },
 	                                                    _react2.default.createElement(
 	                                                        'button',
-	                                                        { type: 'button', className: 'btn btn-info pull-right', style: marginRight15, onClick: this.appendAttribute.bind(this) },
+	                                                        { type: 'button', className: 'btn btn-info pull-right', style: marginRight15 },
 	                                                        _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
 	                                                        'Add More'
 	                                                    )
@@ -106975,7 +107359,7 @@
 	                                                _react2.default.createElement(
 	                                                    'label',
 	                                                    null,
-	                                                    'Control'
+	                                                    'Delegations'
 	                                                )
 	                                            ),
 	                                            _react2.default.createElement(
@@ -107018,7 +107402,7 @@
 	                                                        { className: 'col-md-offset-6 col-md-6 ' },
 	                                                        _react2.default.createElement(
 	                                                            'button',
-	                                                            { type: 'button', className: 'btn btn-info pull-right', onClick: this.addController.bind(this), style: marginRight15 },
+	                                                            { type: 'button', className: 'btn btn-info pull-right', style: marginRight15 },
 	                                                            _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
 	                                                            'Add More'
 	                                                        )
@@ -107047,7 +107431,7 @@
 	                                                _react2.default.createElement(
 	                                                    'label',
 	                                                    null,
-	                                                    'Delegations'
+	                                                    'One-Time or Temporary Delegations'
 	                                                )
 	                                            ),
 	                                            _react2.default.createElement(
@@ -107076,7 +107460,7 @@
 	                                                    _react2.default.createElement(
 	                                                        'label',
 	                                                        { htmlFor: 'control_dist' },
-	                                                        'with whom would you like to share your persona and how many times should that person be able to access?'
+	                                                        'Share this data repository with a 3rd party? How often?'
 	                                                    ),
 	                                                    this.state.delegations.map(function (input, i) {
 	                                                        return _react2.default.createElement(_DimensionDelegationForm2.default, { attr: _this3.state.suggest_attrs[i], max: '10', key: input, labelref: input, autocompleteRenderInput: autocompleteRenderInput, deleValue: _this3.state.deleValue[i], deleToken: _this3.state.deleToken[i], passedFunction: function passedFunction(e) {
@@ -107113,7 +107497,7 @@
 	                                    { className: 'col-sm-6' },
 	                                    _react2.default.createElement(
 	                                        'button',
-	                                        { className: 'btn btn-primary', 'data-loading-text': 'Submit', name: 'submit-form', type: 'button', onClick: this.createDimension.bind(this) },
+	                                        { className: 'btn btn-primary', 'data-loading-text': 'Submit', name: 'submit-form', type: 'button' },
 	                                        'Create'
 	                                    )
 	                                )
@@ -108312,7 +108696,7 @@
 					}
 					var inputLength = inputValue.length || 0;
 	
-					var names = ["Moodys", "Steve, CFA", "Joe Schmo", "AuditBody1"];
+					var names = ["Moodys", "Steve Smith CFA", "Joe Schmo LLC", "AuditBody1", "Emily Lu", "Josh Phillips", "Aaron Bartwell"];
 	
 					//NOTE: WE NEED TO CHANGES names back to 'that.state.names'
 					var suggestions = names.filter(function (name) {
@@ -108447,7 +108831,7 @@
 							_react2.default.createElement(
 								'label',
 								{ htmlFor: 'assetID' },
-								'Notary Label. For example, \'My car\'.'
+								'Notary Label. For example, \'Mortgage\'.'
 							),
 							_react2.default.createElement(_reactTagsinput2.default, _extends({}, basicAttrs, { value: this.state.assetID, onChange: function onChange(e) {
 									_this3.onFieldChange("assetID", e);
@@ -108936,6 +109320,838 @@
 
 /***/ }),
 /* 838 */
+/*!***********************************************************!*\
+  !*** ./src/app/Components/IdentityFederation/IcaForm.jsx ***!
+  \***********************************************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+	
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactTagsinput = __webpack_require__(/*! react-tagsinput */ 370);
+	
+	var _reactTagsinput2 = _interopRequireDefault(_reactTagsinput);
+	
+	var _reactAutosuggest = __webpack_require__(/*! react-autosuggest */ 371);
+	
+	var _reactAutosuggest2 = _interopRequireDefault(_reactAutosuggest);
+	
+	var _jsSha = __webpack_require__(/*! js-sha3 */ 368);
+	
+	var _UploadIpfsFile = __webpack_require__(/*! ../UploadIpfsFile.jsx */ 386);
+	
+	var _UploadIpfsFile2 = _interopRequireDefault(_UploadIpfsFile);
+	
+	var _UniqueIDAttributeForm = __webpack_require__(/*! ./UniqueIDAttributeForm.jsx */ 387);
+	
+	var _UniqueIDAttributeForm2 = _interopRequireDefault(_UniqueIDAttributeForm);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	//var crypto = require('crypto');
+	var secp256k1 = __webpack_require__(/*! secp256k1 */ 311);
+	
+	var IcaForm = function (_React$Component) {
+	    _inherits(IcaForm, _React$Component);
+	
+	    function IcaForm(props) {
+	        _classCallCheck(this, IcaForm);
+	
+	        var _this2 = _possibleConstructorReturn(this, (IcaForm.__proto__ || Object.getPrototypeOf(IcaForm)).call(this, props));
+	
+	        _this2.state = {
+	
+	            file_attrs: [],
+	
+	            inputs: ['input-0'], //removed input-1
+	
+	            official_id: [],
+	
+	            isHuman: [],
+	
+	            showModal: false,
+	            tmpFile: '',
+	            pubKey: localStorage.getItem("pubKey"),
+	            privKey: localStorage.getItem("privKey"),
+	
+	            //gatekeeperAddr: localStorage.getItem("MyGatekeeperAddr"),
+	            validators: [],
+	            signature: '',
+	            assetID: [],
+	
+	            //names: localStorage.getItem("contactNames").split(','),
+	            //keys: localStorage.getItem("contactPubKeys").split(','),
+	            value: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+	            suggest_attrs: [{
+	                addKeys: [13, 188], // Enter and comma
+	                inputProps: {
+	                    placeholder: "use ENTER to add values",
+	                    style: { width: '30%' },
+	                    id: "4"
+	                }
+	            }],
+	            suggest_attrs2: [{
+	                addKeys: [13, 188], // Enter and comma
+	                inputProps: {
+	                    placeholder: "use ENTER to add values",
+	                    style: { width: '30%' },
+	                    id: "14"
+	                }
+	            }],
+	
+	            //for populating the owned assets dropdown
+	            currentAsset: "",
+	            owned_assets: []
+	
+	        };
+	
+	        //for selecting asset to which ICA references
+	        _this2.pickerChange = _this2.pickerChange.bind(_this2);
+	
+	        _this2.maxUniqAttr = 10;
+	        _this2.onFieldChange = _this2.onFieldChange.bind(_this2);
+	        _this2.onFieldChange2 = _this2.onFieldChange2.bind(_this2);
+	        _this2.handleHideModal = _this2.handleHideModal.bind(_this2);
+	        return _this2;
+	    }
+	
+	    //*****************************************************************************
+	
+	
+	    _createClass(IcaForm, [{
+	        key: 'pickerChange',
+	        value: function pickerChange(e) {
+	            this.setState({ currentAsset: e.target.value });
+	            console.log('asset change: ' + e.target.value);
+	        }
+	    }, {
+	        key: 'componentWillMount',
+	        value: function componentWillMount() {
+	            if (localStorage.getItem("owned_assets")) {
+	
+	                var own_assets = [];
+	
+	                var owned = localStorage.getItem("owned_assets");
+	                owned = JSON.parse(owned);
+	
+	                for (var i = 0; i < owned.length; i++) {
+	                    own_assets.push(owned[i]);
+	                }
+	                this.setState({ owned_assets: own_assets });
+	            }
+	        }
+	    }, {
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            //TODO********** add fileName.json********put in localstorage!
+	
+	            var publicKey = localStorage.getItem("pubKey");
+	            console.log("compDidMountAjax");
+	            $.ajax({
+	                type: "POST",
+	                url: twinUrl + 'getAsset',
+	                data: { "pubKey": publicKey, "flag": 0, "fileName": "MyCOID.json" },
+	                success: function (result) {
+	                    var data = result;
+	                    if ($.type(result) != "object") {
+	                        data = JSON.parseJSON(result);
+	                    }
+	                    console.log("gkaddr file: " + result.gatekeeperAddr);
+	                    //var gatekeeperAddr = "gatekeeperAddr_" + publicKey 
+	                    //console.log("gkaddr:  " + gatekeeperAddr)
+	                    localStorage.setItem("gatekeeperAddr", result.gatekeeperAddr);
+	                    //localStorage.setItem("coidAddr", result.coidAddr)
+	                    localStorage.setItem("dimensionCtrlAddr", result.dimensionCtrlAddr);
+	                    console.log("GKAddr: " + localStorage.getItem("gatekeeperAddr"));
+	                }.bind(this),
+	                complete: function complete() {
+	                    //console.log("gkaddr file: "+result);
+	                }
+	                //console.log(result)	
+	            });
+	        }
+	    }, {
+	        key: 'onFieldChange',
+	        value: function onFieldChange(inputField, e) {
+	            var multipleValues = {};
+	            if (inputField == "name" || inputField == "signature" || inputField == "message") {
+	                this.setState(_defineProperty({}, inputField, e.target.value));
+	            } else {
+	                multipleValues[inputField] = e;
+	                this.setState(multipleValues);
+	            }
+	        }
+	    }, {
+	        key: 'onFieldChange2',
+	        value: function onFieldChange2(inputField, e) {
+	            var multipleValues = {};
+	            var pieces = inputField.split(",");
+	            var index = pieces[1];
+	            var variable = pieces[0];
+	            console.log("input field: " + variable + "   index: " + index);
+	            console.log("field value :" + this.state[variable][index]);
+	            this.state[variable][Number(index)] = e;
+	            console.log("field value :" + variable[Number(index)]);
+	            multipleValues[variable] = this.state[variable];
+	            this.setState(multipleValues);
+	            console.log("state value :" + this.state[variable]);
+	        }
+	    }, {
+	        key: 'getHash',
+	        value: function getHash(input) {
+	            var input = $.trim(input);
+	            if (input) {
+	                var hash = (0, _jsSha.keccak_256)(input);
+	                return hash;
+	            }
+	            return input;
+	        }
+	    }, {
+	        key: 'getFileDetails',
+	        value: function getFileDetails(filedata) {
+	            var obj = _defineProperty({}, this.state.tmpFile, filedata);
+	            this.setState({ file_attrs: this.state.file_attrs.concat([obj]) });
+	        }
+	    }, {
+	        key: 'getLabelValues',
+	        value: function getLabelValues() {
+	            var labelVals = [];
+	            var _this = this;
+	            $.each($("input[name^='label-']"), function (obj) {
+	                var value = $.trim($(this).val());
+	                if (value.length > 0) {
+	                    labelVals.push(_defineProperty({}, $(this).attr('name').replace("label-", ""), value));
+	                }
+	            });
+	            return labelVals;
+	        }
+	    }, {
+	        key: 'prepareJsonToSubmit',
+	        value: function prepareJsonToSubmit() {
+	
+	            for (var x = 0; x < this.state.validators.length; x++) {
+	                var index = this.state.names.indexOf(this.state.validators[x]);
+	                if (index >= 0) {
+	                    this.state.validators[x] = this.state.keys[index];
+	                }
+	            }
+	            this.prepareValidators(this.state.validators);
+	
+	            var inputObj = {
+	                "pubKey": this.refs.pubKey.value,
+	                //"sig": this.refs.signature.value,	
+	                //"msg": this.refs.message.value,
+	                "uniqueId": this.createHashAttribute(this.state.file_attrs),
+	                "uniqueIdAttributes": this.prepareUniqueIdAttrs(),
+	                "validatorList": this.state.validators,
+	                "isHuman": false,
+	                "timestamp": "",
+	                "assetID": this.state.assetID,
+	                "propType": 2,
+	                "bigchainHash": "",
+	                "bigchainID": "",
+	                "coidAddr": ""
+	            };
+	
+	            return inputObj;
+	        }
+	    }, {
+	        key: 'createHashAttribute',
+	        value: function createHashAttribute(values) {
+	            if ($.isArray(values) && values.length > 0) {
+	                if ($.isPlainObject(values[0])) {
+	                    var str = "";
+	                    for (var i = 0; i < values.length; i++) {
+	                        for (var key in values[i]) {
+	                            var hash, filehash;
+	
+	                            var _values$i$key$split = values[i][key].split("|");
+	
+	                            var _values$i$key$split2 = _slicedToArray(_values$i$key$split, 2);
+	
+	                            hash = _values$i$key$split2[0];
+	                            filehash = _values$i$key$split2[1];
+	
+	                            if (values.length - 1 == i) str += hash;else str += hash + "|";
+	                        }
+	                    }
+	                    return this.getHash(str);
+	
+	                    //if only one value in 'values'
+	                } else {
+	                    var valStr = values.join("|");
+	                    return this.getHash(valStr);
+	                }
+	            }
+	            return '';
+	        }
+	
+	        //hashes arrays (no delimiter)
+	
+	    }, {
+	        key: 'valueIntoHash',
+	        value: function valueIntoHash(values) {
+	            var newArr = [];
+	            var _this = this;
+	            if ($.isArray(values)) {
+	                values.map(function (value) {
+	                    newArr.push(_this.getHash(value));
+	                });
+	            };
+	            return newArr;
+	        }
+	    }, {
+	        key: 'prepareUniqueIdAttrs',
+	        value: function prepareUniqueIdAttrs() {
+	            var newArr = [];
+	            var labels = this.getLabelValues();
+	
+	            for (var i = 0; i < labels.length; i++) {
+	                var tmpArr = [];
+	                for (var key in labels[i]) {
+	                    tmpArr.push(labels[i][key]);
+	                    var ipfsHash, fileHash;
+	
+	                    var _state$file_attrs$i$k = this.state.file_attrs[i][key].split("|");
+	
+	                    var _state$file_attrs$i$k2 = _slicedToArray(_state$file_attrs$i$k, 2);
+	
+	                    ipfsHash = _state$file_attrs$i$k2[0];
+	                    fileHash = _state$file_attrs$i$k2[1];
+	
+	                    tmpArr.push(fileHash);
+	                    tmpArr.push(ipfsHash);
+	                }
+	                newArr.push(tmpArr);
+	            }
+	
+	            var selected_asset = this.state.currentAsset;
+	            var bigchainTrxnID = void 0;
+	            if (selected_asset != "") {
+	                var assetDetails = [];
+	                console.log("currentAsset: " + selected_asset);
+	                this.state.owned_assets.forEach(function (asset, index) {
+	                    if (selected_asset == asset.asset_id) {
+	                        bigchainTrxnID = asset.asset_bigchainID;
+	                    }
+	                });
+	                assetDetails.push("bigchainID");
+	                assetDetails.push((0, _jsSha.keccak_256)(bigchainTrxnID));
+	                assetDetails.push(bigchainTrxnID);
+	                console.log("assetDetails: " + assetDetails);
+	                newArr.push(assetDetails);
+	            }
+	            return newArr;
+	        }
+	    }, {
+	        key: 'prepareValidators',
+	        value: function prepareValidators(value) {
+	            var tempArr = value;
+	            for (var i = 0; i < tempArr.length; i++) {
+	                tempArr[i] = this.getHash(tempArr[i]);
+	            }
+	            return tempArr;
+	        }
+	    }, {
+	        key: 'submitCoid',
+	        value: function submitCoid(e) {
+	            e.preventDefault();
+	            var json = this.prepareJsonToSubmit();
+	            var privKey1 = new Buffer(this.state.privKey, "hex");
+	            var msg_hash = (0, _jsSha.keccak_256)(JSON.stringify(json));
+	            var msg_hash_buffer = new Buffer(msg_hash, "hex");
+	            var signature1 = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1));
+	
+	            signature1 = JSON.parse(signature1).signature;
+	            signature1 = JSON.stringify(signature1);
+	            signature1 = JSON.parse(signature1).data;
+	            signature1 = new Buffer(signature1, "hex");
+	            signature1 = signature1.toString("hex");
+	
+	            console.log("sig" + signature1);
+	            console.log(typeof signature1 === 'undefined' ? 'undefined' : _typeof(signature1));
+	
+	            json.sig = signature1;
+	            json.msg = msg_hash_buffer.toString("hex");
+	            json.gatekeeperAddr = localStorage.getItem("gatekeeperAddr");
+	            //this.setState({signature: signature1})
+	
+	            console.log("JSON: " + JSON.stringify(json));
+	            $.ajax({
+	                url: twinUrl + 'request_new_COID',
+	                type: 'POST',
+	                data: json,
+	                success: function (res) {
+	                    var sendMe = {};
+	                    sendMe.flag = 0; //owned asset
+	                    sendMe.fileName = json.assetID[0] + ".json";
+	                    sendMe.pubKey = (0, _jsSha.keccak_256)(localStorage.getItem("pubKey"));
+	                    sendMe.updateFlag = 0;
+	                    sendMe.data = json;
+	
+	                    console.log("sendMe object:  " + JSON.stringify(sendMe));
+	                    $.ajax({
+	                        //****************TODO
+	                        url: twinUrl + 'setAsset',
+	                        type: 'POST',
+	                        data: sendMe,
+	                        success: function (res) {
+	                            console.log("response from setAsset: " + res);
+	                        }.bind(this)
+	                    });
+	                }.bind(this),
+	                complete: function () {
+	                    var sendMe = {};
+	                    sendMe.flag = 1; //controlled core identity
+	                    sendMe.fileName = json.assetID[0] + ".json";
+	                    sendMe.updateFlag = 0; //new identity
+	                    sendMe.data = json;
+	                    for (var i = 0; i < COID_controllers.length; i++) {
+	                        console.log("setting asset for controller, " + COID_controllers[i]);
+	                        sendMe.pubKey = (0, _jsSha.keccak_256)(COID_controllers[i]);
+	                        $.ajax({
+	                            url: twinUrl + 'setAsset',
+	                            type: 'POST',
+	                            data: sendMe,
+	                            success: function success(res) {
+	                                console.log("response from setAsset: " + res);
+	                            }
+	                        });
+	                    }
+	                    // do something
+	                }.bind(this)
+	            });
+	        }
+	    }, {
+	        key: 'handleHideModal',
+	        value: function handleHideModal() {
+	            this.setState({ showModal: false });
+	        }
+	    }, {
+	        key: 'handleShowModal',
+	        value: function handleShowModal(e) {
+	            this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
+	        }
+	
+	        //used in uniqueIdAttributeForm
+	
+	    }, {
+	        key: 'appendInput',
+	        value: function appendInput() {
+	            var inputLen = this.state.inputs.length;
+	            if (inputLen < this.maxUniqAttr) {
+	                var newInput = 'input-' + inputLen;
+	                this.setState({ inputs: this.state.inputs.concat([newInput]) });
+	            }
+	        }
+	    }, {
+	        key: 'onChange',
+	        value: function onChange(event, _ref, id) {
+	            var newValue = _ref.newValue;
+	
+	            console.log("onchange");
+	            var arr = this.state.value;
+	            console.log("state value:  " + this.state.value);
+	            arr[Number(id)] = newValue;
+	            this.setState({ value: arr });
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var _this3 = this;
+	
+	            $('div.react-autosuggest__container').css("display", "inline");
+	            var that = this;
+	
+	            function autocompleteRenderInput(_ref2) {
+	                var addTag = _ref2.addTag,
+	                    props = _ref2.props;
+	
+	
+	                var passed = JSON.stringify(arguments[0]);
+	                console.log("passed: " + passed);
+	                passed = JSON.parse(passed);
+	
+	                var handleOnChange = function handleOnChange(e, _ref3) {
+	                    var newValue = _ref3.newValue,
+	                        method = _ref3.method;
+	
+	                    console.log("handleonchange params: " + e + "   " + newValue + "   " + method + "   " + passed.id);
+	                    if (method === 'enter' || method === 'click') {
+	                        that.state.value[passed.id] = "";
+	                        e.preventDefault();
+	                    } else {
+	                        that.onChange(e, { newValue: newValue }, passed.id);
+	                    }
+	                };
+	                var handleKeyPress = function handleKeyPress(event) {
+	                    console.log('enter press here! ' + event.key);
+	                    if (event.key == 'Enter') {
+	                        event.preventDefault();
+	                        addTag(that.state.value[passed.id]);
+	                        that.state.value[passed.id] = "";
+	                        console.log('current tags: ' + that.state.tags);
+	                    }
+	                };
+	
+	                var renderInputComponent = function renderInputComponent(inputProps) {
+	                    return _react2.default.createElement('input', inputProps);
+	                };
+	
+	                //////////////////////////////////////////////////////////////////////
+	                var inputValue = that.state.value[Number(passed.id)] || "";
+	                if (inputValue == 'undefined') {
+	                    inputValue = "";
+	                }
+	                var inputLength = inputValue.length || 0;
+	
+	                var names = ["Moodys", "Steve Smith CFA", "Joe Schmo LLC", "AuditBody1"];
+	
+	                //add back in the that.names
+	                var suggestions = names.filter(function (name) {
+	                    console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
+	                    console.log(inputValue);
+	                    var re = new RegExp(inputValue, "i");
+	                    return Boolean(name.slice(0, inputLength).search(re) + 1);
+	                    //return (name.toLowerCase().slice(0, inputLength) === inputValue  || name.toUpperCase().slice(0, inputLength) === inputValue)
+	                });
+	
+	                var value = String(that.state.value[Number(passed.id)]) || "";
+	                if (value == 'undefined') {
+	                    value = "";
+	                }
+	                //const suggestions = that.state.suggestions;
+	                console.log("passed ID: " + passed.id);
+	                console.log("suggestions: " + suggestions);
+	                console.log("value: " + value);
+	                var inputProps = {
+	                    placeholder: passed.placeholder,
+	                    value: value,
+	                    style: {
+	                        width: '30%',
+	                        height: '100%',
+	                        display: "initial"
+	                    },
+	                    onChange: handleOnChange,
+	                    onKeyPress: handleKeyPress,
+	                    className: "react-tagsinput-input",
+	                    id: passed.id
+	                };
+	                return _react2.default.createElement(_reactAutosuggest2.default, {
+	                    id: passed.id,
+	                    ref: passed.ref,
+	                    suggestions: suggestions,
+	                    shouldRenderSuggestions: function shouldRenderSuggestions(value) {
+	                        return value.length > 0;
+	                    },
+	                    getSuggestionValue: function getSuggestionValue(suggestion) {
+	                        return suggestion;
+	                    },
+	                    renderSuggestion: function renderSuggestion(suggestion) {
+	                        return _react2.default.createElement(
+	                            'span',
+	                            null,
+	                            suggestion
+	                        );
+	                    },
+	                    inputProps: inputProps,
+	                    onSuggestionSelected: function onSuggestionSelected(e, _ref4) {
+	                        var suggestion = _ref4.suggestion,
+	                            method = _ref4.method;
+	
+	                        console.log("SELECTED: " + method);
+	                        if (method == 'click') {
+	                            addTag(suggestion);
+	                            that.state.value[passed.id] = "";
+	                        }
+	                    },
+	                    onSuggestionsClearRequested: function onSuggestionsClearRequested() {},
+	                    onSuggestionsFetchRequested: function onSuggestionsFetchRequested() {},
+	                    renderInputComponent: renderInputComponent
+	                });
+	            }
+	
+	            var basicAttrs = {
+	                addKeys: [13, 188], // Enter and comma
+	                inputProps: {
+	                    placeholder: "use ENTER to add values",
+	                    style: { width: '30%' }
+	                }
+	            };
+	            var inputAttrs = {
+	                addKeys: [13, 188], // Enter and comma
+	                inputProps: {
+	                    placeholder: "use ENTER to add values",
+	                    style: { width: '30%' },
+	                    id: "0"
+	                }
+	            };
+	            var inputAttrs2 = {
+	                addKeys: [13, 188], // Enter and comma
+	                inputProps: {
+	                    placeholder: "use ENTER to add values",
+	                    style: { width: '30%' },
+	                    id: "1"
+	                }
+	            };
+	            var inputAttrs3 = {
+	                addKeys: [13, 188], // Enter and comma
+	                inputProps: {
+	                    placeholder: "use ENTER to add values",
+	                    style: { width: '30%' },
+	                    id: "2"
+	                }
+	            };
+	            var inputAttrs4 = {
+	                addKeys: [13, 188], // Enter and comma
+	                inputProps: {
+	                    placeholder: "use ENTER to add values",
+	                    style: { width: '30%' },
+	                    id: "3"
+	                }
+	            };
+	
+	            var style = {
+	                fontSize: '12.5px'
+	            };
+	
+	            var syle2 = {
+	                marginTop: '26px'
+	            };
+	
+	            var marginRight15 = {
+	                marginRight: '15px'
+	            };
+	
+	            return _react2.default.createElement(
+	                'div',
+	                { id: 'SubmitContainer' },
+	                _react2.default.createElement(
+	                    'h1',
+	                    null,
+	                    'Create Asset Notary Attestation'
+	                ),
+	                _react2.default.createElement(
+	                    'form',
+	                    { method: 'POST', id: 'register', role: 'form' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'form-group' },
+	                        _react2.default.createElement(
+	                            'label',
+	                            { htmlFor: 'assetID' },
+	                            'Name Your Attestation. For example, \'No delinquent mortgage payments\''
+	                        ),
+	                        _react2.default.createElement(_reactTagsinput2.default, _extends({}, basicAttrs, { value: this.state.assetID, onChange: function onChange(e) {
+	                                _this3.onFieldChange("assetID", e);
+	                            } }))
+	                    ),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'form-group' },
+	                        _react2.default.createElement(
+	                            'h5',
+	                            null,
+	                            _react2.default.createElement(
+	                                'b',
+	                                null,
+	                                'Select asset to which this claim will reference:'
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'select',
+	                            { id: 'assetSelect', className: 'selectpicker show-tick', value: this.state.currentAsset, onChange: this.pickerChange },
+	                            _react2.default.createElement(
+	                                'option',
+	                                { selected: true, value: '' },
+	                                '--- Please select ---'
+	                            ),
+	                            _react2.default.createElement(
+	                                'optgroup',
+	                                { label: 'Owned Assets' },
+	                                _react2.default.createElement(
+	                                    'option',
+	                                    null,
+	                                    'Honda Accord'
+	                                )
+	                            )
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'panel-group', id: 'accordion_1' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'panel panel-default' },
+	                            _react2.default.createElement(
+	                                'div',
+	                                { className: 'panel-heading' },
+	                                _react2.default.createElement(
+	                                    'div',
+	                                    { className: 'row' },
+	                                    _react2.default.createElement(
+	                                        'div',
+	                                        { className: 'col-xs-11' },
+	                                        _react2.default.createElement(
+	                                            'label',
+	                                            null,
+	                                            'Membership Attributes'
+	                                        )
+	                                    ),
+	                                    _react2.default.createElement(
+	                                        'div',
+	                                        { className: 'col-xs-1' },
+	                                        _react2.default.createElement(
+	                                            'a',
+	                                            { 'data-toggle': 'collapse', 'data-parent': '#accordion', href: '#collapse_1' },
+	                                            _react2.default.createElement('span', { className: 'glyphicon glyphicon-chevron-down' })
+	                                        )
+	                                    )
+	                                )
+	                            ),
+	                            _react2.default.createElement(
+	                                'div',
+	                                { id: 'collapse_1', className: 'panel-collapse collapse out' },
+	                                _react2.default.createElement(
+	                                    'div',
+	                                    { className: 'panel-body' },
+	                                    _react2.default.createElement(
+	                                        'div',
+	                                        { className: 'row' },
+	                                        _react2.default.createElement(
+	                                            'div',
+	                                            { className: 'form-group' },
+	                                            _react2.default.createElement(
+	                                                'label',
+	                                                { htmlFor: 'unique_id' },
+	                                                'Enter Unique Attributes'
+	                                            ),
+	                                            this.state.inputs.map(function (input) {
+	                                                return _react2.default.createElement(_UniqueIDAttributeForm2.default, { type: 'ICA', handleShowModal: _this3.handleShowModal.bind(_this3), min: _this3.state.subform_cont, max: '10', key: input, labelref: input });
+	                                            })
+	                                        ),
+	                                        _react2.default.createElement(
+	                                            'div',
+	                                            { className: 'form-group' },
+	                                            _react2.default.createElement(
+	                                                'button',
+	                                                { type: 'button', className: 'btn-sm btn-info pull-right', style: marginRight15, onClick: this.appendInput.bind(this) },
+	                                                _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
+	                                                'Add More'
+	                                            )
+	                                        )
+	                                    )
+	                                )
+	                            )
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'panel-group', id: 'accordion_5' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'panel panel-default' },
+	                            _react2.default.createElement(
+	                                'div',
+	                                { className: 'panel-heading' },
+	                                _react2.default.createElement(
+	                                    'div',
+	                                    { className: 'row' },
+	                                    _react2.default.createElement(
+	                                        'div',
+	                                        { className: 'col-xs-11' },
+	                                        _react2.default.createElement(
+	                                            'label',
+	                                            null,
+	                                            'Attestation'
+	                                        )
+	                                    ),
+	                                    _react2.default.createElement(
+	                                        'div',
+	                                        { className: 'col-xs-1' },
+	                                        _react2.default.createElement(
+	                                            'a',
+	                                            { 'data-toggle': 'collapse', 'data-parent': '#accordion4', href: '#collapse_5' },
+	                                            _react2.default.createElement('span', { className: 'glyphicon glyphicon-chevron-down' })
+	                                        )
+	                                    )
+	                                )
+	                            ),
+	                            _react2.default.createElement(
+	                                'div',
+	                                { id: 'collapse_5', className: 'panel-collapse collapse out' },
+	                                _react2.default.createElement(
+	                                    'div',
+	                                    { className: 'panel-body' },
+	                                    _react2.default.createElement(
+	                                        'div',
+	                                        { className: 'row' },
+	                                        _react2.default.createElement(
+	                                            'div',
+	                                            { className: 'form-group' },
+	                                            _react2.default.createElement(
+	                                                'label',
+	                                                { htmlFor: 'validators' },
+	                                                'Attestors (individuals who will very the authenticity of this identity/asset)'
+	                                            ),
+	                                            _react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs4, { className: 'form-control col-md-4', maxTags: 10, renderInput: autocompleteRenderInput, value: this.state.validators, onChange: function onChange(e) {
+	                                                    _this3.onFieldChange("validators", e);
+	                                                } }))
+	                                        )
+	                                    )
+	                                )
+	                            )
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'form-group' },
+	                        _react2.default.createElement('input', { type: 'hidden', ref: 'signature', value: this.state.signature }),
+	                        _react2.default.createElement('input', { type: 'hidden', name: 'pubkey', ref: 'pubKey', value: localStorage.getItem("pubKey") }),
+	                        _react2.default.createElement(
+	                            'button',
+	                            { className: 'btn-med btn-primary pull-right', 'data-loading-text': 'Submit Identity', name: 'submit-form', type: 'button', onClick: this.submitCoid.bind(this) },
+	                            'Submit'
+	                        )
+	                    )
+	                ),
+	                this.state.showModal ? _react2.default.createElement(_UploadIpfsFile2.default, { pubKey: this.state.pubKey, dataHandler: this.getFileDetails.bind(this), handleHideModal: this.handleHideModal }) : null
+	            );
+	        } //end render
+	
+	    }]);
+	
+	    return IcaForm;
+	}(_react2.default.Component);
+	
+	exports.default = IcaForm;
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../../../~/buffer/index.js */ 251).Buffer))
+
+/***/ }),
+/* 839 */
 /*!*********************************************!*\
   !*** ./src/app/Components/Attestations.jsx ***!
   \*********************************************/
@@ -109513,858 +110729,6 @@
 	;
 	exports.default = Attestations;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../../~/buffer/index.js */ 251).Buffer))
-
-/***/ }),
-/* 839 */,
-/* 840 */
-/*!***********************************************************!*\
-  !*** ./src/app/Components/IdentityFederation/IcaForm.jsx ***!
-  \***********************************************************/
-/***/ (function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-	
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _reactTagsinput = __webpack_require__(/*! react-tagsinput */ 370);
-	
-	var _reactTagsinput2 = _interopRequireDefault(_reactTagsinput);
-	
-	var _reactAutosuggest = __webpack_require__(/*! react-autosuggest */ 371);
-	
-	var _reactAutosuggest2 = _interopRequireDefault(_reactAutosuggest);
-	
-	var _jsSha = __webpack_require__(/*! js-sha3 */ 368);
-	
-	var _UploadIpfsFile = __webpack_require__(/*! ../UploadIpfsFile.jsx */ 386);
-	
-	var _UploadIpfsFile2 = _interopRequireDefault(_UploadIpfsFile);
-	
-	var _UniqueIDAttributeForm = __webpack_require__(/*! ./UniqueIDAttributeForm.jsx */ 387);
-	
-	var _UniqueIDAttributeForm2 = _interopRequireDefault(_UniqueIDAttributeForm);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	//var crypto = require('crypto');
-	var secp256k1 = __webpack_require__(/*! secp256k1 */ 311);
-	
-	var IcaForm = function (_React$Component) {
-	    _inherits(IcaForm, _React$Component);
-	
-	    function IcaForm(props) {
-	        _classCallCheck(this, IcaForm);
-	
-	        var _this2 = _possibleConstructorReturn(this, (IcaForm.__proto__ || Object.getPrototypeOf(IcaForm)).call(this, props));
-	
-	        _this2.state = {
-	
-	            file_attrs: [],
-	
-	            inputs: ['input-0'], //removed input-1
-	
-	            official_id: [],
-	
-	            isHuman: [],
-	
-	            showModal: false,
-	            tmpFile: '',
-	            pubKey: localStorage.getItem("pubKey"),
-	            privKey: localStorage.getItem("privKey"),
-	
-	            //gatekeeperAddr: localStorage.getItem("MyGatekeeperAddr"),
-	            validators: [],
-	            signature: '',
-	            assetID: [],
-	
-	            //names: localStorage.getItem("contactNames").split(','),
-	            //keys: localStorage.getItem("contactPubKeys").split(','),
-	            value: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-	            suggest_attrs: [{
-	                addKeys: [13, 188], // Enter and comma
-	                inputProps: {
-	                    placeholder: "use ENTER to add values",
-	                    style: { width: '30%' },
-	                    id: "4"
-	                }
-	            }],
-	            suggest_attrs2: [{
-	                addKeys: [13, 188], // Enter and comma
-	                inputProps: {
-	                    placeholder: "use ENTER to add values",
-	                    style: { width: '30%' },
-	                    id: "14"
-	                }
-	            }],
-	
-	            //for populating the owned assets dropdown
-	            currentAsset: "",
-	            owned_assets: []
-	
-	        };
-	
-	        //for selecting asset to which ICA references
-	        _this2.pickerChange = _this2.pickerChange.bind(_this2);
-	
-	        _this2.maxUniqAttr = 10;
-	        _this2.onFieldChange = _this2.onFieldChange.bind(_this2);
-	        _this2.onFieldChange2 = _this2.onFieldChange2.bind(_this2);
-	        _this2.handleHideModal = _this2.handleHideModal.bind(_this2);
-	        return _this2;
-	    }
-	
-	    //*****************************************************************************
-	
-	
-	    _createClass(IcaForm, [{
-	        key: 'pickerChange',
-	        value: function pickerChange(e) {
-	            this.setState({ currentAsset: e.target.value });
-	            console.log('asset change: ' + e.target.value);
-	        }
-	    }, {
-	        key: 'componentWillMount',
-	        value: function componentWillMount() {
-	            if (localStorage.getItem("owned_assets")) {
-	
-	                var own_assets = [];
-	
-	                var owned = localStorage.getItem("owned_assets");
-	                owned = JSON.parse(owned);
-	
-	                for (var i = 0; i < owned.length; i++) {
-	                    own_assets.push(owned[i]);
-	                }
-	                this.setState({ owned_assets: own_assets });
-	            }
-	        }
-	    }, {
-	        key: 'componentDidMount',
-	        value: function componentDidMount() {
-	            //TODO********** add fileName.json********put in localstorage!
-	
-	            var publicKey = localStorage.getItem("pubKey");
-	            console.log("compDidMountAjax");
-	            $.ajax({
-	                type: "POST",
-	                url: twinUrl + 'getAsset',
-	                data: { "pubKey": publicKey, "flag": 0, "fileName": "MyCOID.json" },
-	                success: function (result) {
-	                    var data = result;
-	                    if ($.type(result) != "object") {
-	                        data = JSON.parseJSON(result);
-	                    }
-	                    console.log("gkaddr file: " + result.gatekeeperAddr);
-	                    //var gatekeeperAddr = "gatekeeperAddr_" + publicKey 
-	                    //console.log("gkaddr:  " + gatekeeperAddr)
-	                    localStorage.setItem("gatekeeperAddr", result.gatekeeperAddr);
-	                    //localStorage.setItem("coidAddr", result.coidAddr)
-	                    localStorage.setItem("dimensionCtrlAddr", result.dimensionCtrlAddr);
-	                    console.log("GKAddr: " + localStorage.getItem("gatekeeperAddr"));
-	                }.bind(this),
-	                complete: function complete() {
-	                    //console.log("gkaddr file: "+result);
-	                }
-	                //console.log(result)	
-	            });
-	        }
-	    }, {
-	        key: 'onFieldChange',
-	        value: function onFieldChange(inputField, e) {
-	            var multipleValues = {};
-	            if (inputField == "name" || inputField == "signature" || inputField == "message") {
-	                this.setState(_defineProperty({}, inputField, e.target.value));
-	            } else {
-	                multipleValues[inputField] = e;
-	                this.setState(multipleValues);
-	            }
-	        }
-	    }, {
-	        key: 'onFieldChange2',
-	        value: function onFieldChange2(inputField, e) {
-	            var multipleValues = {};
-	            var pieces = inputField.split(",");
-	            var index = pieces[1];
-	            var variable = pieces[0];
-	            console.log("input field: " + variable + "   index: " + index);
-	            console.log("field value :" + this.state[variable][index]);
-	            this.state[variable][Number(index)] = e;
-	            console.log("field value :" + variable[Number(index)]);
-	            multipleValues[variable] = this.state[variable];
-	            this.setState(multipleValues);
-	            console.log("state value :" + this.state[variable]);
-	        }
-	    }, {
-	        key: 'getHash',
-	        value: function getHash(input) {
-	            var input = $.trim(input);
-	            if (input) {
-	                var hash = (0, _jsSha.keccak_256)(input);
-	                return hash;
-	            }
-	            return input;
-	        }
-	    }, {
-	        key: 'getFileDetails',
-	        value: function getFileDetails(filedata) {
-	            var obj = _defineProperty({}, this.state.tmpFile, filedata);
-	            this.setState({ file_attrs: this.state.file_attrs.concat([obj]) });
-	        }
-	    }, {
-	        key: 'getLabelValues',
-	        value: function getLabelValues() {
-	            var labelVals = [];
-	            var _this = this;
-	            $.each($("input[name^='label-']"), function (obj) {
-	                var value = $.trim($(this).val());
-	                if (value.length > 0) {
-	                    labelVals.push(_defineProperty({}, $(this).attr('name').replace("label-", ""), value));
-	                }
-	            });
-	            return labelVals;
-	        }
-	    }, {
-	        key: 'prepareJsonToSubmit',
-	        value: function prepareJsonToSubmit() {
-	
-	            for (var x = 0; x < this.state.validators.length; x++) {
-	                var index = this.state.names.indexOf(this.state.validators[x]);
-	                if (index >= 0) {
-	                    this.state.validators[x] = this.state.keys[index];
-	                }
-	            }
-	            this.prepareValidators(this.state.validators);
-	
-	            var inputObj = {
-	                "pubKey": this.refs.pubKey.value,
-	                //"sig": this.refs.signature.value,	
-	                //"msg": this.refs.message.value,
-	                "uniqueId": this.createHashAttribute(this.state.file_attrs),
-	                "uniqueIdAttributes": this.prepareUniqueIdAttrs(),
-	                "validatorList": this.state.validators,
-	                "isHuman": false,
-	                "timestamp": "",
-	                "assetID": this.state.assetID,
-	                "propType": 2,
-	                "bigchainHash": "",
-	                "bigchainID": "",
-	                "coidAddr": ""
-	            };
-	
-	            return inputObj;
-	        }
-	    }, {
-	        key: 'createHashAttribute',
-	        value: function createHashAttribute(values) {
-	            if ($.isArray(values) && values.length > 0) {
-	                if ($.isPlainObject(values[0])) {
-	                    var str = "";
-	                    for (var i = 0; i < values.length; i++) {
-	                        for (var key in values[i]) {
-	                            var hash, filehash;
-	
-	                            var _values$i$key$split = values[i][key].split("|");
-	
-	                            var _values$i$key$split2 = _slicedToArray(_values$i$key$split, 2);
-	
-	                            hash = _values$i$key$split2[0];
-	                            filehash = _values$i$key$split2[1];
-	
-	                            if (values.length - 1 == i) str += hash;else str += hash + "|";
-	                        }
-	                    }
-	                    return this.getHash(str);
-	
-	                    //if only one value in 'values'
-	                } else {
-	                    var valStr = values.join("|");
-	                    return this.getHash(valStr);
-	                }
-	            }
-	            return '';
-	        }
-	
-	        //hashes arrays (no delimiter)
-	
-	    }, {
-	        key: 'valueIntoHash',
-	        value: function valueIntoHash(values) {
-	            var newArr = [];
-	            var _this = this;
-	            if ($.isArray(values)) {
-	                values.map(function (value) {
-	                    newArr.push(_this.getHash(value));
-	                });
-	            };
-	            return newArr;
-	        }
-	    }, {
-	        key: 'prepareUniqueIdAttrs',
-	        value: function prepareUniqueIdAttrs() {
-	            var newArr = [];
-	            var labels = this.getLabelValues();
-	
-	            for (var i = 0; i < labels.length; i++) {
-	                var tmpArr = [];
-	                for (var key in labels[i]) {
-	                    tmpArr.push(labels[i][key]);
-	                    var ipfsHash, fileHash;
-	
-	                    var _state$file_attrs$i$k = this.state.file_attrs[i][key].split("|");
-	
-	                    var _state$file_attrs$i$k2 = _slicedToArray(_state$file_attrs$i$k, 2);
-	
-	                    ipfsHash = _state$file_attrs$i$k2[0];
-	                    fileHash = _state$file_attrs$i$k2[1];
-	
-	                    tmpArr.push(fileHash);
-	                    tmpArr.push(ipfsHash);
-	                }
-	                newArr.push(tmpArr);
-	            }
-	
-	            var selected_asset = this.state.currentAsset;
-	            var bigchainTrxnID = void 0;
-	            if (selected_asset != "") {
-	                var assetDetails = [];
-	                console.log("currentAsset: " + selected_asset);
-	                this.state.owned_assets.forEach(function (asset, index) {
-	                    if (selected_asset == asset.asset_id) {
-	                        bigchainTrxnID = asset.asset_bigchainID;
-	                    }
-	                });
-	                assetDetails.push("bigchainID");
-	                assetDetails.push((0, _jsSha.keccak_256)(bigchainTrxnID));
-	                assetDetails.push(bigchainTrxnID);
-	                console.log("assetDetails: " + assetDetails);
-	                newArr.push(assetDetails);
-	            }
-	            return newArr;
-	        }
-	    }, {
-	        key: 'prepareValidators',
-	        value: function prepareValidators(value) {
-	            var tempArr = value;
-	            for (var i = 0; i < tempArr.length; i++) {
-	                tempArr[i] = this.getHash(tempArr[i]);
-	            }
-	            return tempArr;
-	        }
-	    }, {
-	        key: 'submitCoid',
-	        value: function submitCoid(e) {
-	            e.preventDefault();
-	            var json = this.prepareJsonToSubmit();
-	            var privKey1 = new Buffer(this.state.privKey, "hex");
-	            var msg_hash = (0, _jsSha.keccak_256)(JSON.stringify(json));
-	            var msg_hash_buffer = new Buffer(msg_hash, "hex");
-	            var signature1 = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1));
-	
-	            signature1 = JSON.parse(signature1).signature;
-	            signature1 = JSON.stringify(signature1);
-	            signature1 = JSON.parse(signature1).data;
-	            signature1 = new Buffer(signature1, "hex");
-	            signature1 = signature1.toString("hex");
-	
-	            console.log("sig" + signature1);
-	            console.log(typeof signature1 === 'undefined' ? 'undefined' : _typeof(signature1));
-	
-	            json.sig = signature1;
-	            json.msg = msg_hash_buffer.toString("hex");
-	            json.gatekeeperAddr = localStorage.getItem("gatekeeperAddr");
-	            //this.setState({signature: signature1})
-	
-	            console.log("JSON: " + JSON.stringify(json));
-	            $.ajax({
-	                url: twinUrl + 'request_new_COID',
-	                type: 'POST',
-	                data: json,
-	                success: function (res) {
-	                    var sendMe = {};
-	                    sendMe.flag = 0; //owned asset
-	                    sendMe.fileName = json.assetID[0] + ".json";
-	                    sendMe.pubKey = (0, _jsSha.keccak_256)(localStorage.getItem("pubKey"));
-	                    sendMe.updateFlag = 0;
-	                    sendMe.data = json;
-	
-	                    console.log("sendMe object:  " + JSON.stringify(sendMe));
-	                    $.ajax({
-	                        //****************TODO
-	                        url: twinUrl + 'setAsset',
-	                        type: 'POST',
-	                        data: sendMe,
-	                        success: function (res) {
-	                            console.log("response from setAsset: " + res);
-	                        }.bind(this)
-	                    });
-	                }.bind(this),
-	                complete: function () {
-	                    var sendMe = {};
-	                    sendMe.flag = 1; //controlled core identity
-	                    sendMe.fileName = json.assetID[0] + ".json";
-	                    sendMe.updateFlag = 0; //new identity
-	                    sendMe.data = json;
-	                    for (var i = 0; i < COID_controllers.length; i++) {
-	                        console.log("setting asset for controller, " + COID_controllers[i]);
-	                        sendMe.pubKey = (0, _jsSha.keccak_256)(COID_controllers[i]);
-	                        $.ajax({
-	                            url: twinUrl + 'setAsset',
-	                            type: 'POST',
-	                            data: sendMe,
-	                            success: function success(res) {
-	                                console.log("response from setAsset: " + res);
-	                            }
-	                        });
-	                    }
-	                    // do something
-	                }.bind(this)
-	            });
-	        }
-	    }, {
-	        key: 'handleHideModal',
-	        value: function handleHideModal() {
-	            this.setState({ showModal: false });
-	        }
-	    }, {
-	        key: 'handleShowModal',
-	        value: function handleShowModal(e) {
-	            this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
-	        }
-	
-	        //used in uniqueIdAttributeForm
-	
-	    }, {
-	        key: 'appendInput',
-	        value: function appendInput() {
-	            var inputLen = this.state.inputs.length;
-	            if (inputLen < this.maxUniqAttr) {
-	                var newInput = 'input-' + inputLen;
-	                this.setState({ inputs: this.state.inputs.concat([newInput]) });
-	            }
-	        }
-	    }, {
-	        key: 'onChange',
-	        value: function onChange(event, _ref, id) {
-	            var newValue = _ref.newValue;
-	
-	            console.log("onchange");
-	            var arr = this.state.value;
-	            console.log("state value:  " + this.state.value);
-	            arr[Number(id)] = newValue;
-	            this.setState({ value: arr });
-	        }
-	    }, {
-	        key: 'renderNormalAsset',
-	        value: function renderNormalAsset() {}
-	    }, {
-	        key: 'renderICA',
-	        value: function renderICA() {}
-	    }, {
-	        key: 'render',
-	        value: function render() {
-	            var _this3 = this;
-	
-	            $('div.react-autosuggest__container').css("display", "inline");
-	            var that = this;
-	
-	            function autocompleteRenderInput(_ref2) {
-	                var addTag = _ref2.addTag,
-	                    props = _ref2.props;
-	
-	
-	                var passed = JSON.stringify(arguments[0]);
-	                console.log("passed: " + passed);
-	                passed = JSON.parse(passed);
-	
-	                var handleOnChange = function handleOnChange(e, _ref3) {
-	                    var newValue = _ref3.newValue,
-	                        method = _ref3.method;
-	
-	                    console.log("handleonchange params: " + e + "   " + newValue + "   " + method + "   " + passed.id);
-	                    if (method === 'enter' || method === 'click') {
-	                        that.state.value[passed.id] = "";
-	                        e.preventDefault();
-	                    } else {
-	                        that.onChange(e, { newValue: newValue }, passed.id);
-	                    }
-	                };
-	                var handleKeyPress = function handleKeyPress(event) {
-	                    console.log('enter press here! ' + event.key);
-	                    if (event.key == 'Enter') {
-	                        event.preventDefault();
-	                        addTag(that.state.value[passed.id]);
-	                        that.state.value[passed.id] = "";
-	                        console.log('current tags: ' + that.state.tags);
-	                    }
-	                };
-	
-	                var renderInputComponent = function renderInputComponent(inputProps) {
-	                    return _react2.default.createElement('input', inputProps);
-	                };
-	
-	                //////////////////////////////////////////////////////////////////////
-	                var inputValue = that.state.value[Number(passed.id)] || "";
-	                if (inputValue == 'undefined') {
-	                    inputValue = "";
-	                }
-	                var inputLength = inputValue.length || 0;
-	
-	                var names = ["Moodys", "Steve Smith CFA", "Joe Schmo LLC", "AuditBody1"];
-	
-	                //add back in the that.names
-	                var suggestions = names.filter(function (name) {
-	                    console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
-	                    console.log(inputValue);
-	                    var re = new RegExp(inputValue, "i");
-	                    return Boolean(name.slice(0, inputLength).search(re) + 1);
-	                    //return (name.toLowerCase().slice(0, inputLength) === inputValue  || name.toUpperCase().slice(0, inputLength) === inputValue)
-	                });
-	
-	                var value = String(that.state.value[Number(passed.id)]) || "";
-	                if (value == 'undefined') {
-	                    value = "";
-	                }
-	                //const suggestions = that.state.suggestions;
-	                console.log("passed ID: " + passed.id);
-	                console.log("suggestions: " + suggestions);
-	                console.log("value: " + value);
-	                var inputProps = {
-	                    placeholder: passed.placeholder,
-	                    value: value,
-	                    style: {
-	                        width: '30%',
-	                        height: '100%',
-	                        display: "initial"
-	                    },
-	                    onChange: handleOnChange,
-	                    onKeyPress: handleKeyPress,
-	                    className: "react-tagsinput-input",
-	                    id: passed.id
-	                };
-	                return _react2.default.createElement(_reactAutosuggest2.default, {
-	                    id: passed.id,
-	                    ref: passed.ref,
-	                    suggestions: suggestions,
-	                    shouldRenderSuggestions: function shouldRenderSuggestions(value) {
-	                        return value.length > 0;
-	                    },
-	                    getSuggestionValue: function getSuggestionValue(suggestion) {
-	                        return suggestion;
-	                    },
-	                    renderSuggestion: function renderSuggestion(suggestion) {
-	                        return _react2.default.createElement(
-	                            'span',
-	                            null,
-	                            suggestion
-	                        );
-	                    },
-	                    inputProps: inputProps,
-	                    onSuggestionSelected: function onSuggestionSelected(e, _ref4) {
-	                        var suggestion = _ref4.suggestion,
-	                            method = _ref4.method;
-	
-	                        console.log("SELECTED: " + method);
-	                        if (method == 'click') {
-	                            addTag(suggestion);
-	                            that.state.value[passed.id] = "";
-	                        }
-	                    },
-	                    onSuggestionsClearRequested: function onSuggestionsClearRequested() {},
-	                    onSuggestionsFetchRequested: function onSuggestionsFetchRequested() {},
-	                    renderInputComponent: renderInputComponent
-	                });
-	            }
-	
-	            var basicAttrs = {
-	                addKeys: [13, 188], // Enter and comma
-	                inputProps: {
-	                    placeholder: "use ENTER to add values",
-	                    style: { width: '30%' }
-	                }
-	            };
-	            var inputAttrs = {
-	                addKeys: [13, 188], // Enter and comma
-	                inputProps: {
-	                    placeholder: "use ENTER to add values",
-	                    style: { width: '30%' },
-	                    id: "0"
-	                }
-	            };
-	            var inputAttrs2 = {
-	                addKeys: [13, 188], // Enter and comma
-	                inputProps: {
-	                    placeholder: "use ENTER to add values",
-	                    style: { width: '30%' },
-	                    id: "1"
-	                }
-	            };
-	            var inputAttrs3 = {
-	                addKeys: [13, 188], // Enter and comma
-	                inputProps: {
-	                    placeholder: "use ENTER to add values",
-	                    style: { width: '30%' },
-	                    id: "2"
-	                }
-	            };
-	            var inputAttrs4 = {
-	                addKeys: [13, 188], // Enter and comma
-	                inputProps: {
-	                    placeholder: "use ENTER to add values",
-	                    style: { width: '30%' },
-	                    id: "3"
-	                }
-	            };
-	
-	            var style = {
-	                fontSize: '12.5px'
-	            };
-	
-	            var syle2 = {
-	                marginTop: '26px'
-	            };
-	
-	            var marginRight15 = {
-	                marginRight: '15px'
-	            };
-	
-	            return _react2.default.createElement(
-	                'div',
-	                { id: 'SubmitContainer' },
-	                _react2.default.createElement(
-	                    'h1',
-	                    null,
-	                    'Create Asset Notary Attestation'
-	                ),
-	                _react2.default.createElement(
-	                    'form',
-	                    { method: 'POST', id: 'register', role: 'form' },
-	                    _react2.default.createElement(
-	                        'div',
-	                        { className: 'form-group' },
-	                        _react2.default.createElement(
-	                            'label',
-	                            { htmlFor: 'assetID' },
-	                            'Name Your Attestation. For example, \'I possess a graduate degree\''
-	                        ),
-	                        _react2.default.createElement(_reactTagsinput2.default, _extends({}, basicAttrs, { value: this.state.assetID, onChange: function onChange(e) {
-	                                _this3.onFieldChange("assetID", e);
-	                            } }))
-	                    ),
-	                    _react2.default.createElement(
-	                        'div',
-	                        { className: 'form-group' },
-	                        _react2.default.createElement(
-	                            'h5',
-	                            null,
-	                            _react2.default.createElement(
-	                                'b',
-	                                null,
-	                                'Select asset to which this claim will reference:'
-	                            )
-	                        ),
-	                        _react2.default.createElement(
-	                            'select',
-	                            { id: 'assetSelect', className: 'selectpicker show-tick', value: this.state.currentAsset, onChange: this.pickerChange },
-	                            _react2.default.createElement(
-	                                'option',
-	                                { selected: true, value: '' },
-	                                '--- Please select ---'
-	                            ),
-	                            _react2.default.createElement(
-	                                'optgroup',
-	                                { label: 'Owned Assets' },
-	                                function () {
-	                                    if (_this3.state.owned_assets.length > 0) {
-	                                        return _this3.state.owned_assets.map(function (asset, i) {
-	                                            //let val = label.split(',') //get rid of the .json
-	                                            return _react2.default.createElement(
-	                                                'option',
-	                                                { key: i, value: asset.asset_id },
-	                                                asset.asset_id
-	                                            );
-	                                        });
-	                                    } else {
-	                                        return _react2.default.createElement(
-	                                            'option',
-	                                            null,
-	                                            'No Owned Assets'
-	                                        );
-	                                    }
-	                                }(this)
-	                            )
-	                        )
-	                    ),
-	                    _react2.default.createElement(
-	                        'div',
-	                        { className: 'panel-group', id: 'accordion_1' },
-	                        _react2.default.createElement(
-	                            'div',
-	                            { className: 'panel panel-default' },
-	                            _react2.default.createElement(
-	                                'div',
-	                                { className: 'panel-heading' },
-	                                _react2.default.createElement(
-	                                    'div',
-	                                    { className: 'row' },
-	                                    _react2.default.createElement(
-	                                        'div',
-	                                        { className: 'col-xs-11' },
-	                                        _react2.default.createElement(
-	                                            'label',
-	                                            null,
-	                                            'Membership Attributes'
-	                                        )
-	                                    ),
-	                                    _react2.default.createElement(
-	                                        'div',
-	                                        { className: 'col-xs-1' },
-	                                        _react2.default.createElement(
-	                                            'a',
-	                                            { 'data-toggle': 'collapse', 'data-parent': '#accordion', href: '#collapse_1' },
-	                                            _react2.default.createElement('span', { className: 'glyphicon glyphicon-chevron-down' })
-	                                        )
-	                                    )
-	                                )
-	                            ),
-	                            _react2.default.createElement(
-	                                'div',
-	                                { id: 'collapse_1', className: 'panel-collapse collapse out' },
-	                                _react2.default.createElement(
-	                                    'div',
-	                                    { className: 'panel-body' },
-	                                    _react2.default.createElement(
-	                                        'div',
-	                                        { className: 'row' },
-	                                        _react2.default.createElement(
-	                                            'div',
-	                                            { className: 'form-group' },
-	                                            _react2.default.createElement(
-	                                                'label',
-	                                                { htmlFor: 'unique_id' },
-	                                                'Enter Unique Attributes'
-	                                            ),
-	                                            this.state.inputs.map(function (input) {
-	                                                return _react2.default.createElement(_UniqueIDAttributeForm2.default, { type: 'ICA', handleShowModal: _this3.handleShowModal.bind(_this3), min: _this3.state.subform_cont, max: '10', key: input, labelref: input });
-	                                            })
-	                                        ),
-	                                        _react2.default.createElement(
-	                                            'div',
-	                                            { className: 'form-group' },
-	                                            _react2.default.createElement(
-	                                                'button',
-	                                                { type: 'button', className: 'btn-sm btn-info pull-right', style: marginRight15, onClick: this.appendInput.bind(this) },
-	                                                _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
-	                                                'Add More'
-	                                            )
-	                                        )
-	                                    )
-	                                )
-	                            )
-	                        )
-	                    ),
-	                    _react2.default.createElement(
-	                        'div',
-	                        { className: 'panel-group', id: 'accordion_5' },
-	                        _react2.default.createElement(
-	                            'div',
-	                            { className: 'panel panel-default' },
-	                            _react2.default.createElement(
-	                                'div',
-	                                { className: 'panel-heading' },
-	                                _react2.default.createElement(
-	                                    'div',
-	                                    { className: 'row' },
-	                                    _react2.default.createElement(
-	                                        'div',
-	                                        { className: 'col-xs-11' },
-	                                        _react2.default.createElement(
-	                                            'label',
-	                                            null,
-	                                            'Attestation'
-	                                        )
-	                                    ),
-	                                    _react2.default.createElement(
-	                                        'div',
-	                                        { className: 'col-xs-1' },
-	                                        _react2.default.createElement(
-	                                            'a',
-	                                            { 'data-toggle': 'collapse', 'data-parent': '#accordion4', href: '#collapse_5' },
-	                                            _react2.default.createElement('span', { className: 'glyphicon glyphicon-chevron-down' })
-	                                        )
-	                                    )
-	                                )
-	                            ),
-	                            _react2.default.createElement(
-	                                'div',
-	                                { id: 'collapse_5', className: 'panel-collapse collapse out' },
-	                                _react2.default.createElement(
-	                                    'div',
-	                                    { className: 'panel-body' },
-	                                    _react2.default.createElement(
-	                                        'div',
-	                                        { className: 'row' },
-	                                        _react2.default.createElement(
-	                                            'div',
-	                                            { className: 'form-group' },
-	                                            _react2.default.createElement(
-	                                                'label',
-	                                                { htmlFor: 'validators' },
-	                                                'Attestors (individuals who will very the authenticity of this identity/asset)'
-	                                            ),
-	                                            _react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs4, { className: 'form-control col-md-4', maxTags: 10, renderInput: autocompleteRenderInput, value: this.state.validators, onChange: function onChange(e) {
-	                                                    _this3.onFieldChange("validators", e);
-	                                                } }))
-	                                        )
-	                                    )
-	                                )
-	                            )
-	                        )
-	                    ),
-	                    _react2.default.createElement(
-	                        'div',
-	                        { className: 'form-group' },
-	                        _react2.default.createElement('input', { type: 'hidden', ref: 'signature', value: this.state.signature }),
-	                        _react2.default.createElement('input', { type: 'hidden', name: 'pubkey', ref: 'pubKey', value: localStorage.getItem("pubKey") }),
-	                        _react2.default.createElement(
-	                            'button',
-	                            { className: 'btn-med btn-primary pull-right', 'data-loading-text': 'Submit Identity', name: 'submit-form', type: 'button', onClick: this.submitCoid.bind(this) },
-	                            'Submit'
-	                        )
-	                    )
-	                ),
-	                this.state.showModal ? _react2.default.createElement(_UploadIpfsFile2.default, { pubKey: this.state.pubKey, dataHandler: this.getFileDetails.bind(this), handleHideModal: this.handleHideModal }) : null
-	            );
-	        } //end render
-	
-	    }]);
-	
-	    return IcaForm;
-	}(_react2.default.Component);
-	
-	exports.default = IcaForm;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../../../~/buffer/index.js */ 251).Buffer))
 
 /***/ })
 /******/ ]);

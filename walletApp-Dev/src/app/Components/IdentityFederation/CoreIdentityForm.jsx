@@ -470,7 +470,7 @@ class CoreIdentity extends React.Component {
 				if (inputValue == 'undefined') { inputValue = ""; }
 				var inputLength = inputValue.length || 0
 
-				let names = ["Moodys","Steve Smith CFA","Joe Schmo LLC", "AuditBody1"];
+				let names = ["Moodys","Steve Smith CFA","Joe Schmo LLC", "AuditBody1", "Emily Lu", "Josh Phillips", "Aaron Bartwell"];
 
 				//NEED TO COMMENT BACK IN 'that.state.names' ...
 				const suggestions = names.filter((name) => {
@@ -619,7 +619,7 @@ class CoreIdentity extends React.Component {
 								<div className="panel-body">
 									<div className="row">
 										<div className="form-group">
-											<label htmlFor="owner_id">Enter yourself as your own Membership Holder.</label>
+											<label htmlFor="owner_id">Enter yourself as Membership Holder.</label>
 											<TagsInput {...inputAttrs} maxTags={1} renderInput={autocompleteRenderInput} value={this.state.owner_id} onChange={(e) => { this.onFieldChange("owner_id", e) }} />
 										</div>
 										<div className="form-group">
@@ -660,7 +660,7 @@ class CoreIdentity extends React.Component {
 													<table className="table table-striped table-hover" style={style}>
 														<tbody>
 															<tr>
-																<th><b>Delegatees</b></th>
+																<th><b>Delegatee</b></th>
 																<th><b>Token Quantity</b></th>
 															</tr>
 															<tr>

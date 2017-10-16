@@ -9,6 +9,7 @@ import UniqueIDAttributeForm from './IdentityFederation/UniqueIDAttributeForm.js
 import DimensionAttributeForm from './IdentityDimension/DimensionAttributeForm.jsx';
 import DimensionDelegationForm from './IdentityDimension/DimensionDelegationForm.jsx';
 import UploadIpfsFile from './UploadIpfsFile.jsx';
+import Autosuggest from 'react-autosuggest';
 
 //USED TO SIGN REQUESTS
 var secp256k1 = require('secp256k1');
@@ -62,6 +63,8 @@ class Modal extends Component {
 					id: "1"
 				}
 			}],
+
+			value: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
 
 			asset: props.asset || {},
 			asset_class: this.tags.getAssetData("classes"),
@@ -159,11 +162,13 @@ class Modal extends Component {
 		let standardAsset = document.getElementById("standardAsset");
 		let KYC = document.getElementById("KYC");
 
-		if (this.props.asset.asset_details.propType == 2) {
-			standardAsset.style.display = 'none';
-			KYC.style.display = 'block';
-		}
-		else { KYC.style.display = 'none' }
+		// if (this.props.asset.asset_details.propType == 2) {
+		// 	standardAsset.style.display = 'none';
+		// 	KYC.style.display = 'block';
+		// }
+		// else { KYC.style.display = 'none' }
+
+		KYC.style.display = 'none'
 
 		var prop = this.props.asset.asset_details;
 
@@ -547,146 +552,146 @@ class Modal extends Component {
 	//START DIMENSION FUNCTIONS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	//*****************************************************************************
-    //when we click Add More, a new value is pushed into this.state.inputs_files,
-    //and a new DimensionAttributeForm is rendered
-    appendAttribute() {
-        var inputLen = this.state.inputs_files.length;
-        if (inputLen < 10) {
-            var newInput = `input-${inputLen}`;
-            this.setState({ inputs_files: this.state.inputs_files.concat([newInput]) });
-            //inputs: input-0
-        }
+	//when we click Add More, a new value is pushed into this.state.inputs_files,
+	//and a new DimensionAttributeForm is rendered
+	appendAttribute() {
+		var inputLen = this.state.inputs_files.length;
+		if (inputLen < 10) {
+			var newInput = `input-${inputLen}`;
+			this.setState({ inputs_files: this.state.inputs_files.concat([newInput]) });
+			//inputs: input-0
+		}
 	}
-	
-    //*****************************************************************************/
-    updateAttributes() {
-        //e.preventDefault();
 
-        let dimension = this.state.dimension;
-        let json = {};
+	//*****************************************************************************/
+	updateAttributes() {
+		//e.preventDefault();
 
-        json.dimensionName = dimension.dimensionName;
-        json.pubKey = keccak_256(localStorage.getItem("pubKey"));
-        json.address = dimension.address;
+		let dimension = this.state.dimension;
+		let json = {};
 
-        let selected_asset = this.state.selectedAsset_addDimAttr;
-        console.log("selected asset: " + selected_asset);
+		json.dimensionName = dimension.dimensionName;
+		json.pubKey = keccak_256(localStorage.getItem("pubKey"));
+		json.address = dimension.address;
 
-        let bigchainTrxnID; //we will pass this to prepareAttributes function
-        this.state.own_assets.forEach(function (asset, index) {
-            if (selected_asset == asset.asset_id) {
-                console.log("\n\n SELECTED ASSET: " + selected_asset + "  Owned assetID: " + asset.asset_id);
-                bigchainTrxnID = asset.asset_bigchainID
-            }
-        })
-        // this.state.control_assets.forEach(function (asset, index) {
-        //     if (selected_asset == asset.asset_id) {
-        //         console.log("\n\n SELECTED ASSET: " + selected_asset + "  Controlled assetID: " + asset.asset_id);
-        //         bigchainTrxnID = asset.asset_bigchainID
-        //     }
-        // })
+		let selected_asset = this.state.selectedAsset_addDimAttr;
+		console.log("selected asset: " + selected_asset);
 
-        //WE CANNOT PASS A NORMAL ASSET ... ONLY ICA CLAIM CAN BE ADDED WITH THIS CURRENT LOGIC
+		let bigchainTrxnID; //we will pass this to prepareAttributes function
+		this.state.own_assets.forEach(function (asset, index) {
+			if (selected_asset == asset.asset_id) {
+				console.log("\n\n SELECTED ASSET: " + selected_asset + "  Owned assetID: " + asset.asset_id);
+				bigchainTrxnID = asset.asset_bigchainID
+			}
+		})
+		// this.state.control_assets.forEach(function (asset, index) {
+		//     if (selected_asset == asset.asset_id) {
+		//         console.log("\n\n SELECTED ASSET: " + selected_asset + "  Controlled assetID: " + asset.asset_id);
+		//         bigchainTrxnID = asset.asset_bigchainID
+		//     }
+		// })
 
-        json.ID = 0;
+		//WE CANNOT PASS A NORMAL ASSET ... ONLY ICA CLAIM CAN BE ADDED WITH THIS CURRENT LOGIC
 
-        if (this.state.owned == true) { json.flag = 0; }
-        else json.flag = 1;
+		json.ID = 0;
 
-        json.dimensionCtrlAddr = dimension.dimensionCtrlAddr;
+		if (this.state.owned == true) { json.flag = 0; }
+		else json.flag = 1;
 
-        let attributes = this.prepareAttributes(selected_asset, bigchainTrxnID);
-        json.data = attributes;
+		json.dimensionCtrlAddr = dimension.dimensionCtrlAddr;
 
-        //json.controllers_dimension = controllers_dimension
+		let attributes = this.prepareAttributes(selected_asset, bigchainTrxnID);
+		json.data = attributes;
 
-        var signature = this.getSignature(json);
-        var msg_hash = keccak_256(JSON.stringify(json));
-        var msg_hash_buffer = new Buffer(msg_hash, "hex");
-        json.msg = msg_hash_buffer.toString("hex");
-        json.sig = signature;
+		//json.controllers_dimension = controllers_dimension
 
-        $.ajax({
-            type: "POST",
-            url: twinUrl + 'dimensions/addEntry',
-            data: json,
-            success: function (result) {
-                var data = result;
-                if ($.type(result) != "object") {
-                    data = JSON.parseJSON(result)
-                }
-                console.log("response addEntry: " + JSON.stringify(data))
+		var signature = this.getSignature(json);
+		var msg_hash = keccak_256(JSON.stringify(json));
+		var msg_hash_buffer = new Buffer(msg_hash, "hex");
+		json.msg = msg_hash_buffer.toString("hex");
+		json.sig = signature;
 
-            }.bind(this),
-            complete: function () {
-                // do something
-                //ST: HERE WE COULD WRITE DIMENSIONS INTO COID JSON?
-            },
-        })
-        console.log("JSON: " + JSON.stringify(json))
-    }
+		$.ajax({
+			type: "POST",
+			url: twinUrl + 'dimensions/addEntry',
+			data: json,
+			success: function (result) {
+				var data = result;
+				if ($.type(result) != "object") {
+					data = JSON.parseJSON(result)
+				}
+				console.log("response addEntry: " + JSON.stringify(data))
 
-	 //*****************************************************************************
-	 requestAddDelegation() {
-		
-				let dimension = this.state.dimension
-				//*********************************************/
-				var json = {}
-		
-				json.publicKey = localStorage.getItem("pubKey");
-				json.typeInput = dimension.dimensionName;
-				json.owners = dimension.owners
-				json.coidAddr = dimension.coidAddr
-				json.dimensionCtrlAddr = dimension.dimensionCtrlAddr
-				//json.flag   UNCOMMENT THIS!!!!!!!!!!!!
-		
-				//*********************************************************************
-				//checking if they want to delegate access to all attrs
-				//this mean accessCategories (contract) will be null
-				// var x = $("#allAttrs").is(":checked");
-				// console.log("checkbox: " + x)
-				// if ($("#allAttrs").is(":checked")) {
-				//     $('#accessCategories').hide();
-				// }
-		
-				let accessCategories = []
-		
-				//Getting the value (index) of selected access categories
-				//the index represents the desriptor/attribute
-				$('#accessCategories option:selected').each(function () {
-					accessCategories.push($(this).val());
-					//accessCategories now contains the selected indices
-				});
-		
-				console.log("selectedCategories: " + accessCategories)
-		
-				accessCategories.forEach(function (element) {
-					//console.log("got element: " + element)
-					json.accessCategories += dimension.data[element].descriptor + ","
-				})
-		
-				//this will get rid of the last trailing comma
-				json.accessCategories = json.accessCategories.substring(0, json.accessCategories.length - 1)
-		
-				let delegations = this.prepareDelegationDistribution(dimension.dimensionName, json.owners);
-				json.delegations = delegations;
-		
-				json.propType = 2;
-		
-				console.log("\n JSON body: " + JSON.stringify(json))
-				$.ajax({
-					url: twinUrl + 'dimensions/delegate',
-					type: 'POST',
-					data: json,
-					success: function (res) {
-						console.log("response delegate: " + res);
-						//if (res.status == "Ok" && res.msg == "true") {
-						//var i_dimension = this.state.dimension.ID
-						//}
-					}
-				});
-		
-			}//requestAddDelegation
+			}.bind(this),
+			complete: function () {
+				// do something
+				//ST: HERE WE COULD WRITE DIMENSIONS INTO COID JSON?
+			},
+		})
+		console.log("JSON: " + JSON.stringify(json))
+	}
+
+	//*****************************************************************************
+	requestAddDelegation() {
+
+		let dimension = this.state.dimension
+		//*********************************************/
+		var json = {}
+
+		json.publicKey = localStorage.getItem("pubKey");
+		json.typeInput = dimension.dimensionName;
+		json.owners = dimension.owners
+		json.coidAddr = dimension.coidAddr
+		json.dimensionCtrlAddr = dimension.dimensionCtrlAddr
+		//json.flag   UNCOMMENT THIS!!!!!!!!!!!!
+
+		//*********************************************************************
+		//checking if they want to delegate access to all attrs
+		//this mean accessCategories (contract) will be null
+		// var x = $("#allAttrs").is(":checked");
+		// console.log("checkbox: " + x)
+		// if ($("#allAttrs").is(":checked")) {
+		//     $('#accessCategories').hide();
+		// }
+
+		let accessCategories = []
+
+		//Getting the value (index) of selected access categories
+		//the index represents the desriptor/attribute
+		$('#accessCategories option:selected').each(function () {
+			accessCategories.push($(this).val());
+			//accessCategories now contains the selected indices
+		});
+
+		console.log("selectedCategories: " + accessCategories)
+
+		accessCategories.forEach(function (element) {
+			//console.log("got element: " + element)
+			json.accessCategories += dimension.data[element].descriptor + ","
+		})
+
+		//this will get rid of the last trailing comma
+		json.accessCategories = json.accessCategories.substring(0, json.accessCategories.length - 1)
+
+		let delegations = this.prepareDelegationDistribution(dimension.dimensionName, json.owners);
+		json.delegations = delegations;
+
+		json.propType = 2;
+
+		console.log("\n JSON body: " + JSON.stringify(json))
+		$.ajax({
+			url: twinUrl + 'dimensions/delegate',
+			type: 'POST',
+			data: json,
+			success: function (res) {
+				console.log("response delegate: " + res);
+				//if (res.status == "Ok" && res.msg == "true") {
+				//var i_dimension = this.state.dimension.ID
+				//}
+			}
+		});
+
+	}//requestAddDelegation
 
 	render() {
 		console.log("this.pubkey: " + this.pubKey);
@@ -695,8 +700,105 @@ class Modal extends Component {
 		//console.log("******" + JSON.stringify(this.state.qrCode_COID_device_relation))
 
 		var _this = this;
+		var that = this;//ADDED BY ST OCT 16!!!!!!!!
 
 		var prop = this.props.asset.asset_details;
+
+		let dims1 = {
+			"dimensionName": "Mortgage History BAC Florida",
+			"pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+			"address": "",
+			"flag": 0,
+			"ID": 0,
+			"coidAddr": "E2B24811DB9B23DDEA8313D82D11A82014C8E3BC",
+			"dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
+			"uniqueId": "9aaddf7caa690217bddc743102dc7e417608a93418ad5da2c0c82c501004f26f",
+			"owners": [
+				"59d110a3ab34a2ebd0ddb9d72ead24e8e906bebe794ea13c8c35b8a6c81314cd"
+			],
+			"controllers": [
+				"Steve Smith",
+				"BAC Florida"
+			],
+			"delegations": [
+				{
+					"owner": "Steve Smith",
+					"delegatee": "Moodys",
+					"amount": "2",
+					"accessCategories": ""
+				}
+			],
+			"data": [
+				{
+					"descriptor": "Payment confirmation BAC Florida June-2016",
+					"attribute": "QmXVFStSMEcoAWPVKLrxJ8wf5ohn2UdmdAxcnfB8TtSAZG",
+					"flag": 0
+				},
+				{
+					"descriptor": "Loan ID 122235 Summary 2015",
+					"attribute": "QmSMWeGPjtgzQ75Y1YXbnC4uByni8bwHcB4vPXrPVcUTUM",
+					"flag": 0
+				}]
+		}
+		// },
+		// {
+		// 	"dimensionName": "Car Loan Honda City FL",
+		// 	"pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+		// 	"address": "",
+		// 	"flag": 0,
+		// 	"ID": 0,
+		// 	"coidAddr": "E2B24811DB9B23DDEA8313D82D11A82014C8E3BC",
+		// 	"dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
+		// 	"uniqueId": "9aaddf7caa690217bddc743102dc7e417608a93418ad5da2c0c82c501004f26f",
+		// 	"owners": [
+		// 		"Steve Smith"
+		// 	],
+		// 	"controllers": [
+		// 		"Steve Smith",
+		// 		"BAC Florida"
+		// 	],
+		// 	"delegations": [
+		// 		{
+		// 			"owner": "Steve Smith",
+		// 			"delegatee": "Moodys",
+		// 			"amount": "2",
+		// 			"accessCategories": ""
+		// 		}
+		// 	],
+		// 	"data": [
+		// 		{
+		// 			"descriptor": "Leasing Document Signed June-2015",
+		// 			"attribute": "QmXVFStSMEcoAWPVKLrxJ8wf5ohn2UdmdAxcnfB8TtSAZG",
+		// 			"flag": 0
+		// 		},
+		// 		{
+		// 			"descriptor": "Payment Confirmation Oct-2017",
+		// 			"attribute": "QmSMWeGPjtgzQ75Y1YXbnC4uByni8bwHcB4vPXrPVcUTUM",
+		// 			"flag": 0
+		// 		}
+		// 	]
+		// }]
+
+		var dataArray1 = []
+		//var data = this.props.dimension.dimension_details.data
+		var data = dims1.data
+		//{"descriptor":"jan_history","attribute":"QmTok8Hgi4CCYS3fkxS83XpRjHjfegQZNszU6ekSFFq65s","flag":0}
+		Object.keys(data).forEach(key => {
+			dataArray1.push(data[key].descriptor)
+			dataArray1.push(data[key].attribute)
+			dataArray1.push(data[key].flag)
+		})
+		let arrayOfArrays1 = []
+		for (var i = 0; i < data.length; i++) {
+			var element = [dataArray1[3 * i + 0], dataArray1[3 * i + 1], dataArray1[3 * i + 2]] /*, dataArray[4 * i + 3]*/
+			arrayOfArrays1.push(element)
+		}
+
+		console.log("array of Arrays: " + arrayOfArrays1)
+		//this.setState({ dimensionDataArray: arrayOfArrays })
+
+
+
 		// var hashedKeys = [];
 		// for (var i = 0; i < this.keys.length; i++) {
 		//  hashedKeys[i] = keccak_256(this.keys[i]);
@@ -811,22 +913,108 @@ class Modal extends Component {
 			}
 		};
 
+		function autocompleteRenderInput({ addTag, props }) {
+
+			var passed = JSON.stringify(arguments[0]);
+			console.log("passed: " + passed + JSON.stringify(arguments[1]));
+			passed = JSON.parse(passed);
+
+			const handleOnChange = (e, { newValue, method }) => {
+				console.log("handleonchange params: " + e + "   " + newValue + "   " + method + "   " + passed.id);
+				if (method === 'enter' || method === 'click') {
+					that.state.value[passed.id] = "";
+					e.preventDefault()
+				} else {
+					that.onChange(e, { newValue }, passed.id)
+				}
+			}
+			const handleKeyPress = (event) => {
+				console.log('enter press here! ' + event.key)
+				if (event.key == 'Enter') {
+					event.preventDefault()
+					addTag(that.state.value[passed.id])
+					that.state.value[passed.id] = "";
+					console.log('current tags: ' + that.state.tags)
+				}
+			}
+
+			const renderInputComponent = inputProps => (
+				<input {...inputProps} />
+			);
+			var inputValue = that.state.value[Number(passed.id)] || "";
+			if (inputValue == 'undefined') { inputValue = ""; }
+			var inputLength = inputValue.length || 0
+
+			let names = ["Moodys", "Steve Smith CFA", "Joe Schmo LLC", "AuditBody1"];
+
+			//PUT BACK IN 'that.state.names'
+			const suggestions = names.filter((name) => {
+				//console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
+				//console.log(inputValue);
+				var re = new RegExp(inputValue, "i");
+				return (Boolean(name.slice(0, inputLength).search(re) + 1))
+				//return (name.toLowerCase().slice(0, inputLength) === inputValue  || name.toUpperCase().slice(0, inputLength) === inputValue)
+			})
+			/////////////////////////////////////
+
+			var value = String(that.state.value[Number(passed.id)]) || "";
+			if (value == 'undefined') { value = ""; }
+			//const suggestions = that.state.suggestions;
+			console.log("passed ID: " + passed.id);
+			console.log("suggestions: " + suggestions);
+			console.log("value: " + value);
+			const inputProps = {
+				placeholder: passed.placeholder,
+				value,
+				style: {
+					width: '30%',
+					height: '100%',
+					display: "initial"
+				},
+				onChange: handleOnChange,
+				onKeyPress: handleKeyPress,
+				className: "react-tagsinput-input",
+				id: passed.id
+			};
+			return (
+				<Autosuggest
+					id={passed.id}
+					ref={passed.ref}
+					suggestions={suggestions}
+					shouldRenderSuggestions={(value) => value.length > 0}
+					getSuggestionValue={(suggestion) => suggestion}
+					renderSuggestion={(suggestion) => <span>{suggestion}</span>}
+					inputProps={inputProps}
+					onSuggestionSelected={(e, { suggestion, method }) => {
+						console.log("SELECTED: " + method)
+						if (method == 'click') {
+							addTag(suggestion)
+							that.state.value[passed.id] = "";
+						}
+					}}
+					onSuggestionsClearRequested={() => { }}
+					onSuggestionsFetchRequested={() => { }}
+					renderInputComponent={renderInputComponent}
+				/>
+			)
+		}
+
 		return (
 			<div className="modal fade" id="assetDetails" key={this.props.asset.asset_id} tabIndex="-1" role="dialog" aria-labelledby="asset">
-				
-				
+
+
 				<div className="modal-dialog modal-lg" role="document" style={popUpWidth}>
 					<div className="modal-content modalstyle">
 
 						<div className="modal-header">
 							<button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times; </span></button>
 							<ul className="nav nav-pills" role="tablist">
-								<li role="presentation" className="active"><a href="#asset_details" role="tab" data-toggle="tab">Asset Details</a></li>
+								<li role="presentation" className="active"><a href="#asset_details" role="tab" data-toggle="tab">Asset Info</a></li>
 								<li role="presentation"><a href="#menu1" role="tab" data-toggle="tab">Edit Asset</a></li>
-								<li role="presentation"><a href="#menu2" role="tab" data-toggle="tab">Dimension Details</a></li>
-								<li role="presentation"><a href="#menu3" role="tab" data-toggle="tab">Edit Dimensions</a></li>
-								<li role="presentation"><a href="#menu4" role="tab" data-toggle="tab">Create Dimension</a></li>
-								<li role="presentation"><a href="#qrcode" role="tab" data-toggle="tab">QR Codes</a></li>
+								<li role="presentation"><a href="#menu2" role="tab" data-toggle="tab">Data Repository Info</a></li>
+								<li role="presentation"><a href="#menu3" role="tab" data-toggle="tab">Edit Repositories</a></li>
+								<li role="presentation"><a href="#menu4" role="tab" data-toggle="tab">Create Repository</a></li>
+								<li role="presentation"><a href="#qrcode" role="tab" data-toggle="tab">Proofs</a></li>
 							</ul>
 						</div>
 
@@ -870,9 +1058,9 @@ class Modal extends Component {
 													<td>BigchainDB Transaction Hash</td>
 													<td><p> {prop.bigchainHash} </p></td>
 												</tr> */}
-												<tr>
+												{/* <tr>
 													<td colSpan="2"><b>Official IDs</b></td>
-												</tr>
+												</tr> */}
 												{(() => {
 													var ipfs_url = "http://10.101.114.231:8080/ipfs/";
 													if (!$.isEmptyObject(prop.uniqueIdAttributes)) {
@@ -881,7 +1069,7 @@ class Modal extends Component {
 																return (
 																	<tr key={i}>
 																		<td>{ids[0]}</td>
-																		<td><p>File hash: {ids[1]}</p><p>IPFS hash: <a target="_blank" href={ipfs_url + "/" + ids[2]}>{ids[2]}</a></p></td>
+																		<td><p>Validation ID: {ids[1]}</p><p>Data Pointer: <a target="_blank" href={ipfs_url + "/" + ids[2]}>{ids[2]}</a></p></td>
 																	</tr>
 																)
 															}
@@ -889,7 +1077,7 @@ class Modal extends Component {
 																return (
 																	<tr key={i}>
 																		<td>{ids[0]}</td>
-																		<td><p>File hash: {ids[1]}</p><p>BigChain hash: <a href="javascript:" onClick={(e) => { this.bigchainGet(ids[2]) }}>{ids[2]}</a></p></td>
+																		<td><p>Validation ID: {ids[1]}</p><p>Data Pointer: <a href="javascript:" onClick={(e) => { this.bigchainGet(ids[2]) }}>{ids[2]}</a></p></td>
 																	</tr>
 																)
 															}
@@ -899,15 +1087,15 @@ class Modal extends Component {
 													}
 												})(this)}
 												<tr>
-													<td>Ownership Token Description</td>
+													<td>Membership Holding Token Description</td>
 													<td><p>{prop.ownershipTokenAttributes}</p></td>
 												</tr>
 												<tr>
-													<td>Ownership ID</td>
+													<td>Membership Holding ID</td>
 													<td><p> {prop.ownershipId}</p></td>
 												</tr>
 												<tr>
-													<td>Ownership ID List</td>
+													<td>Membership Holding ID List</td>
 													<td>{(() => {
 														if (!$.isEmptyObject(prop.ownerIdList)) {
 															return prop.ownerIdList.map((ids, i) => {
@@ -918,7 +1106,7 @@ class Modal extends Component {
 													</td>
 												</tr>
 												<tr>
-													<td>Ownership Token Quantity</td>
+													<td>Membership Holding Token Quantity</td>
 													<td>{(() => {
 														if (!$.isEmptyObject(prop.ownershipTokenQuantity)) {
 															return prop.ownershipTokenQuantity.map((ids, i) => {
@@ -929,19 +1117,19 @@ class Modal extends Component {
 													</td>
 												</tr>
 												<tr>
-													<td>Ownership Token ID</td>
+													<td>Membership Holding Token ID</td>
 													<td><p> {prop.ownershipTokenId}</p></td>
 												</tr>
 												<tr>
-													<td>Control Token Description</td>
+													<td>Delegation Token Description</td>
 													<td><p>{prop.controlTokenAttributes}</p></td>
 												</tr>
 												<tr>
-													<td>Control ID</td>
+													<td>Delegation ID</td>
 													<td><p> {prop.controlId}</p></td>
 												</tr>
 												<tr>
-													<td>Control ID List</td>
+													<td>Delegation ID List</td>
 													<td>{(() => {
 														if (!$.isEmptyObject(prop.controlIdList)) {
 															return prop.controlIdList.map((ids, i) => {
@@ -952,7 +1140,7 @@ class Modal extends Component {
 													</td>
 												</tr>
 												<tr>
-													<td>Control Token Quantity</td>
+													<td>Delegation Token Quantity</td>
 													<td>{(() => {
 														if (!$.isEmptyObject(prop.controlTokenQuantity)) {
 															return prop.controlIdList.map((ids, i) => {
@@ -963,7 +1151,7 @@ class Modal extends Component {
 													</td>
 												</tr>
 												<tr>
-													<td>Control Token ID</td>
+													<td>Delegation Token ID</td>
 													<td> <p> {prop.controlTokenId}</p></td>
 												</tr>
 												<tr>
@@ -1065,7 +1253,7 @@ class Modal extends Component {
 												<div className="panel-heading">
 													<div className="row">
 														<div className="col-xs-11">
-															<label>Uniqueness</label>
+															<label>Membership Attributes</label>
 														</div>
 														<div className="col-xs-1">
 															<a data-toggle="collapse" data-parent="#accordion" href="#collapse1">
@@ -1077,12 +1265,12 @@ class Modal extends Component {
 												<div id="collapse1" className="panel-collapse collapse out">
 													<div className="panel-body">
 														<div className="row">
-															<table className="table table-striped table-hover" >
-																<tbody>
+															{/* <table className="table table-striped table-hover" > */}
+															{/* <tbody>
 																	<tr>
 																		<td colSpan="2"><b>Official IDs</b></td>
-																	</tr>
-																	{/* {(() => {
+																	</tr> */}
+															{/* {(() => {
                                                                     var ipfs_url = "http://10.101.114.231:8080/ipfs/";
                                                                     if (!$.isEmptyObject(prop.uniqueIdAttributes)) {
                                                                         return prop.uniqueIdAttributes.map((ids, i) => {
@@ -1097,15 +1285,15 @@ class Modal extends Component {
                                                                         return <tr><td colSpan="2">No Ids found</td></tr>
                                                                     }
                                                                 })(this)} */}
-																</tbody>
-															</table>
+															{/* </tbody> */}
+															{/* </table> */}
 															<div className="form-group">
-																<label htmlFor="unique_id">Enter Unique ID Attributes:</label>
+																<label htmlFor="unique_id">Unique ID Attributes:</label>
 																{this.state.inputs.map(input => <UniqueIDAttributeForm type={"MyCOID"} handleShowModal={this.handleShowModal.bind(this)} max="10" key={input} labelref={input} />)}
 															</div>
 															<div className="form-group">
 																<button type="button" className="btn-sm btn-info pull-right" style={marginRight15} onClick={this.appendInput.bind(this)}>
-																		<span className="glyphicon glyphicon-plus"></span>Add More
+																	<span className="glyphicon glyphicon-plus"></span>Add More
 																</button>
 															</div>
 															<div className="form-group">
@@ -1124,7 +1312,7 @@ class Modal extends Component {
 												<div className="panel-heading">
 													<div className="row">
 														<div className="col-xs-11">
-															<label>Ownership</label>
+															<label>Membership Holding</label>
 														</div>
 														<div className="col-xs-1">
 															<a data-toggle="collapse" data-parent="#accordion" href="#collapse2">
@@ -1140,7 +1328,7 @@ class Modal extends Component {
 															<table className="table table-striped table-hover" style={style}>
 																<tbody>
 																	<tr>
-																		<td><b>Owner ID List</b></td>
+																		<td><b>Membership Holding ID List</b></td>
 																		<td>
 																			{(() => {
 																				if (!$.isEmptyObject(prop.ownerIdList)) {
@@ -1156,7 +1344,7 @@ class Modal extends Component {
 															<div id="OWNERSHIP">
 																{/*  style={this.state.removeIfMyCOID}> */}
 																<div className="form-group">
-																	<label htmlFor="control_dist">Enter Owners and their ownership token(s).</label>
+																	<label htmlFor="control_dist">Enter holders and their membership token(s).</label>
 																	{this.state.inputs_owners.map(input => <TokenDistributionForm min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
 																</div>
 																<div className="col-md-offset-6 col-md-6 ">
@@ -1166,7 +1354,7 @@ class Modal extends Component {
 																</div>
 																<div className="form-group">
 																	<button style={style} type="button" className="btn btn-primary" onClick={this.requestUpdateOwners.bind(this)}>
-																		<span className="glyphicon glyphicon-plus"></span>Update Ownership
+																		<span className="glyphicon glyphicon-plus"></span>Update Membership Holdings
                                 								</button>
 																</div>
 															</div>{/*OWNERSHIP*/}
@@ -1181,7 +1369,7 @@ class Modal extends Component {
 												<div className="panel-heading">
 													<div className="row">
 														<div className="col-xs-11">
-															<label>Control</label>
+															<label>Delegation</label>
 														</div>
 														<div className="col-xs-1">
 															<a data-toggle="collapse" data-parent="#accordion" href="#collapse3">
@@ -1196,7 +1384,7 @@ class Modal extends Component {
 															<table className="table table-striped table-hover" style={style}>
 																<tbody>
 																	<tr>
-																		<td><b>Control ID List</b></td>
+																		<td><b>Delegation ID List</b></td>
 																		<td>
 																			{(() => {
 																				if (!$.isEmptyObject(prop.controlIdList)) {
@@ -1211,7 +1399,7 @@ class Modal extends Component {
 															</table>
 
 															<div className="form-group">
-																<label htmlFor="control_dist">Enter Controllers and their control token(s).</label>
+																<label htmlFor="control_dist">Enter Delegatees and their delegated token(s).</label>
 																{this.state.inputs_controllers.map(input => <TokenDistributionForm min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
 															</div>
 															<div className="col-md-offset-6 col-md-6 ">
@@ -1294,7 +1482,7 @@ class Modal extends Component {
 												<div className="panel-heading">
 													<div className="row">
 														<div className="col-xs-11">
-															<label>Delegations</label>
+															<label>One-Time or Temporary Delegation</label>
 														</div>
 														<div className="col-xs-1">
 															<a data-toggle="collapse" data-parent="#accordion" href="#collapse5">
@@ -1309,7 +1497,7 @@ class Modal extends Component {
 															<table className="table table-striped table-hover" style={style}>
 																<tbody>
 																	<tr>
-																		<td><b>Delegations List</b></td>
+																		<td><b>Temporary Delegations List</b></td>
 																		<td>
 																			{(() => {
 																				if (!$.isEmptyObject(prop.delegateeIdList)) {
@@ -1323,7 +1511,7 @@ class Modal extends Component {
 																</tbody>
 															</table>
 															<div className="form-group">
-																<label htmlFor="delegatee_dist">Enter Delegatees and their delegated control token(s).</label>
+																<label htmlFor="delegatee_dist">Enter Delegatees and their delegated token(s).</label>
 																{this.state.inputs_delegatees.map(input => <TokenDistributionForm min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
 															</div>
 															<div className="col-md-offset-6 col-md-6 ">
@@ -1346,7 +1534,7 @@ class Modal extends Component {
 								</div>{/*menu1*/}
 
 								<div id="menu2" className="tab-pane">
-									<h4>Data Repositories (Identity Dimensions)</h4>
+									<h4>Data Repositories</h4>
 									{/*Note: data-parent attribute makes sure that all collapsible elements under the specified parent will be closed when one of the collapsible item is shown*/}
 									{(() => {
 										if (!$.isEmptyObject(this.props.dimensions)) {
@@ -1369,8 +1557,27 @@ class Modal extends Component {
 																					<td>{dims.coidAddr}</td>
 																				</tr>
 																				<tr>
-																					<td>Asset Owner List</td>
+																					<td>Membership Holding List</td>
+																					<td>Steve Smith</td>
 																				</tr>
+																				<tr>
+																					<td colSpan="2"><b>Descriptors</b></td>
+																				</tr>
+																				{(() => {
+																					if (arrayOfArrays1.length > 0) {
+																						return arrayOfArrays1.map((attrs, i) => {
+																							console.log("attrs[0]: " + attrs[0] + ", attrs[1]:" + attrs[1] + ", attrs[2]: " + attrs[2])
+																							return (
+																								<tr key={i}>
+																									<td>{attrs[0]}</td>
+																									{/* onClick={this.showAttrs.bind(this)} */}
+																									<td><button type="button" className="btn btn-primary btn-sm" data-val={i}>Spend Token</button></td>
+																								</tr>
+																							)
+																						});
+																					}
+																					else { return <tr><td colSpan="2">No descriptors found.</td></tr> }
+																				})(this)}
 																			</tbody>
 																		</table>
 																	</div>
@@ -1387,8 +1594,7 @@ class Modal extends Component {
 								</div>{/*menu2*/}
 
 								<div id="menu3" className="tab-pane">
-									<a href="#identitydimension">CREATE NEW</a><br />
-									<label>Select Dimension:</label><br />
+									<label>Select Repository:</label><br />
 									<select defaultValue={this.state.selectValue} onChange={this.handleSelectViewDimension}>
 										{(() => {
 											if (!$.isEmptyObject(this.props.dimensions)) {
@@ -1421,7 +1627,7 @@ class Modal extends Component {
 													<div className="row">
 														<form method="POST" id="register" role="form">
 
-															<div className="form-group">
+															{/* <div className="form-group">
 																<label>Are you adding an attested identity claims as an entry?</label>
 																<select id="addICA" onChange={this.addICA}>
 																	<option value="selectOption">--- Please select ---</option>
@@ -1449,7 +1655,7 @@ class Modal extends Component {
 																		</div>
 																	)
 																}
-															})(this)}
+															})(this)} */}
 
 															<div className="form-group">
 																<label htmlFor="unique_id">Enter descriptor(s) and attribute(s):</label>
@@ -1477,7 +1683,7 @@ class Modal extends Component {
 											<div className="panel-heading">
 												<div className="row">
 													<div className="col-xs-11">
-														<label>Update Control</label>
+														<label>Delegation</label>
 													</div>
 													<div className="col-xs-1">
 														<a data-toggle="collapse" data-parent="#accordion" href="#collapseB">
@@ -1493,7 +1699,7 @@ class Modal extends Component {
 
 															<div className="form-group">
 																{/* renderInput={autocompleteRenderInput} */}
-																<label htmlFor="control_dist">Enter additional persona controllers. Note: Core Identity controllers will automatically be controllers of the persona.</label>
+																<label htmlFor="control_dist">Enter additional persona delegations</label>
 																<TagsInput maxTags={10} value={this.state.dim_control_list} onChange={(e) => { this.onFieldChange("dim_control_list", e) }} />
 															</div>
 
@@ -1521,7 +1727,7 @@ class Modal extends Component {
 											<div className="panel-heading">
 												<div className="row">
 													<div className="col-xs-11">
-														<label>Add Delegations</label>
+														<label>Temporary Data Delegation</label>
 													</div>
 													<div className="col-xs-1">
 														<a data-toggle="collapse" data-parent="#accordion" href="#collapseC">
@@ -1537,7 +1743,7 @@ class Modal extends Component {
 															<tbody>
 																<tr>
 																	<td>
-																		<label htmlFor="control_dist">With whom would you like to share your persona and how many times should that person be able to access?</label>
+																		<label htmlFor="control_dist">Share this data repository with a 3rd party? How often?</label>
 																		{/* autocompleteRenderInput={autocompleteRenderInput} */}
 																		{this.state.delegations.map((input, i) =>
 																			<DimensionDelegationForm attr={this.state.suggest_attrs[i]} max="10" key={input} labelref={input} deleValue={this.state.deleValue[i]} deleToken={this.state.deleToken[i]} passedFunction={(e) => { this.onFieldChange2("deleValue," + i, e) }} passedFunction2={(e) => { this.onFieldChange2("deleToken," + i, e) }} />)}
@@ -1550,29 +1756,6 @@ class Modal extends Component {
 																			<span className="glyphicon glyphicon-plus"></span>Add More</button>
 																	</td>
 																</tr>
-																{/*<tr>
-															<th><b>Delegate access to all attributes:</b></th>
-														</tr>
-														<tr>
-															<td><input id="allAttrs" type="checkbox" />YES</td>
-														</tr>*/}
-																<tr>
-																	{/* <th><b>Access Categories (select 1 or many):</b></th> */}
-																</tr>
-																<tr>
-																	<td>
-																		<select id="accessCategories" className="selectpicker" multiple="multiple">
-																			{/* {(() => {
-																				if (arrayOfArrays.length > 0) {
-																					return arrayOfArrays.map((attrs, i) => {
-																						return (<option key={i} value={i}>{attrs[0]}</option>)
-																					})
-
-																				}
-																			})(this)} */}
-																		</select>
-																	</td>
-																</tr>
 															</tbody>
 														</table>
 														{/* onClick={this.requestAddDelegation.bind(this)} */}
@@ -1583,19 +1766,188 @@ class Modal extends Component {
 										</div>
 									</div>
 
-
-
 								</div>
 
 								<div id="menu4" className="tab-pane">
-									HERE WE WILL ADD THE CREATE DIMENSION!!!!!!
+
+
+											
+
+									<div id="SubmitContainer">
+
+										
+										<form method="POST" id="register" role="form">
+										<div className="form-group">
+									<label htmlFor="dimensionName">Data Repository name:</label>
+									<input name="dimensionName" className="form-control col-md-4" type="text" placeholder="Dimension Name"/><hr/>
+									</div><hr/>
+
+											{/* <div className="panel-group" id="accordion1">
+                                <div className="panel panel-default">
+                                    <div className="panel-heading">
+                                        <div className="row">
+                                            <div className="col-xs-11">
+                                                <label>Describe this persona</label>
+                                            </div>
+                                            <div className="col-xs-1">
+                                                <a data-toggle="collapse" data-parent="#accordion" href="#collapse1">
+                                                    <span className="glyphicon glyphicon-chevron-down"></span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="collapse1" className="panel-collapse collapse out">
+                                        <div className="panel-body">
+                                            <div className="row">
+                                                <div className="form-group">
+                                                    <label>Is this persona for sharing attested identity claims (stored in BigchainDB) with others?</label>
+                                                    <select id="passBigchainID">
+                                                        <option value="selectOption">--- Please select ---</option>
+                                                        <option value="Yes">Yes</option>
+                                                        <option value="No">No</option>
+                                                    </select>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label>Allow shared identity claims tokens to be signed by the party with whom the token was shared?</label>
+                                                    <select id="ICA">
+                                                        <option value="selectOption">--- Please select ---</option>
+                                                        <option value="Yes">Yes</option>
+                                                        <option value="No">No</option>
+                                                    </select>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> */}
+
+											<div className="panel-group" id="accordion2A">
+												<div className="panel panel-default">
+													<div className="panel-heading">
+														<div className="row">
+															<div className="col-xs-11">
+																<label>Repository Attributes</label>
+															</div>
+															<div className="col-xs-1">
+																<a data-toggle="collapse" data-parent="#accordion" href="#collapse2A">
+																	<span className="glyphicon glyphicon-chevron-down"></span>
+																</a>
+															</div>
+														</div>
+													</div>
+													<div id="collapse2A" className="panel-collapse collapse out">
+														<div className="panel-body">
+															<div className="row">
+																<div className="form-group" id="unique_id_div">
+																	<label htmlFor="unique_id">Enter descriptor(s) and attribute(s):</label>
+																	{this.state.inputs.map(input =>
+																		<DimensionAttributeForm handleShowModal={this.handleShowModal.bind(this)} max="10" key={input} labelref={input} />)}
+																</div>
+																<div className="form-group" id="unique_id_btn">
+																	{/* onClick={this.appendAttribute.bind(this)} */}
+																	<button type="button" className="btn-sm btn-info pull-right" style={marginRight15}>
+																		<span className="glyphicon glyphicon-plus"></span>Add More
+                                                    </button>
+																</div>
+
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<div className="panel-group" id="accordion3A">
+												<div className="panel panel-default">
+													<div className="panel-heading">
+														<div className="row">
+															<div className="col-xs-11">
+																<label>Delegations</label>
+															</div>
+															<div className="col-xs-1">
+																<a data-toggle="collapse" data-parent="#accordion" href="#collapse3A">
+																	<span className="glyphicon glyphicon-chevron-down"></span>
+																</a>
+															</div>
+														</div>
+													</div>
+													<div id="collapse3A" className="panel-collapse collapse out">
+														<div className="panel-body">
+															<div className="row">
+																<div className="form-group">
+																	<label htmlFor="control_list">Enter additional persona controllers. Note: Core Identity controllers will automatically be controllers of the persona.</label>
+																	<TagsInput maxTags={10} renderInput={autocompleteRenderInput} value={this.state.control_list} onChange={(e) => { this.onFieldChange("control_list", e) }} />
+																</div>
+																<div className="form-group">
+																	<div className="col-md-offset-6 col-md-6 ">
+																		{/* onClick={this.addController.bind(this)} */}
+																		<button type="button" className="btn btn-info pull-right" style={marginRight15}>
+																			<span className="glyphicon glyphicon-plus"></span>Add More
+                                                        </button>
+																	</div>
+																</div>
+
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<div className="panel-group" id="accordion4">
+												<div className="panel panel-default">
+													<div className="panel-heading">
+														<div className="row">
+															<div className="col-xs-11">
+																<label>One-Time or Temporary Delegations</label>
+															</div>
+															<div className="col-xs-1">
+																<a data-toggle="collapse" data-parent="#accordion" href="#collapse4">
+																	<span className="glyphicon glyphicon-chevron-down"></span>
+																</a>
+															</div>
+														</div>
+													</div>
+													<div id="collapse4" className="panel-collapse collapse out">
+														<div className="panel-body">
+															<div className="row">
+																<div className="form-group">
+																	<label htmlFor="control_dist">Share this data repository with a 3rd party? How often?</label>
+																	{this.state.delegations.map((input, i) =>
+																		<DimensionDelegationForm attr={this.state.suggest_attrs[i]} max="10" key={input} labelref={input} autocompleteRenderInput={autocompleteRenderInput} deleValue={this.state.deleValue[i]} deleToken={this.state.deleToken[i]} passedFunction={(e) => { this.onFieldChange2("deleValue," + i, e) }} passedFunction2={(e) => { this.onFieldChange2("deleToken," + i, e) }} />)}
+																</div>
+																<div className="form-group">
+																	<div className="col-md-offset-6 col-md-6 ">
+																		{/* onClick={this.appendDelegation.bind(this)} */}
+																		<button type="button" className="btn btn-info pull-right" style={marginRight15}>
+																			<span className="glyphicon glyphicon-plus"></span>Add More
+                                                        </button>
+																	</div>
+																</div>
+
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div className="form-group">
+													{/* onClick={this.createDimension.bind(this)} */}
+													<button className="btn btn-primary" data-loading-text="Submit" name="submit-form" type="button">Create</button>
+											</div>
+											
+
+										</form>
+
+
+										{this.state.showModal ? <UploadIpfsFile pubKey={this.state.pubKey} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}
+									</div>{/*SubmitContainer*/}
+
 
 								</div>
 
 								<div role="tabpanel" className="tab-pane center-block" id="qrcode" style={qrStyle}>
-									<h6>Digital Identity</h6>
+									<h6>Proof of Membership</h6>
 									<QRCode value={qrConfig} size={200} /><hr />
-									{this.state.notCOID ? <h6>Owner-Device Relationship</h6> : null}
+									{this.state.notCOID ? <h6>Proof of Asset Ownership</h6> : null}
 									{this.state.notCOID ? <QRCode value={qrOwnedDevice} size={200} /> : null}
 								</div>
 
@@ -1616,6 +1968,7 @@ Modal.propTypes = {
 	hideHandler: React.PropTypes.func.isRequired // hideHandler method must exists in parent component
 };
 
+
 //**************************************************************************************************************** */
 
 class Dims extends Component {
@@ -1625,8 +1978,8 @@ class Dims extends Component {
 		this.pubKey = localStorage.getItem("pubKey");
 		this.privKey = localStorage.getItem("privKey");
 		this.tags = new AssetTags(this.pubKey, props.dimension.dimension_id);
-		this.names = localStorage.getItem("contactNames").split(',');
-		this.keys = localStorage.getItem("contactPubKeys").split(',');
+		//this.names = localStorage.getItem("contactNames").split(',');
+		//this.keys = localStorage.getItem("contactPubKeys").split(',');
 		this.state = {
 
 			asset_class: this.tags.getAssetData("classes"),
@@ -1683,11 +2036,13 @@ class Dims extends Component {
 
 		var prop = this.props.dimension.dimension_details;
 
-		if (prop.propType == 2) {
-			standardDim.style.display = 'none';
-			ICA_Dim.style.display = 'block';
-		}
-		else { ICA_Dim.style.display = 'none' }
+		ICA_Dim.style.display = 'none';
+
+		// if (prop.propType == 2) {
+		// 	standardDim.style.display = 'none';
+		// 	ICA_Dim.style.display = 'block';
+		// }
+		// else { ICA_Dim.style.display = 'none' }
 
 
 	}
@@ -1884,17 +2239,17 @@ class Dims extends Component {
 		var prop = this.props.dimension
 
 		var hashedKeys = [];
-		for (var i = 0; i < this.keys.length; i++) {
-			hashedKeys[i] = keccak_256(this.keys[i]);
-		}
+		// for (var i = 0; i < this.keys.length; i++) {
+		// 	hashedKeys[i] = keccak_256(this.keys[i]);
+		// }
 
-		for (var x = 0; x < prop.dimension_details.owners.length; x++) {
-			var index = hashedKeys.indexOf(prop.dimension_details.owners[x]);
-			if (index >= 0) {
-				prop.dimension_details.owners[x] = this.names[index];
-				console.log("\n\nCHANGED: " + prop.dimension_details.owners[x]);
-			}
-		}
+		// for (var x = 0; x < prop.dimension_details.owners.length; x++) {
+		// 	var index = hashedKeys.indexOf(prop.dimension_details.owners[x]);
+		// 	if (index >= 0) {
+		// 		prop.dimension_details.owners[x] = this.names[index];
+		// 		console.log("\n\nCHANGED: " + prop.dimension_details.owners[x]);
+		// 	}
+		// }
 
 		console.log("dimension(props): " + JSON.stringify(prop))
 
@@ -2077,14 +2432,15 @@ class Assets extends Component {
 	componentWillMount() {
 
 		let O = [{
-			"asset_id": "MYCOID", "asset_details": {
+			"asset_id": "Steve Smith",
+			"asset_details": {
 				"Type": "non_cash",
-				"assetID": "MyCOID",
+				"assetID": "Steve Smith",
 				"bigchainHash": "",
 				"bigchainID": "",
 				"coidAddr": "",
 				"controlId": "aae858de3899d2ff096ddb5384365c6a86ce7964f1c4f1f22878944d39bd943a",
-				"controlIdList": ["Myself","My Company LLC"],
+				"controlIdList": ["Myself", "My Company LLC"],
 				"controlTokenAttributes": "My Delegated Identity Tokens",
 				"controlTokenId": "289d3c526086b3832f4fd1338e5b0f437e7c84d6d7c556f53ef7d2eaf4e316a4",
 				"controlTokenQuantity": ["10", "5"],
@@ -2105,9 +2461,45 @@ class Assets extends Component {
 				"txn_id": "requestCOID",
 				"uniqueId": "01547929f9184f362e1ab0126a15013087f4d1ab25d11ea971e8ffb159546d94",
 
-				"uniqueIdAttributes": [["Bejoy George CPA","557d1294ba620922e1655aa9b5c9be5f2c5dad876740dd2a9a22934b79ee164d","QmWbbhSo7GzZi6zyi7MpJyAfiqzPRcSfV1oHFRyCgT54iG"],
-				["label2","557d1294ba620922e1655aa9b5c9be5f2c5dad876740dd2a9a22934b79ee164d","QmWbbhSo7GzZi6zyi7MpJyAfiqzPRcSfV1oHFRyCgT54iG"]],
-				
+				"uniqueIdAttributes": [["Steve Smith birth cert.", "557d1294ba620922e1655aa9b5c9be5f2c5dad876740dd2a9a22934b79ee164d", "QmWbbhSo7GzZi6zyi7MpJyAfiqzPRcSfV1oHFRyCgT54iG"],
+				["passport USA", "557d1294ba620922e1655aa9b5c9be5f2c5dad876740dd2a9a22934b79ee164d", "QmWbbhSo7GzZi6zyi7MpJyAfiqzPRcSfV1oHFRyCgT54iG"]],
+
+				"yesVotesRequiredToPass": "2",
+				"dimensions": ["LIVING_ROOM.json", "Finance.json"]
+			}
+		},
+		{
+			"asset_id": "Honda Accord", "asset_details": {
+				"Type": "non_cash",
+				"assetID": "Honda Accord",
+				"bigchainHash": "",
+				"bigchainID": "",
+				"coidAddr": "",
+				"controlId": "aae858de3899d2ff096ddb5384365c6a86ce7964f1c4f1f22878944d39bd943a",
+				"controlIdList": ["Myself", "My wife", "My son"],
+				"controlTokenAttributes": "My Delegated Honda Control Tokens",
+				"controlTokenId": "289d3c526086b3832f4fd1338e5b0f437e7c84d6d7c556f53ef7d2eaf4e316a4",
+				"controlTokenQuantity": ["10", "5", "5"],
+				"dimensions": "",
+				"gatekeeperAddr": "",
+				"identityRecoveryIdList": ["My Wife", "My Son"],
+				"isHuman": "true",
+				"msg": "e98cfaa4317c583cd87fb1d538bb64eafea1f516adf02b193fe224d2a60610f6",
+				"ownerIdList": ["Myself"],
+				"ownershipId": "8b44edd090224a5c2350c1b2f3f57ee2d3443744462bb7c3c970c337e570eac4",
+				"ownershipTokenAttributes": "My Honda's Ownership Tokens",
+				"ownershipTokenId": "289d3c526086b3832f4fd1338e5b0f437e7c84d6d7c556f53ef7d2eaf4e316a4",
+				"ownershipTokenQuantity": ["10"],
+				"pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+				"recoveryCondition": "2",
+				"sig": "4fb1eaab7042e093ed6ca3251af91dca3ec417ef579fe5ea8f079125bd1e6e3c35472aa559fbc6023f2c7c438c1b038b5bc58269b59e3651a65aa3524b22b621",
+				"timestamp": "",
+				"txn_id": "requestCOID",
+				"uniqueId": "01547929f9184f362e1ab0126a15013087f4d1ab25d11ea971e8ffb159546d94",
+
+				"uniqueIdAttributes": [["Dealership receipt", "557d1294ba620922e1655aa9b5c9be5f2c5dad876740dd2a9a22934b79ee164d", "QmWbbhSo7GzZi6zyi7MpJyAfiqzPRcSfV1oHFRyCgT54iG"],
+				["VIN information document", "557d1294ba620922e1655aa9b5c9be5f2c5dad876740dd2a9a22934b79ee164d", "QmWbbhSo7GzZi6zyi7MpJyAfiqzPRcSfV1oHFRyCgT54iG"]],
+
 				"yesVotesRequiredToPass": "2",
 				"dimensions": ["LIVING_ROOM.json", "Finance.json"]
 			}
@@ -2126,7 +2518,7 @@ class Assets extends Component {
 
 
 		let dimensions = [{
-			"dimensionName": "LIVING_ROOM",
+			"dimensionName": "Mortgage History BAC Florida",
 			"pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
 			"address": "",
 			"flag": 0,
@@ -2138,32 +2530,32 @@ class Assets extends Component {
 				"59d110a3ab34a2ebd0ddb9d72ead24e8e906bebe794ea13c8c35b8a6c81314cd"
 			],
 			"controllers": [
-				"a016d3445c892d76d9efc222d9598b4bfaf889ef5c5323c5cec67ab20c96c01c",
-				"16f121833eee6c25847aa9e63d4aa1b5cc2bf72d0d48f46ad25316b6e9bc5976"
+				"Steve Smith",
+				"BAC Florida"
 			],
 			"delegations": [
 				{
-					"owner": "COID_OWNER",
-					"delegatee": "03683536757fdb821c10810b51caa51a84fc1dfab5c17edbf5246f9713ffe31adf",
+					"owner": "Steve Smith",
+					"delegatee": "Moodys",
 					"amount": "2",
 					"accessCategories": ""
 				}
 			],
 			"data": [
 				{
-					"descriptor": "smartTV",
+					"descriptor": "Payment confirmation BAC Florida June-2016",
 					"attribute": "QmXVFStSMEcoAWPVKLrxJ8wf5ohn2UdmdAxcnfB8TtSAZG",
 					"flag": 0
 				},
 				{
-					"descriptor": "family_laptop",
+					"descriptor": "Loan ID 122235, Summary 2015",
 					"attribute": "QmSMWeGPjtgzQ75Y1YXbnC4uByni8bwHcB4vPXrPVcUTUM",
 					"flag": 0
 				}
 			]
 		},
 		{
-			"dimensionName": "FINANCE",
+			"dimensionName": "Car Loan Honda City FL",
 			"pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
 			"address": "",
 			"flag": 0,
@@ -2172,28 +2564,28 @@ class Assets extends Component {
 			"dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
 			"uniqueId": "9aaddf7caa690217bddc743102dc7e417608a93418ad5da2c0c82c501004f26f",
 			"owners": [
-				"59d110a3ab34a2ebd0ddb9d72ead24e8e906bebe794ea13c8c35b8a6c81314cd"
+				"Steve Smith"
 			],
 			"controllers": [
-				"a016d3445c892d76d9efc222d9598b4bfaf889ef5c5323c5cec67ab20c96c01c",
-				"16f121833eee6c25847aa9e63d4aa1b5cc2bf72d0d48f46ad25316b6e9bc5976"
+				"Steve Smith",
+				"BAC Florida"
 			],
 			"delegations": [
 				{
-					"owner": "COID_OWNER",
-					"delegatee": "03683536757fdb821c10810b51caa51a84fc1dfab5c17edbf5246f9713ffe31adf",
+					"owner": "Steve Smith",
+					"delegatee": "Moodys",
 					"amount": "2",
 					"accessCategories": ""
 				}
 			],
 			"data": [
 				{
-					"descriptor": "Bank Statement",
+					"descriptor": "Leasing Document Signed June-2015",
 					"attribute": "QmXVFStSMEcoAWPVKLrxJ8wf5ohn2UdmdAxcnfB8TtSAZG",
 					"flag": 0
 				},
 				{
-					"descriptor": "AMEX Payment history",
+					"descriptor": "Payment Confirmation Oct-2017",
 					"attribute": "QmSMWeGPjtgzQ75Y1YXbnC4uByni8bwHcB4vPXrPVcUTUM",
 					"flag": 0
 				}
@@ -2419,10 +2811,102 @@ class Assets extends Component {
 
 		//                      var delegatedDims = this.state.delegated_dims;
 
+		// let O = [{
+		// 	"asset_id": "Steve Smith", 
+		// 	"asset_details": {
+
+		let idims = [{
+			"dimension_id": "Mortgate Info Steve Smith",
+			"dimension_details": {
+
+				"dimensionName": "Mortgage History BAC Florida",
+				"pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+				"address": "",
+				"flag": 0,
+				"ID": 0,
+				"coidAddr": "E2B24811DB9B23DDEA8313D82D11A82014C8E3BC",
+				"dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
+				"uniqueId": "9aaddf7caa690217bddc743102dc7e417608a93418ad5da2c0c82c501004f26f",
+				"owners": [
+					"59d110a3ab34a2ebd0ddb9d72ead24e8e906bebe794ea13c8c35b8a6c81314cd"
+				],
+				"controllers": [
+					"Steve Smith",
+					"BAC Florida"
+				],
+				"delegations": [
+					{
+						"owner": "Steve Smith",
+						"delegatee": "Moodys",
+						"amount": "2",
+						"accessCategories": ""
+					}
+				],
+				"data": [
+					{
+						"descriptor": "Payment confirmation BAC Florida June-2016",
+						"attribute": "QmXVFStSMEcoAWPVKLrxJ8wf5ohn2UdmdAxcnfB8TtSAZG",
+						"flag": 0
+					},
+					{
+						"descriptor": "Loan ID 122235, Summary 2015",
+						"attribute": "QmSMWeGPjtgzQ75Y1YXbnC4uByni8bwHcB4vPXrPVcUTUM",
+						"flag": 0
+					}
+				]
+			}
+		},
+		{
+			"dimension_id": "Loan AAA Bundle Miami Fl",
+
+			"dimension_details": {
+				"dimensionName": "Car Loan Honda City FL",
+				"pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+				"address": "",
+				"flag": 0,
+				"ID": 0,
+				"coidAddr": "E2B24811DB9B23DDEA8313D82D11A82014C8E3BC",
+				"dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
+				"uniqueId": "9aaddf7caa690217bddc743102dc7e417608a93418ad5da2c0c82c501004f26f",
+				"owners": [
+					"Steve Smith"
+				],
+				"controllers": [
+					"Steve Smith",
+					"BAC Florida"
+				],
+				"delegations": [
+					{
+						"owner": "Steve Smith",
+						"delegatee": "Moodys",
+						"amount": "2",
+						"accessCategories": ""
+					}
+				],
+				"data": [
+					{
+						"descriptor": "Leasing Document Signed June-2015",
+						"attribute": "QmXVFStSMEcoAWPVKLrxJ8wf5ohn2UdmdAxcnfB8TtSAZG",
+						"flag": 0
+					},
+					{
+						"descriptor": "Payment Confirmation Oct-2017",
+						"attribute": "QmSMWeGPjtgzQ75Y1YXbnC4uByni8bwHcB4vPXrPVcUTUM",
+						"flag": 0
+					}
+				]
+			}
+		}]
+
+		this.setState({ delegated_dims: idims });
+
 		//                      delegatedDims[delegatedDims.length] = {
 		//                          dimension_id: dataResult.dimension.dimensionName,
 		//                          dimension_details: dataResult.dimension
 		//                      }
+
+
+
 		//                      this.setState({ delegated_dims: delegatedDims });
 
 		//                      console.log("dataResult get Dimension: \n " + JSON.stringify(dataResult))
@@ -2450,7 +2934,7 @@ class Assets extends Component {
 	}
 
 	dimensionHandler(dimension) {
-		console.log("dimension handler.. " + dimension)
+		console.log("dimension handler.. " + JSON.stringify(dimension))
 		var dimensionID = dimension.dimension_id
 		if (dimensionID) {
 			console.log("dimensionID: " + dimensionID)

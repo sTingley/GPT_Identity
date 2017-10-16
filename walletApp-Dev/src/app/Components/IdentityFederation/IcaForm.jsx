@@ -378,14 +378,6 @@ class IcaForm extends React.Component {
     };
 
 
-    renderNormalAsset() {
-
-    }
-
-    renderICA() {
-
-    }
-
 
     render() {
 
@@ -537,7 +529,7 @@ class IcaForm extends React.Component {
                 <h1>Create Asset Notary Attestation</h1>
                 <form method="POST" id="register" role="form">
                     <div className="form-group">
-                        <label htmlFor="assetID">Name Your Attestation. For example, 'I possess a graduate degree'</label>
+                        <label htmlFor="assetID">Name Your Attestation. For example, 'No delinquent mortgage payments'</label>
                         <TagsInput {...basicAttrs} value={this.state.assetID} onChange={(e) => { this.onFieldChange("assetID", e) }} />
                     </div>
                     <div className="form-group">
@@ -545,7 +537,8 @@ class IcaForm extends React.Component {
                         <select id="assetSelect" className="selectpicker show-tick" value={this.state.currentAsset} onChange={this.pickerChange}>
                             <option selected value="">--- Please select ---</option>
                             <optgroup label="Owned Assets">
-                                {(() => {
+                                <option>Honda Accord</option>
+                                {/* {(() => {
                                     if (this.state.owned_assets.length > 0) {
                                         return this.state.owned_assets.map((asset, i) => {
                                             //let val = label.split(',') //get rid of the .json
@@ -553,7 +546,7 @@ class IcaForm extends React.Component {
                                         })
                                     }
                                     else { return <option>No Owned Assets</option> }
-                                })(this)}
+                                })(this)} */}
                             </optgroup>
                         </select>
                     </div>

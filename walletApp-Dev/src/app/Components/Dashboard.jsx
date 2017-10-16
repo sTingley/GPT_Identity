@@ -1,16 +1,13 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { VictoryPie } from 'victory';
-import { VictoryChart } from 'victory';
-import { VictoryBar } from 'victory';
-import { VictoryTheme } from 'victory';
+import { VictoryPie, VictoryChart, VictoryBar, VictoryTheme, VictoryAxis } from 'victory';
 //import { VictoryLabel } from 'victory';
-import { VictoryAxis } from 'victory';
 import GoogleMapReact from 'google-map-react';
 // import Marker from 'react-google-maps';
 
 class Dashboard extends React.Component {
     render() {
+        
         var cardStyle1 = {
             width: '800px', marginTop: '30px'
 
@@ -53,18 +50,14 @@ class Dashboard extends React.Component {
             backgroundColor: '#aaaaaa',
             width: '103%',
             height: '300px',
-
-
         }
 
         let maprops = {
             center: { lat: 43.680039, lng: -79.417076 },
             zoom: 11,
-            title:'The marker`s title will appear as a tooltip.',
-            name:'SOMA',
-            position:{lat: 37.778519, lng: -122.405640}
-
-
+            title: 'The marker`s title will appear as a tooltip.',
+            name: 'SOMA',
+            position: { lat: 37.778519, lng: -122.405640 }
         };
 
         // const data = [
@@ -75,31 +68,33 @@ class Dashboard extends React.Component {
         // ];
 
         return (
-
+            
             <div>
+                <hr /><br/>
                 <div className="row">
 
                     <div className="col-xs-7">
 
                         <div style={cardStyle3} data-toggle="modal" data-target="#myModal">
                             High Risk
-                   <div style={cardNum1}> 08</div>
+                        <div style={cardNum1}> 08</div>
                         </div>
 
                         <div style={cardStyle4} data-toggle="modal" data-target="#myModal2">
                             Moderate Risk
-                   <div style={cardNum1}> 04</div>
+                        <div style={cardNum1}> 04</div>
                         </div>
 
                         <div style={cardStyle5} data-toggle="modal" data-target="#myModal3">
 
                             Low Risk
-                   <div style={cardNum1}> 02</div>
+                        <div style={cardNum1}> 02</div>
 
                         </div>
-
                     </div>
-                    <div className="col-xs-5 speedo-shadow"><img src="./img/screenshot2.png" style={cardStyle2} /></div>
+                    <div className="col-xs-5 speedo-shadow">
+                        <img src="/home/training/Desktop/Identity/GPT_Identity/walletApp-Dev/src/app/Components/screenshot2.png" style={cardStyle2} />
+                    </div>
 
                 </div><br></br>
 
@@ -107,14 +102,13 @@ class Dashboard extends React.Component {
                     <GoogleMapReact
                         center={maprops.center}
                         defaultZoom={maprops.zoom}
-                       
-                        
                     >
-                    {/* {props.isMarkerShown && <Marker position={{ lat: -34.397, lng: 150.644 }} />} */}
+
+                        {/* {props.isMarkerShown && <Marker position={{ lat: -34.397, lng: 150.644 }} />} */}
                     </GoogleMapReact>
                     {/* <Marker
                         /> */}
-                    
+
                 </div>
                 <div className="centered tooltip">
                     <span className="tooltiptext">#4a8s756haf</span>
@@ -144,7 +138,7 @@ class Dashboard extends React.Component {
                     <span className="tooltiptext">#89a8s756haf</span>
                 </div>
 
-                <div className="modal fade out" id="myModal" role="dialog"> 
+                <div className="modal fade out" id="myModal" role="dialog">
                     <div className="modal-dialog">
 
                         <div className="modal-content">
@@ -173,42 +167,25 @@ class Dashboard extends React.Component {
                                     theme={VictoryTheme.material}
                                     //padding={{ top: 80, bottom: 80 }}
                                     height={200}
-
                                     index={2}
-
-
                                 >
-
-
 
                                     <VictoryBar horizontal
                                         style={{
                                             data: { fill: "#c43a31" },
-
-
                                         }}
-
                                     />
-
 
                                     {/* <VictoryLabel 
    stlye={{data:{x:"x axis"},
    }}/> */}
-
                                     <VictoryAxis
-
                                         label="Destruction"
 
                                         style={{
-
                                             axis: { stroke: "#756f6a" },
-
                                             axisLabel: { fontSize: 10, padding: 30 },
-
-
-
                                             tickLabels: { padding: 5 }
-
                                         }}
 
                                     />
@@ -218,15 +195,9 @@ class Dashboard extends React.Component {
                                         label="Asset"
 
                                         style={{
-
                                             axis: { stroke: "#756f6a" },
-
                                             axisLabel: { fontSize: 10, padding: 30 },
-
-
-
                                             tickLabels: { padding: 5 }
-
                                         }}
 
                                     />
@@ -244,7 +215,6 @@ class Dashboard extends React.Component {
                 <div className="modal fade out" id="myModal2" role="dialog">
                     <div className="modal-dialog">
 
-
                         <div className="modal-content">
                             <div className="modal-header">
                                 <button type="button" className="close" data-dismiss="modal">&times;</button>
@@ -255,7 +225,6 @@ class Dashboard extends React.Component {
                                     <thead>
                                         <tr><th>Asset</th><th>Owner</th><th>Location</th></tr>
                                     </thead>
-
                                     <tbody>
                                         <tr>
                                             <td>12345</td>
@@ -271,57 +240,36 @@ class Dashboard extends React.Component {
                                     theme={VictoryTheme.material}
                                     //padding={{ top: 80, bottom: 80 }}
                                     height={200}
-
                                     index={2}
-
-
                                 >
-
-
 
                                     <VictoryBar horizontal
                                         style={{
                                             data: { fill: "#43a047" },
-
-
                                         }}
 
                                     />
-
 
                                     {/* <VictoryLabel 
    stlye={{data:{x:"x axis"},
    }}/> */}
 
                                     <VictoryAxis
-
                                         label="Destruction"
 
                                         style={{
-
                                             axis: { stroke: "#756f6a" },
-
                                             axisLabel: { fontSize: 10, padding: 30 },
-
                                             tickLabels: { padding: 5 },
-
-
                                         }}
-
                                     />
 
                                     <VictoryAxis dependentAxis
-
                                         label="Asset"
 
                                         style={{
-
                                             axis: { stroke: "#756f6a" },
-
                                             axisLabel: { fontSize: 10, padding: 30 },
-
-
-
                                             tickLabels: { padding: 5 }
 
                                         }}
@@ -367,62 +315,37 @@ class Dashboard extends React.Component {
                                     theme={VictoryTheme.material}
                                     //padding={{ top: 80, bottom: 80 }}
                                     height={200}
-
                                     index={2}
-
-
                                 >
-
-
 
                                     <VictoryBar horizontal
                                         style={{
                                             data: { fill: "#00acc1" },
-
-
                                         }}
-
                                     />
-
 
                                     {/* <VictoryLabel 
    stlye={{data:{x:"x axis"},
    }}/> */}
 
                                     <VictoryAxis
-
                                         label="Destruction"
 
                                         style={{
-
                                             axis: { stroke: "#756f6a" },
-
                                             axisLabel: { fontSize: 10, padding: 30 },
-
-
-
                                             tickLabels: { padding: 5 }
-
                                         }}
-
                                     />
 
                                     <VictoryAxis dependentAxis
-
                                         label="Asset"
 
                                         style={{
-
                                             axis: { stroke: "#756f6a" },
-
                                             axisLabel: { fontSize: 10, padding: 30 },
-
-
-
                                             tickLabels: { padding: 5 }
-
                                         }}
-
                                     />
                                 </VictoryChart>
                             </div>
@@ -432,7 +355,6 @@ class Dashboard extends React.Component {
                         </div>
                     </div>
                 </div>
-
 
             </div>
 

@@ -673,7 +673,8 @@ class MyGatekeeper extends React.Component {
 			if (inputValue == 'undefined') { inputValue = ""; }
 			var inputLength = inputValue.length || 0
 
-			let names = ["Moodys","Steve, CFA","Joe Schmo", "AuditBody1"];
+			let names = ["Moodys","Steve Smith CFA","Joe Schmo LLC", "AuditBody1", "Emily Lu", "Josh Phillips", "Aaron Bartwell"];
+
 
 			//NOTE: WE NEED TO CHANGES names back to 'that.state.names'
 			const suggestions = names.filter((name) => {
@@ -783,7 +784,7 @@ class MyGatekeeper extends React.Component {
 					<h1>Create Asset</h1>
 					<form method="POST" id="register" role="form">
 						<div className="form-group">
-							<label htmlFor="assetID">Notary Label. For example, 'My car'.</label>
+							<label htmlFor="assetID">Notary Label. For example, 'Mortgage'.</label>
 							<TagsInput {...basicAttrs} value={this.state.assetID} onChange={(e) => { this.onFieldChange("assetID", e) }} />
 						</div>
 

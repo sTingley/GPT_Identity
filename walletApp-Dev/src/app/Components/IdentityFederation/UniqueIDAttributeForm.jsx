@@ -7,16 +7,16 @@ class UniqueIDAttributeForm extends React.Component {
         this.maxAttributes = this.props.max;
     }
     renderIDF() {
-        return (<label htmlFor="unique_id_attrs"> Official IDs e.g. SSN, Passport, Driver's License, Digital retinal scans and/or digital fingerprints</label>)
+        return (<label htmlFor="unique_id_attrs">Official IDs e.g. SSN, Passport, Driver's License, Digital retinal scans and/or digital fingerprints</label>)
     }
     renderMyGK() {
-        return (<label htmlFor="unique_id_attrs"> Unique Identfiers e.g. Serial Numbers, MAC Addresses, Vehicle Identitfication Numbers</label>)
+        return (<label htmlFor="unique_id_attrs">Unique Identfiers e.g. Serial Numbers, MAC Addresses, Vehicle Identitfication Numbers</label>)
     }
     renderICA() {
-        return(<label htmlFor="unique_id_attrs">Clams e.g. "My payment history" or "My current vehicle inspection"</label>)
+        return(<label htmlFor="unique_id_attrs">Claims e.g. "My 120 day payment history"</label>)
     }
     renderMyCOID() {
-        return (<label htmlFor="unique_id_attrs"> Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research"</label>)
+        return (<label htmlFor="unique_id_attrs">Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research"</label>)
     }
     render() {
         console.log("UniqueIDAttributeForm props: " + JSON.stringify(this.props));

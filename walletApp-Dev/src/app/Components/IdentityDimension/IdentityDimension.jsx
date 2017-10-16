@@ -377,7 +377,6 @@ class IdentityDimensions extends Component {
 
         console.log("privacy Array: " + descrPrivacy);
 
-
         var objArray = [];
         for (var i = 0; i < attrs.length; i++) {
             let obj = {}
@@ -393,13 +392,15 @@ class IdentityDimensions extends Component {
         if (passBigchainObj.selectedIndex == 0) {
             alert('select one answer');
         }
-        if (passBigchainObj.selectedIndex == 1) {
+        //NOTE: WE ARE HARD CODING THIS TO 1 so we will pass the Bigchain object
+        //for the asset !!!!!!!!!!!!!!!!!
+        //if (passBigchainObj.selectedIndex == 1) {
             let objKYC = {};
             objKYC.descriptor = "bigchainID";
             objKYC.attribute = bigchainTrxnID;
             objKYC.flag = 0;
             objArray.push(objKYC);
-        }
+        //}
 
         //needed to stringify this obj Array for backend
         return JSON.stringify(objArray)
@@ -623,11 +624,15 @@ class IdentityDimensions extends Component {
         // GET PROPER DATA FROM SELECTED ASSET (we will pass owners to prepareDelegations)
         let selected_asset = this.state.currentAsset//$("#assetSelect option:selected").text();
 
-        let ICA_claim = document.getElementById("ICA");
-        if (ICA_claim.selectedIndex == 1) {
-            json.propType = 2;
-        }
-        else json.propType = 0;
+        // let ICA_claim = document.getElementById("ICA");
+        // if (ICA_claim.selectedIndex == 1) {
+        //     json.propType = 2;
+        // }
+        // else json.propType = 0;
+
+        //NOTE: WE NEED TO ADD THIS BACK IN AFTER THE VIDEO!!!!!!!!!!!!!!!
+        // -ST
+        json.propType = 0;
 
         let bigchainTrxnID; //we will pass this to prepareAttributes function
         this.state.own_assets.forEach(function (asset, index) {
@@ -780,57 +785,58 @@ class IdentityDimensions extends Component {
             if (inputValue == 'undefined') { inputValue = ""; }
             var inputLength = inputValue.length || 0
 
-            //const suggestions = that.state.names.filter((name) => {
-            // //console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
-            // //console.log(inputValue);
-            // var re = new RegExp(inputValue, "i");
-            // return (Boolean(name.slice(0, inputLength).search(re) + 1))
-            // //return (name.toLowerCase().slice(0, inputLength) === inputValue  || name.toUpperCase().slice(0, inputLength) === inputValue)
-            //})
-            ///////////////////////////////////////
+            let names = ["Moodys","Steve Smith CFA","Joe Schmo LLC", "AuditBody1"];
 
+            //PUT BACK IN 'that.state.names'
+            const suggestions = names.filter((name) => {
+            //console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
+            //console.log(inputValue);
+            var re = new RegExp(inputValue, "i");
+            return (Boolean(name.slice(0, inputLength).search(re) + 1))
+            //return (name.toLowerCase().slice(0, inputLength) === inputValue  || name.toUpperCase().slice(0, inputLength) === inputValue)
+            })
+            /////////////////////////////////////
 
-
-            // var value = String(that.state.value[Number(passed.id)]) || "";
-            // if (value == 'undefined') { value = ""; }
-            // //const suggestions = that.state.suggestions;
-            // console.log("passed ID: " + passed.id);
-            // console.log("suggestions: " + suggestions);
-            // console.log("value: " + value);
-            // const inputProps = {
-            //     placeholder: passed.placeholder,
-            //     value,
-            //     style: {
-            //         width: '30%',
-            //         height: '100%',
-            //         display: "initial"
-            //     },
-            //     onChange: handleOnChange,
-            //     onKeyPress: handleKeyPress,
-            //     className: "react-tagsinput-input",
-            //     id: passed.id
-            // };
-            // return (
-            //     <Autosuggest
-            //         id={passed.id}
-            //         ref={passed.ref}
-            //         suggestions={suggestions}
-            //         shouldRenderSuggestions={(value) => value.length > 0}
-            //         getSuggestionValue={(suggestion) => suggestion}
-            //         renderSuggestion={(suggestion) => <span>{suggestion}</span>}
-            //         inputProps={inputProps}
-            //         onSuggestionSelected={(e, { suggestion, method }) => {
-            //             console.log("SELECTED: " + method)
-            //             if (method == 'click') {
-            //                 addTag(suggestion)
-            //                 that.state.value[passed.id] = "";
-            //             }
-            //         }}
-            //         onSuggestionsClearRequested={() => { }}
-            //         onSuggestionsFetchRequested={() => { }}
-            //         renderInputComponent={renderInputComponent}
-            //     />
-            // )
+            var value = String(that.state.value[Number(passed.id)]) || "";
+            if (value == 'undefined') { value = ""; }
+            //const suggestions = that.state.suggestions;
+            console.log("passed ID: " + passed.id);
+            console.log("suggestions: " + suggestions);
+            console.log("value: " + value);
+            const inputProps = {
+                placeholder: passed.placeholder,
+                value,
+                style: {
+                    width: '30%',
+                    height: '100%',
+                    display: "initial"
+                },
+                onChange: handleOnChange,
+                onKeyPress: handleKeyPress,
+                className: "react-tagsinput-input",
+                id: passed.id
+            };
+            return (
+                <Autosuggest
+                    id={passed.id}
+                    ref={passed.ref}
+                    suggestions={suggestions}
+                    shouldRenderSuggestions={(value) => value.length > 0}
+                    getSuggestionValue={(suggestion) => suggestion}
+                    renderSuggestion={(suggestion) => <span>{suggestion}</span>}
+                    inputProps={inputProps}
+                    onSuggestionSelected={(e, { suggestion, method }) => {
+                        console.log("SELECTED: " + method)
+                        if (method == 'click') {
+                            addTag(suggestion)
+                            that.state.value[passed.id] = "";
+                        }
+                    }}
+                    onSuggestionsClearRequested={() => { }}
+                    onSuggestionsFetchRequested={() => { }}
+                    renderInputComponent={renderInputComponent}
+                />
+            )
         }
 
         var inputAttrs = {
@@ -863,7 +869,9 @@ class IdentityDimensions extends Component {
                         <h5><b>Select asset:</b></h5>
                         <select id="assetSelect" className="selectpicker show-tick" value={this.state.currentAsset} onChange={this.pickerChange}>
                             <optgroup label="Owned">
-                                {(() => {
+                                <option>Steve Smith</option>
+                                <option>Honda Accord</option>
+                                {/* {(() => {
                                     if (this.state.owned_assets_label.length > 0) {
                                         return this.state.owned_assets_label.map((label, i) => {
                                             //let val = label.split(',') //get rid of the .json
@@ -871,9 +879,9 @@ class IdentityDimensions extends Component {
                                         })
                                     }
                                     else { return <option>None</option> }
-                                })(this)}
+                                })(this)} */}
                             </optgroup>
-                            <optgroup label="Controlled">
+                            {/* <optgroup label="Controlled">
                                 {(() => {
                                     if (this.state.controlled_assets_label.length > 0) {
                                         return this.state.controlled_assets_label.map((label, i) => {
@@ -883,7 +891,7 @@ class IdentityDimensions extends Component {
                                     }
                                     else { return <option>None</option> }
                                 })(this)}
-                            </optgroup>
+                            </optgroup> */}
                         </select>
                     </div>
                     {/* select asset --- this should be passed from the screen */}
@@ -896,7 +904,7 @@ class IdentityDimensions extends Component {
                             </div>
 
 
-                            <div className="panel-group" id="accordion1">
+                            {/* <div className="panel-group" id="accordion1">
                                 <div className="panel panel-default">
                                     <div className="panel-heading">
                                         <div className="row">
@@ -934,14 +942,14 @@ class IdentityDimensions extends Component {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
 
                             <div className="panel-group" id="accordion2">
                                 <div className="panel panel-default">
                                     <div className="panel-heading">
                                         <div className="row">
                                             <div className="col-xs-11">
-                                                <label>Official (Unique) IDs</label>
+                                                <label>Repository Attributes</label>
                                             </div>
                                             <div className="col-xs-1">
                                                 <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">
@@ -959,7 +967,8 @@ class IdentityDimensions extends Component {
                                                         <DimensionAttributeForm handleShowModal={this.handleShowModal.bind(this)} max="10" key={input} labelref={input} />)}
                                                 </div>
                                                 <div className="form-group" id="unique_id_btn">
-                                                    <button type="button" className="btn btn-info pull-right" style={marginRight15} onClick={this.appendAttribute.bind(this)}>
+                                                    {/* onClick={this.appendAttribute.bind(this)} */}
+                                                    <button type="button" className="btn btn-info pull-right" style={marginRight15}>
                                                         <span className="glyphicon glyphicon-plus"></span>Add More
                                                     </button>
                                                 </div>
@@ -975,7 +984,7 @@ class IdentityDimensions extends Component {
                                     <div className="panel-heading">
                                         <div className="row">
                                             <div className="col-xs-11">
-                                                <label>Control</label>
+                                                <label>Delegations</label>
                                             </div>
                                             <div className="col-xs-1">
                                                 <a data-toggle="collapse" data-parent="#accordion" href="#collapse3">
@@ -993,7 +1002,8 @@ class IdentityDimensions extends Component {
                                                 </div>
                                                 <div className="form-group">
                                                     <div className="col-md-offset-6 col-md-6 ">
-                                                        <button type="button" className="btn btn-info pull-right" onClick={this.addController.bind(this)} style={marginRight15}>
+                                                        {/* onClick={this.addController.bind(this)} */}
+                                                        <button type="button" className="btn btn-info pull-right" style={marginRight15}>
                                                             <span className="glyphicon glyphicon-plus"></span>Add More
                                                         </button>
                                                     </div>
@@ -1010,7 +1020,7 @@ class IdentityDimensions extends Component {
                                     <div className="panel-heading">
                                         <div className="row">
                                             <div className="col-xs-11">
-                                                <label>Delegations</label>
+                                                <label>One-Time or Temporary Delegations</label>
                                             </div>
                                             <div className="col-xs-1">
                                                 <a data-toggle="collapse" data-parent="#accordion" href="#collapse4">
@@ -1023,7 +1033,7 @@ class IdentityDimensions extends Component {
                                         <div className="panel-body">
                                             <div className="row">
                                                 <div className="form-group">
-                                                    <label htmlFor="control_dist">with whom would you like to share your persona and how many times should that person be able to access?</label>
+                                                    <label htmlFor="control_dist">Share this data repository with a 3rd party? How often?</label>
                                                     {this.state.delegations.map((input, i) =>
                                                         <DimensionDelegationForm attr={this.state.suggest_attrs[i]} max="10" key={input} labelref={input} autocompleteRenderInput={autocompleteRenderInput} deleValue={this.state.deleValue[i]} deleToken={this.state.deleToken[i]} passedFunction={(e) => { this.onFieldChange2("deleValue," + i, e) }} passedFunction2={(e) => { this.onFieldChange2("deleToken," + i, e) }} />)}
                                                 </div>
@@ -1044,7 +1054,8 @@ class IdentityDimensions extends Component {
 
                             <div className="form-group">
                                 <div className="col-sm-6">
-                                    <button className="btn btn-primary" data-loading-text="Submit" name="submit-form" type="button" onClick={this.createDimension.bind(this)}>Create</button>
+                                    {/* onClick={this.createDimension.bind(this)} */}
+                                    <button className="btn btn-primary" data-loading-text="Submit" name="submit-form" type="button">Create</button>
                                 </div>
                             </div>
                         </form>

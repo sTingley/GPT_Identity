@@ -20,7 +20,7 @@ import ToVote from './Components/ToVote.jsx';
 import Notifications from './Components/Notifications.jsx';
 import Assets from './Components/Assets.jsx';
 import Dashboard from './Components/Dashboard.jsx';
-//import AssetUtilities from './Components/AssetUtilities';
+import AssetUtilities from '/home/training/Desktop/Identity/GPT_Identity/walletApp-Dev/src/app/Components/AssetUtilities.jsx';
 import MyCOID from './Components/MyCOID.jsx';
 import IdentityDimension from './Components/IdentityDimension/IdentityDimension.jsx';
 import Documents from './Components/Documents.jsx';
@@ -90,7 +90,7 @@ render((
 			<Route path="identity" component={CoreIdentity} onEnter={validateLogin} />
 			<Route path="assets" component={Assets} onEnter={validateLogin} />
 			<Route path="dashboard" component={Dashboard} onEnter={validateLogin} />
-			{/* <Route path="assetUtilities" component={AssetUtilities} onEnter={validateLogin}/> */}
+			<Route path="assetUtilities" component={AssetUtilities} onEnter={validateLogin}/>
 			<Route path="docs" component={Documents} onEnter={validateLogin} />
 			<Route path="myGateKeeper" component={MyGateKeeper} onEnter={validateLogin} />
 			<Route path="icaForm" component={IcaForm} onEnter={validateLogin} />

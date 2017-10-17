@@ -30,6 +30,7 @@ class Menu extends React.Component {
 					{prop.loggedin ? <li><Link to='/dashboard' activeClassName="active">Investor Dashboard</Link></li> : ''}
 					{/* {prop.loggedin ? <li><Link to='/docs' activeClassName="active">My Documents</Link></li> : ''} */}
 					{prop.loggedin ? <li><Link to='/notifications' activeClassName="active">Notifications</Link></li> : ''}
+					{/* {prop.loggedin ? <li><Link to='/assetUtilities' activeClassName="active">Asset Utilities</Link></li> : ''} */}
 					{prop.loggedin ? <li><Link to='/mycoreidentity' activeClassName="active">Manage Identities and Assets</Link></li> : ''}
 				</ul>
 			</div>

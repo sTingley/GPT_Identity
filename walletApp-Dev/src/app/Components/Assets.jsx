@@ -1770,58 +1770,13 @@ class Modal extends Component {
 
 								<div id="menu4" className="tab-pane">
 
-
-											
-
 									<div id="SubmitContainer">
-
-										
 										<form method="POST" id="register" role="form">
-										<div className="form-group">
-									<label htmlFor="dimensionName">Data Repository name:</label>
-									<input name="dimensionName" className="form-control col-md-4" type="text" placeholder="Dimension Name"/><hr/>
-									</div><hr/>
 
-											{/* <div className="panel-group" id="accordion1">
-                                <div className="panel panel-default">
-                                    <div className="panel-heading">
-                                        <div className="row">
-                                            <div className="col-xs-11">
-                                                <label>Describe this persona</label>
-                                            </div>
-                                            <div className="col-xs-1">
-                                                <a data-toggle="collapse" data-parent="#accordion" href="#collapse1">
-                                                    <span className="glyphicon glyphicon-chevron-down"></span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div id="collapse1" className="panel-collapse collapse out">
-                                        <div className="panel-body">
-                                            <div className="row">
-                                                <div className="form-group">
-                                                    <label>Is this persona for sharing attested identity claims (stored in BigchainDB) with others?</label>
-                                                    <select id="passBigchainID">
-                                                        <option value="selectOption">--- Please select ---</option>
-                                                        <option value="Yes">Yes</option>
-                                                        <option value="No">No</option>
-                                                    </select>
-                                                </div>
-                                                <div className="form-group">
-                                                    <label>Allow shared identity claims tokens to be signed by the party with whom the token was shared?</label>
-                                                    <select id="ICA">
-                                                        <option value="selectOption">--- Please select ---</option>
-                                                        <option value="Yes">Yes</option>
-                                                        <option value="No">No</option>
-                                                    </select>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> */}
-
+											<div className="form-group">
+												<label htmlFor="dimensionName">Data Repository name:</label>
+												<input name="dimensionName" className="form-control col-md-4" type="text" placeholder="Dimension Name" /><hr />
+											</div><hr />
 											<div className="panel-group" id="accordion2A">
 												<div className="panel panel-default">
 													<div className="panel-heading">
@@ -1848,7 +1803,7 @@ class Modal extends Component {
 																	{/* onClick={this.appendAttribute.bind(this)} */}
 																	<button type="button" className="btn-sm btn-info pull-right" style={marginRight15}>
 																		<span className="glyphicon glyphicon-plus"></span>Add More
-                                                    </button>
+                                                    				</button>
 																</div>
 
 															</div>
@@ -1930,10 +1885,10 @@ class Modal extends Component {
 												</div>
 											</div>
 											<div className="form-group">
-													{/* onClick={this.createDimension.bind(this)} */}
-													<button className="btn btn-primary" data-loading-text="Submit" name="submit-form" type="button">Create</button>
+												{/* onClick={this.createDimension.bind(this)} */}
+												<button className="btn btn-primary" data-loading-text="Submit" name="submit-form" type="button">Create</button>
 											</div>
-											
+
 
 										</form>
 
@@ -2927,10 +2882,14 @@ class Assets extends Component {
 
 
 	assetHandler(asset) {
-		var assetID = asset.asset_id;
-		if (assetID) {
-			this.setState({ showDetails: true, active_asset: asset });
-		}
+		// var assetID = asset.asset_id;
+		// if (assetID) {
+		// 	this.setState({ showDetails: true, active_asset: asset });
+		// }
+		/*NOW WE NEED TO WRITE TO LOCAL STORAGE BRIEFLY n change screens,
+		when we get to the new screen we will use local storage to get proper asset
+		and associated dimensions*/
+		this.props.history.push('/assetUtilities');
 	}
 
 	dimensionHandler(dimension) {

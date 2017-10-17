@@ -988,7 +988,7 @@ class MyGatekeeper extends React.Component {
 							<br />
 							<input className="form-control" ref="signature" type="hidden" value={this.state.signature} />
 							<input type="hidden" name="pubkey" ref="pubKey" value={localStorage.getItem("pubKey")} />
-							<button className="btn-md btn-primary pull-right" data-loading-text="Submit Identity" name="submit-form" type="button" onClick={this.submitCoid.bind(this)}>Submit Identity</button>
+							<button className="btn btn-primary pull-right" data-loading-text="Submit Identity" name="submit-form" type="button" onClick={this.submitCoid.bind(this)}>Submit Identity</button>
 						</div>
 					</form>
 					{this.state.showModal ? <UploadIpfsFile pubKey={this.state.pubKey} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}

@@ -612,7 +612,7 @@ class IcaForm extends React.Component {
                     <div className="form-group">
                         <input type="hidden" ref="signature" value={this.state.signature} />
                         <input type="hidden" name="pubkey" ref="pubKey" value={localStorage.getItem("pubKey")} />
-                        <button className="btn-med btn-primary pull-right" data-loading-text="Submit Identity" name="submit-form" type="button" onClick={this.submitCoid.bind(this)}>Submit</button>
+                        <button className="btn btn-primary pull-right" data-loading-text="Submit Identity" name="submit-form" type="button" onClick={this.submitCoid.bind(this)}>Submit</button>
                     </div>
                 </form>
                 {this.state.showModal ? <UploadIpfsFile pubKey={this.state.pubKey} dataHandler={this.getFileDetails.bind(this)} handleHideModal={this.handleHideModal} /> : null}

@@ -95,27 +95,31 @@
 	
 	var _Dashboard2 = _interopRequireDefault(_Dashboard);
 	
-	var _MyCOID = __webpack_require__(/*! ./Components/MyCOID.jsx */ 834);
+	var _AssetUtilities = __webpack_require__(/*! ./src/app/Components/AssetUtilities.jsx */ 834);
+	
+	var _AssetUtilities2 = _interopRequireDefault(_AssetUtilities);
+	
+	var _MyCOID = __webpack_require__(/*! ./Components/MyCOID.jsx */ 835);
 	
 	var _MyCOID2 = _interopRequireDefault(_MyCOID);
 	
-	var _IdentityDimension = __webpack_require__(/*! ./Components/IdentityDimension/IdentityDimension.jsx */ 835);
+	var _IdentityDimension = __webpack_require__(/*! ./Components/IdentityDimension/IdentityDimension.jsx */ 836);
 	
 	var _IdentityDimension2 = _interopRequireDefault(_IdentityDimension);
 	
-	var _Documents = __webpack_require__(/*! ./Components/Documents.jsx */ 836);
+	var _Documents = __webpack_require__(/*! ./Components/Documents.jsx */ 837);
 	
 	var _Documents2 = _interopRequireDefault(_Documents);
 	
-	var _MyGatekeeper = __webpack_require__(/*! ./Components/IdentityFederation/MyGatekeeper.jsx */ 837);
+	var _MyGatekeeper = __webpack_require__(/*! ./Components/IdentityFederation/MyGatekeeper.jsx */ 838);
 	
 	var _MyGatekeeper2 = _interopRequireDefault(_MyGatekeeper);
 	
-	var _IcaForm = __webpack_require__(/*! ./Components/IdentityFederation/IcaForm.jsx */ 838);
+	var _IcaForm = __webpack_require__(/*! ./Components/IdentityFederation/IcaForm.jsx */ 839);
 	
 	var _IcaForm2 = _interopRequireDefault(_IcaForm);
 	
-	var _Attestations = __webpack_require__(/*! ./Components/Attestations.jsx */ 839);
+	var _Attestations = __webpack_require__(/*! ./Components/Attestations.jsx */ 840);
 	
 	var _Attestations2 = _interopRequireDefault(_Attestations);
 	
@@ -136,8 +140,6 @@
 	// TODO: Asset menu only applicable for logged in users, this will be taking care once the functionality get done
 	
 	//import NameRegister from './Components/NameRegister.jsx';
-	
-	//import AssetUtilities from './Components/AssetUtilities';
 	
 	
 	var App = function (_React$Component) {
@@ -224,6 +226,7 @@
 			_react2.default.createElement(_reactRouter.Route, { path: 'identity', component: _CoreIdentityForm2.default, onEnter: validateLogin }),
 			_react2.default.createElement(_reactRouter.Route, { path: 'assets', component: _Assets2.default, onEnter: validateLogin }),
 			_react2.default.createElement(_reactRouter.Route, { path: 'dashboard', component: _Dashboard2.default, onEnter: validateLogin }),
+			_react2.default.createElement(_reactRouter.Route, { path: 'assetUtilities', component: _AssetUtilities2.default, onEnter: validateLogin }),
 			_react2.default.createElement(_reactRouter.Route, { path: 'docs', component: _Documents2.default, onEnter: validateLogin }),
 			_react2.default.createElement(_reactRouter.Route, { path: 'myGateKeeper', component: _MyGatekeeper2.default, onEnter: validateLogin }),
 			_react2.default.createElement(_reactRouter.Route, { path: 'icaForm', component: _IcaForm2.default, onEnter: validateLogin }),
@@ -28606,7 +28609,7 @@
   \***************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -28618,8 +28621,6 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _reactRouter = __webpack_require__(/*! react-router */ 184);
-	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -28627,6 +28628,8 @@
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	//import { Link } from 'react-router';
 	
 	var Header = function (_React$Component) {
 	  _inherits(Header, _React$Component);
@@ -28638,153 +28641,46 @@
 	  }
 	
 	  _createClass(Header, [{
-	    key: 'render',
+	    key: "render",
 	    value: function render() {
-	      var prop = this.props;
+	      //var prop = this.props;
 	      return _react2.default.createElement(
-	        'nav',
-	        { className: 'navbar navbar-default navbar-fixed-top' },
+	        "nav",
+	        { className: "navbar navbar-default navbar-fixed-top" },
 	        _react2.default.createElement(
-	          'div',
-	          { className: 'container-fluid' },
+	          "div",
+	          { className: "container-fluid" },
 	          _react2.default.createElement(
-	            'div',
-	            { className: 'navbar-header' },
+	            "div",
+	            { className: "navbar-header" },
 	            _react2.default.createElement(
-	              'button',
-	              { type: 'button', className: 'navbar-toggle collapsed', 'data-toggle': 'collapse', 'data-target': '#navbar', 'aria-expanded': 'false', 'aria-controls': 'navbar' },
+	              "button",
+	              { type: "button", className: "navbar-toggle collapsed", "data-toggle": "collapse", "data-target": "#navbar", "aria-expanded": "false", "aria-controls": "navbar" },
 	              _react2.default.createElement(
-	                'span',
-	                { className: 'sr-only' },
-	                'Toggle navigation'
+	                "span",
+	                { className: "sr-only" },
+	                "Toggle navigation"
 	              ),
-	              _react2.default.createElement('span', { className: 'icon-bar' }),
-	              _react2.default.createElement('span', { className: 'icon-bar' }),
-	              _react2.default.createElement('span', { className: 'icon-bar' })
+	              _react2.default.createElement("span", { className: "icon-bar" }),
+	              _react2.default.createElement("span", { className: "icon-bar" }),
+	              _react2.default.createElement("span", { className: "icon-bar" })
 	            ),
 	            _react2.default.createElement(
-	              'a',
-	              { className: 'navbar-brand', href: '#' },
-	              'Your Moody\'s Membership Wallet'
+	              "a",
+	              { className: "navbar-brand", href: "#" },
+	              "Your Moody's Membership Wallet"
 	            )
 	          ),
 	          _react2.default.createElement(
-	            'div',
-	            { id: 'navbar', className: 'navbar-collapse collapse' },
+	            "ul",
+	            { className: "nav navbar-nav navbar-right" },
 	            _react2.default.createElement(
-	              'ul',
-	              { className: 'nav navbar-nav hidden-lg' },
+	              "li",
+	              null,
 	              _react2.default.createElement(
-	                'li',
-	                null,
-	                _react2.default.createElement(
-	                  _reactRouter.Link,
-	                  { to: '/home', activeClassName: 'active' },
-	                  'Home'
-	                )
-	              ),
-	              _react2.default.createElement(
-	                'li',
-	                null,
-	                _react2.default.createElement(
-	                  _reactRouter.Link,
-	                  { to: '/upload', activeClassName: 'active' },
-	                  'Upload Keys'
-	                )
-	              ),
-	              prop.loggedin ? _react2.default.createElement(
-	                'li',
-	                null,
-	                _react2.default.createElement(
-	                  _reactRouter.Link,
-	                  { to: '/tovote', activeClassName: 'active' },
-	                  'Vote'
-	                )
-	              ) : '',
-	              prop.loggedin ? _react2.default.createElement(
-	                'li',
-	                null,
-	                _react2.default.createElement(
-	                  _reactRouter.Link,
-	                  { to: '/notifications', activeClassName: 'active' },
-	                  'Notifications'
-	                )
-	              ) : '',
-	              prop.loggedin ? _react2.default.createElement(
-	                'li',
-	                null,
-	                _react2.default.createElement(
-	                  _reactRouter.Link,
-	                  { to: '/register', activeClassName: 'active' },
-	                  'Name Register'
-	                )
-	              ) : '',
-	              prop.loggedin ? _react2.default.createElement(
-	                'li',
-	                null,
-	                _react2.default.createElement(
-	                  _reactRouter.Link,
-	                  { to: '/identity', activeClassName: 'active' },
-	                  'Core Identity'
-	                )
-	              ) : '',
-	              prop.loggedin ? _react2.default.createElement(
-	                'li',
-	                null,
-	                _react2.default.createElement(
-	                  _reactRouter.Link,
-	                  { to: '/assets', activeClassName: 'active' },
-	                  'Assets'
-	                )
-	              ) : '',
-	              prop.loggedin ? _react2.default.createElement(
-	                'li',
-	                null,
-	                _react2.default.createElement(
-	                  _reactRouter.Link,
-	                  { to: '/docs', activeClassName: 'active' },
-	                  'My Documents'
-	                )
-	              ) : '',
-	              prop.loggedin ? _react2.default.createElement(
-	                'li',
-	                null,
-	                _react2.default.createElement(
-	                  _reactRouter.Link,
-	                  { to: '/myGatekeeper', activeClassName: 'active' },
-	                  'My Gatekeeper'
-	                )
-	              ) : '',
-	              prop.loggedin ? _react2.default.createElement(
-	                'li',
-	                null,
-	                _react2.default.createElement(
-	                  _reactRouter.Link,
-	                  { to: '/mycoreidentity', activeClassName: 'active' },
-	                  'My Core Identity'
-	                )
-	              ) : '',
-	              prop.loggedin ? _react2.default.createElement(
-	                'li',
-	                null,
-	                _react2.default.createElement(
-	                  _reactRouter.Link,
-	                  { to: '/identitydimension', activeClassName: 'active' },
-	                  'Identity Dimensions'
-	                )
-	              ) : ''
-	            ),
-	            _react2.default.createElement(
-	              'ul',
-	              { className: 'nav navbar-nav navbar-right' },
-	              _react2.default.createElement(
-	                'li',
-	                null,
-	                _react2.default.createElement(
-	                  'a',
-	                  { href: 'http://www.tcs.com' },
-	                  'Powered by TCS, Monax, BigChainDB and IPFS'
-	                )
+	                "a",
+	                { href: "http://www.tcs.com" },
+	                "Powered by TCS, Monax, BigChainDB and IPFS"
 	              )
 	            )
 	          )
@@ -28797,6 +28693,23 @@
 	}(_react2.default.Component);
 	
 	exports.default = Header;
+	
+	
+	{/* <div id="navbar" className="navbar-collapse collapse">
+	   <ul className="nav navbar-nav hidden-lg">
+	     <li><Link to='/home' activeClassName="active">Home</Link></li>
+	     <li><Link to='/upload' activeClassName="active">Upload Keys</Link></li>
+	     {prop.loggedin ? <li><Link to='/tovote' activeClassName="active">Vote</Link></li> : ''}
+	     {prop.loggedin ? <li><Link to='/notifications' activeClassName="active">Notifications</Link></li> : ''}
+	     {prop.loggedin ? <li><Link to='/register' activeClassName="active">Name Register</Link></li> : ''}
+	     {prop.loggedin ? <li><Link to='/identity' activeClassName="active">Core Identity</Link></li> : ''}
+	     {prop.loggedin ? <li><Link to='/assets' activeClassName="active">Assets</Link></li> : ''}
+	     {prop.loggedin ? <li><Link to='/docs' activeClassName="active">My Documents</Link></li> : ''}
+	     {prop.loggedin ? <li><Link to='/myGatekeeper' activeClassName="active">My Gatekeeper</Link></li> : ''}
+	     {prop.loggedin ? <li><Link to='/mycoreidentity' activeClassName="active">My Core Identity</Link></li> : ''}
+	     {prop.loggedin ? <li><Link to='/identitydimension' activeClassName='active'>Identity Dimensions</Link></li> : ''}
+	   </ul>
+	  </div> */}
 
 /***/ }),
 /* 249 */
@@ -50934,7 +50847,7 @@
 							_react2.default.createElement('input', { type: 'hidden', name: 'pubkey', ref: 'pubKey', value: localStorage.getItem("pubKey") }),
 							_react2.default.createElement(
 								'button',
-								{ className: 'btn-md btn-primary', 'data-loading-text': 'Submit Identity', name: 'submit-form', type: 'button', onClick: this.submitCoid.bind(this) },
+								{ className: 'btn btn-primary', 'data-loading-text': 'Submit Identity', name: 'submit-form', type: 'button', onClick: this.submitCoid.bind(this) },
 								'Submit'
 							)
 						)
@@ -61424,10 +61337,14 @@
 		}, {
 			key: 'assetHandler',
 			value: function assetHandler(asset) {
-				var assetID = asset.asset_id;
-				if (assetID) {
-					this.setState({ showDetails: true, active_asset: asset });
-				}
+				// var assetID = asset.asset_id;
+				// if (assetID) {
+				// 	this.setState({ showDetails: true, active_asset: asset });
+				// }
+				/*NOW WE NEED TO WRITE TO LOCAL STORAGE BRIEFLY n change screens,
+	   when we get to the new screen we will use local storage to get proper asset
+	   and associated dimensions*/
+				this.props.history.push('/assetUtilities');
 			}
 		}, {
 			key: 'dimensionHandler',
@@ -104640,6 +104557,61 @@
 
 /***/ }),
 /* 834 */
+/*!***********************************************!*\
+  !*** ./src/app/Components/AssetUtilities.jsx ***!
+  \***********************************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var AssetUtilities = function (_React$Component) {
+	    _inherits(AssetUtilities, _React$Component);
+	
+	    function AssetUtilities(props) {
+	        _classCallCheck(this, AssetUtilities);
+	
+	        var _this = _possibleConstructorReturn(this, (AssetUtilities.__proto__ || Object.getPrototypeOf(AssetUtilities)).call(this, props));
+	
+	        _this.state = {};
+	        return _this;
+	    }
+	
+	    _createClass(AssetUtilities, [{
+	        key: 'render',
+	        value: function render() {
+	            return _react2.default.createElement(
+	                'label',
+	                null,
+	                'Asset Utilities'
+	            );
+	        }
+	    }]);
+	
+	    return AssetUtilities;
+	}(_react2.default.Component);
+	
+	exports.default = AssetUtilities;
+
+/***/ }),
+/* 835 */
 /*!***************************************!*\
   !*** ./src/app/Components/MyCOID.jsx ***!
   \***************************************/
@@ -106235,7 +106207,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../../~/buffer/index.js */ 251).Buffer))
 
 /***/ }),
-/* 835 */
+/* 836 */
 /*!********************************************************************!*\
   !*** ./src/app/Components/IdentityDimension/IdentityDimension.jsx ***!
   \********************************************************************/
@@ -107519,7 +107491,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../../../~/buffer/index.js */ 251).Buffer))
 
 /***/ }),
-/* 836 */
+/* 837 */
 /*!******************************************!*\
   !*** ./src/app/Components/Documents.jsx ***!
   \******************************************/
@@ -107928,7 +107900,7 @@
 	exports.default = Documents;
 
 /***/ }),
-/* 837 */
+/* 838 */
 /*!****************************************************************!*\
   !*** ./src/app/Components/IdentityFederation/MyGatekeeper.jsx ***!
   \****************************************************************/
@@ -109301,7 +109273,7 @@
 							_react2.default.createElement('input', { type: 'hidden', name: 'pubkey', ref: 'pubKey', value: localStorage.getItem("pubKey") }),
 							_react2.default.createElement(
 								'button',
-								{ className: 'btn-md btn-primary pull-right', 'data-loading-text': 'Submit Identity', name: 'submit-form', type: 'button', onClick: this.submitCoid.bind(this) },
+								{ className: 'btn btn-primary pull-right', 'data-loading-text': 'Submit Identity', name: 'submit-form', type: 'button', onClick: this.submitCoid.bind(this) },
 								'Submit Identity'
 							)
 						)
@@ -109319,7 +109291,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../../../~/buffer/index.js */ 251).Buffer))
 
 /***/ }),
-/* 838 */
+/* 839 */
 /*!***********************************************************!*\
   !*** ./src/app/Components/IdentityFederation/IcaForm.jsx ***!
   \***********************************************************/
@@ -110133,7 +110105,7 @@
 	                        _react2.default.createElement('input', { type: 'hidden', name: 'pubkey', ref: 'pubKey', value: localStorage.getItem("pubKey") }),
 	                        _react2.default.createElement(
 	                            'button',
-	                            { className: 'btn-med btn-primary pull-right', 'data-loading-text': 'Submit Identity', name: 'submit-form', type: 'button', onClick: this.submitCoid.bind(this) },
+	                            { className: 'btn btn-primary pull-right', 'data-loading-text': 'Submit Identity', name: 'submit-form', type: 'button', onClick: this.submitCoid.bind(this) },
 	                            'Submit'
 	                        )
 	                    )
@@ -110151,7 +110123,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../../../~/buffer/index.js */ 251).Buffer))
 
 /***/ }),
-/* 839 */
+/* 840 */
 /*!*********************************************!*\
   !*** ./src/app/Components/Attestations.jsx ***!
   \*********************************************/

@@ -16,7 +16,7 @@ class UploadKeyStore extends React.Component {
 
 	//puts the users keys into local storage
 	createStorage(pubKey, private_key) {
-		localStorage.setItem("pubKey", pubKey);
+		localStorage.setItem("pubKey", '0x'+pubKey);
 		localStorage.setItem("privKey", private_key);
 		var now = new Date();
 		now.setMinutes(now.getMinutes() + 30);

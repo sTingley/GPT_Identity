@@ -2,6 +2,8 @@
 //yes for passBigchainID, no for signing (div id="ICA")
 
 
+//ID: IDENTITY DIMENSION CHOICES
+
 {/* <div className="panel-group" id="accordion1">
     <div className="panel panel-default">
         <div className="panel-heading">

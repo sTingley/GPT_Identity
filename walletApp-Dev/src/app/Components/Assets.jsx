@@ -2882,13 +2882,16 @@ class Assets extends Component {
 
 
 	assetHandler(asset) {
-		// var assetID = asset.asset_id;
+		var assetID = asset.asset_id;
 		// if (assetID) {
 		// 	this.setState({ showDetails: true, active_asset: asset });
 		// }
+
+		localStorage.setItem("selectedAsset", JSON.stringify(asset));
 		/*NOW WE NEED TO WRITE TO LOCAL STORAGE BRIEFLY n change screens,
 		when we get to the new screen we will use local storage to get proper asset
 		and associated dimensions*/
+		
 		this.props.history.push('/assetUtilities');
 	}
 

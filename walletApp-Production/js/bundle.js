@@ -95,7 +95,7 @@
 	
 	var _Dashboard2 = _interopRequireDefault(_Dashboard);
 	
-	var _AssetUtilities = __webpack_require__(/*! ./src/app/Components/AssetUtilities.jsx */ 834);
+	var _AssetUtilities = __webpack_require__(/*! ./Components/AssetUtilities.jsx */ 834);
 	
 	var _AssetUtilities2 = _interopRequireDefault(_AssetUtilities);
 	
@@ -43713,29 +43713,34 @@
 /***/ (function(module, exports) {
 
 	module.exports = {
-		"_from": "elliptic@^6.2.3",
+		"_args": [
+			[
+				"elliptic@6.4.0",
+				"/Users/Spencer/Desktop/GPT_Identity/walletApp-Dev"
+			]
+		],
+		"_from": "elliptic@6.4.0",
 		"_id": "elliptic@6.4.0",
 		"_inBundle": false,
 		"_integrity": "sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=",
 		"_location": "/elliptic",
 		"_phantomChildren": {},
 		"_requested": {
-			"type": "range",
+			"type": "version",
 			"registry": true,
-			"raw": "elliptic@^6.2.3",
+			"raw": "elliptic@6.4.0",
 			"name": "elliptic",
 			"escapedName": "elliptic",
-			"rawSpec": "^6.2.3",
+			"rawSpec": "6.4.0",
 			"saveSpec": null,
-			"fetchSpec": "^6.2.3"
+			"fetchSpec": "6.4.0"
 		},
 		"_requiredBy": [
 			"/secp256k1"
 		],
 		"_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
-		"_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
-		"_spec": "elliptic@^6.2.3",
-		"_where": "/home/training/Desktop/Identity/GPT_Identity/walletApp-Dev/node_modules/secp256k1",
+		"_spec": "6.4.0",
+		"_where": "/Users/Spencer/Desktop/GPT_Identity/walletApp-Dev",
 		"author": {
 			"name": "Fedor Indutny",
 			"email": "fedor@indutny.com"
@@ -43743,7 +43748,6 @@
 		"bugs": {
 			"url": "https://github.com/indutny/elliptic/issues"
 		},
-		"bundleDependencies": false,
 		"dependencies": {
 			"bn.js": "^4.4.0",
 			"brorand": "^1.0.1",
@@ -43753,7 +43757,6 @@
 			"minimalistic-assert": "^1.0.0",
 			"minimalistic-crypto-utils": "^1.0.0"
 		},
-		"deprecated": false,
 		"description": "EC cryptography",
 		"devDependencies": {
 			"brfs": "^1.4.3",
@@ -54015,7 +54018,7 @@
 		_createClass(UploadKeyStore, [{
 			key: "createStorage",
 			value: function createStorage(pubKey, private_key) {
-				localStorage.setItem("pubKey", pubKey);
+				localStorage.setItem("pubKey", '0x' + pubKey);
 				localStorage.setItem("privKey", private_key);
 				var now = new Date();
 				now.setMinutes(now.getMinutes() + 30);
@@ -61337,13 +61340,16 @@
 		}, {
 			key: 'assetHandler',
 			value: function assetHandler(asset) {
-				// var assetID = asset.asset_id;
+				var assetID = asset.asset_id;
 				// if (assetID) {
 				// 	this.setState({ showDetails: true, active_asset: asset });
 				// }
+	
+				localStorage.setItem("selectedAsset", JSON.stringify(asset));
 				/*NOW WE NEED TO WRITE TO LOCAL STORAGE BRIEFLY n change screens,
 	   when we get to the new screen we will use local storage to get proper asset
 	   and associated dimensions*/
+	
 				this.props.history.push('/assetUtilities');
 			}
 		}, {
@@ -104562,11 +104568,15 @@
   \***********************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
@@ -104574,33 +104584,1034 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
+	var _AssetTable = __webpack_require__(/*! ./IdentityFederation/AssetTable.jsx */ 841);
+	
+	var _AssetTable2 = _interopRequireDefault(_AssetTable);
+	
+	var _reactDayPicker = __webpack_require__(/*! react-day-picker */ 390);
+	
+	var _reactDayPicker2 = _interopRequireDefault(_reactDayPicker);
+	
+	var _reactTagsinput = __webpack_require__(/*! react-tagsinput */ 370);
+	
+	var _reactTagsinput2 = _interopRequireDefault(_reactTagsinput);
+	
+	var _TokenDistributionForm = __webpack_require__(/*! ./TokenDistributionForm.jsx */ 418);
+	
+	var _TokenDistributionForm2 = _interopRequireDefault(_TokenDistributionForm);
+	
+	var _UniqueIDAttributeForm = __webpack_require__(/*! ./IdentityFederation/UniqueIDAttributeForm.jsx */ 387);
+	
+	var _UniqueIDAttributeForm2 = _interopRequireDefault(_UniqueIDAttributeForm);
+	
+	var _DimensionAttributeForm = __webpack_require__(/*! ./IdentityDimension/DimensionAttributeForm.jsx */ 419);
+	
+	var _DimensionAttributeForm2 = _interopRequireDefault(_DimensionAttributeForm);
+	
+	var _DimensionDelegationForm = __webpack_require__(/*! ./IdentityDimension/DimensionDelegationForm.jsx */ 420);
+	
+	var _DimensionDelegationForm2 = _interopRequireDefault(_DimensionDelegationForm);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	//import PanelGroup from './IdentityFederation/PanelGroup.jsx'
 	
+	
+	//Right now we write to localStorage when inspected an asset, before we render this 
 	var AssetUtilities = function (_React$Component) {
 	    _inherits(AssetUtilities, _React$Component);
 	
 	    function AssetUtilities(props) {
 	        _classCallCheck(this, AssetUtilities);
 	
-	        var _this = _possibleConstructorReturn(this, (AssetUtilities.__proto__ || Object.getPrototypeOf(AssetUtilities)).call(this, props));
+	        var _this2 = _possibleConstructorReturn(this, (AssetUtilities.__proto__ || Object.getPrototypeOf(AssetUtilities)).call(this, props));
 	
-	        _this.state = {};
-	        return _this;
+	        _this2.state = {
+	
+	            selectedAsset: {},
+	
+	            //added from MYCOID.jsx
+	            file_attrs: [], //updating asset OfficialIDs
+	            inputs: ['input-0'], //updating asset OfficialIDs
+	
+	            tmpFile: '', //comes from UploadIpfsFile class
+	            showModal: false, //set to true when we want to use UploadIpfsFile class
+	
+	            inputs_owners: ['input1-0'],
+	
+	            inputs_controllers: ['inputCtrl-0'], //dimension controllers and their tokens
+	            controllers_pubkeys: [],
+	            controllers_tokens: [],
+	            control_list: [],
+	
+	            recovery_list: [],
+	            inputs_delegatees: ['input1-0'],
+	            delegatee_id: [],
+	            delegatee_token_quantity: []
+	
+	        };
+	        return _this2;
 	    }
 	
 	    _createClass(AssetUtilities, [{
+	        key: 'componentWillMount',
+	        value: function componentWillMount() {
+	            //here we will make a call to local storage to get the selected asset
+	            var selected = localStorage.getItem("selectedAsset");
+	            if (selected != "empty") {
+	                this.state.selectedAsset = JSON.parse(selected);
+	            }
+	            console.log("selectedAsset: " + JSON.stringify(this.state.selectedAsset));
+	
+	            localStorage.setItem("selectedAsset", "empty");
+	        }
+	    }, {
+	        key: 'handleHideModal',
+	        value: function handleHideModal() {
+	            this.setState({ showModal: false });
+	        }
+	    }, {
+	        key: 'handleShowModal',
+	        value: function handleShowModal(e) {
+	            this.setState({ showModal: true, tmpFile: $(e.target).attr('data-id') });
+	        }
+	
+	        //*****************************************************************************
+	        //takes in a msg/json and returns a signature (needed for requests)
+	
+	    }, {
+	        key: 'getSignature',
+	        value: function getSignature(msg) {
+	            console.log("creating signature, signing msg: \n" + JSON.stringify(msg));
+	            var privKey = localStorage.getItem("privKey");
+	            var privKey1 = new Buffer(privKey, "hex");
+	            var msg_hash = keccak_256(JSON.stringify(msg));
+	            var msg_hash_buffer = new Buffer(msg_hash, "hex");
+	            var signature = JSON.stringify(secp256k1.sign(msg_hash_buffer, privKey1));
+	            signature = JSON.parse(signature).signature;
+	            signature = JSON.stringify(signature);
+	            signature = JSON.parse(signature).data;
+	            signature = new Buffer(signature, "hex");
+	            signature = signature.toString("hex");
+	            return signature;
+	        }
+	
+	        //**********************************************************************
+	        // START ASSET OFFICAL ID FUNCTIONS:
+	
+	    }, {
+	        key: 'appendInput',
+	        value: function appendInput() {
+	            console.log("hit append Input");
+	            var inputLen = this.state.inputs.length;
+	            if (inputLen < this.maxUniqAttr) {
+	                var newInput = 'input-' + inputLen;
+	                this.setState({ inputs: this.state.inputs.concat([newInput]) });
+	            }
+	        }
+	    }, {
+	        key: 'getLabelValues',
+	        value: function getLabelValues() {
+	            console.log("hit getLabelValues");
+	            var labelVals = [];
+	            var _this = this;
+	            $.each($("input[name^='label-']"), function (obj) {
+	                var value = $.trim($(this).val());
+	                if (value.length > 0) {
+	                    labelVals.push(_defineProperty({}, $(this).attr('name').replace("label-", ""), value));
+	                }
+	            });
+	            return labelVals;
+	        }
+	    }, {
+	        key: 'prepareUniqueIdAttrs',
+	        value: function prepareUniqueIdAttrs() {
+	            var newArr = [],
+	                labels = this.getLabelValues();
+	            for (var i = 0; i < labels.length; i++) {
+	                var tmpArr = [];
+	                for (var key in labels[i]) {
+	                    tmpArr.push(labels[i][key]);
+	                    var ipfsHash, fileHash;
+	
+	                    var _state$file_attrs$i$k = this.state.file_attrs[i][key].split("|");
+	
+	                    var _state$file_attrs$i$k2 = _slicedToArray(_state$file_attrs$i$k, 2);
+	
+	                    ipfsHash = _state$file_attrs$i$k2[0];
+	                    fileHash = _state$file_attrs$i$k2[1];
+	
+	                    tmpArr.push(fileHash);
+	                    tmpArr.push(ipfsHash);
+	                }
+	                newArr.push(tmpArr);
+	            }
+	            return newArr;
+	        }
+	        /***********************************************************************
+	        if this.state.showModal is true UploadIpfsFile component is rendered,
+	            and passed the prop dataHandler={this.getFileDetails.bind(this)}*/
+	
+	    }, {
+	        key: 'getFileDetails',
+	        value: function getFileDetails(filedata) {
+	            var obj = _defineProperty({}, this.state.tmpFile, filedata);
+	            this.setState({ file_attrs: this.state.file_attrs.concat([obj]) });
+	        }
+	    }, {
+	        key: 'requestUpdateOfficalIDs',
+	        value: function requestUpdateOfficalIDs(e) {
+	
+	            e.preventDefault();
+	            var asset = this.state.asset;
+	            var json = {};
+	            //*********************************************
+	            var filename = asset.asset_id + ".json";
+	            json.filename = filename;
+	            json.forUniqueId = true;
+	            json.uniqueId = "2222222222222222322323";
+	            json.isHuman = asset.asset_name.isHuman;
+	            json.yesVotesRequiredToPass = 2;
+	            json.pubKey = localStorage.getItem("pubKey");
+	            //*********************************************
+	            console.log("this.state.fileAttrs.. " + JSON.stringify(this.state.file_attrs));
+	            console.log("this.state.tmpfile.. " + this.state.tmpFile);
+	            console.log("this.state.inputs.. " + this.state.inputs);
+	            //[label,shaHash,ipfsHash]
+	            var attrsArray = this.prepareUniqueIdAttrs();
+	            json.uniqueIdAttributes = attrsArray;
+	            console.log("prepared attrs.. " + attrsArray);
+	            console.log("asset: " + this.props.asset.asset_id);
+	            console.log("coidAddr: " + this.props.asset.asset_name.coidAddr);
+	            //*********************************************
+	            var signature = this.getSignature(json);
+	            //*********************************************
+	            var msg_hash = keccak_256(JSON.stringify(json));
+	            var msg_hash_buffer = new Buffer(msg_hash, "hex");
+	            json.msg = msg_hash_buffer.toString("hex");
+	            json.sig = signature;
+	
+	            //Request needs to go to gatekeeper to submit officialID proposal
+	
+	            console.log("JSON: " + JSON.stringify(json));
+	
+	            $.ajax({
+	                type: "POST",
+	                url: twinUrl + 'addOfficialIDs',
+	                data: json,
+	                success: function (result) {
+	                    var data = result;
+	                    if ($.type(result) != "object") {
+	                        data = JSON.parseJSON(result);
+	                    }
+	                    console.log("result: " + JSON.stringify(data));
+	                }.bind(this)
+	            });
+	        }
+	        // END ASSET OFFICIAL ID FUNCTIONS:
+	        //**********************************************************************
+	        //**********************************************************************
+	        // START OWNERSHIP UPDATE FUNCTIONS:
+	
+	        //used in tokendistrubtionform (ASSETS)
+	
+	    }, {
+	        key: 'appendOwners',
+	        value: function appendOwners() {
+	            var inputLen = this.state.inputs_owners.length;
+	            if (inputLen < 10) {
+	                var newInput1 = 'input1-' + inputLen;
+	                this.setState({
+	                    inputs_owners: this.state.inputs_owners.concat([newInput1])
+	                });
+	            }
+	        }
+	        // prepareOwnerTokenDistribution() {
+	        // 	var labels = this.getTokenLabelValues();
+	        // 	console.log("got labels... " + JSON.stringify(labels))
+	        // 	for (var i = 0; i < labels.length; i += 2) {
+	        // 		for (var key in labels[i]) {
+	        // 			this.state.owner_id.push(labels[i][key]);
+	        // 			this.state.owner_token_quantity.push(labels[i + 1][key]);
+	        // 		}
+	        // 	}
+	        // }
+	
+	    }, {
+	        key: 'requestUpdateOwners',
+	        value: function requestUpdateOwners(e) {
+	
+	            e.preventDefault();
+	            var asset = this.state.asset;
+	            var json = {};
+	            //*********************************************
+	            var filename = asset.asset_id + ".json";
+	            json.filename = filename;
+	            json.pubKey = localStorage.getItem("pubKey");
+	            json.address = asset.asset_name.coidAddr;
+	            //*********************************************
+	            //NEW OWNERS AND THEIR TOKENS
+	            //this.prepareOwnerTokenDistribution();
+	
+	            //OWNERS CAN CREATE TOKENS SO THEY DONT NEED THEM?
+	            json.owners = this.state.owner_id;
+	            json.token_quantity = this.state.owner_token_quantity;
+	            //*********************************************
+	            var signature = this.getSignature(json);
+	            //*********************************************
+	            var msg_hash = keccak_256(JSON.stringify(json));
+	            var msg_hash_buffer = new Buffer(msg_hash, "hex");
+	            json.sig = signature;
+	            json.msg = msg_hash_buffer.toString("hex");
+	            //*********************************************
+	            console.log("update owner JSON!! \n" + JSON.stringify(json));
+	
+	            $.ajax({
+	                type: "POST",
+	                url: twinUrl + 'MyCOID/addOwner',
+	                data: json,
+	                success: function (result) {
+	                    var data = result;
+	                    if ($.type(result) != "object") {
+	                        data = JSON.parseJSON(result);
+	                    }
+	                    console.log("result: " + JSON.stringify(data));
+	                }.bind(this)
+	            });
+	        }
+	        // END OWNER UPDATE FUNCTIONS:
+	        //**********************************************************************
+	
+	        //**********************************************************************
+	        //**********************************************************************
+	        //**********************************************************************
+	        //**********************************************************************
+	        //**********************************************************************
+	        //**********************************************************************
+	        //**********************************************************************
+	        //**********************************************************************
+	
+	    }, {
 	        key: 'render',
 	        value: function render() {
+	            var _this3 = this;
+	
+	            var inputAttrs = {
+	                addKeys: [13, 188], // Enter and comma
+	                inputProps: {
+	                    placeholder: "use comma(,) to add multiple values",
+	                    style: { width: '30%' }
+	                }
+	            };
+	
+	            var style = { fontSize: '12.5px' };
+	            var popUpWidth = { width: '70%' };
+	            var marginRight15 = { marginRight: '15px' };
+	
+	            var asset = this.state.selectedAsset.asset_details;
+	
 	            return _react2.default.createElement(
-	                'label',
-	                null,
-	                'Asset Utilities'
+	                'div',
+	                { id: 'assetDetails', tabIndex: '-1', role: 'dialog', 'aria-labelledby': 'asset' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'modal-dialog modal-lg' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'modal-header' },
+	                        _react2.default.createElement(
+	                            'ul',
+	                            { className: 'nav nav-tabs', role: 'tablist' },
+	                            _react2.default.createElement(
+	                                'li',
+	                                { role: 'presentation', className: 'active' },
+	                                _react2.default.createElement(
+	                                    'a',
+	                                    { href: '#asset_details', role: 'tab', 'data-toggle': 'tab' },
+	                                    'Asset Info'
+	                                )
+	                            ),
+	                            _react2.default.createElement(
+	                                'li',
+	                                { role: 'presentation' },
+	                                _react2.default.createElement(
+	                                    'a',
+	                                    { href: '#menu1', role: 'tab', 'data-toggle': 'tab' },
+	                                    'Edit Asset'
+	                                )
+	                            ),
+	                            _react2.default.createElement(
+	                                'li',
+	                                { role: 'presentation' },
+	                                _react2.default.createElement(
+	                                    'a',
+	                                    { href: '#menu2', role: 'tab', 'data-toggle': 'tab' },
+	                                    'Data Repository Info'
+	                                )
+	                            ),
+	                            _react2.default.createElement(
+	                                'li',
+	                                { role: 'presentation' },
+	                                _react2.default.createElement(
+	                                    'a',
+	                                    { href: '#menu3', role: 'tab', 'data-toggle': 'tab' },
+	                                    'Edit Repositories'
+	                                )
+	                            ),
+	                            _react2.default.createElement(
+	                                'li',
+	                                { role: 'presentation' },
+	                                _react2.default.createElement(
+	                                    'a',
+	                                    { href: '#menu4', role: 'tab', 'data-toggle': 'tab' },
+	                                    'Create Repository'
+	                                )
+	                            ),
+	                            _react2.default.createElement(
+	                                'li',
+	                                { role: 'presentation' },
+	                                _react2.default.createElement(
+	                                    'a',
+	                                    { href: '#qrcode', role: 'tab', 'data-toggle': 'tab' },
+	                                    'Proofs'
+	                                )
+	                            )
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'modal-body' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'tab-content' },
+	                            _react2.default.createElement(
+	                                'div',
+	                                { role: 'tabpanel', className: 'tab-pane active', id: 'asset_details' },
+	                                this.state.selectedAsset ? _react2.default.createElement(_AssetTable2.default, { asset: this.state.selectedAsset }) : null()
+	                            ),
+	                            _react2.default.createElement(
+	                                'div',
+	                                { id: 'menu1', className: 'tab-pane' },
+	                                _react2.default.createElement(
+	                                    'div',
+	                                    { className: 'panel-group', id: 'accordion' },
+	                                    _react2.default.createElement(
+	                                        'div',
+	                                        { className: 'panel panel-default' },
+	                                        _react2.default.createElement(
+	                                            'div',
+	                                            { className: 'panel-heading' },
+	                                            _react2.default.createElement(
+	                                                'div',
+	                                                { className: 'row' },
+	                                                _react2.default.createElement(
+	                                                    'div',
+	                                                    { className: 'col-xs-11' },
+	                                                    _react2.default.createElement(
+	                                                        'label',
+	                                                        null,
+	                                                        'Membership Attributes'
+	                                                    )
+	                                                ),
+	                                                _react2.default.createElement(
+	                                                    'div',
+	                                                    { className: 'col-xs-1' },
+	                                                    _react2.default.createElement(
+	                                                        'a',
+	                                                        { 'data-toggle': 'collapse', 'data-parent': '#accordion', href: '#collapse1' },
+	                                                        _react2.default.createElement('span', { className: 'glyphicon glyphicon-chevron-down' })
+	                                                    )
+	                                                )
+	                                            )
+	                                        ),
+	                                        _react2.default.createElement(
+	                                            'div',
+	                                            { id: 'collapse1', className: 'panel-collapse collapse out' },
+	                                            _react2.default.createElement(
+	                                                'div',
+	                                                { className: 'panel-body' },
+	                                                _react2.default.createElement(
+	                                                    'div',
+	                                                    { className: 'row' },
+	                                                    _react2.default.createElement(
+	                                                        'table',
+	                                                        { className: 'table table-striped table-hover' },
+	                                                        _react2.default.createElement(
+	                                                            'tbody',
+	                                                            null,
+	                                                            _react2.default.createElement(
+	                                                                'tr',
+	                                                                null,
+	                                                                _react2.default.createElement(
+	                                                                    'td',
+	                                                                    { colSpan: '2' },
+	                                                                    _react2.default.createElement(
+	                                                                        'b',
+	                                                                        null,
+	                                                                        'Official IDs'
+	                                                                    )
+	                                                                )
+	                                                            ),
+	                                                            function () {
+	                                                                var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+	                                                                if (!$.isEmptyObject(asset.uniqueIdAttributes)) {
+	                                                                    return asset.uniqueIdAttributes.map(function (ids, i) {
+	                                                                        return _react2.default.createElement(
+	                                                                            'tr',
+	                                                                            { key: i },
+	                                                                            _react2.default.createElement(
+	                                                                                'td',
+	                                                                                null,
+	                                                                                ids[0]
+	                                                                            ),
+	                                                                            _react2.default.createElement(
+	                                                                                'td',
+	                                                                                null,
+	                                                                                _react2.default.createElement(
+	                                                                                    'p',
+	                                                                                    null,
+	                                                                                    'Validation ID : ',
+	                                                                                    ids[1]
+	                                                                                ),
+	                                                                                _react2.default.createElement(
+	                                                                                    'p',
+	                                                                                    null,
+	                                                                                    'Data Pointer: ',
+	                                                                                    _react2.default.createElement(
+	                                                                                        'a',
+	                                                                                        { target: '_blank', href: ipfs_url + "/" + ids[2] },
+	                                                                                        ids[2]
+	                                                                                    )
+	                                                                                )
+	                                                                            )
+	                                                                        );
+	                                                                    });
+	                                                                } else {
+	                                                                    return _react2.default.createElement(
+	                                                                        'tr',
+	                                                                        null,
+	                                                                        _react2.default.createElement(
+	                                                                            'td',
+	                                                                            { colSpan: '2' },
+	                                                                            'No Ids found'
+	                                                                        )
+	                                                                    );
+	                                                                }
+	                                                            }(this)
+	                                                        )
+	                                                    ),
+	                                                    _react2.default.createElement(
+	                                                        'div',
+	                                                        { className: 'form-group' },
+	                                                        _react2.default.createElement(
+	                                                            'label',
+	                                                            { htmlFor: 'unique_id' },
+	                                                            'Unique ID Attributes:'
+	                                                        ),
+	                                                        this.state.inputs.map(function (input) {
+	                                                            return _react2.default.createElement(_UniqueIDAttributeForm2.default, { type: "MyCOID", handleShowModal: _this3.handleShowModal.bind(_this3), max: '10', key: input, labelref: input });
+	                                                        })
+	                                                    ),
+	                                                    _react2.default.createElement(
+	                                                        'div',
+	                                                        { className: 'form-group' },
+	                                                        _react2.default.createElement(
+	                                                            'button',
+	                                                            { type: 'button', className: 'btn-sm btn-info pull-right', style: marginRight15, onClick: this.appendInput.bind(this) },
+	                                                            _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
+	                                                            'Add More'
+	                                                        )
+	                                                    ),
+	                                                    _react2.default.createElement(
+	                                                        'div',
+	                                                        { className: 'form-group' },
+	                                                        _react2.default.createElement(
+	                                                            'button',
+	                                                            { style: style, type: 'button', className: 'btn-sm btn-primary', onClick: this.requestUpdateOfficalIDs.bind(this) },
+	                                                            _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
+	                                                            'Update Official IDs'
+	                                                        )
+	                                                    )
+	                                                )
+	                                            )
+	                                        )
+	                                    )
+	                                ),
+	                                _react2.default.createElement(
+	                                    'div',
+	                                    { className: 'panel-group', id: 'accordion' },
+	                                    _react2.default.createElement(
+	                                        'div',
+	                                        { className: 'panel panel-default' },
+	                                        _react2.default.createElement(
+	                                            'div',
+	                                            { className: 'panel-heading' },
+	                                            _react2.default.createElement(
+	                                                'div',
+	                                                { className: 'row' },
+	                                                _react2.default.createElement(
+	                                                    'div',
+	                                                    { className: 'col-xs-11' },
+	                                                    _react2.default.createElement(
+	                                                        'label',
+	                                                        null,
+	                                                        'Membership Holding'
+	                                                    )
+	                                                ),
+	                                                _react2.default.createElement(
+	                                                    'div',
+	                                                    { className: 'col-xs-1' },
+	                                                    _react2.default.createElement(
+	                                                        'a',
+	                                                        { 'data-toggle': 'collapse', 'data-parent': '#accordion', href: '#collapse2' },
+	                                                        _react2.default.createElement('span', { className: 'glyphicon glyphicon-chevron-down' })
+	                                                    )
+	                                                )
+	                                            )
+	                                        ),
+	                                        ' ',
+	                                        _react2.default.createElement(
+	                                            'div',
+	                                            { id: 'collapse2', className: 'panel-collapse collapse out' },
+	                                            _react2.default.createElement(
+	                                                'div',
+	                                                { className: 'panel-body' },
+	                                                _react2.default.createElement(
+	                                                    'div',
+	                                                    { className: 'row' },
+	                                                    _react2.default.createElement(
+	                                                        'table',
+	                                                        { className: 'table table-striped table-hover', style: style },
+	                                                        _react2.default.createElement(
+	                                                            'tbody',
+	                                                            null,
+	                                                            _react2.default.createElement(
+	                                                                'tr',
+	                                                                null,
+	                                                                _react2.default.createElement(
+	                                                                    'td',
+	                                                                    null,
+	                                                                    _react2.default.createElement(
+	                                                                        'b',
+	                                                                        null,
+	                                                                        'Membership Holding ID List'
+	                                                                    )
+	                                                                ),
+	                                                                _react2.default.createElement(
+	                                                                    'td',
+	                                                                    null,
+	                                                                    function () {
+	                                                                        if (!$.isEmptyObject(asset.ownerIdList)) {
+	                                                                            return asset.ownerIdList.map(function (ids, i) {
+	                                                                                return _react2.default.createElement(
+	                                                                                    'p',
+	                                                                                    { key: i },
+	                                                                                    ' ',
+	                                                                                    asset.ownerIdList[i]
+	                                                                                );
+	                                                                            });
+	                                                                        }
+	                                                                    }(this)
+	                                                                )
+	                                                            )
+	                                                        )
+	                                                    ),
+	                                                    _react2.default.createElement(
+	                                                        'div',
+	                                                        { id: 'OWNERSHIP' },
+	                                                        _react2.default.createElement(
+	                                                            'div',
+	                                                            { className: 'form-group' },
+	                                                            _react2.default.createElement(
+	                                                                'label',
+	                                                                { htmlFor: 'control_dist' },
+	                                                                'Enter holders and their membership token(s).'
+	                                                            ),
+	                                                            this.state.inputs_owners.map(function (input) {
+	                                                                return _react2.default.createElement(_TokenDistributionForm2.default, { min: _this3.state.subform_cont, max: '10', key: input, labelref: input });
+	                                                            })
+	                                                        ),
+	                                                        _react2.default.createElement(
+	                                                            'div',
+	                                                            { className: 'col-md-offset-6 col-md-6 ' },
+	                                                            _react2.default.createElement(
+	                                                                'button',
+	                                                                { type: 'button', className: 'btn btn-info pull-right', style: style, onClick: this.appendOwners.bind(this) },
+	                                                                _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
+	                                                                'Add More'
+	                                                            )
+	                                                        ),
+	                                                        _react2.default.createElement(
+	                                                            'div',
+	                                                            { className: 'form-group' },
+	                                                            _react2.default.createElement(
+	                                                                'button',
+	                                                                { style: style, type: 'button', className: 'btn btn-primary', onClick: this.requestUpdateOwners.bind(this) },
+	                                                                _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
+	                                                                'Update Membership Holdings'
+	                                                            )
+	                                                        )
+	                                                    )
+	                                                )
+	                                            )
+	                                        )
+	                                    )
+	                                ),
+	                                _react2.default.createElement(
+	                                    'div',
+	                                    { className: 'panel-group', id: 'accordion' },
+	                                    _react2.default.createElement(
+	                                        'div',
+	                                        { className: 'panel panel-default' },
+	                                        _react2.default.createElement(
+	                                            'div',
+	                                            { className: 'panel-heading' },
+	                                            _react2.default.createElement(
+	                                                'div',
+	                                                { className: 'row' },
+	                                                _react2.default.createElement(
+	                                                    'div',
+	                                                    { className: 'col-xs-11' },
+	                                                    _react2.default.createElement(
+	                                                        'label',
+	                                                        null,
+	                                                        'Delegation'
+	                                                    )
+	                                                ),
+	                                                _react2.default.createElement(
+	                                                    'div',
+	                                                    { className: 'col-xs-1' },
+	                                                    _react2.default.createElement(
+	                                                        'a',
+	                                                        { 'data-toggle': 'collapse', 'data-parent': '#accordion', href: '#collapse3' },
+	                                                        _react2.default.createElement('span', { className: 'glyphicon glyphicon-chevron-down' })
+	                                                    )
+	                                                )
+	                                            )
+	                                        ),
+	                                        _react2.default.createElement(
+	                                            'div',
+	                                            { id: 'collapse3', className: 'panel-collapse collapse out' },
+	                                            _react2.default.createElement(
+	                                                'div',
+	                                                { className: 'panel-body' },
+	                                                _react2.default.createElement(
+	                                                    'div',
+	                                                    { className: 'row' },
+	                                                    _react2.default.createElement(
+	                                                        'table',
+	                                                        { className: 'table table-striped table-hover', style: style },
+	                                                        _react2.default.createElement(
+	                                                            'tbody',
+	                                                            null,
+	                                                            _react2.default.createElement(
+	                                                                'tr',
+	                                                                null,
+	                                                                _react2.default.createElement(
+	                                                                    'td',
+	                                                                    null,
+	                                                                    _react2.default.createElement(
+	                                                                        'b',
+	                                                                        null,
+	                                                                        'Delegation ID List'
+	                                                                    )
+	                                                                ),
+	                                                                _react2.default.createElement(
+	                                                                    'td',
+	                                                                    null,
+	                                                                    function () {
+	                                                                        if (!$.isEmptyObject(asset.controlIdList)) {
+	                                                                            return asset.controlIdList.map(function (ids, i) {
+	                                                                                return _react2.default.createElement(
+	                                                                                    'p',
+	                                                                                    { key: i },
+	                                                                                    ' ',
+	                                                                                    asset.controlIdList[i]
+	                                                                                );
+	                                                                            });
+	                                                                        }
+	                                                                    }(this)
+	                                                                )
+	                                                            )
+	                                                        )
+	                                                    ),
+	                                                    _react2.default.createElement(
+	                                                        'div',
+	                                                        { className: 'form-group' },
+	                                                        _react2.default.createElement(
+	                                                            'label',
+	                                                            { htmlFor: 'control_dist' },
+	                                                            'Enter Delegatees and their delegated token(s).'
+	                                                        ),
+	                                                        this.state.inputs_controllers.map(function (input) {
+	                                                            return _react2.default.createElement(_TokenDistributionForm2.default, { min: _this3.state.subform_cont, max: '10', key: input, labelref: input });
+	                                                        })
+	                                                    ),
+	                                                    _react2.default.createElement(
+	                                                        'button',
+	                                                        { type: 'button', className: 'btn-sm btn-info pull-right', style: style },
+	                                                        _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
+	                                                        'Add More'
+	                                                    ),
+	                                                    _react2.default.createElement(
+	                                                        'div',
+	                                                        { className: 'form-group' },
+	                                                        _react2.default.createElement(
+	                                                            'button',
+	                                                            { style: style, type: 'button', className: 'btn-sm btn-primary' },
+	                                                            _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
+	                                                            'Update Delegatees'
+	                                                        )
+	                                                    )
+	                                                )
+	                                            )
+	                                        )
+	                                    )
+	                                ),
+	                                _react2.default.createElement(
+	                                    'div',
+	                                    { className: 'panel-group', id: 'accordion' },
+	                                    _react2.default.createElement(
+	                                        'div',
+	                                        { className: 'panel panel-default' },
+	                                        _react2.default.createElement(
+	                                            'div',
+	                                            { className: 'panel-heading' },
+	                                            _react2.default.createElement(
+	                                                'div',
+	                                                { className: 'row' },
+	                                                _react2.default.createElement(
+	                                                    'div',
+	                                                    { className: 'col-xs-11' },
+	                                                    _react2.default.createElement(
+	                                                        'label',
+	                                                        null,
+	                                                        'Recovery'
+	                                                    )
+	                                                ),
+	                                                _react2.default.createElement(
+	                                                    'div',
+	                                                    { className: 'col-xs-1' },
+	                                                    _react2.default.createElement(
+	                                                        'a',
+	                                                        { 'data-toggle': 'collapse', 'data-parent': '#accordion', href: '#collapse4' },
+	                                                        _react2.default.createElement('span', { className: 'glyphicon glyphicon-chevron-down' })
+	                                                    )
+	                                                )
+	                                            )
+	                                        ),
+	                                        _react2.default.createElement(
+	                                            'div',
+	                                            { id: 'collapse4', className: 'panel-collapse collapse out' },
+	                                            _react2.default.createElement(
+	                                                'div',
+	                                                { className: 'panel-body' },
+	                                                _react2.default.createElement(
+	                                                    'div',
+	                                                    { className: 'row' },
+	                                                    _react2.default.createElement(
+	                                                        'table',
+	                                                        { className: 'table table-striped table-hover', style: style },
+	                                                        _react2.default.createElement(
+	                                                            'tbody',
+	                                                            null,
+	                                                            _react2.default.createElement(
+	                                                                'tr',
+	                                                                null,
+	                                                                _react2.default.createElement(
+	                                                                    'td',
+	                                                                    null,
+	                                                                    'Recovery IDs'
+	                                                                ),
+	                                                                _react2.default.createElement(
+	                                                                    'td',
+	                                                                    null,
+	                                                                    function () {
+	                                                                        if (!$.isEmptyObject(asset.identityRecoveryIdList)) {
+	                                                                            return asset.identityRecoveryIdList.map(function (ids, i) {
+	                                                                                return _react2.default.createElement(
+	                                                                                    'p',
+	                                                                                    { key: i },
+	                                                                                    ' ',
+	                                                                                    asset.identityRecoveryIdList[i]
+	                                                                                );
+	                                                                            });
+	                                                                        }
+	                                                                    }(this)
+	                                                                )
+	                                                            ),
+	                                                            _react2.default.createElement(
+	                                                                'tr',
+	                                                                null,
+	                                                                _react2.default.createElement(
+	                                                                    'td',
+	                                                                    null,
+	                                                                    'Recovery Condition'
+	                                                                ),
+	                                                                _react2.default.createElement(
+	                                                                    'td',
+	                                                                    null,
+	                                                                    _react2.default.createElement(
+	                                                                        'p',
+	                                                                        null,
+	                                                                        asset.recoveryCondition
+	                                                                    )
+	                                                                )
+	                                                            ),
+	                                                            _react2.default.createElement(
+	                                                                'tr',
+	                                                                null,
+	                                                                _react2.default.createElement(
+	                                                                    'td',
+	                                                                    null,
+	                                                                    'Change recovery condition:'
+	                                                                ),
+	                                                                _react2.default.createElement(
+	                                                                    'td',
+	                                                                    null,
+	                                                                    _react2.default.createElement('input', { name: 'recoveryCondition', className: 'form-control col-md-4', type: 'text', placeholder: '# of signatures required.' })
+	                                                                )
+	                                                            )
+	                                                        )
+	                                                    ),
+	                                                    _react2.default.createElement(
+	                                                        'div',
+	                                                        { className: 'form-group' },
+	                                                        _react2.default.createElement(
+	                                                            'label',
+	                                                            { style: style, htmlFor: 'control_dist' },
+	                                                            'Enter Recovery ID(s).'
+	                                                        ),
+	                                                        _react2.default.createElement(_reactTagsinput2.default, _extends({}, inputAttrs, { value: this.state.recovery_list, onChange: function onChange(e) {
+	                                                                _this3.onFieldChange("recovery_list", e);
+	                                                            } }))
+	                                                    ),
+	                                                    _react2.default.createElement('br', null),
+	                                                    _react2.default.createElement(
+	                                                        'div',
+	                                                        { className: 'form-group' },
+	                                                        ' */}',
+	                                                        _react2.default.createElement(
+	                                                            'button',
+	                                                            { style: style, type: 'button', className: 'btn btn-primary' },
+	                                                            _react2.default.createElement('span', { className: 'glyphicon glyphicon-plus' }),
+	                                                            'Update Recovery'
+	                                                        )
+	                                                    )
+	                                                )
+	                                            )
+	                                        )
+	                                    )
+	                                ),
+	                                _react2.default.createElement(
+	                                    'div',
+	                                    { className: 'panel-group', id: 'accordion' },
+	                                    _react2.default.createElement(
+	                                        'div',
+	                                        { className: 'panel panel-default' },
+	                                        _react2.default.createElement(
+	                                            'div',
+	                                            { className: 'panel-heading' },
+	                                            _react2.default.createElement(
+	                                                'div',
+	                                                { className: 'row' },
+	                                                _react2.default.createElement(
+	                                                    'div',
+	                                                    { className: 'col-xs-11' },
+	                                                    _react2.default.createElement(
+	                                                        'label',
+	                                                        null,
+	                                                        'One-Time or Temporary Delegation'
+	                                                    )
+	                                                ),
+	                                                _react2.default.createElement(
+	                                                    'div',
+	                                                    { className: 'col-xs-1' },
+	                                                    _react2.default.createElement(
+	                                                        'a',
+	                                                        { 'data-toggle': 'collapse', 'data-parent': '#accordion', href: '#collapse5' },
+	                                                        _react2.default.createElement('span', { className: 'glyphicon glyphicon-chevron-down' })
+	                                                    )
+	                                                )
+	                                            )
+	                                        ),
+	                                        _react2.default.createElement(
+	                                            'div',
+	                                            { id: 'collapse5', className: 'panel-collapse collapse out' },
+	                                            _react2.default.createElement(
+	                                                'div',
+	                                                { className: 'panel-body' },
+	                                                _react2.default.createElement(
+	                                                    'div',
+	                                                    { className: 'row' },
+	                                                    _react2.default.createElement(
+	                                                        'table',
+	                                                        { className: 'table table-striped table-hover', style: style },
+	                                                        _react2.default.createElement(
+	                                                            'tbody',
+	                                                            null,
+	                                                            _react2.default.createElement(
+	                                                                'tr',
+	                                                                null,
+	                                                                _react2.default.createElement(
+	                                                                    'td',
+	                                                                    null,
+	                                                                    _react2.default.createElement(
+	                                                                        'b',
+	                                                                        null,
+	                                                                        'Temporary Delegations List'
+	                                                                    )
+	                                                                ),
+	                                                                _react2.default.createElement(
+	                                                                    'td',
+	                                                                    null,
+	                                                                    function () {
+	                                                                        if (!$.isEmptyObject(asset.delegateeIdList)) {
+	                                                                            return asset.delegateeIdList.map(function (ids, i) {
+	                                                                                return _react2.default.createElement(
+	                                                                                    'p',
+	                                                                                    { key: i },
+	                                                                                    ' ',
+	                                                                                    asset.delegateeIdList[i]
+	                                                                                );
+	                                                                            });
+	                                                                        }
+	                                                                    }(this)
+	                                                                )
+	                                                            )
+	                                                        )
+	                                                    ),
+	                                                    _react2.default.createElement(
+	                                                        'div',
+	                                                        { className: 'form-group' },
+	                                                        _react2.default.createElement(
+	                                                            'label',
+	                                                            { htmlFor: 'delegatee_dist' },
+	                                                            'Enter Delegatees and their delegated token(s).'
+	                                                        ),
+	                                                        this.state.inputs_delegatees.map(function (input) {
+	                                                            return _react2.default.createElement(_TokenDistributionForm2.default, { min: _this3.state.subform_cont, max: '10', key: input, labelref: input });
+	                                                        })
+	                                                    )
+	                                                )
+	                                            )
+	                                        )
+	                                    )
+	                                )
+	                            )
+	                        ),
+	                        _react2.default.createElement('div', { id: 'menu2', className: 'tab-pane' }),
+	                        _react2.default.createElement('div', { id: 'menu3', className: 'tab-pane' }),
+	                        _react2.default.createElement('div', { id: 'menu4', className: 'tab-pane' })
+	                    )
+	                )
 	            );
 	        }
 	    }]);
@@ -104609,6 +105620,7 @@
 	}(_react2.default.Component);
 	
 	exports.default = AssetUtilities;
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../../~/buffer/index.js */ 251).Buffer))
 
 /***/ }),
 /* 835 */
@@ -107171,6 +108183,9 @@
 	
 	            var marginRight15 = { marginRight: '15px' };
 	            var table = { margin: '0 auto' };
+	
+	            //let heynow = "panel-collapse collapse out"
+	
 	
 	            return _react2.default.createElement(
 	                'div',
@@ -110701,6 +111716,491 @@
 	;
 	exports.default = Attestations;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./../../../~/buffer/index.js */ 251).Buffer))
+
+/***/ }),
+/* 841 */
+/*!**************************************************************!*\
+  !*** ./src/app/Components/IdentityFederation/AssetTable.jsx ***!
+  \**************************************************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactTagsinput = __webpack_require__(/*! react-tagsinput */ 370);
+	
+	var _reactTagsinput2 = _interopRequireDefault(_reactTagsinput);
+	
+	var _classAndSubClass = __webpack_require__(/*! ../classAndSubClass.js */ 417);
+	
+	var _classAndSubClass2 = _interopRequireDefault(_classAndSubClass);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var AssetTable = function (_React$Component) {
+	    _inherits(AssetTable, _React$Component);
+	
+	    function AssetTable(props) {
+	        _classCallCheck(this, AssetTable);
+	
+	        var _this = _possibleConstructorReturn(this, (AssetTable.__proto__ || Object.getPrototypeOf(AssetTable)).call(this, props));
+	
+	        _this.tags = new _classAndSubClass2.default(_this.props.asset.asset_id);
+	        _this.state = {
+	            asset_class: _this.tags.getAssetData("classes"),
+	            asset_subclass: _this.tags.getAssetData("subclasses")
+	        };
+	        return _this;
+	    }
+	
+	    _createClass(AssetTable, [{
+	        key: 'handleClassChange',
+	        value: function handleClassChange(tags) {
+	            this.setState({ asset_class: tags });
+	            this.tags.updateClasses(tags, this.props.asset.asset_id, "classes");
+	        }
+	    }, {
+	        key: 'handleSubClassChange',
+	        value: function handleSubClassChange(tags) {
+	            this.setState({ asset_subclass: tags });
+	            this.tags.updateClasses(tags, this.props.asset.asset_id, "subclasses");
+	        }
+	    }, {
+	        key: 'renderICA',
+	        value: function renderICA() {
+	            return _react2.default.createElement(
+	                'p',
+	                null,
+	                'Normal'
+	            );
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var _this2 = this;
+	
+	            console.log("got to the asset table render");
+	            var prop = this.props.asset.asset_details;
+	            var style = { fontSize: '12.5px' };
+	
+	            var classInput = {
+	                addKeys: [13, 188], // Enter and comma
+	                value: this.state.asset_class,
+	                onChange: this.handleClassChange,
+	                inputProps: { placeholder: "" }
+	            };
+	            var subClassInput = {
+	                addKeys: [13, 188], // Enter and comma
+	                value: this.state.asset_subclass,
+	                onChange: this.handleSubClassChange.bind(this),
+	                inputProps: { placeholder: "" }
+	            };
+	
+	            return _react2.default.createElement(
+	                'div',
+	                { id: 'AssetTable' },
+	                _react2.default.createElement(
+	                    'table',
+	                    { className: 'table table-striped table-hover', style: style },
+	                    _react2.default.createElement(
+	                        'tbody',
+	                        null,
+	                        _react2.default.createElement(
+	                            'tr',
+	                            null,
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                'Asset Name'
+	                            ),
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                this.props.asset.asset_id
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'tr',
+	                            null,
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                'Asset Class',
+	                                _react2.default.createElement(
+	                                    'p',
+	                                    { className: 'text-info' },
+	                                    'Use comma/enter to add class '
+	                                )
+	                            ),
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                _react2.default.createElement(_reactTagsinput2.default, classInput)
+	                            )
+	                        ),
+	                        function () {
+	                            var ipfs_url = "http://10.101.114.231:8080/ipfs/";
+	                            if (!$.isEmptyObject(prop.uniqueIdAttributes)) {
+	                                return prop.uniqueIdAttributes.map(function (ids, i) {
+	                                    if (ids[2].charAt(0) == "Q") {
+	                                        return _react2.default.createElement(
+	                                            'tr',
+	                                            { key: i },
+	                                            _react2.default.createElement(
+	                                                'td',
+	                                                null,
+	                                                ids[0]
+	                                            ),
+	                                            _react2.default.createElement(
+	                                                'td',
+	                                                null,
+	                                                _react2.default.createElement(
+	                                                    'p',
+	                                                    null,
+	                                                    'Validation ID: ',
+	                                                    ids[1]
+	                                                ),
+	                                                _react2.default.createElement(
+	                                                    'p',
+	                                                    null,
+	                                                    'Data Pointer: ',
+	                                                    _react2.default.createElement(
+	                                                        'a',
+	                                                        { target: '_blank', href: ipfs_url + "/" + ids[2] },
+	                                                        ids[2]
+	                                                    )
+	                                                )
+	                                            )
+	                                        );
+	                                    } else {
+	                                        return _react2.default.createElement(
+	                                            'tr',
+	                                            { key: i },
+	                                            _react2.default.createElement(
+	                                                'td',
+	                                                null,
+	                                                ids[0]
+	                                            ),
+	                                            _react2.default.createElement(
+	                                                'td',
+	                                                null,
+	                                                _react2.default.createElement(
+	                                                    'p',
+	                                                    null,
+	                                                    'Validation ID: ',
+	                                                    ids[1]
+	                                                ),
+	                                                _react2.default.createElement(
+	                                                    'p',
+	                                                    null,
+	                                                    'Data Pointer: ',
+	                                                    _react2.default.createElement(
+	                                                        'a',
+	                                                        { href: 'javascript:', onClick: function onClick(e) {
+	                                                                _this2.bigchainGet(ids[2]);
+	                                                            } },
+	                                                        ids[2]
+	                                                    )
+	                                                )
+	                                            )
+	                                        );
+	                                    }
+	                                });
+	                            } else {
+	                                return _react2.default.createElement(
+	                                    'tr',
+	                                    null,
+	                                    _react2.default.createElement(
+	                                        'td',
+	                                        { colSpan: '2' },
+	                                        'No Ids found'
+	                                    )
+	                                );
+	                            }
+	                        }(this),
+	                        _react2.default.createElement(
+	                            'tr',
+	                            null,
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                'Membership Holding Token Description'
+	                            ),
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                _react2.default.createElement(
+	                                    'p',
+	                                    null,
+	                                    prop.ownershipTokenAttributes
+	                                )
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'tr',
+	                            null,
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                'Membership Holding ID'
+	                            ),
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                _react2.default.createElement(
+	                                    'p',
+	                                    null,
+	                                    ' ',
+	                                    prop.ownershipId
+	                                )
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'tr',
+	                            null,
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                'Membership Holding ID List'
+	                            ),
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                function () {
+	                                    if (!$.isEmptyObject(prop.ownerIdList)) {
+	                                        return prop.ownerIdList.map(function (ids, i) {
+	                                            return _react2.default.createElement(
+	                                                'p',
+	                                                { key: i },
+	                                                ' ',
+	                                                prop.ownerIdList[i]
+	                                            );
+	                                        });
+	                                    }
+	                                }(this)
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'tr',
+	                            null,
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                'Membership Holding Token Quantity'
+	                            ),
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                function () {
+	                                    if (!$.isEmptyObject(prop.ownershipTokenQuantity)) {
+	                                        return prop.ownershipTokenQuantity.map(function (ids, i) {
+	                                            return _react2.default.createElement(
+	                                                'p',
+	                                                { key: i },
+	                                                ' ',
+	                                                prop.ownershipTokenQuantity[i]
+	                                            );
+	                                        });
+	                                    }
+	                                }(this)
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'tr',
+	                            null,
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                'Membership Holding Token ID'
+	                            ),
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                _react2.default.createElement(
+	                                    'p',
+	                                    null,
+	                                    ' ',
+	                                    prop.ownershipTokenId
+	                                )
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'tr',
+	                            null,
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                'Delegation Token Description'
+	                            ),
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                _react2.default.createElement(
+	                                    'p',
+	                                    null,
+	                                    prop.controlTokenAttributes
+	                                )
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'tr',
+	                            null,
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                'Delegation ID'
+	                            ),
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                _react2.default.createElement(
+	                                    'p',
+	                                    null,
+	                                    ' ',
+	                                    prop.controlId
+	                                )
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'tr',
+	                            null,
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                'Delegation ID List'
+	                            ),
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                function () {
+	                                    if (!$.isEmptyObject(prop.controlIdList)) {
+	                                        return prop.controlIdList.map(function (ids, i) {
+	                                            return _react2.default.createElement(
+	                                                'p',
+	                                                { key: i },
+	                                                ' ',
+	                                                prop.controlIdList[i]
+	                                            );
+	                                        });
+	                                    }
+	                                }(this)
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'tr',
+	                            null,
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                'Delegation Token Quantity'
+	                            ),
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                function () {
+	                                    if (!$.isEmptyObject(prop.controlTokenQuantity)) {
+	                                        return prop.controlIdList.map(function (ids, i) {
+	                                            return _react2.default.createElement(
+	                                                'p',
+	                                                { key: i },
+	                                                ' ',
+	                                                prop.controlTokenQuantity[i]
+	                                            );
+	                                        });
+	                                    }
+	                                }(this)
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'tr',
+	                            null,
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                'Delegation Token ID'
+	                            ),
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                ' ',
+	                                _react2.default.createElement(
+	                                    'p',
+	                                    null,
+	                                    ' ',
+	                                    prop.controlTokenId
+	                                )
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'tr',
+	                            null,
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                'Recovery IDs'
+	                            ),
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                function () {
+	                                    if (!$.isEmptyObject(prop.identityRecoveryIdList)) {
+	                                        return prop.identityRecoveryIdList.map(function (ids, i) {
+	                                            return _react2.default.createElement(
+	                                                'p',
+	                                                { key: i },
+	                                                ' ',
+	                                                prop.identityRecoveryIdList[i]
+	                                            );
+	                                        });
+	                                    }
+	                                }(this)
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'tr',
+	                            null,
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                'Recovery Condition'
+	                            ),
+	                            _react2.default.createElement(
+	                                'td',
+	                                null,
+	                                ' ',
+	                                _react2.default.createElement(
+	                                    'p',
+	                                    null,
+	                                    ' ',
+	                                    prop.recoveryCondition
+	                                )
+	                            )
+	                        )
+	                    )
+	                )
+	            );
+	        }
+	    }]);
+	
+	    return AssetTable;
+	}(_react2.default.Component);
+	
+	exports.default = AssetTable;
 
 /***/ })
 /******/ ]);

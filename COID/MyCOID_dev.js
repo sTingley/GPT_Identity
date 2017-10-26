@@ -403,6 +403,7 @@ var MyCOID = function (contractAddress) {
         -amountDelegated
         -addController
         -removeController
+        -offsetControllerTokenQuantity
     */
 
     //GET CONTROLLER VALUES (from list)
@@ -913,6 +914,7 @@ var MyCOID = function (contractAddress) {
         var msg = formdata.msg;
         var sig = formdata.sig;
         var pubKey = formdata.pubKey;
+        var owner = keccak_256(pubKey);
         var controller = formdata.controllers;
         var amount = Number(formdata.token_quantity);
         var flag = formdata.flag;
@@ -920,7 +922,7 @@ var MyCOID = function (contractAddress) {
         var controllerHash = keccak_256(controller).toUpperCase()
 
         theNotifier.GetAsset(pubKey, fileName, flag, function (results) {
-            self.contract.offsetControllerTokenQuantity(controllerHash, function (error, result) {
+            self.contract.offsetControllerTokenQuantity(owner, controllerHash, function (error, result) {
                 if (result) {
                     var ctrlIndex = results.controlIdList.indexOf(controllerHash);
                     results.controlTokenQuantity[ctrlIndex] += Number(amount);
@@ -1170,7 +1172,7 @@ var MyCOID = function (contractAddress) {
 
     }
 
-
+    //ST: UPDATE FILE in DT!!!!! Currently hardcoded MyCOID.json
     this.removeRecoveryID = function (formdata, callback) {
         var sig = formdata.sig;
         var pubKey = formdata.pubKey;
@@ -1210,6 +1212,7 @@ var MyCOID = function (contractAddress) {
 
     this.getUniqueAttributes = function (formdata, callback) {
 
+        //this is one of the functions called by the ballot app when validator needs to see data
         self.contract.getUniqueID(function (error, result) {
             if (error) { callback(error, result) }
             else {
@@ -1221,31 +1224,40 @@ var MyCOID = function (contractAddress) {
         })
     }
 
+    //ST: /addOfficialIDs endpoint goes to the IDF_GK for 'MyCOID'
+    //THIS NEEDS TO BE COMPLETED FOR MYGK assets and we therefore need gk address (?) and fileName!!!!!!!
+    //ALSO OF COURSE CHECK THAT THEY ARE AN OWNER
     this.addUniqueAttributes = function (formdata, callback) {
         var theUniqueID;
         var theUniqueIDAttributes;
         var isHumanValue;
         var AoA;
-        var fileName = "MyCOID.json";
+        //var fileName = "MyCOID.json";
         //var fileName = formdata.fileName;
+
 
         self.contract.getUniqueID(function (error, result) {
             if (error) { callback(error, result) }
             else {
-                theUniqueID = result[0];
-                AoA = JSON.parse(result[1]);
-                isHumanValue = Boolean(result[2]);
-                console.log("Attributes: " + result[1]);
-                console.log("Parsed Attribute: " + AoA[0]);
 
-                for (var j = 0; j < theUniqueIDAttributes.length; j++) {
-                    AoA.push(theUniqueIDAttributes[j]);
-                }
+                result = "hey, this is good only for adding to assets created with your gatekeeper.. finish this code!!"
+                callback(error,result);
 
-                AoA.concat(Array(10 - AoA.length).fill("0"));
+                //ST: COMMENT THIS BACK IN LATER !!!!! 
+                // theUniqueID = result[0];
+                // AoA = JSON.parse(result[1]);
+                // isHumanValue = Boolean(result[2]);
+                // console.log("Attributes: " + result[1]);
+                // console.log("Parsed Attribute: " + AoA[0]);
 
-                self.contract.setUniqueID(theUniqueID, AoA, isHumanValue);
-                callback(error, result);
+                // for (var j = 0; j < theUniqueIDAttributes.length; j++) {
+                //     AoA.push(theUniqueIDAttributes[j]);
+                // }
+
+                // AoA.concat(Array(10 - AoA.length).fill("0"));
+
+                // self.contract.setUniqueID(theUniqueID, AoA, isHumanValue);
+                // callback(error, result);
 
             }
         })
@@ -1278,14 +1290,12 @@ for (let endpoint in MyCoidConfig) {
 
         //their contract address
         var contractAddress = req.body.address;
-        console.log(contractAddress)
-        console.log("endpoint is: " + endpoint)
-        //instantiate their Coid
+        console.log("contract address: " + contractAddress)
+        //instantiate a MyCOID object
         var myCoid = new MyCOID(contractAddress)
 
         //function input
         var formdata = req.body;
-
         console.log("function call is: " + functionCall)
 
         // res.json({'Status':'hi','Result':'hello'})

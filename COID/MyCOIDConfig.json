@@ -14,5 +14,6 @@
     "giveTokens": "giveTokens",
     "getControllerList": "getControllerList",
     "getControllerTokens": "getControllerTokens",
-    "addRecoveryID":"addRecoveryID"
+    "addRecoveryID":"addRecoveryID",
+    "removeRecoveryID": "removeRecoveryID"
 }

@@ -17,6 +17,7 @@ class AssetUtilities extends React.Component {
         this.state = {
 
             selectedAsset: {},
+            dimensions: [],
 
             //added from MYCOID.jsx
             file_attrs: [], //updating asset OfficialIDs
@@ -49,6 +50,92 @@ class AssetUtilities extends React.Component {
         console.log("selectedAsset: " + JSON.stringify(this.state.selectedAsset));
 
         localStorage.setItem("selectedAsset", "empty")
+
+        let idims = [{
+			"dimension_id": "Mortgate Info Steve Smith",
+			"dimension_details": {
+
+				"dimensionName": "Mortgage History BAC Florida",
+				"pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+				"address": "",
+				"flag": 0,
+				"ID": 0,
+				"coidAddr": "E2B24811DB9B23DDEA8313D82D11A82014C8E3BC",
+				"dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
+				"uniqueId": "9aaddf7caa690217bddc743102dc7e417608a93418ad5da2c0c82c501004f26f",
+				"owners": [
+					"59d110a3ab34a2ebd0ddb9d72ead24e8e906bebe794ea13c8c35b8a6c81314cd"
+				],
+				"controllers": [
+					"Steve Smith",
+					"BAC Florida"
+				],
+				"delegations": [
+					{
+						"owner": "Steve Smith",
+						"delegatee": "Moodys",
+						"amount": "2",
+						"accessCategories": ""
+					}
+				],
+				"data": [
+					{
+						"descriptor": "Payment confirmation BAC Florida June-2016",
+						"attribute": "QmXVFStSMEcoAWPVKLrxJ8wf5ohn2UdmdAxcnfB8TtSAZG",
+						"flag": 0
+					},
+					{
+						"descriptor": "Loan ID 122235, Summary 2015",
+						"attribute": "QmSMWeGPjtgzQ75Y1YXbnC4uByni8bwHcB4vPXrPVcUTUM",
+						"flag": 0
+					}
+				]
+			}
+		},
+		{
+			"dimension_id": "Loan AAA Bundle Miami Fl",
+
+			"dimension_details": {
+				"dimensionName": "Car Loan Honda City FL",
+				"pubKey": "0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055",
+				"address": "",
+				"flag": 0,
+				"ID": 0,
+				"coidAddr": "E2B24811DB9B23DDEA8313D82D11A82014C8E3BC",
+				"dimensionCtrlAddr": "2C6C1B0DA4B8001C0EE4A8E1ED4704643C372534",
+				"uniqueId": "9aaddf7caa690217bddc743102dc7e417608a93418ad5da2c0c82c501004f26f",
+				"owners": [
+					"Steve Smith"
+				],
+				"controllers": [
+					"Steve Smith",
+					"BAC Florida"
+				],
+				"delegations": [
+					{
+						"owner": "Steve Smith",
+						"delegatee": "Moodys",
+						"amount": "2",
+						"accessCategories": ""
+					}
+				],
+				"data": [
+					{
+						"descriptor": "Leasing Document Signed June-2015",
+						"attribute": "QmXVFStSMEcoAWPVKLrxJ8wf5ohn2UdmdAxcnfB8TtSAZG",
+						"flag": 0
+					},
+					{
+						"descriptor": "Payment Confirmation Oct-2017",
+						"attribute": "QmSMWeGPjtgzQ75Y1YXbnC4uByni8bwHcB4vPXrPVcUTUM",
+						"flag": 0
+					}
+				]
+			}
+        }]
+        
+        this.state.dimensions = idims;
+        console.log("dimension length: " + this.state.dimensions.length);
     }
 
     handleHideModal() {
@@ -257,7 +344,7 @@ class AssetUtilities extends React.Component {
 
     render() {
 
-        		var inputAttrs = {
+        var inputAttrs = {
 			addKeys: [13, 188],	// Enter and comma
 			inputProps: {
 				placeholder: "use comma(,) to add multiple values",
@@ -266,6 +353,7 @@ class AssetUtilities extends React.Component {
 		};
 
         var style = { fontSize: '12.5px' };
+        var alignLeft = {'text-align': 'left'}
         var popUpWidth = { width: '70%' };
         var marginRight15 = { marginRight: '15px' };
 
@@ -312,7 +400,7 @@ class AssetUtilities extends React.Component {
                                         </div>
                                         <div id="collapse1" className="panel-collapse collapse out">
                                             <div className="panel-body">
-                                                <div className="row">
+                                                <div className="form-group col-md-12">
                                                     <table className="table table-striped table-hover" >
                                                         <tbody>
                                                             <tr>
@@ -340,7 +428,7 @@ class AssetUtilities extends React.Component {
                                                         {this.state.inputs.map(input => <UniqueIDAttributeForm type={"MyCOID"} handleShowModal={this.handleShowModal.bind(this)} max="10" key={input} labelref={input} />)}
                                                     </div>
                                                     <div className="form-group">
-                                                        <button type="button" className="btn-sm btn-info pull-right" style={marginRight15} onClick={this.appendInput.bind(this)}>
+                                                        <button type="button" style={style} className="btn-sm btn-info pull-right" onClick={this.appendInput.bind(this)}>
                                                             <span className="glyphicon glyphicon-plus"></span>Add More
 																</button>
                                                     </div>
@@ -368,25 +456,27 @@ class AssetUtilities extends React.Component {
                                                     </a>
                                                 </div>
                                             </div>
-                                        </div> {/* panel-heading */}
+                                        </div>{/* panel-heading */}
 
                                         <div id="collapse2" className="panel-collapse collapse out">
                                             <div className="panel-body">
-                                                <div className="row">
-                                                    <table className="table table-striped table-hover" style={style}>
+                                                <div className="form-group col-md-12">
+                                                    <table className="table table-striped table-hover">
                                                         <tbody>
                                                             <tr>
                                                                 <td><b>Membership Holding ID List</b></td>
-                                                                <td>
-                                                                    {(() => {
-                                                                        if (!$.isEmptyObject(asset.ownerIdList)) {
-                                                                            return asset.ownerIdList.map((ids, i) => {
-                                                                                return <p key={i}> {asset.ownerIdList[i]}</p>
-                                                                            })
-                                                                        }
-                                                                    })(this)}
-                                                                </td>
                                                             </tr>
+                                                            {(() => {
+                                                                if (!$.isEmptyObject(asset.ownerIdList)) {
+                                                                    return asset.ownerIdList.map((ids, i) => {
+                                                                        return (
+                                                                            <tr key={i}>
+                                                                                <td>{asset.ownerIdList[i]}</td>
+                                                                            </tr>
+                                                                        )
+                                                                    })
+                                                                }
+                                                            })(this)}
                                                         </tbody>
                                                     </table>
                                                     <div id="OWNERSHIP">
@@ -395,10 +485,10 @@ class AssetUtilities extends React.Component {
                                                             <label htmlFor="control_dist">Enter holders and their membership token(s).</label>
                                                             {this.state.inputs_owners.map(input => <TokenDistributionForm min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
                                                         </div>
-                                                        <div className="col-md-offset-6 col-md-6 ">
+                                                        <div className="col-md-offset-6 col-md-6">
                                                             <button type="button" className="btn btn-info pull-right" style={style} onClick={this.appendOwners.bind(this)}>
                                                                 <span className="glyphicon glyphicon-plus"></span>Add More
-							    								</button>
+							    							</button>
                                                         </div>
                                                         <div className="form-group">
                                                             <button style={style} type="button" className="btn btn-primary" onClick={this.requestUpdateOwners.bind(this)}>
@@ -428,21 +518,23 @@ class AssetUtilities extends React.Component {
                                         </div>
                                         <div id="collapse3" className="panel-collapse collapse out">
                                             <div className="panel-body">
-                                                <div className="row">
-                                                    <table className="table table-striped table-hover" style={style}>
+                                                <div className="form-group col-md-12">
+                                                    <table className="table table-striped table-hover">
                                                         <tbody>
                                                             <tr>
                                                                 <td><b>Delegation ID List</b></td>
-                                                                <td>
-                                                                    {(() => {
-                                                                        if (!$.isEmptyObject(asset.controlIdList)) {
-                                                                            return asset.controlIdList.map((ids, i) => {
-                                                                                return <p key={i}> {asset.controlIdList[i]}</p>
-                                                                            })
-                                                                        }
-                                                                    })(this)}
-                                                                </td>
                                                             </tr>
+                                                            {(() => {
+                                                                if (!$.isEmptyObject(asset.controlIdList)) {
+                                                                    return asset.controlIdList.map((ids, i) => {
+                                                                        return(
+                                                                            <tr key={i}>
+                                                                                <td>{asset.controlIdList[i]}</td>
+                                                                            </tr>
+                                                                        )
+                                                                    })
+                                                                }
+                                                            })(this)}
                                                         </tbody>
                                                     </table>
 
@@ -451,9 +543,11 @@ class AssetUtilities extends React.Component {
                                                         {this.state.inputs_controllers.map(input => <TokenDistributionForm min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
                                                     </div>
                                                         {/* onClick={this.appendControllers.bind(this)} */}
-                                                        <button type="button" className="btn-sm btn-info pull-right" style={style}>
+                                                    <div className="col-md-offset-6 col-md-6">
+                                                        <button type="button" className="btn btn-info pull-right" style={style}>
                                                             <span className="glyphicon glyphicon-plus"></span>Add More
 														</button>
+                                                    </div>
                                                     <div className="form-group">
                                                         {/* onClick={this.requestUpdateController.bind(this)} */}
                                                         <button style={style} type="button" className="btn-sm btn-primary">
@@ -482,20 +576,23 @@ class AssetUtilities extends React.Component {
                                         </div>
                                         <div id="collapse4" className="panel-collapse collapse out">
                                             <div className="panel-body">
-                                                <div className="row">
-                                                    <table className="table table-striped table-hover" style={style}>
+                                                <div className="form-group col-md-12">
+                                                    <table className="table table-striped table-hover">
                                                         <tbody>
                                                             <tr>
-                                                                <td>Recovery IDs</td>
-                                                                <td>{(() => {
-                                                                    if (!$.isEmptyObject(asset.identityRecoveryIdList)) {
-                                                                        return asset.identityRecoveryIdList.map((ids, i) => {
-                                                                            return <p key={i}> {asset.identityRecoveryIdList[i]}</p>
-                                                                        })
-                                                                    }
-                                                                })(this)}
-                                                                </td>
+                                                                <td><b>Recovery IDs</b></td>
                                                             </tr>
+                                                            {(() => {
+                                                                if (!$.isEmptyObject(asset.identityRecoveryIdList)) {
+                                                                    return asset.identityRecoveryIdList.map((ids, i) => {
+                                                                        return(
+                                                                            <tr key={i}>
+                                                                                <td>{asset.identityRecoveryIdList[i]}</td>
+                                                                            </tr>
+                                                                        )
+                                                                    })
+                                                                }
+                                                            })(this)}
                                                             <tr>
                                                                 <td>Recovery Condition</td>
                                                                 <td><p>{asset.recoveryCondition}</p></td>
@@ -507,15 +604,15 @@ class AssetUtilities extends React.Component {
                                                         </tbody>
                                                     </table>
                                                     <div className="form-group">
-                                                        <label style={style} htmlFor="control_dist">Enter Recovery ID(s).</label>
+                                                        <label htmlFor="control_dist">Enter Recovery ID(s).</label>
                                                         <TagsInput {...inputAttrs} value={this.state.recovery_list} onChange={(e) => { this.onFieldChange("recovery_list", e) }} />
                                                     </div><br />
 
-                                                    <div className="form-group"> */}
+                                                    <div className="form-group">
                                                     {/* onClick={this.requestUpdateRecovery.bind(this)*/}
                                                         <button style={style} type="button" className="btn btn-primary">
                                                             <span className="glyphicon glyphicon-plus"></span>Update Recovery
-													</button>
+													    </button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -539,16 +636,22 @@ class AssetUtilities extends React.Component {
                                         </div>
                                         <div id="collapse5" className="panel-collapse collapse out">
                                             <div className="panel-body">
-                                                <div className="row">
+                                                <div className="form-group col-md-12">
                                                     <table className="table table-striped table-hover" style={style}>
                                                         <tbody>
                                                             <tr>
                                                                 <td><b>Temporary Delegations List</b></td>
+                                                            </tr>
+                                                            <tr>
                                                                 <td>
                                                                     {(() => {
                                                                         if (!$.isEmptyObject(asset.delegateeIdList)) {
                                                                             return asset.delegateeIdList.map((ids, i) => {
-                                                                                return <p key={i}> {asset.delegateeIdList[i]}</p>
+                                                                                return(
+                                                                                    <tr key={i}>
+                                                                                        <td>{asset.delegateeIdList[i]}</td>
+                                                                                    </tr>
+                                                                                )
                                                                             })
                                                                         }
                                                                     })(this)}
@@ -560,16 +663,18 @@ class AssetUtilities extends React.Component {
                                                         <label htmlFor="delegatee_dist">Enter Delegatees and their delegated token(s).</label>
                                                         {this.state.inputs_delegatees.map(input => <TokenDistributionForm min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
                                                     </div>
-                                                    {/* <div className="col-md-offset-6 col-md-6 ">
-                                                        <button type="button" className="btn btn-info pull-right" style={style} onClick={this.appendDelegatees.bind(this)}>
+                                                    <div className="col-md-offset-6 col-md-6">
+                                                        {/* onClick={this.appendDelegatees.bind(this)} */}
+                                                        <button type="button" className="btn btn-info pull-right" style={style}>
                                                             <span className="glyphicon glyphicon-plus"></span>Add More
-							    								</button>
+							    						</button>
                                                     </div>
                                                     <div className="form-group">
-                                                        <button style={style} type="button" className="btn btn-primary" onClick={this.requestUpdateDelegatees.bind(this)}>
+                                                        {/* onClick={this.requestUpdateDelegatees.bind(this)} */}
+                                                        <button style={style} type="button" className="btn btn-primary">
                                                             <span className="glyphicon glyphicon-plus"></span>Update Delegations
                                 								</button>
-                                                    </div> */}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

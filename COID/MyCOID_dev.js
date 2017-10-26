@@ -196,7 +196,7 @@ var MyCOID = function (contractAddress) {
 
     this.clearExpirations = function (formdata, callback) {
         var currentDate = new Date();
-        currentDate = parseInt(currentDate.getTime())/1000;
+        currentDate = parseInt(currentDate.getTime()) / 1000;
         var spliceArr = [];
         console.log("CLEAR EXPIR: " + JSON.stringify(formdata));
         //first check to avoid an out-of-bounds error
@@ -208,7 +208,7 @@ var MyCOID = function (contractAddress) {
                     console.log(formdata.delegations[i].delegatee);
                     spliceArr.push(i);
                     console.log(currentDate + "  token cleared " + i);
-		    var ctrlIndex = formdata.controlIdList.indexOf(formdata.delegations[i].owner);
+                    var ctrlIndex = formdata.controlIdList.indexOf(formdata.delegations[i].owner);
                     if (ctrlIndex >= 0) {
                         formdata.controlTokenQuantity[ctrlIndex] += Number(formdata.delegations[i].amount);
                     }
@@ -219,7 +219,7 @@ var MyCOID = function (contractAddress) {
             }
             callback();
         }
-	else{callback();}
+        else { callback(); }
     }
 
     this.bigchainIt = function (formdata, callback) {
@@ -316,16 +316,16 @@ var MyCOID = function (contractAddress) {
 
 
     this.writeAll = function (formdata, callback) {
-	if (typeof(formdata.delegations) == 'object' && formdata.delegations[0] == "") {
+        if (typeof (formdata.delegations) == 'object' && formdata.delegations[0] == "") {
             formdata.delegations.splice(0, 1);
             //formdata.delegateeTokenQuantity.splice(0, 1);
             console.log("empty delegatee removed from results: " + formdata);
         }
 
-	 if (typeof(formdata.delegations) != 'object'){
-	    formdata.delegations = [];
-	    formdata.delegateeTokenQuantity = [];
-	 }
+        if (typeof (formdata.delegations) != 'object') {
+            formdata.delegations = [];
+            formdata.delegateeTokenQuantity = [];
+        }
 
         var max = Math.max(formdata.ownerIdList.length, formdata.controlIdList.length);
         var max = Math.max(max, formdata.delegations.length);
@@ -333,7 +333,7 @@ var MyCOID = function (contractAddress) {
         var fileName = formdata.assetID + ".json";
         var owners = formdata.ownerIdList;
         var controllers = formdata.controlIdList;
-	//var delegatees = formdata.delegateeIdList;
+        //var delegatees = formdata.delegateeIdList;
         //max = Math.max(formdata.dimension.delegations.length, max);
         console.log("\n*****THE MIGHTY WRITEALL*****\n");
         console.log(JSON.stringify(formdata));
@@ -364,7 +364,7 @@ var MyCOID = function (contractAddress) {
                     if (k == total) { console.log("controlller callback"); callback() }
                 })
             }
-	    if (typeof (formdata.delegations[i]) != 'undefined' && typeof (formdata.delegations[i]) != 'null' && formdata.delegations[i] != "" && formdata.delegations[i].owner != "") {
+            if (typeof (formdata.delegations[i]) != 'undefined' && typeof (formdata.delegations[i]) != 'null' && formdata.delegations[i] != "" && formdata.delegations[i].owner != "") {
                 var delegatee = formdata.delegations[i].delegatee;
                 delegateeLog = JSON.parse(JSON.stringify(formdata));
                 delegateeLog.pubKey = "";
@@ -431,7 +431,7 @@ var MyCOID = function (contractAddress) {
     }
 
 
-   //REVOKE DELEGATION TO A DELEGATEE AS A CONTROLLER
+    //REVOKE DELEGATION TO A DELEGATEE AS A CONTROLLER
     this.revokeControlDelegation = function (formdata, callback) {
         var controller = formdata.pubKey;
         var delegatee = formdata.delegatee;
@@ -441,18 +441,18 @@ var MyCOID = function (contractAddress) {
         var pubKey = formdata.pubKey;
         var fileName = formdata.filename;
         var flag = formdata.flag;
-	var all = Boolean(formdata.all.toLowerCase() == 'true');//boolean - true or false;
-	var spliceArr=[];
-	var isCtrl = false;
+        var all = Boolean(formdata.all.toLowerCase() == 'true');//boolean - true or false;
+        var spliceArr = [];
+        var isCtrl = false;
         //TODO:
         var controllerHash = keccak_256(controller).toUpperCase()
-	var owner = controllerHash;
+        var owner = controllerHash;
         var delegateeHash = keccak_256(delegatee).toUpperCase()
 
         theNotifier.GetAsset(pubKey, fileName, flag, function (results) {
             self.contract.revokeDelegation(controllerHash, delegateeHash, amount, all, function (error, result) {
                 if (result) {
-		    var ctrlIndex = results.controlIdList.indexOf(controllerHash);
+                    var ctrlIndex = results.controlIdList.indexOf(controllerHash);
                     if (ctrlIndex >= 0) {
                         isCtrl = true;
                     }
@@ -463,16 +463,16 @@ var MyCOID = function (contractAddress) {
 
                             for (var j = 0; j < log.delegations.length; j++) {
                                 if (log.delegations[j].owner == owner && log.delegations[j].delegatee == delegateeHash) {
-                                spliceArr.push(j);
-				if (isCtrl) {
-                                        results.controlTokenQuantity[ctrlIndex] = Number(results.controlTokenQuantity[ctrlIndex])+ Number(log.delegations[j].amount);
+                                    spliceArr.push(j);
+                                    if (isCtrl) {
+                                        results.controlTokenQuantity[ctrlIndex] = Number(results.controlTokenQuantity[ctrlIndex]) + Number(log.delegations[j].amount);
                                     }
-				if(j == (log.delegations.length-1)){
-				     if (spliceArr.length > 0) {
-               				 for(var i = spliceArr.length-1; i >= 0 ; i--) { log.delegations.splice(spliceArr[i], 1); console.log("spliced " + spliceArr[i]); }
-            				}
+                                    if (j == (log.delegations.length - 1)) {
+                                        if (spliceArr.length > 0) {
+                                            for (var i = spliceArr.length - 1; i >= 0; i--) { log.delegations.splice(spliceArr[i], 1); console.log("spliced " + spliceArr[i]); }
+                                        }
 
-				}    
+                                    }
                                 }
                             }
                         }
@@ -526,18 +526,18 @@ var MyCOID = function (contractAddress) {
                                 //now spend the amount
                                 if (amount >= log.delegations[index].amount) {
                                     amount = amount - log.delegations[index].amount;
-				    if (isCtrl) {
+                                    if (isCtrl) {
                                         results.controlTokenQuantity[ctrlIndex] += Number(log.delegations[index].amount);
                                     }
-				    log.delegations.splice(index, 1);//this function clears and returns coins back to owner
+                                    log.delegations.splice(index, 1);//this function clears and returns coins back to owner
                                 }
                                 else {
                                     //no need to give tokens back to owner--they are infinite and created on the fly
 
                                     //just subtract remaining amount from the current delegation amount
                                     log.delegations[index].amount = log.delegations[index].amount - amount;
-				    if (isCtrl) {
-                                        results.controlTokenQuantity[ctrlIndex] = Number(results.controlTokenQuantity[ctrlIndex])+amount;
+                                    if (isCtrl) {
+                                        results.controlTokenQuantity[ctrlIndex] = Number(results.controlTokenQuantity[ctrlIndex]) + amount;
                                     }
                                     //now set amount = 0 since we are done
                                     amount = 0;
@@ -574,13 +574,13 @@ var MyCOID = function (contractAddress) {
         var sig = formdata.sig;
         var delegatee = formdata.delegatee;
         var amount = formdata.amount;
-	var pubKey = formdata.pubKey;
+        var pubKey = formdata.pubKey;
         var fileName = formdata.filename;
         var flag = formdata.flag;
-	var index = 0;
-	var keepGoing = true;
-	var isCtrl = false;
-	var ctrlIndex = -1;
+        var index = 0;
+        var keepGoing = true;
+        var isCtrl = false;
+        var ctrlIndex = -1;
 
         //TODO:
         var delegateeHash = keccak_256(delegatee).toUpperCase()
@@ -609,19 +609,19 @@ var MyCOID = function (contractAddress) {
                             //now spend the amount
                             if (amount >= results.delegations[index].amount) {
                                 amount = amount - results.delegations[index].amount;
-				ctrlIndex = results.controlIdList.indexOf(results.delegations[index].owner);
-				if (ctrlIndex >= 0) {
-                                        results.controlTokenQuantity[ctrlIndex] += Number(results.delegations[index].amount);
-                                    }
+                                ctrlIndex = results.controlIdList.indexOf(results.delegations[index].owner);
+                                if (ctrlIndex >= 0) {
+                                    results.controlTokenQuantity[ctrlIndex] += Number(results.delegations[index].amount);
+                                }
                                 results.delegations.splice(index, 1);
                             }
                             else {
                                 //just subtract remaining amount from the current delegation amount
                                 results.delegations[index].amount = results.delegations[index].amount - amount;
-				ctrlIndex = results.controlIdList.indexOf(results.delegations[index].owner);
-				if (ctrlIndex >= 0) {
-                                        results.controlTokenQuantity[ctrlIndex] += amount;
-                                    }
+                                ctrlIndex = results.controlIdList.indexOf(results.delegations[index].owner);
+                                if (ctrlIndex >= 0) {
+                                    results.controlTokenQuantity[ctrlIndex] += amount;
+                                }
                                 //now set amount = 0 since we are done
                                 amount = 0;
 
@@ -641,16 +641,16 @@ var MyCOID = function (contractAddress) {
                 }
                 else {
                     console.log("Error occurred while spending: " + error);
-		    if(result == 'false' || result === false){
+                    if (result == 'false' || result === false) {
                         self.clearExpirations(results, function () {
-                             self.bigchainIt(results, function (res, bigchainID, bigchainHash) {
-                                    results.bigchainID = bigchainID;
-                                    results.bigchainHash = bigchainHash;
-                                    self.writeAll(results, function () { callback(error, result) })
-                                });
+                            self.bigchainIt(results, function (res, bigchainID, bigchainHash) {
+                                results.bigchainID = bigchainID;
+                                results.bigchainHash = bigchainHash;
+                                self.writeAll(results, function () { callback(error, result) })
+                            });
                         })
                     }
-		    else{
+                    else {
                         callback(error, result);
                     }
                 }
@@ -684,21 +684,21 @@ var MyCOID = function (contractAddress) {
         var fileName = formdata.filename;
         var flag = formdata.flag;
         var isOwner = true;
-	var timeFrame = Number(formdata.timeFrame) || 5000;
-	var currentDate = new Date();
+        var timeFrame = Number(formdata.timeFrame) || 5000;
+        var currentDate = new Date();
         currentDate = currentDate.getTime() / 1000;
 
         //TODO:
         var controllerHash = keccak_256(controller).toUpperCase()
         var delegateeHash = keccak_256(delegatee).toUpperCase()
 
-console.log("pubkey: "+pubKey+" filename: "+fileName+" flag: "+flag+"\n")
+        console.log("pubkey: " + pubKey + " filename: " + fileName + " flag: " + flag + "\n")
         theNotifier.GetAsset(pubKey, fileName, flag, function (results) {
             self.contract.delegate(controllerHash, delegateeHash, amount, timeFrame, function (error, result) {
                 if (result) {
-		    if(typeof(results.delegations) == 'undefined' || typeof(results.delegations) == 'null'){
-		        results.delegations=[];
-		    }
+                    if (typeof (results.delegations) == 'undefined' || typeof (results.delegations) == 'null') {
+                        results.delegations = [];
+                    }
                     console.log("Contract call complete");
                     var entry = {
                         "owner": controllerHash,
@@ -707,9 +707,9 @@ console.log("pubkey: "+pubKey+" filename: "+fileName+" flag: "+flag+"\n")
                         "expiration": String(currentDate + timeFrame)
                     };
                     results.delegations.push(entry);
-		    var ctrlIndex = results.controlIdList.indexOf(controllerHash);
-                    if(ctrlIndex>=0){
-                        results.controlTokenQuantity[ctrlIndex] -= amount; 
+                    var ctrlIndex = results.controlIdList.indexOf(controllerHash);
+                    if (ctrlIndex >= 0) {
+                        results.controlTokenQuantity[ctrlIndex] -= amount;
                     }
                     //j++;
                     //if (j == (formdata.length)) {
@@ -725,7 +725,7 @@ console.log("pubkey: "+pubKey+" filename: "+fileName+" flag: "+flag+"\n")
                     i = formdata.length;
                     console.log("Error occurred while delegating: " + error);
                 }
-            })	               
+            })
         })
     }
 
@@ -740,7 +740,7 @@ console.log("pubkey: "+pubKey+" filename: "+fileName+" flag: "+flag+"\n")
         var amount = formdata.amount;
         var oldIndex;
         var newIndex;
-        var fileName = formdata.filename; 
+        var fileName = formdata.filename;
 
         //TODO:
         var originalControllerHash = keccak_256(originalController).toUpperCase()
@@ -801,7 +801,7 @@ console.log("pubkey: "+pubKey+" filename: "+fileName+" flag: "+flag+"\n")
         var fileName = formdata.filename;
         var flag = 0;
         var k = 0;
-       // var verified = self.verify(msg, sig, pubKey);
+        // var verified = self.verify(msg, sig, pubKey);
         //TODO:
         //var controllerHash = keccak_256(controller).toUpperCase()
         //var controllerHash = keccak_256(controller)
@@ -819,8 +819,8 @@ console.log("pubkey: "+pubKey+" filename: "+fileName+" flag: "+flag+"\n")
                     console.log("lenght: " + controller.length);
                     var controllerHash = keccak_256(controller[i]).toUpperCase();
                     console.log("get complete : " + controllerHash);
-                    
-                    self.contract.addController(keccak_256(pubKey), controllerHash,amount[i], function (error, result) {
+
+                    self.contract.addController(keccak_256(pubKey), controllerHash, amount[i], function (error, result) {
                         console.log("contract complete");
                         if (result[0]) {
 
@@ -865,8 +865,8 @@ console.log("pubkey: "+pubKey+" filename: "+fileName+" flag: "+flag+"\n")
         var pubKey = formdata.pubKey
         var controller = formdata.controller;
         var fileName = formdata.filename;
-	var flag = formdata.flag;
-       // var verified = self.verify(msg, sig, pubKey);
+        var flag = formdata.flag;
+        // var verified = self.verify(msg, sig, pubKey);
 
         //TODO:
         var controllerHash = keccak_256(controller).toUpperCase()
@@ -875,15 +875,15 @@ console.log("pubkey: "+pubKey+" filename: "+fileName+" flag: "+flag+"\n")
             theNotifier.GetAsset(pubKey, fileName, flag, function (results) {
                 self.contract.removeController(keccak_256(pubKey), controllerHash, function (error, result) {
                     if (result[0]) {
-			console.log("contract complete");
+                        console.log("contract complete");
                         for (var j = 0; j < results.controlIdList.length; j++) {
-				console.log("j: "+j);
-				 console.log("CH: "+ controllerHash + "res: "+results.controlIdList[j]);
+                            console.log("j: " + j);
+                            console.log("CH: " + controllerHash + "res: " + results.controlIdList[j]);
                             if (results.controlIdList[j].toUpperCase() == controllerHash) {
-				for(var x=results.delegations.length-1;x>=0;x--){
-					console.log("x: "+x);
-                                    if(results.delegations[x].owner == controllerHash){
-                                        results.delegations.splice(x, 1); 
+                                for (var x = results.delegations.length - 1; x >= 0; x--) {
+                                    console.log("x: " + x);
+                                    if (results.delegations[x].owner == controllerHash) {
+                                        results.delegations.splice(x, 1);
                                         console.log("spliced " + x);
                                     }
                                 }
@@ -894,7 +894,7 @@ console.log("pubkey: "+pubKey+" filename: "+fileName+" flag: "+flag+"\n")
                                     results.bigchainHash = bigchainHash;
                                     self.writeAll(results, function () { callback(error, result) })
                                 });
-				break;
+                                break;
                             }
                         }
                     }

@@ -1197,9 +1197,9 @@ var eventListener = function () {
         var bigchainInput = {
             "Description": description,
             "proposalID": proposalID,
-            "Coid_Data": coidData,
-            "coidGK_Address": coidGKAddress,
-            "coid_Address": coidAddr,
+            "Coid_Data":,
+            // "coidGK_Address": coidGKAddress,
+            // "coid_Address": coidAddr,
             "dimensionCtrlAddr": dimensionCtrlAddr,
             "blockNumber": blockNumber,
             "blockHash": blockHash,

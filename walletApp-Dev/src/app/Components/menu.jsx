@@ -5,13 +5,10 @@ class Menu extends React.Component {
 
 	constructor(props) {
 		super(props);
-		// this.state = {
-		// 	userLoggedIn: this.props.loggedin
-		// }
 	}
 
 	componentWillMount(){
-		//here we need to add code to check if Moodys is logged in
+		//here we need to add code to check who is logged in?
 	}
 
 	render() {

@@ -1,7 +1,5 @@
 var webpack = require('webpack');
 var path = require('path');
-
-
 var DEPLOY_PATH = "C:/Users/1070933/Desktop/GPT_Identity/walletApp-Production";
 var BUILD_DIR = path.resolve(DEPLOY_PATH + '/js');
 var APP_DIR = path.resolve(__dirname, 'src/app');
@@ -22,14 +20,6 @@ var config = {
       { test: /\.json$/, loader: 'json' }
     ]
   },
-
-  // resolve: {
-  //   extensions: ['', '.js', '.jsx', '.json'],
-  //   root: 'node_modules/',
-  //   alias: {
-  //     'json': 'json-loader/index.js',
-  //   },
-  // },
 
 };
 

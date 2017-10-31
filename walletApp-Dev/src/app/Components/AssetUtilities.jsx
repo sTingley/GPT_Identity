@@ -507,7 +507,7 @@ class AssetUtilities extends React.Component {
                                         <div className="panel-heading">
                                             <div className="row">
                                                 <div className="col-xs-11">
-                                                    <label>Delegation</label>
+                                                    <label>Control</label>
                                                 </div>
                                                 <div className="col-xs-1">
                                                     <a data-toggle="collapse" data-parent="#accordion" href="#collapse3">
@@ -522,7 +522,7 @@ class AssetUtilities extends React.Component {
                                                     <table className="table table-striped table-hover">
                                                         <tbody>
                                                             <tr>
-                                                                <td><b>Delegation ID List</b></td>
+                                                                <td><b>Control ID List</b></td>
                                                             </tr>
                                                             {(() => {
                                                                 if (!$.isEmptyObject(asset.controlIdList)) {
@@ -533,13 +533,13 @@ class AssetUtilities extends React.Component {
                                                                             </tr>
                                                                         )
                                                                     })
-                                                                }
+                                                                } else return (<tr><td>No Controllers</td></tr>)
                                                             })(this)}
                                                         </tbody>
                                                     </table>
 
                                                     <div className="form-group">
-                                                        <label htmlFor="control_dist">Enter Delegatees and their delegated token(s).</label>
+                                                        <label htmlFor="control_dist">Enter controllers and their delegated control token(s).</label>
                                                         {this.state.inputs_controllers.map(input => <TokenDistributionForm min={this.state.subform_cont} max="10" key={input} labelref={input} />)}
                                                     </div>
                                                         {/* onClick={this.appendControllers.bind(this)} */}
@@ -551,7 +551,7 @@ class AssetUtilities extends React.Component {
                                                     <div className="form-group">
                                                         {/* onClick={this.requestUpdateController.bind(this)} */}
                                                         <button style={style} type="button" className="btn-sm btn-primary">
-                                                            <span className="glyphicon glyphicon-plus"></span>Update Delegatees
+                                                            <span className="glyphicon glyphicon-plus"></span>Update Controllers
 														</button>
                                                     </div>
                                                 </div>
@@ -653,7 +653,7 @@ class AssetUtilities extends React.Component {
                                                                                     </tr>
                                                                                 )
                                                                             })
-                                                                        }
+                                                                        } else return (<tr><td>No Temporary Delegations have been created</td></tr>)
                                                                     })(this)}
                                                                 </td>
                                                             </tr>

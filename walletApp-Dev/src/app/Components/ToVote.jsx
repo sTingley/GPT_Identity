@@ -390,7 +390,7 @@ class ToVote extends React.Component {
 	// 	let test = JSON.parse(coidData.data);
 	// 	test = JSON.parse(JSON.stringify(test.messages));
 	// 	this.setState({coid: test});
-	// }
+	}
 
 	hideHandler() {
 		this.setState({ showDetails: false });

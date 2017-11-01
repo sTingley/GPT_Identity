@@ -97,27 +97,27 @@ var ballotApp = function () {
     var self = this;
 
     this.createNotification = function (inputs) {
-        request.post(this.twinUrl + "/ballot/writeNotify")
+        request.post(this.twinUrl + "/notification/writeNotify")
             .send(inputs)
             .set('Accept', 'application/json')
             .end((err, res) => {
-                if (err) { console.log("/ballot/writeNotify error: " + err) }
+                if (err) { console.log("/writeNotify error: " + err) }
                 // if (res.status == 200) {
                 // do something
                 //}
             });
     };
 
-    this.createExpiredProposalNotification = function (inputs) {
-        request.post(this.twinUrl + "/ballot/writeExpiredProposal")
-            .send(inputs)
-            .set('Accept', 'application/json')
-            .end((err, res) => {
-                if (res.status == 200) {
-                    // do something
-                }
-            });
-    };
+    // this.createExpiredProposalNotification = function (inputs) {
+    //     request.post(this.twinUrl + "/ballot/writeExpiredProposal")
+    //         .send(inputs)
+    //         .set('Accept', 'application/json')
+    //         .end((err, res) => {
+    //             if (res.status == 200) {
+    //                 // do something
+    //             }
+    //         });
+    // };
 
     //ST: This is never called.......
     // this.createCoid = function (inputs) {
@@ -183,10 +183,10 @@ var ballotApp = function () {
 
     }, function (error, result) {
         if (error) {
-            console.log("Notification event exists with err", error);
+            console.log("Notification event exists with error: ", error);
         }
         console.log("notifyValidator event reached")
-        console.log(JSON.stringify(result.args))
+        console.log("event args: " + JSON.stringify(result.args));
         var proposal = result.args.proposalIdToVote;
         var validator = result.args.validator;
         var isHuman = result.args.isHuman;
@@ -195,9 +195,15 @@ var ballotApp = function () {
 
         console.log("isHuman val: " + isHuman);
         console.log("address is: " + address);
-        _this.createNotification({ "pubKey": validator, "proposalID": proposal, "message": "You have been selected to vote on the proposal.", "isHuman": isHuman, "gatekeeperAddr": address, "propType": propType });
-        //_this.createProposalPendingNotification(validator, proposal);
-        console.log("pass on err check: ballot contract notify event");
+        _this.createNotification({
+            "pubKey": validator,
+            "proposalID": proposal,
+            "message": "You have been selected to vote on the proposal.",
+            "isHuman": isHuman,
+            "gatekeeperAddr": address,
+            "propType": propType });
+            //_this.createProposalPendingNotification(validator, proposal);
+            console.log("pass on err check: ballot contract notify event");
     })
 } //end of ballotApp
 

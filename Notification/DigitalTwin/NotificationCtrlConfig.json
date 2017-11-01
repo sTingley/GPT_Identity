@@ -1,4 +1,5 @@
 {
   "notifications_file": "_notify",
-  "path": "/home/demoadmin/DigitalTwin/notifications/"
+  "ballots_file": "_vote",
+  "path": "/home/1070933/DigitalTwin/notifications/"
 }

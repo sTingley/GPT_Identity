@@ -4,9 +4,7 @@ var app = require('express')(),
         bodyParser = require('body-parser'),
         fileUpload = require('express-fileupload'),
         NotificationCtrl = require('./NotificationCtrl.js'),
-	BallotCtrl = require('./ballotCtrl.js'),
         http = require('http'),
-        expiredNotification = require('./expiredNotification.js'),
         IPFS = require('./ipfs.js'),
         TwinConfig = require('./TwinConfig.json'),
         IdentityDimensionCtrl = require('./IdentityDimensionCtrl.js'),
@@ -28,8 +26,6 @@ app.all('/*', function (req, res, next) {
         res.header("Access-Control-Allow-Headers", "X-Requested-With");
         next();
 });
-
-
 
 
 //Returns a proxy configuration
@@ -74,17 +70,12 @@ app.post('/writeContacts',contactCtrl.writeContacts);
 // <- <- <- END CONTACT FUNCTIONS <- <- <-
 
 // -> -> -> START NOTIFICATION FUNCTIONS -> -> ->
-app.post('/ballot/writeNotify', BallotCtrl.writeBallot);
-app.get('/ballot/readNotify/:pubKey', BallotCtrl.fetchBallot);
-//writeExpiredProposalNotification is commented out in NotificationCtrl
-app.post('/notification/writeExpiredProposal', NotificationCtrl.writeExpiredProposalNotification);
-//writeNotification is called in Gatekeepers ..... need to verify that this notify requester correctly (?)
 app.post('/notification/writeNotify', NotificationCtrl.writeNotification);
 app.get('/notification/readNotify/:pubKey', NotificationCtrl.fetchNotification);
-
-//ST WE NEVER USE THIS!!!!!!
-//app.get('/ballot/readExpiredProposal/:pubKey', expiredNotification.fetchExpiredProposalNotification);
-
+app.get('/notification/readProposals/:pubKey', NotificationCtrl.fetchBallot);
+//ST WE NEVER USE THESE... do we need to fetch expired notifications???!
+//app.get('/ballot/readExpiredProposal/:pubKey', NotificationCtrl.fetchExpiredProposalNotification);
+//app.post('/notification/writeExpiredProposal', NotificationCtrl.writeExpiredProposalNotification);
 
 // <- <- <- END NOTIFICATION FUNCTIONS <- <- <-
 

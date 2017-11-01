@@ -368,29 +368,29 @@ class ToVote extends React.Component {
 		console.log("hash of empty: " + keccak_256(""));
 		console.log("hash of spencer: " + keccak_256("spencer"));
 
-		// $.ajax({
-		// 	url: twinUrl + "ballot/readNotify/" + keccak_256(localStorage.getItem("pubKey")).toUpperCase(),
-		// 	dataType: 'json',
-		// 	cache: false,
-		// 	success: function (result) {
-		// 		console.log("result: " + JSON.stringify((result)));
-		// 		if (typeof (result) != "object") {
-		// 			var data = JSON.parse(result);
-		// 		} else {
-		// 			var data = result;
-		// 			var test = JSON.parse((result.data));
-		// 			test = JSON.parse(JSON.stringify(test.messages));
-		// 			console.log(test[0].type);
-		// 		}
-		// 		this.setState({ coid: test });
-		// 		console.log("result: " + JSON.stringify((result.data)));
-		// 	}.bind(this)
-		// });
-		let coidData = {"data":"{\"id\":\"252B21496C1BB4BD63A26751A09350ABA052B8185A713C6C7FFA8B01DC2B8F1A\",\"messages\":[{\"type\":\"proposal\",\"proposal_id\":\"E6D67871E5D8C63FEE0C756D3BDB979AE3F3585ECAB4B106E274C399B4660F65\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1508145049990,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"},{\"type\":\"proposal\",\"proposal_id\":\"EF904896BED7C07BD3E42163415FD64A8E46C3415DAC0302218E6978C688251E\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1508143256055,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"},{\"type\":\"proposal\",\"proposal_id\":\"D263CCFE3D47B87FA7B2E383F0834D7DD0FDC9FC92ECF361399B1CC3E63BB18E\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1508137339494,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"},{\"type\":\"proposal\",\"proposal_id\":\"B4A24A37903F1F79B57B82F170925CF9D409F774111B947982C1C2447DAE2D1B\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1508136875822,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"},{\"type\":\"proposal\",\"proposal_id\":\"3B08D0AE54888B07DF2BDAD9846153AFCFF2E1E515D8FD41DD083D14EA566879\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1508135783055,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"},{\"type\":\"proposal\",\"proposal_id\":\"D7D6F5CF0E7B6E633D0AC31E1539B62CD7530FF6BF6E36DB8A2191406C74FB7E\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1508134006740,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"},{\"type\":\"proposal\",\"proposal_id\":\"B83BA4A36711D35F65572437E347998F95870C5618018A14FDDFF5891A959A22\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1508126411714,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"},{\"type\":\"proposal\",\"proposal_id\":\"EF6F5DB37441A379B302BA5D9CEA3D9271AD5B21F5AECE3F04D8CC86AC7A4F17\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1507785222153,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"}]}"}
-		let test = JSON.parse(coidData.data);
-		test = JSON.parse(JSON.stringify(test.messages));
-		this.setState({coid: test});
-	}
+	// 	$.ajax({
+	// 		url: twinUrl + "/notification/readProposals/" + keccak_256(localStorage.getItem("pubKey")).toUpperCase(),
+	// 		dataType: 'json',
+	// 		cache: false,
+	// 		success: function (result) {
+	// 			console.log("result: " + JSON.stringify((result)));
+	// 			if (typeof (result) != "object") {
+	// 				var data = JSON.parse(result);
+	// 			} else {
+	// 				var data = result;
+	// 				var test = JSON.parse((result.data));
+	// 				test = JSON.parse(JSON.stringify(test.messages));
+	// 				console.log(test[0].type);
+	// 			}
+	// 			this.setState({ coid: test });
+	// 			console.log("result: " + JSON.stringify((result.data)));
+	// 		}.bind(this)
+	// 	});
+	// 	let coidData = {"data":"{\"id\":\"252B21496C1BB4BD63A26751A09350ABA052B8185A713C6C7FFA8B01DC2B8F1A\",\"messages\":[{\"type\":\"proposal\",\"proposal_id\":\"E6D67871E5D8C63FEE0C756D3BDB979AE3F3585ECAB4B106E274C399B4660F65\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1508145049990,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"},{\"type\":\"proposal\",\"proposal_id\":\"EF904896BED7C07BD3E42163415FD64A8E46C3415DAC0302218E6978C688251E\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1508143256055,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"},{\"type\":\"proposal\",\"proposal_id\":\"D263CCFE3D47B87FA7B2E383F0834D7DD0FDC9FC92ECF361399B1CC3E63BB18E\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1508137339494,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"},{\"type\":\"proposal\",\"proposal_id\":\"B4A24A37903F1F79B57B82F170925CF9D409F774111B947982C1C2447DAE2D1B\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1508136875822,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"},{\"type\":\"proposal\",\"proposal_id\":\"3B08D0AE54888B07DF2BDAD9846153AFCFF2E1E515D8FD41DD083D14EA566879\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1508135783055,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"},{\"type\":\"proposal\",\"proposal_id\":\"D7D6F5CF0E7B6E633D0AC31E1539B62CD7530FF6BF6E36DB8A2191406C74FB7E\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1508134006740,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"},{\"type\":\"proposal\",\"proposal_id\":\"B83BA4A36711D35F65572437E347998F95870C5618018A14FDDFF5891A959A22\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1508126411714,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"},{\"type\":\"proposal\",\"proposal_id\":\"EF6F5DB37441A379B302BA5D9CEA3D9271AD5B21F5AECE3F04D8CC86AC7A4F17\",\"message\":\"You have been selected to vote on the proposal.\",\"read_status\":false,\"time\":1507785222153,\"gatekeeperAddr\":\"0000000000000000000000000000000000000000\",\"isHuman\":true,\"propType\":\"0\"}]}"}
+	// 	let test = JSON.parse(coidData.data);
+	// 	test = JSON.parse(JSON.stringify(test.messages));
+	// 	this.setState({coid: test});
+	// }
 
 	hideHandler() {
 		this.setState({ showDetails: false });

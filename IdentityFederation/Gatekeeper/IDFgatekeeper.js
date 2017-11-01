@@ -658,12 +658,8 @@ var gatekeeper = function () {
                 this1.setmyControlTokenID(requester, proposalId, myControlTokenId, myControlTokenAttributes, myControlTokenQuantity);
                 this1.setmyIdentityRecoveryIdList(requester, proposalId, myIdentityRecoveryIdList, myRecoveryCondition);
                 this1.selectValidators(proposalId, DaoContractAddr, ballotContractAddr);
-
                 this1.initiateCoidProposalSubmission(ballotContractAddr, proposalId, yesVotesRequiredToPass, isHuman);
-                //this.selectValidators(proposalId, DaoContractAddr, ballotContractAddr);
                 //theNotifier.createProposalPendingNotification(requester, proposalId);
-
-
                 callback(false, res);
             }, 3000)
         }

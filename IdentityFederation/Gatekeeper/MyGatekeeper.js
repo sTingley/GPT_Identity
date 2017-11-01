@@ -589,9 +589,7 @@ var gatekeeper = function (MyGKaddr) {
                 this1.setmyControlTokenID(requester, proposalId, myControlTokenId, myControlTokenAttributes, myControlTokenQuantity);
                 this1.setmyIdentityRecoveryIdList(requester, proposalId, myIdentityRecoveryIdList, myRecoveryCondition);
                 this1.setValidators(proposalId, validators, ballotContractAddr);
-
                 this1.initiateCoidProposalSubmission(ballotContractAddr, proposalId, yesVotesRequiredToPass, false, MyGKaddr, propType);
-
                 theNotifier.createProposalPendingNotification(requester, proposalId, isHuman, gatekeeperAddr, 0);
 
                 callback(false, res);

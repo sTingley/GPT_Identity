@@ -1,8 +1,8 @@
 'use strict'
 
-var chainConfig = require('/home/demoadmin/.eris/ErisChainConfig.json');
+var chainConfig = require('/home/1070933/.monax/ErisChainConfig.json');
 
-var erisContracts = require('eris-contracts')
+var erisContracts = require('@monax/legacy-contracts')
 var fs = require('fs')
 var http = require('http')
 var express = require('express')
@@ -51,7 +51,7 @@ var indexer = 0;
 //this function is intended to send a notification
 var notifier = function () {
     //location of digital twin
-    this.twinUrl = "http://10.100.98.218:5050";
+    this.twinUrl = "http://35.154.255.203:8000";
 
     //for grabbing the appropriate scope
     var _this = this;
@@ -60,26 +60,28 @@ var notifier = function () {
     //TODO: CHANGE THE ENDPOINT:
 
     //NOTE: THE DIGITAL TWIN will reject it without pubKey
-    this.notifyCoidCreation = function (pubKey, assetID, txnID, txnHash, gkAddr, coidAddr, dimensionCtrlAddr) {
+    //st: THIS IS NO LONGER NEEDED BECAUSE WE HAVE THE 'writeAll' method
+    // this.notifyCoidCreation = function (pubKey, assetID, txnID, txnHash, gkAddr, coidAddr, dimensionCtrlAddr) {
 
-        console.log("ASSET ID IS: " + assetID);
-        superAgent.post(this.twinUrl + "/setAsset")
-            .send({
-                "pubKey": keccak_256(pubKey),
-                "flag": 0,
-                "fileName": assetID + ".json",
-                "updateFlag": 1,
-                "keys": ["bigchainID", "bigchainHash", "gatekeeperAddr", "coidAddr", "dimensionCtrlAddr"],
-                "values": [txnID, txnHash, gkAddr, coidAddr, dimensionCtrlAddr]
-            })
-            .set('Accept', 'application/json')
-            .end((err, res) => {
-                // if(res.status == 200){
-                // do something
-                // }
-            });
-    };
+    //     console.log("ASSET ID IS: " + assetID);
+    //     superAgent.post(this.twinUrl + "/setAsset")
+    //         .send({
+    //             "pubKey": keccak_256(pubKey),
+    //             "flag": 0,
+    //             "fileName": assetID + ".json",
+    //             "updateFlag": 1,
+    //             "keys": ["bigchainID", "bigchainHash", "gatekeeperAddr", "coidAddr", "dimensionCtrlAddr"],
+    //             "values": [txnID, txnHash, gkAddr, coidAddr, dimensionCtrlAddr]
+    //         })
+    //         .set('Accept', 'application/json')
+    //         .end((err, res) => {
+    //             // if(res.status == 200){
+    //             // do something
+    //             // }
+    //         });
+    // };
 
+    //THIS NOTIFICATION WILL TELL THE REQUESTER OF THE COID THEIR PROPOSAL IS PENDING
     this.createProposalPendingNotification = function (requester, proposalId, isHumanVal, gkAddr, propType) {
         console.log("proposal pending event caught.. mygk addr:  " + gkAddr)
 
@@ -93,9 +95,10 @@ var notifier = function () {
             })
             .set('Accept', 'application/json')
             .end((err, res) => {
-                //if(res.status == 200){
-                console.log("proposalPending message sent successfully");
-                // }
+                if (err) {console.log("error createProposalPendingNotification: " + err)};
+                if (res.status == 200) {
+                    console.log("proposalPending message sent successfully");
+                }
             });
     };
 
@@ -140,6 +143,7 @@ var notifier = function () {
             });
     }
 
+    //THIS WILL WRITE AN ATTESTATION IN THE DT
     this.createIcaSigNotification = function (validator, proposalId, sigExpire, txid, assetId, owner) {
 
         superAgent.post(this.twinUrl + "/signature/writeAttestation")
@@ -199,7 +203,7 @@ function CoidMaker(coidAddr, dimensionCtrlAddr, formdata) {
     //get params for their COID contract
     console.log("Inside CoidMaker function")
     var chainUrl = chainConfig.chainURL;
-    var contrData = require("./epm.json");
+    var contrData = require("./jobs_output.json");
     var accounts = require('./accounts.json')
     var manager = erisContracts.newContractManagerDev(chainUrl, chainConfig.primaryAccount)
 
@@ -271,15 +275,15 @@ function CoidMaker(coidAddr, dimensionCtrlAddr, formdata) {
         myOwnershipTokenQuantity = myOwnershipTokenQuantity.concat(Array(10 - myOwnershipTokenQuantity.length).fill("0"));
         myControlTokenQuantity = myControlTokenQuantity.concat(Array(10 - myControlTokenQuantity.length).fill("0"));
         myIdentityRecoveryIdList = myIdentityRecoveryIdList.concat(Array(10 - myIdentityRecoveryIdList.length).fill("0"));
-	combinedList = combinedList.concat(Array(10 - combinedList.length).fill("0"));
+        combinedList = combinedList.concat(Array(10 - combinedList.length).fill("0"));
 
         console.log("form atr: " + formdata.uniqueIdAttributes);
         console.log("uid: " + myUniqueId);
         console.log("atr: " + theUniqueIDAttributes);
         console.log("UIDAttr: " + UIDAttr);
         console.log("fileHashes: " + fileHashes);
-	console.log("combolist: "+combinedList);
-	console.log("ctrllist: "+myControlIdList);
+        console.log("combolist: "+combinedList);
+        console.log("ctrllist: "+myControlIdList);
 
         //instantiate coid
         var _this = this;
@@ -449,7 +453,7 @@ var gatekeeper = function (MyGKaddr) {
 
     this.chain = 'primaryAccount';
     this.erisdburl = chainConfig.chainURL;
-    this.contractData = require("./epm.json");
+    this.contractData = require("./jobs_output.json");
     this.contractAbiAddress = this.contractData['MyGateKeeper'];
     this.erisAbi = JSON.parse(fs.readFileSync("./abi/" + this.contractAbiAddress));
     this.accountData = require("./accounts.json");
@@ -463,14 +467,14 @@ var gatekeeper = function (MyGKaddr) {
     this.ballotContract = this.contractMgr.newContractFactory(this.ballotAbi).at(this.ballotAddress);
 
     //verification contract (oraclizer)
-    this.VerificationAddress = require('/home/demoadmin/.eris/apps/VerifyOraclizerEthereum/wallet2/epm.json').deployStorageK;
-    this.VerificationAbi = JSON.parse(fs.readFileSync('/home/demoadmin/.eris/apps/VerifyOraclizerEthereum/wallet2/abi/' + this.VerificationAddress, 'utf8'))
+    this.VerificationAddress = require('/home/1070933/.monax/apps/VerifyOraclizerEthereum/wallet2/jobs_output.json').deployStorageK;
+    this.VerificationAbi = JSON.parse(fs.readFileSync('/home/1070933/.monax/apps/VerifyOraclizerEthereum/wallet2/abi/' + this.VerificationAddress, 'utf8'))
     this.VerificationContract = this.contractMgr.newContractFactory(this.VerificationAbi).at(this.VerificationAddress)
     this.ErisAddress = chainConfig[this.chain].address;
 
     //bigchain contract (oraclizer)
-    this.bigchain_query_addr = require('/home/demoadmin/.eris/apps/BigchainOraclizer/epm.json').deployStorageK
-    this.bigchain_abi = JSON.parse(fs.readFileSync('/home/demoadmin/.eris/apps/BigchainOraclizer/abi/' + this.bigchain_query_addr, 'utf8'))
+    this.bigchain_query_addr = require('/home/1070933/.monax/apps/BigchainOraclizer/jobs_output.json').deployStorageK
+    this.bigchain_abi = JSON.parse(fs.readFileSync('/home/1070933/.monax/apps/BigchainOraclizer/abi/' + this.bigchain_query_addr, 'utf8'))
     this.bigchain_contract = this.contractMgr.newContractFactory(this.bigchain_abi).at(this.bigchain_query_addr)
 
     //use this to have the gatekeeper scope inside functions
@@ -1015,7 +1019,7 @@ var eventListener = function (MyGKAddr) {
 
     this.chain = 'primaryAccount';
     this.erisdburl = chainConfig.chainURL;
-    this.contractData = require("./epm.json");
+    this.contractData = require("./jobs_output.json");
     this.contractAddress = this.contractData['MyGateKeeper'];
     this.erisAbi = JSON.parse(fs.readFileSync("./abi/" + this.contractAddress));
     this.accountData = require("./accounts.json");
@@ -1028,14 +1032,14 @@ var eventListener = function (MyGKAddr) {
     this.ballotContract = this.contractMgr.newContractFactory(this.ballotAbi).at(this.ballotAddress);
 
     //verification contract (oraclizer)
-    this.VerificationAddress = require('/home/demoadmin/.eris/apps/VerifyOraclizerEthereum/wallet2/epm.json').deployStorageK;
-    this.VerificationAbi = JSON.parse(fs.readFileSync('/home/demoadmin/.eris/apps/VerifyOraclizerEthereum/wallet2/abi/' + this.VerificationAddress, 'utf8'))
+    this.VerificationAddress = require('/home/1070933/.monax/apps/VerifyOraclizerEthereum/wallet2/jobs_output.json').deployStorageK;
+    this.VerificationAbi = JSON.parse(fs.readFileSync('/home/1070933/.monax/apps/VerifyOraclizerEthereum/wallet2/abi/' + this.VerificationAddress, 'utf8'))
     this.VerificationContract = this.contractMgr.newContractFactory(this.VerificationAbi).at(this.VerificationAddress)
     this.ErisAddress = chainConfig[this.chain].address;
 
     //bigchain contract (oraclizer)
-    this.bigchain_query_addr = require('/home/demoadmin/.eris/apps/BigchainOraclizer/epm.json').deployStorageK
-    this.bigchain_abi = JSON.parse(fs.readFileSync('/home/demoadmin/.eris/apps/BigchainOraclizer/abi/' + this.bigchain_query_addr, 'utf8'))
+    this.bigchain_query_addr = require('/home/1070933/.monax/apps/BigchainOraclizer/jobs_output.json').deployStorageK
+    this.bigchain_abi = JSON.parse(fs.readFileSync('/home/1070933/.monax/apps/BigchainOraclizer/abi/' + this.bigchain_query_addr, 'utf8'))
     this.bigchain_contract = this.contractMgr.newContractFactory(this.bigchain_abi).at(this.bigchain_query_addr)
 
     //use this to have the gatekeeper scope inside functions
@@ -1252,7 +1256,7 @@ var eventListener = function (MyGKAddr) {
                                 console.log("GK ADDR: " + formdataArray[index].gatekeeperAddr)
                                 console.log("COID ADDR: " + coidAddr)
                                 console.log("DIM CTRL ADDR: " + dimensionCtrlAddr)
-                                theNotifier.notifyCoidCreation(formdataArray[index].pubKey, formdataArray[index].assetID, theId, theHash, coidGKAddr, coidAddr, dimensionCtrlAddr)
+                                //theNotifier.notifyCoidCreation(formdataArray[index].pubKey, formdataArray[index].assetID, theId, theHash, coidGKAddr, coidAddr, dimensionCtrlAddr)
 
                                 var form = formdataArray[index];
                                 form.bigchainID = theId;
@@ -1375,7 +1379,7 @@ var eventListener = function (MyGKAddr) {
                                 form.ownerIdList = keccak_256(form.pubKey);
                                 form.validatorSigs = validatorSigs;
                                 var chainUrl = chainConfig.chainURL;
-                                var contrData = require("./epm.json");
+                                var contrData = require("./jobs_output.json");
                                 var accounts = require('./accounts.json')
                                 var manager = erisContracts.newContractManagerDev(chainUrl, chainConfig.primaryAccount)
 
@@ -1557,7 +1561,7 @@ app.post("/MyGatekeeper", function (req, res) {
 
     //for testing with hardcoded data
     /*      var formdata =
-            {  
+            {
        "pubKey":"029fb6ea7e2394df2b10c9157b3e6c37762b83fe09941fe75cef09cbeb38179dea",
        "uniqueId":"a7ab1388c4e945e3e0c0d90be3a1687202a7acb5af4ae6a78b8f9d9c208d52dd",
        "uniqueIdAttributes":"kyc4,e1e1a536e9fc0127738d793451b5dea26dd37d31d76adfa98cfd4a54d118351c,QmcHrja8JXPjPeAm3MwKdRT66pNzqJNrkc1Wp4nR1T3zF5",
@@ -1600,15 +1604,15 @@ app.post("/MyGatekeeper", function (req, res) {
         //console.log("THE OBJ: "+ eventListener(formdata.gatekeeperAddr));
         console.log("LISTENING: " + listening);
         //if(listening != undefined){console.log("\ntrying\n");listening = eventListener(formdata.gatekeeperAddr);}
-        //	try {
-        //	
+        //      try {
+        //
         //       listening = eventListener(formdata.gatekeeperAddr);
-        //	console.log("THE OBJ: "+ listening);
+        //      console.log("THE OBJ: "+ listening);
         //    }
         //    catch(err) {
-        //	console.log("Creating new listener");
+        //      console.log("Creating new listener");
         //       listening = new eventListener(formdata.gatekeeperAddr);//WILL THIS EXPIRE AT THE END OF THEIR POST REQUEST?
-        //	console.log(listening);
+        //      console.log(listening);
         //    }
 
 
@@ -1653,3 +1657,4 @@ app.listen(3002, function () {
     console.log("Connected to contract http://10.101.114.231:1337/rpc");
     console.log("Listening on port 3002");
 });
+

@@ -5,11 +5,11 @@
  */
 
 
-var chainConfig = require('/home/demoadmin/.eris/ErisChainConfig.json');
+var chainConfig = require('/home/1070933/.monax/ErisChainConfig.json');
 var keccak_256 = require('js-sha3').keccak_256;
 var app = require("express")();
 var request = require("superagent");
-var erisC = require('eris-contracts');
+var erisC = require('@monax/legacy-contracts');
 //var erisContracts = require('eris-contracts')
 var fs = require('fs')
 var bodyParser = require('body-parser')
@@ -19,7 +19,7 @@ var chain = "primaryAccount";
 // Change eris:db url
 var erisdburl = chainConfig.chainURL;
 
-var contractData = require("./epm.json");
+var contractData = require("./jobs_output.json");
 var contractAddress = contractData['GateKeeper'];
 var erisAbi = JSON.parse(fs.readFileSync("./abi/" + contractAddress));
 var myGKaddressABI = contractData['MyGateKeeper'];
@@ -36,7 +36,7 @@ var ballotApp = function () {
     // Change eris:db url
     this.erisdburl = chainConfig.chainURL;
 
-    this.contractData = require("./epm.json");
+    this.contractData = require("./jobs_output.json");
     this.contractAddress = this.contractData['ballot'];
     this.erisAbi = JSON.parse(fs.readFileSync("./abi/" + this.contractAddress));
     this.accountData = require("./accounts.json");
@@ -44,8 +44,8 @@ var ballotApp = function () {
     this.ballotContract = this.contractMgr.newContractFactory(this.erisAbi).at(this.contractAddress);
 
     //verification contract (oraclizer)
-    this.VerificationAddress = require('/home/demoadmin/.eris/apps/VerifyOraclizerEthereum/wallet2/epm.json').deployStorageK;
-    this.VerificationAbi = JSON.parse(fs.readFileSync('/home/demoadmin/.eris/apps/VerifyOraclizerEthereum/wallet2/abi/' + this.VerificationAddress, 'utf8'))
+    this.VerificationAddress = require('/home/1070933/.monax/apps/VerifyOraclizerEthereum/wallet2/jobs_output.json').deployStorageK;
+    this.VerificationAbi = JSON.parse(fs.readFileSync('/home/1070933/.monax/apps/VerifyOraclizerEthereum/wallet2/abi/' + this.VerificationAddress, 'utf8'))
     this.VerificationContract = this.contractMgr.newContractFactory(this.VerificationAbi).at(this.VerificationAddress)
     this.ErisAddress = chainConfig[this.chain].address;
 
@@ -93,7 +93,7 @@ var ballotApp = function () {
             console.log("hello");
         })
 
-    this.twinUrl = "http://10.100.98.218:5050";
+    this.twinUrl = "http://35.154.255.203:8000";
     var self = this;
 
     this.createNotification = function (inputs) {
@@ -119,34 +119,36 @@ var ballotApp = function () {
             });
     };
 
-    this.createCoid = function (inputs) {
-        request.post(this.twinUrl + "/ballot/writeCoid")
-            .send(inputs)
-            .set('Accept', 'application/json')
-            .end((err, res) => {
-                if (res.status == 200) {
-                    // do something
-                }
-            });
-    };
+    //ST: This is never called.......
+    // this.createCoid = function (inputs) {
+    //     request.post(this.twinUrl + "/ballot/writeCoid")
+    //         .send(inputs)
+    //         .set('Accept', 'application/json')
+    //         .end((err, res) => {
+    //             if (res.status == 200) {
+    //                 // do something
+    //             }
+    //         });
+    // };
+    
+    //WE SHOULD CALL THIS IN THE GATEKEEPERS NOT THE BALLOT
+    // this.createProposalPendingNotification = function (requester, proposalId) {
 
-    this.createProposalPendingNotification = function (requester, proposalId) {
-
-        request.post(this.twinUrl + "/notification/writeNotify")
-            .send({
-                "pubKey": requester,
-                "proposalID": proposalId,
-                "isHuman": true,
-                "gatekeeperAddr": "",
-                "message": "Your proposal is pending for validation"
-            })
-            .set('Accept', 'application/json')
-            .end((err, res) => {
-                if (res.status == 200) {
-                    console.log("proposalPending message sent successfully");
-                }
-            });
-    };
+    //     request.post(this.twinUrl + "/notification/writeNotify")
+    //         .send({
+    //             "pubKey": requester,
+    //             "proposalID": proposalId,
+    //             "isHuman": true,
+    //             "gatekeeperAddr": "",
+    //             "message": "Your proposal is pending for validation"
+    //         })
+    //         .set('Accept', 'application/json')
+    //         .end((err, res) => {
+    //             if (res.status == 200) {
+    //                 console.log("proposalPending message sent successfully");
+    //             }
+    //         });
+    // };
 
     this.createIcaSigNotification = function (validator, proposalId, sigExpire) {
 
@@ -194,7 +196,7 @@ var ballotApp = function () {
         console.log("isHuman val: " + isHuman);
         console.log("address is: " + address);
         _this.createNotification({ "pubKey": validator, "proposalID": proposal, "message": "You have been selected to vote on the proposal.", "isHuman": isHuman, "gatekeeperAddr": address, "propType": propType });
-        _this.createProposalPendingNotification(validator, proposal);
+        //_this.createProposalPendingNotification(validator, proposal);
         console.log("pass on err check: ballot contract notify event");
     })
 } //end of ballotApp

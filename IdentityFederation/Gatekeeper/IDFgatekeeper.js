@@ -1,6 +1,6 @@
 'use strict'
-var chainConfig = require('/home/demoadmin/.eris/ErisChainConfig.json')
-var erisContracts = require('eris-contracts')
+var chainConfig = require('/home/1070933/.monax/ErisChainConfig.json')
+var erisContracts = require('@monax/legacy-contracts')
 var fs = require('fs')
 var http = require('http')
 var express = require('express')
@@ -49,7 +49,7 @@ var indexer = 0;
 //this function is intended to send a notification
 var notifier = function () {
     //location of digital twin
-    this.twinUrl = "http://10.100.98.218:5050";
+    this.twinUrl = "http://35.154.255.203:8000";
 
     //for grabbing the appropriate scope
     var _this = this;
@@ -58,24 +58,25 @@ var notifier = function () {
     //TODO: CHANGE THE ENDPOINT:
 
     //NOTE: THE DIGITAL TWIN will reject it without pubKey
-    this.notifyCoidCreation = function (pubKey, txnID, txnHash, gkAddr, coidAddr, dimensionCtrlAddr) {
-        console.log("Notify coid creation: " + pubKey);
-        superAgent.post(this.twinUrl + "/setAsset")
-            .send({
-                "pubKey": keccak_256(pubKey),
-                "flag": 0,
-                "fileName": "MyCOID.json",
-                "updateFlag": 1,
-                "keys": ["bigchainID", "bigchainHash", "gatekeeperAddr", "coidAddr", "dimensionCtrlAddr"],
-                "values": [txnID, txnHash, gkAddr, coidAddr, dimensionCtrlAddr]
-            })
-            .set('Accept', 'application/json')
-            .end((err, res) => {
-                // if(res.status == 200){
-                console.log("Notify coid creation finished");
-                // }
-            });
-    };
+    //ST: This is commented out because the 'writeAll' method will take care of this
+    // this.notifyCoidCreation = function (pubKey, txnID, txnHash, gkAddr, coidAddr, dimensionCtrlAddr) {
+    //     console.log("Notify coid creation: " + pubKey);
+    //     superAgent.post(this.twinUrl + "/setAsset")
+    //         .send({
+    //             "pubKey": keccak_256(pubKey),
+    //             "flag": 0,
+    //             "fileName": "MyCOID.json",
+    //             "updateFlag": 1,
+    //             "keys": ["bigchainID", "bigchainHash", "gatekeeperAddr", "coidAddr", "dimensionCtrlAddr"],
+    //             "values": [txnID, txnHash, gkAddr, coidAddr, dimensionCtrlAddr]
+    //         })
+    //         .set('Accept', 'application/json')
+    //         .end((err, res) => {
+    //             // if(res.status == 200){
+    //             console.log("Notify coid creation finished");
+    //             // }
+    //         });
+    // };
 
     this.GetAsset = function (pubKey, fileName, flag, callback) {
         superAgent.post(this.twinUrl + "/getAsset")
@@ -118,6 +119,7 @@ var notifier = function () {
             });
     }
 
+    //THIS NOTIFICATION WILL TELL THE REQUESTER OF THE COID THEIR PROPOSAL IS PENDING
     this.createProposalPendingNotification = function (requester, proposalId) {
 
         superAgent.post(this.twinUrl + "/notification/writeNotify")
@@ -130,6 +132,7 @@ var notifier = function () {
             })
             .set('Accept', 'application/json')
             .end((err, res) => {
+                if (err) {console.log("error createProposalPendingNotification: " + err)};
                 if (res.status == 200) {
                     console.log("proposalPending message sent successfully");
                 }
@@ -208,9 +211,10 @@ function CoidMaker(coidAddr, dimensionCtrlAddr, formdata) {
     //get params for their COID contract
     console.log("hi")
     var chain = 'primaryAccount';
-    var chainUrl = chainConfig.URL;
-    var contrData = require("./epm.json");
+    var chainUrl = chainConfig.chainURL;
+    var contrData = require("./jobs_output.json");
     var accounts = require('./accounts.json')
+    console.log("chain: "+chainConfig.chainURL + "   " +JSON.stringify(chainConfig[chain]));
     var manager = erisContracts.newContractManagerDev(chainUrl, chainConfig[chain])
 
     var COIDabiAddr = contrData['CoreIdentity'];
@@ -266,14 +270,14 @@ function CoidMaker(coidAddr, dimensionCtrlAddr, formdata) {
         k++;
     }
     for (var i = 0; i < myOwnerIdList.length; i++) {
-        if (combinedList.indexOf(myOwnerIdList[i]) == -1) {
+        if(combinedList.indexOf(myOwnerIdList[i]) == -1){
             combinedList.push(myOwnerIdList[i])
         }
     }
 
     setTimeout(function () {
 
-        combinedList = combinedList.concat(Array(10 - combinedList.length).fill("0"));
+	combinedList = combinedList.concat(Array(10 - combinedList.length).fill("0"));
         theUniqueIDAttributes = theUniqueIDAttributes.concat(Array(10 - theUniqueIDAttributes.length).fill("0"));
         myOwnerIdList = myOwnerIdList.concat(Array(10 - myOwnerIdList.length).fill("0"));
         myControlIdList = myControlIdList.concat(Array(10 - myControlIdList.length).fill("0"));
@@ -449,8 +453,8 @@ function UniqueAttributeChanger(coidAddr, dimensionCtrlAddr, formdata) {
     //get params for their COID contract
     console.log("Unique Attribute Changer formdata:\n" + JSON.stringify(formdata) + "\n")
     var chain = 'primaryAccount';
-    var chainUrl = chainConfig.URL;
-    var contrData = require("./epm.json");
+    var chainUrl = chainConfig.chainURL;
+    var contrData = require("./jobs_output.json");
     var accounts = require('./accounts.json')
     var manager = erisContracts.newContractManagerDev(chainUrl, chainConfig[chain])
 
@@ -513,7 +517,7 @@ var gatekeeper = function () {
 
     this.chain = 'primaryAccount';
     this.erisdburl = chainConfig.chainURL;
-    this.contractData = require("./epm.json");
+    this.contractData = require("./jobs_output.json");
     this.contractAddress = this.contractData['GateKeeper'];
     this.erisAbi = JSON.parse(fs.readFileSync("./abi/" + this.contractAddress));
     this.accountData = require("./accounts.json");
@@ -527,20 +531,20 @@ var gatekeeper = function () {
     this.ballotContract = this.contractMgr.newContractFactory(this.ballotAbi).at(this.ballotAddress);
 
     //dao contract
-    this.DaoData = require("/home/demoadmin/.eris/apps/Dao/epm.json");
+    this.DaoData = require("/home/1070933/.monax/apps/Dao/jobs_output.json");
     this.DaoAddress = this.DaoData['Dao'];
-    this.DaoAbi = JSON.parse(fs.readFileSync("/home/demoadmin/.eris/apps/Dao/abi/" + this.DaoAddress));
+    this.DaoAbi = JSON.parse(fs.readFileSync("/home/1070933/.monax/apps/Dao/abi/" + this.DaoAddress));
     this.DaoContract = this.contractMgr.newContractFactory(this.DaoAbi).at(this.DaoAddress);
 
     //verification contract (oraclizer)
-    this.VerificationAddress = require('/home/demoadmin/.eris/apps/VerifyOraclizerEthereum/wallet2/epm.json').deployStorageK;
-    this.VerificationAbi = JSON.parse(fs.readFileSync('/home/demoadmin/.eris/apps/VerifyOraclizerEthereum/wallet2/abi/' + this.VerificationAddress, 'utf8'))
+    this.VerificationAddress = require('/home/1070933/.monax/apps/VerifyOraclizerEthereum/wallet2/jobs_output.json').deployStorageK;
+    this.VerificationAbi = JSON.parse(fs.readFileSync('/home/1070933/.monax/apps/VerifyOraclizerEthereum/wallet2/abi/' + this.VerificationAddress, 'utf8'))
     this.VerificationContract = this.contractMgr.newContractFactory(this.VerificationAbi).at(this.VerificationAddress)
     this.ErisAddress = chainConfig[this.chain].address;
 
     //bigchain contract (oraclizer)
-    this.bigchain_query_addr = require('/home/demoadmin/.eris/apps/BigchainOraclizer/epm.json').deployStorageK
-    this.bigchain_abi = JSON.parse(fs.readFileSync('/home/demoadmin/.eris/apps/BigchainOraclizer/abi/' + this.bigchain_query_addr, 'utf8'))
+    this.bigchain_query_addr = require('/home/1070933/.monax/apps/BigchainOraclizer/jobs_output.json').deployStorageK
+    this.bigchain_abi = JSON.parse(fs.readFileSync('/home/1070933/.monax/apps/BigchainOraclizer/abi/' + this.bigchain_query_addr, 'utf8'))
     this.bigchain_contract = this.contractMgr.newContractFactory(this.bigchain_abi).at(this.bigchain_query_addr)
 
 
@@ -1112,7 +1116,7 @@ var eventListener = function () {
 
     this.chain = 'primaryAccount';
     this.erisdburl = chainConfig.chainURL;
-    this.contractData = require("./epm.json");
+    this.contractData = require("./jobs_output.json");
     this.contractAddress = this.contractData['GateKeeper'];
     this.erisAbi = JSON.parse(fs.readFileSync("./abi/" + this.contractAddress));
     this.accountData = require("./accounts.json");
@@ -1126,20 +1130,20 @@ var eventListener = function () {
     this.ballotContract = this.contractMgr.newContractFactory(this.ballotAbi).at(this.ballotAddress);
 
     //dao contract
-    this.DaoData = require("/home/demoadmin/.eris/apps/Dao/epm.json");
+    this.DaoData = require("/home/1070933/.monax/apps/Dao/jobs_output.json");
     this.DaoAddress = this.DaoData['Dao'];
-    this.DaoAbi = JSON.parse(fs.readFileSync("/home/demoadmin/.eris/apps/Dao/abi/" + this.DaoAddress));
+    this.DaoAbi = JSON.parse(fs.readFileSync("/home/1070933/.monax/apps/Dao/abi/" + this.DaoAddress));
     this.DaoContract = this.contractMgr.newContractFactory(this.DaoAbi).at(this.DaoAddress);
 
     //verification contract (oraclizer)
-    this.VerificationAddress = require('/home/demoadmin/.eris/apps/VerifyOraclizerEthereum/wallet2/epm.json').deployStorageK;
-    this.VerificationAbi = JSON.parse(fs.readFileSync('/home/demoadmin/.eris/apps/VerifyOraclizerEthereum/wallet2/abi/' + this.VerificationAddress, 'utf8'))
+    this.VerificationAddress = require('/home/1070933/.monax/apps/VerifyOraclizerEthereum/wallet2/jobs_output.json').deployStorageK;
+    this.VerificationAbi = JSON.parse(fs.readFileSync('/home/1070933/.monax/apps/VerifyOraclizerEthereum/wallet2/abi/' + this.VerificationAddress, 'utf8'))
     this.VerificationContract = this.contractMgr.newContractFactory(this.VerificationAbi).at(this.VerificationAddress)
     this.ErisAddress = chainConfig[this.chain].address;
 
     //bigchain contract (oraclizer)
-    this.bigchain_query_addr = require('/home/demoadmin/.eris/apps/BigchainOraclizer/epm.json').deployStorageK
-    this.bigchain_abi = JSON.parse(fs.readFileSync('/home/demoadmin/.eris/apps/BigchainOraclizer/abi/' + this.bigchain_query_addr, 'utf8'))
+    this.bigchain_query_addr = require('/home/1070933/.monax/apps/BigchainOraclizer/jobs_output.json').deployStorageK
+    this.bigchain_abi = JSON.parse(fs.readFileSync('/home/1070933/.monax/apps/BigchainOraclizer/abi/' + this.bigchain_query_addr, 'utf8'))
     this.bigchain_contract = this.contractMgr.newContractFactory(this.bigchain_abi).at(this.bigchain_query_addr)
 
     //recovery contract
@@ -1197,9 +1201,9 @@ var eventListener = function () {
         var bigchainInput = {
             "Description": description,
             "proposalID": proposalID,
-            "Coid_Data":,
-            // "coidGK_Address": coidGKAddress,
-            // "coid_Address": coidAddr,
+            "Coid_Data": coidData,
+            "coidGK_Address": coidGKAddress,
+            "coid_Address": coidAddr,
             "dimensionCtrlAddr": dimensionCtrlAddr,
             "blockNumber": blockNumber,
             "blockHash": blockHash,
@@ -1325,7 +1329,7 @@ var eventListener = function () {
             var recoveryAbi = JSON.parse(fs.readFileSync("./abi/" + recoveryAddr));
             var recoveryContractFactory = _this.contractMgr.newContractFactory(recoveryAbi);
             var recoveryContract;
-            var code = fs.readFileSync("./Recovery.bin");
+            var code = fs.readFileSync("./bin/Recovery.bin");
             console.log(JSON.stringify(recoveryAbi));
 
             recoveryContractFactory.new({ data: code }, function (error, contract) {
@@ -1435,6 +1439,7 @@ var eventListener = function () {
                                     form.proposalId = proposalId;
                                     form.trieAddr = "pending";
 
+                                    //we knocked out notifyCoidCreation because of writeAll
                                     writeAll(prepareForm(form), function () { });
                                     //call recovery contract
                                     var recoveryAddr = recoveryContract.address;
@@ -1449,9 +1454,9 @@ var eventListener = function () {
                                     //}
                                     //else {
                                     //console.log("set recovery struct " + res)
-                                    for (var x = 0; x < form.identityRecoveryIdList.split(',').length; x++) {
-                                        theNotifier.createRecoveryNotification(form, recoveryAddr, form.identityRecoveryIdList.split(',')[x])
-                                    }
+                                     for (var x = 0; x < form.identityRecoveryIdList.split(',').length; x++) {
+                                         theNotifier.createRecoveryNotification(form, recoveryAddr, form.identityRecoveryIdList.split(',')[x])
+                                     }
                                     //}
 
                                     //})
@@ -1710,10 +1715,10 @@ app.post("/gatekeeper", function (req, res) {
     var formdata = req.body;
     console.log("Form data from gatekeeper ===> ", formdata);
 
-    /*    var formdata =
-    { pubKey: '0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055',
-      uniqueId: '1fc5423ba3d8efec282b89fbbe03fb9c0c7cbfc1e3a9f9cbf029bec1e3e2df7c',
-      uniqueIdAttributes: 'ben21,312d9797c4a7f7026c066aa8007444b50821b1396ad5329ce7e86616cf9109cc,QmeisSzvczanjqPNXFAiZnBwRHpKrgwpjAC9Y4BLc3JgsY',
+       /* var formdata =
+    { pubKey: '0x0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055',
+      uniqueId: '42c5423ba3d8efec282b89fbbe03fb9c0c7cbfc1e3a9f9cbf029bec1e3e2df7c',
+      uniqueIdAttributes: 'ben24,432d9797c4a7f7026c066aa8007444b50821b1396ad5329ce7e86616cf9109cc,QmQNowQxrtGR9BtCvEG357NZfWVfftPLqLEqCr16PVPzRq',
       ownershipId: '795aa43564a4bb68e8014a823a1698e361d85e2fbd92bb7f93fc256f2ac0a66a',
       ownerIdList: '795aa43564a4bb68e8014a823a1698e361d85e2fbd92bb7f93fc256f2ac0a66a',
       controlId: '5674453b04fe840851038e94bb45ecec7b88cac5a354bde6116e15f12295edfc',
@@ -1739,7 +1744,7 @@ app.post("/gatekeeper", function (req, res) {
       sig: '79e2bb1c1f60f6d300a6676a157c7078fd4e0001f1e06bd49313807c8db0a60327f260cb4cd7d0aff3add0bf654be68b22e18bffcf5e9692dfdfc05efaab1763',
       msg: '4d0f626621af134d41a7ce8c21ca78e56616e7cb5a149ab91d19fb3dd30a8720',
       txn_id: 'requestCOID',
-      forUniqueId : 'true'
+      forUniqueId : 'false'
     }*/
 
     if (formdata.isHuman == 'true') {
@@ -1780,7 +1785,7 @@ app.post("/gatekeeper", function (req, res) {
 
 
 app.listen(3000, function () {
-    console.log("Connected to contract http://10.101.114.231:1337/rpc");
+    console.log("Connected to contract http://35.154.255.203:1337/rpc");
     console.log("Listening on port 3000");
 });
 

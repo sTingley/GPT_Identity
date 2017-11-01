@@ -73,15 +73,19 @@ app.get('/readContacts/:pubKey',contactCtrl.readContacts);
 app.post('/writeContacts',contactCtrl.writeContacts);
 // <- <- <- END CONTACT FUNCTIONS <- <- <-
 
-//TODO: expiredNotification
 // -> -> -> START NOTIFICATION FUNCTIONS -> -> ->
 app.post('/ballot/writeNotify', BallotCtrl.writeBallot);
-app.post('/ballot/writeExpiredProposal', expiredNotification.writeExpiredProposalNotification);
 app.get('/ballot/readNotify/:pubKey', BallotCtrl.fetchBallot);
-app.get('/ballot/readExpiredProposal/:pubKey', expiredNotification.fetchExpiredProposalNotification);
-
+//writeExpiredProposalNotification is commented out in NotificationCtrl
+app.post('/notification/writeExpiredProposal', NotificationCtrl.writeExpiredProposalNotification);
+//writeNotification is called in Gatekeepers ..... need to verify that this notify requester correctly (?)
 app.post('/notification/writeNotify', NotificationCtrl.writeNotification);
 app.get('/notification/readNotify/:pubKey', NotificationCtrl.fetchNotification);
+
+//ST WE NEVER USE THIS!!!!!!
+//app.get('/ballot/readExpiredProposal/:pubKey', expiredNotification.fetchExpiredProposalNotification);
+
+
 // <- <- <- END NOTIFICATION FUNCTIONS <- <- <-
 
 // -> -> -> START ASSET FUNCTIONS -> -> ->
@@ -241,4 +245,3 @@ for (var i = 0; i < TwinConfig.ports.length; i++) {
         http.createServer(app).listen(port);
         console.log("Digital Twin running at " + port);
 }
-

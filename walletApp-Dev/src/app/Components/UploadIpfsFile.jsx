@@ -19,6 +19,7 @@ class UploadIpfsFile extends React.Component {
             dataType: 'json',
             cache: false,
             success: function (resp) {
+                console.log("ipfs/alldocs response: " + JSON.stringify(resp));
                 this.setState({ docs: resp.data.documents });
             }.bind(this),
             error: function (xhr, status, err) {
@@ -45,6 +46,11 @@ class UploadIpfsFile extends React.Component {
     }
 
     uploadHandler(data, additionalParams) {
+
+        console.log("upload handler inputs, \n" +
+        "data: " + JSON.stringify(data) + "\n additionalParams: " +
+        JSON.stringify(additionalParams));
+
         var params = {
             url: twinUrl + "ipfs/upload",
             type: 'POST',
@@ -53,8 +59,13 @@ class UploadIpfsFile extends React.Component {
             processData: false,
             contentType: false,
         };
+        console.log("\n upload handler request: " + JSON.stringify(params));
+
         $.extend(params, additionalParams);
-        $.ajax(params);
+        $.ajax(params, function(err,res){
+            if(err){console.log("error: " + err)}
+            console.log("upload res: " + JSON.stringify(res));
+        });
     }
 
     fileHandler(e) {
@@ -67,9 +78,8 @@ class UploadIpfsFile extends React.Component {
         } else {
             //WE COME HERE WHEN WE CLICK SUBMIT?
             console.log("we are in the else");
-            console.log("button: " + ($("button.close").attr("id")
-             == "ipfs"))
             if (this.state.files.size > 0) {
+                console.log("this.state.files: " + this.state.files);
                 var fileInput = $("input[name=newdoc]");
                 var fData = new FormData();
                 fData.append("user_pubkey", this.state.pubKey);
@@ -83,8 +93,10 @@ class UploadIpfsFile extends React.Component {
                         $("button.close").hide();
                     },
                     success: function (resp) {
+                        console.log("filehandler got resp: " + JSON.stringify(resp));
                         if (resp.uploded && resp.uploded.length > 0) {
                             var filedata = resp.uploded[0].hash + "|" + resp.uploded[0].file_hash;
+                            console.log("fileData: " + filedata);
                             //data handler forms JSON object
                             this.props.dataHandler(filedata);
                             $("button.close").trigger("click");

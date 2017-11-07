@@ -94,6 +94,7 @@ class CoreIdentity extends React.Component {
 	}
 
 	getFileDetails(filedata) {
+		console.log("getFileDetails function, filedata = " + filedata)
 		var obj = { [this.state.tmpFile]: filedata };
 		this.setState({ file_attrs: this.state.file_attrs.concat([obj]) });
 	}
@@ -441,7 +442,7 @@ class CoreIdentity extends React.Component {
 		function autocompleteRenderInput({ addTag, props }) {
 
 				var passed = JSON.stringify(arguments[0]);
-				console.log("passed: " + passed + JSON.stringify(arguments[1]));
+				//console.log("passed: " + passed + JSON.stringify(arguments[1]));
 				passed = JSON.parse(passed);
 
 				const handleOnChange = (e, { newValue, method }) => {
@@ -474,7 +475,7 @@ class CoreIdentity extends React.Component {
 
 				//NEED TO COMMENT BACK IN 'that.state.names' ...
 				const suggestions = names.filter((name) => {
-					console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
+					//console.log("FILTER: " + name.toLowerCase().slice(0, inputLength));
 					return name.toLowerCase().slice(0, inputLength) === inputValue
 				})
 				///////////////////////////////////////
@@ -484,9 +485,9 @@ class CoreIdentity extends React.Component {
 				var value = String(that.state.value[Number(passed.id)]) || "";
 				if (value == 'undefined') { value = ""; }
 				//const suggestions = that.state.suggestions;
-				console.log("passed ID: " + passed.id);
-				console.log("suggestions: " + suggestions);
-				console.log("value: " + value);
+				//console.log("passed ID: " + passed.id);
+				//console.log("suggestions: " + suggestions);
+				//console.log("value: " + value);
 				const inputProps = {
 					placeholder: passed.placeholder,
 					value,

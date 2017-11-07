@@ -9,11 +9,10 @@ var spawn = require('child_process').spawn,
 //DigitalTwin/tmp
 var tmpPath = config.IPFS_CONFIG.ipfs_file_tmp_path;
 
-//"/home/demoadmin/DigitalTwin/notifications/"
+//"/home/1070933/DigitalTwin/notifications/"
 var JSONPath = config.notification_folder_path;
 
 //for eris service it was "ipfs_file_read_url": "http://192.168.99.101:8080/ipfs/",
-// ...
 //now it is "ipfs_file_read_url": "http://10.100.98.218:8080/"
 var IPFS_baseUrl = config.IPFS_CONFIG.ipfs_file_read_url;
 
@@ -31,8 +30,9 @@ var IPFS = {
 
 	pubKey: '',
 
-	/*******************************************************************************************
-	UPLOAD FILE:
+	/*******************************************************************************************`
+	DT route: '/ipfs/upload'
+
 		0) method is called with formdata including pubkey and files
 		1) if the 'tmpPath' directoy doesn't exist, create it
 		2) create fileName var, = JSONpath + pubkey + _files + .json
@@ -81,16 +81,6 @@ var IPFS = {
 				id: IPFS.pubKey,
 				documents: []
 			};
-
-			//ST: added this to check the writeFileSync method
-			// var check_file_data = fs.writeFileSync(fileName, JSON.stringify(datastruct), 'utf8', function(err) {
-			// 	if(err) {
-			// 		console.log("failed. file_data: " + check_file_data)
-			// 	}
-			// 	else console.log("all good. file_data: " + check_file_data)
-			// })
-			// console.log("check_file_data: " + check_file_data)
-
 			//declaring a new reference, cryptoCtr, to use encryption methods in required file
 			var cryptoEncr = new cryptoCtr({ pubKey: IPFS.pubKey });
 			var cryptoData = cryptoEncr.encrypt(JSON.stringify(datastruct));
@@ -111,6 +101,7 @@ var IPFS = {
 		}
 	},
 
+	//helper method called above in uploadFile
 	objIntoArray: function (allFiles) {
 		var newArr = new Array();
 		for (var key in allFiles) {
@@ -240,16 +231,14 @@ var IPFS = {
 									console.log("getFileHash return: " + JSON.stringify(fileData))
 									IPFS.incr++;
 									//apply() method calls a function with a given this value and arguments provided as an array
-									callback.apply(this, [fileData, res], function(err){
-										if(err){console.log("callback.apply error: " + err)}
+									callback.apply(this, [fileData, res], function (err) {
+										if (err) { console.log("callback.apply error: " + err) }
 									});
 									fs.unlinkSync(file); // Delete the file from temp path
 								});
 
 							}); //end close event of ipfsCache childProcess
-						} else {
-							IPFS.errors.push(fileNode.name);
-						}
+						} else { IPFS.errors.push(fileNode.name); }
 					}
 				}); //end of close event of ipfs childProcess
 
@@ -257,11 +246,10 @@ var IPFS = {
 		}); //end of fileNode.mv
 	},
 
-	//*****************************************************************************************
-	// THIS METHOD IS COMMENTED OUT BC WE HAVENT INTEGRATED IT YET,
-	// NEEDS TO BE CALLED WHENEVER WE NEED TO VALIDATE FILES
-	//*****************************************************************************************
-	//called from DT endpoint /ipfs/validateFiles
+	/*****************************************************************************************
+	THIS METHOD IS COMMENTED OUT BC WE HAVENT INTEGRATED IT YET
+	DT route: /ipfs/validateFiles
+	*****************************************************************************************/
 	getHashFromIpfsFile(req, res) {
 		// var param = req.body;
 		// console.log("getHashFromIPFSFile req.body: " + req.body)
@@ -292,7 +280,7 @@ var IPFS = {
 	getFileHash: function (filePath) {
 		var promise = new Promise((resolve, reject) => {
 			//this line opens the file as a readable stream
-			var input = fs.createReadStream(filePath,[]);
+			var input = fs.createReadStream(filePath, []);
 			var hash = crypto.createHash('sha256');
 			console.log("sha256 hash: " + JSON.stringify(hash))
 			console.log("getFileHash, filePath: " + filePath)
@@ -300,13 +288,13 @@ var IPFS = {
 			//changed from end
 			input.on('end', () => {
 				console.log("readStream on end")
-				hash.end(function(err) {
+				hash.end(function (err) {
 					if (err) { //ST: Added callback for debugging
 						console.log("hash.end error: " + err)
 					}
 				});
-				resolve(hash.read(function(err){
-					if(err){console.log("err: " + err)}
+				resolve(hash.read(function (err) {
+					if (err) { console.log("err: " + err) }
 				}));
 			});
 			//This pipes the ReadStream to the response object (which goes to the client or caller)

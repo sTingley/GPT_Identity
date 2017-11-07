@@ -19,10 +19,7 @@ class UniqueIDAttributeForm extends React.Component {
         return (<label htmlFor="unique_id_attrs">Attributes e.g. "My college transcript", "Chase Bank KYC", or "My blockchain research"</label>)
     }
     render() {
-        console.log("UniqueIDAttributeForm props: " + JSON.stringify(this.props));
-        // this.props = {"type":"MyGK","max":"10","labelref":"input-0"} //for MyGatekeeper.jsx
-        // this.props = {"type":"IDF","max":"10","labelref":"input-0"} //for CoreIdentityForm.jsx
-        // this.props = {"type":"MyCOID","max":"10","labelref":"input-0"} //for Assets.jsx (formerly MyCOID.jsx)
+        //console.log("UniqueIDAttributeForm props: " + JSON.stringify(this.props));
         let style = { fontSize: '12.5px' }
         return (
             <div className="form-group" style={style}>

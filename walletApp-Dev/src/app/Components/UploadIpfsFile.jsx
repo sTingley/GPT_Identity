@@ -34,11 +34,14 @@ class UploadIpfsFile extends React.Component {
         //     $("#descriptors .modal").on('hidden.bs.modal', this.props.handleHideModal);
         // }
 
+        //assetDetails was name of parent container div thru old MyCOID.jsx screen
         if(this.props.addOfficialID) {
             $("#assetDetails .modal").modal('show');
             $("#assetDetails .modal").on('hidden.bs.modal', this.props.handleHideModal);
         }
         else{
+            //SubmitContainer is the name of parent div in CoreIdentityForm.jsx render,
+            //also is the name of the parent div in MyGatekeeper.jsx render
             $("#SubmitContainer .modal").modal('show');
             $("#SubmitContainer .modal").on('hidden.bs.modal', this.props.handleHideModal);
         }

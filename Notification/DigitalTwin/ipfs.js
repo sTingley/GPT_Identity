@@ -4,6 +4,7 @@ var spawn = require('child_process').spawn,
 	cryptoCtr = require('./cryptoCtr.js'),
 	crypto = require('crypto'),
 	fs = require('fs'),
+	keccak_256 = require('js-sha3').keccak_256,
 	http = require('http');
 
 //DigitalTwin/tmp
@@ -70,7 +71,7 @@ var IPFS = {
 			fs.mkdirSync(tmpPath);
 		}
 
-		IPFS.pubKey = req.body.user_pubkey;
+		IPFS.pubKey = keccak_256(req.body.user_pubkey);
 
 		//This file will be an object of the form {"id": "","documents": []}
 		var fileName = JSONPath + IPFS.pubKey + suffix + ".json";
@@ -308,8 +309,9 @@ var IPFS = {
 	 * DT route: /ipfs/alldocs/:pubkey
 	/*****************************************************************************************/
 	getAllFiles: function (req, res) {
-		console.log("hit getAllFiles, params: " + req.params)
 		var param = req.params;
+		console.log("hit getAllFiles, params: " + param);
+		param.pubKey = keccak_256(param.pubKey);
 		console.log("pubkey: " + param.pubKey);
 		var fileName = JSONPath + param.pubKey + suffix + ".json";
 		var cryptoDecr = new cryptoCtr({ pubKey: param.pubKey });

@@ -1,0 +1,16 @@
+version: '3.4'
+services:
+  configuration:
+    image: localhost:5000/monax_configuration
+    build: .
+    ports:
+      - 7000:8080
+    networks:
+      default:
+        ipv4_address: 172.18.2.1
+networks:
+  default:
+    driver: overlay
+    ipam:
+      config:
+        - subnet: 172.18.2.0/22

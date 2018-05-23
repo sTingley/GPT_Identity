@@ -1,0 +1,45 @@
+{
+  "properties": {
+    "chainURL": "http://localhost:1337/rpc",
+    "accounts_file_path": "../configuration_service/configuration_files/accounts.json",
+    "primary_account": "testchain_full_000"
+  },
+  "jobs": {
+    "global": {
+      "base_path": "../configuration_service/output_files/jobs_output.json"
+    },
+    "icaSig": {
+      "base_path": "../configuration_service/output_files/jobs_output.json"
+    },
+    "ballot": {
+      "base_path": "../configuration_service/output_files/jobs_output.json"
+    },
+    "Dao": {
+      "base_path": "../configuration_service/output_files/jobs_output.json"
+    },
+    "identityDimensionControl": {
+      "base_path": "../configuration_service/output_files/jobs_output.json"
+    },
+    "iDFgatekeeper": {
+      "base_path": "../configuration_service/output_files/jobs_output.json"
+    },
+    "myCOID_dev": {
+      "base_path": "../configuration_service/output_files/jobs_output.json"
+    },
+    "myGatekeeper": {
+      "base_path": "../configuration_service/output_files/jobs_output.json"
+    },
+    "recovery": {
+      "base_path": "../configuration_service/output_files/jobs_output.json"
+    },
+    "requester": {
+      "base_path": "../configuration_service/output_files/jobs_output.json"
+    },
+    "erisBigchainService": {
+      "base_path": "../configuration_service/output_files/jobs_output.json"
+    },
+    "Verification": {
+      "base_path": "../configuration_service/output_files/jobs_output.json"
+    }
+  }
+}

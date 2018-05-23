@@ -1,0 +1,22 @@
+{
+  "base_url": "/config",
+  "secret": "U3OGTK2tpR669pUyAk4M",
+  "routes": {
+    "global_properties": {
+      "module": "./routes/global.js",
+      "route": "/global"
+    },
+    "module_properties": {
+      "module": "./routes/module.js",
+      "route": "/module/:name"
+    },
+    "accounts": {
+      "module": "./routes/accounts.js",
+      "route": "/accounts"
+    },
+    "chain_properties": {
+      "module": "./routes/chain.js",
+      "route": "/chain"
+    }
+  }
+}

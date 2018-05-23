@@ -1,0 +1,8 @@
+{
+  "name": "dif_monax_global_configuration",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "TCS",
+  "license": "None",
+  "private": true
+}

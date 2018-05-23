@@ -1,0 +1,15 @@
+{
+  "name": "myCOID_dev",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@monax/legacy-contracts": "^0.17.0",
+    "bluebird": "^3.5.1",
+    "body-parser": "^1.18.2",
+    "ed25519": "^0.0.4",
+    "express": "^4.16.3",
+    "js-sha3": "^0.7.0",
+    "secp256k1": "^3.5.0"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "settings": {
+    "schema": "http",
+    "baseurl": "localhost",
+    "port": 8080
+  },
+  "call_routes": {
+    "accounts": "%SCHEMA%://%BASEURL%:%PORT%/config/accounts",
+    "chain": "%SCHEMA%://%BASEURL%:%PORT%/config/chain",
+    "global": "%SCHEMA%://%BASEURL%:%PORT%/config/global",
+    "module": "%SCHEMA%://%BASEURL%:%PORT%/config/module/%NAME%"
+  }
+}

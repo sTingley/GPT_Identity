@@ -1,0 +1,87 @@
+#!/bin/bash
+# This script was designed to make a chain after you input the chain's name. CAN USE COMMAND: "source chainMakerV2"
+
+#DO NOT RUN THIS UNTIL YOU:
+#ENSURE NO OTHER CHAINS ARE RUNNING
+#BE AWARE THIS ONLY WORKS FOR GPT
+#ACCEPT THAT IF THIS DESTROYS SOMETHING THAT IT IS YOUR FAULT
+
+
+#kill all node processes so node services arn't listening to the old chain
+killall nodejs
+killall node
+# show chains
+monax ls
+#set variables for making a chain
+echo Enter the name of the chain you would like to create
+read chainName
+#chainName=t11
+#make chain
+monax chains make $chainName --account-types=Root:2,Full:1 --unsafe
+#pause to allow monax command to finish
+sleep 5
+chain_dir=$HOME/.monax/chains/$chainName
+chain_dir_this=$chain_dir/"${chainName}"_full_000
+#start chain
+monax chains start $chainName --init-dir $chain_dir_this
+sleep 5
+addr=$(cat $chain_dir/addresses.csv | grep "${chainName}"_full_000 | cut -d ',' -f 1)
+echo the chain name is $chainName
+echo the chain address is $addr
+echo the chain directory is $chain_dir
+echo the chain address file is located here $chain_dir_this
+cd ~/.monax/apps/Solidity
+#compile All contract
+monax pkgs do --chain $chainName --address $addr
+sleep 10
+cp ~/.monax/chains/$chainName/accounts.json ~/.monax/apps/configuration_service/configuration_files/accounts.json
+cp ~/.monax/apps/Solidity/jobs_output.json ~/.monax/apps/configuration_service/output_files/jobs_output.json
+cd ~/test
+#edit ErisChainConfig.json by running node
+nodejs > ${chainName} <<EOF
+var fs = require("fs-extra")
+//Read data
+var data = {
+    "chainName": "${chainName}",
+    "primaryAccount":{
+    "address":"" ,
+    "pubKey": "",
+    "privKey":""
+    },
+    "secondaryAccount": {
+    "address": "",
+    "pubKey": "",
+    "privKey":""
+    },
+    "chainURL": "http://BCMonaxApp01:1337/rpc"
+};
+
+var accounts = require(process.env.HOME+"/.monax/chains/${chainName}/accounts.json");
+var global =  require(process.env.HOME+"/.monax/apps/configuration_service/configuration_files/global.json");//assume this file exists
+global["properties"]["primary_account"] = "${chainName}_full_000"
+data["primaryAccount"]["address"] = accounts["${chainName}_full_000"]["address"];
+data["primaryAccount"]["pubKey"] = accounts["${chainName}_full_000"]["pubKey"];
+data["primaryAccount"]["privKey"] = accounts["${chainName}_full_000"]["privKey"];
+data["secondaryAccount"]["address"] = accounts["${chainName}_root_000"]["address"];
+data["secondaryAccount"]["pubKey"] = accounts["${chainName}_root_000"]["pubKey"];
+data["secondaryAccount"]["privKey"] = accounts["${chainName}_root_000"]["privKey"];
+fs.writeFileSync(process.env.HOME+"/.monax/apps/configuration_service/configuration_files/ErisChainConfig.json",JSON.stringify(data))
+fs.writeFileSync(process.env.HOME+"/.monax/apps/configuration_service/configuration_files/global.json",JSON.stringify(global))
+
+EOF
+echo erischainconfig and global json changed
+#run Dao contract in background
+cd ~/.monax/apps/dao/
+nodejs index.js &
+sleep 1
+
+#fill dao with validators
+curl -i -H "Content-Type: application/json" -X POST -d'{"validatorAddr":"0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055", "validatorIP":"10.4.0.207"}' http://localhost:8002/addValidator
+curl -i -H "Content-Type: application/json" -X POST -d'{"validatorAddr":"03683536757fdb821c10810b51caa51a84fc1dfab5c17edbf5246f9713ffe31adf", "validatorIP":"10.4.0.207"}' http://localhost:8002/addValidator
+curl -i -H "Content-Type: application/json" -X POST -d'{"validatorAddr":"03a066efbb37f5fabfab05bf4a65e0dc376d0e3fb1c3d930d7f5ec6da3ac5bc237", "validatorIP":"10.4.0.207"}' http://localhost:8002/addValidator
+#check that the validators are in the dao
+curl http://localhost:8002/getList > validatorlist.txt
+cat validatorlist.txt
+#kill Dao.js process as it is no longer needed
+killall nodejs
+echo program has destroyed everything...this is your fault

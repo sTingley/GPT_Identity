@@ -1,0 +1,20 @@
+{
+  "revokeControlDelegation": "revokeControlDelegation",
+  "spendMyTokens": "spendMyTokens",
+  "myAmount": "myAmount",
+  "delegate": "delegate",
+  "changeTokenController": "changeTokenController",
+  "amountDelegated": "amountDelegated",
+  "addController": "addController",
+  "removeController": "removeController",
+  "offsetControllerTokenQuantity": "offsetControllerTokenQuantity",
+  "myTokenAmount": "myTokenAmount",
+  "addOwner": "addOwner",
+  "removeOwner": "removeOwner",
+  "giveTokens": "giveTokens",
+  "getControllerList": "getControllerList",
+  "getControllerTokens": "getControllerTokens",
+  "addRecoveryID":"addRecoveryID",
+  "removeRecoveryID": "removeRecoveryID",
+  "addUniqueAttributes": "addUniqueAttributes"
+}

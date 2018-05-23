@@ -1,0 +1,127 @@
+#!/bin/bash
+
+# This script was designed to make a chain after you input the chain's name. CAN USE COMMAND: "source chainMakerV2"
+
+#DO NOT RUN THIS UNTIL YOU:
+
+#ENSURE NO OTHER CHAINS ARE RUNNING
+
+#BE AWARE THIS ONLY WORKS FOR GPT
+
+#ACCEPT THAT IF THIS DESTROYS SOMETHING THAT IT IS YOUR FAULT
+
+currentChain=$(monax ls -rf '{{.ShortName}}, {{.Type}}, {{astmonaxk .Info.State.Running}}\t' | egrep ", chain," | cut -d "," -f1)
+
+monax chains stop $currentChain
+
+cd ..
+
+configDir=$(pwd)
+
+export configDir
+
+cd ..
+
+appDir=$(pwd)
+
+#kill all node processes so node services arn't listening to the old chain
+
+#killall nodejs
+
+killall node
+
+# show chains
+
+monax ls
+
+#set variables for making a chain
+
+echo Enter the name of the chain you would like to create
+
+read chainName
+
+#make chain
+
+monax chains make $chainName --account-types=Root:2,Full:1 --unsafe
+
+#pause to allow monax command to finish
+
+sleep 5
+
+chain_dir=$HOME/.monax/chains/$chainName
+
+chain_dir_this=$chain_dir/"${chainName}"_full_000
+
+#start chain
+
+monax chains start $chainName --init-dir $chain_dir_this
+
+sleep 5
+
+addr=$(cat $chain_dir/addresses.csv | grep "${chainName}"_full_000 | cut -d ',' -f 1)
+
+echo the chain name is $chainName
+
+echo the chain address is $addr
+
+echo the chain directory is $chain_dir
+
+echo the chain address file is located here $chain_dir_this
+
+cd $appDir/Solidity
+
+#compile All contract
+
+monax pkgs do --chain $chainName --address $addr
+
+sleep 10
+
+cp ~/.monax/chains/$chainName/accounts.json $configDir/configuration_files/accounts.json
+
+cp $appDir/Solidity/jobs_output.json $configDir/output_files/jobs_output.json
+
+#edit Config files by running node
+
+node > ${chainName} <<EOF
+
+var fs = require("fs-extra")
+
+var global =  require(process.env.configDir+"/configuration_files/global.json");//assume this file exists
+
+global["properties"]["primary_account"] = "${chainName}_full_000"
+
+fs.writeFileSync(process.env.configDir+"/configuration_files/global.json",JSON.stringify(global))
+
+EOF
+
+echo erischainconfig and global json changed
+
+#run Dao contract in background
+
+cd $appDir/dao/
+
+node index.js &
+
+sleep 1
+
+#fill dao with validators
+
+curl -i -H "Content-Type: application/json" -X POST -d'{"validatorAddr":"0373ecbb94edf2f4f6c09f617725e7e2d2b12b3bccccfe9674c527c83f50c89055", "validatorIP":"10.4.0.207"}' http://localhost:8002/addValidator
+
+curl -i -H "Content-Type: application/json" -X POST -d'{"validatorAddr":"03683536757fdb821c10810b51caa51a84fc1dfab5c17edbf5246f9713ffe31adf", "validatorIP":"10.4.0.207"}' http://localhost:8002/addValidator
+
+curl -i -H "Content-Type: application/json" -X POST -d'{"validatorAddr":"03a066efbb37f5fabfab05bf4a65e0dc376d0e3fb1c3d930d7f5ec6da3ac5bc237", "validatorIP":"10.4.0.207"}' http://localhost:8002/addValidator
+
+#check that the validators are in the dao
+
+curl http://localhost:8002/getList > validatorlist.txt
+
+cat validatorlist.txt
+
+#kill Dao.js process as it is no longer needed
+
+#killall nodejs
+
+killall node
+
+echo program has destroyed everything...this is your fault

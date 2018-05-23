@@ -1,0 +1,11 @@
+{
+  "name": "configuration_service_helper",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "NONE",
+  "private": true,
+  "dependencies": {
+    "promisify": "^0.0.3",
+    "request": "^2.83.0"
+  }
+}
